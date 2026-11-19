@@ -154,6 +154,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <span>⭐</span> Revision Notebook
                     </button>
 
+                    {user.role === 'admin' && (
+                      <button
+                        type="button"
+                        onClick={() => { setUserDropdownOpen(false); onNavigate?.('#/admin') || (window.location.hash = '#/admin'); }}
+                        className="w-full flex items-center gap-2 p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-left transition-colors"
+                      >
+                        <span>🛡️</span> Admin Panel
+                      </button>
+                    )}
+
                     <div className="border-t border-slate-100 dark:border-zinc-800/80 pt-1">
                       <button
                         type="button"
@@ -220,6 +230,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <p className="font-bold text-slate-900 dark:text-zinc-100">{user.name}</p>
                     <p className="text-[11px] text-slate-500">{user.email}</p>
                   </div>
+                  {user.role === 'admin' && (
+                    <button
+                      type="button"
+                      onClick={() => { setMobileMenuOpen(false); onNavigate?.('#/admin') || (window.location.hash = '#/admin'); }}
+                      className="w-full py-2.5 px-3 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold text-xs text-left flex items-center gap-2"
+                    >
+                      <span>🛡️</span> Admin Dashboard
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => { setMobileMenuOpen(false); logOut(); window.location.hash = '#/'; }}

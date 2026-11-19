@@ -1,6 +1,42 @@
+// ==============================================================================
+// NelovMallickIITD CBT Platform - Unified Auth & Storage Engine (Browser Runtime)
+// Supports Supabase Cloud Sync (Email + Google OAuth) & Robust Local Fallback
+// Mentored by Nelov Mallick (IIT Delhi) · 100% Free Forever
+// ==============================================================================
+
 (function() {
   const USERS_KEY = 'nelov_users_store';
   const SESSION_KEY = 'nelov_active_session';
+  const REDIRECT_KEY = 'nelov_auth_redirect';
+  const ERROR_REPORTS_KEY = 'nelov_error_reports';
+  const TEST_CONFIGS_OVERRIDE_KEY = 'nelov_test_configs_overrides';
+
+  // Environment detection
+  const envUrl = (window.__ENV__ && window.__ENV__.VITE_SUPABASE_URL) || localStorage.getItem('VITE_SUPABASE_URL') || '';
+  const envAnonKey = (window.__ENV__ && window.__ENV__.VITE_SUPABASE_ANON_KEY) || localStorage.getItem('VITE_SUPABASE_ANON_KEY') || '';
+
+  const isConfigured = Boolean(
+    envUrl &&
+    envAnonKey &&
+    !envUrl.includes('your-project') &&
+    !envAnonKey.includes('your-anon-key')
+  );
+
+  let supabaseClient = null;
+  if (isConfigured && window.supabase && window.supabase.createClient) {
+    try {
+      supabaseClient = window.supabase.createClient(envUrl, envAnonKey, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+          storageKey: 'nelov_supabase_auth_token'
+        }
+      });
+    } catch (e) {
+      console.warn('Failed to initialize browser Supabase client:', e);
+    }
+  }
 
   async function hashPassword(password) {
     if (window.crypto && window.crypto.subtle) {
@@ -37,7 +73,18 @@
     } catch (e) {}
   }
 
+  // ============================================================================
+  // AUTH SERVICE
+  // ============================================================================
   window.authService = {
+    isCloudConnected() {
+      return Boolean(isConfigured && supabaseClient);
+    },
+
+    getSupabaseClient() {
+      return supabaseClient;
+    },
+
     async signUp({ name, email, password, targetExam }) {
       const trimmedEmail = (email || '').trim().toLowerCase();
       const trimmedName = (name || '').trim();
@@ -50,17 +97,52 @@
         throw new Error('Password must be at least 6 characters long.');
       }
 
+      // 1. Supabase Cloud Auth
+      if (this.isCloudConnected()) {
+        const { data, error } = await supabaseClient.auth.signUp({
+          email: trimmedEmail,
+          password,
+          options: {
+            data: {
+              full_name: trimmedName,
+              target_exam: targetExam || 'JEE Advanced'
+            }
+          }
+        });
+
+        if (error) throw new Error(error.message);
+        if (!data.user) throw new Error('Registration failed. Please try again.');
+
+        const cleanUser = {
+          id: data.user.id,
+          name: trimmedName,
+          email: trimmedEmail,
+          targetExam: targetExam || 'JEE Advanced',
+          role: 'student',
+          createdAt: data.user.created_at || new Date().toISOString()
+        };
+        this.setActiveSession(cleanUser);
+        return cleanUser;
+      }
+
+      // 2. Local Fallback Mode
       const users = getStoredUsers();
       if (users.some(u => u.email === trimmedEmail)) {
         throw new Error('An account with this email already exists. Please log in.');
       }
 
       const passwordHash = await hashPassword(password);
+      // Auto-assign admin role to the first user or if email contains 'admin' or 'nelov' for easy test access
+      const isFirst = users.length === 0;
+      const isAdminEmail = trimmedEmail.includes('admin') || trimmedEmail.includes('nelov');
+      const role = (isFirst || isAdminEmail) ? 'admin' : 'student';
+
       const newUser = {
         id: 'usr_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
         name: trimmedName,
         email: trimmedEmail,
         targetExam: targetExam || 'JEE Advanced',
+        role,
         createdAt: new Date().toISOString(),
         passwordHash
       };
@@ -73,6 +155,7 @@
         name: newUser.name,
         email: newUser.email,
         targetExam: newUser.targetExam,
+        role: newUser.role,
         createdAt: newUser.createdAt
       };
       this.setActiveSession(cleanUser);
@@ -85,6 +168,47 @@
         throw new Error('Please provide both email and password.');
       }
 
+      // 1. Supabase Cloud Auth
+      if (this.isCloudConnected()) {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: trimmedEmail,
+          password
+        });
+
+        if (error) throw new Error(error.message);
+        if (!data.user) throw new Error('Invalid email or password.');
+
+        let role = 'student';
+        let fullName = data.user.user_metadata?.full_name || trimmedEmail.split('@')[0];
+        let targetExam = data.user.user_metadata?.target_exam || 'JEE Advanced';
+
+        try {
+          const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('full_name, target_exam, role')
+            .eq('id', data.user.id)
+            .single();
+
+          if (profile) {
+            if (profile.role === 'admin') role = 'admin';
+            if (profile.full_name) fullName = profile.full_name;
+            if (profile.target_exam) targetExam = profile.target_exam;
+          }
+        } catch (e) {}
+
+        const cleanUser = {
+          id: data.user.id,
+          name: fullName,
+          email: trimmedEmail,
+          targetExam,
+          role,
+          createdAt: data.user.created_at || new Date().toISOString()
+        };
+        this.setActiveSession(cleanUser);
+        return cleanUser;
+      }
+
+      // 2. Local Fallback Mode
       const users = getStoredUsers();
       const user = users.find(u => u.email === trimmedEmail);
       if (!user) {
@@ -101,10 +225,57 @@
         name: user.name,
         email: user.email,
         targetExam: user.targetExam,
+        role: user.role || 'student',
         createdAt: user.createdAt
       };
       this.setActiveSession(cleanUser);
       return cleanUser;
+    },
+
+    async signInWithGoogle(redirectTo) {
+      const destination = redirectTo || window.location.hash || '#/';
+      sessionStorage.setItem(REDIRECT_KEY, destination);
+
+      if (this.isCloudConnected()) {
+        const redirectUrl = window.location.origin + window.location.pathname;
+        const { error } = await supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: redirectUrl
+          }
+        });
+        if (error) throw new Error(error.message);
+      } else {
+        // Fast local mock for Google login in offline test mode
+        const googleUser = {
+          id: 'usr_g_' + Date.now().toString(36),
+          name: 'Aspirant Google User',
+          email: 'aspirant.google@example.com',
+          targetExam: 'JEE Advanced',
+          role: 'student',
+          createdAt: new Date().toISOString()
+        };
+        this.setActiveSession(googleUser);
+        window.location.hash = destination;
+      }
+    },
+
+    async resetPassword(email) {
+      const trimmedEmail = (email || '').trim().toLowerCase();
+      if (!trimmedEmail) throw new Error('Please enter your email.');
+
+      if (this.isCloudConnected()) {
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(trimmedEmail, {
+          redirectTo: window.location.origin + '#/login'
+        });
+        if (error) throw new Error(error.message);
+        return;
+      }
+
+      const users = getStoredUsers();
+      if (!users.some(u => u.email === trimmedEmail)) {
+        throw new Error('No registered account found with this email.');
+      }
     },
 
     getCurrentUser() {
@@ -116,37 +287,60 @@
       }
     },
 
+    isAdmin() {
+      const user = this.getCurrentUser();
+      return Boolean(user && user.role === 'admin');
+    },
+
+    setUserRole(userId, role) {
+      const current = this.getCurrentUser();
+      if (current && current.id === userId) {
+        current.role = role;
+        this.setActiveSession(current);
+      }
+      const users = getStoredUsers();
+      const idx = users.findIndex(u => u.id === userId);
+      if (idx !== -1) {
+        users[idx].role = role;
+        saveStoredUsers(users);
+      }
+    },
+
+    getAllUsers() {
+      return getStoredUsers().map(u => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        targetExam: u.targetExam,
+        role: u.role || 'student',
+        createdAt: u.createdAt
+      }));
+    },
+
     setActiveSession(user) {
       try {
         localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+        window.dispatchEvent(new CustomEvent('nelov_auth_changed', { detail: { user } }));
       } catch (e) {}
     },
 
-    logOut() {
+    async logOut() {
+      if (this.isCloudConnected()) {
+        try {
+          await supabaseClient.auth.signOut();
+        } catch (e) {}
+      }
       try {
         localStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(REDIRECT_KEY);
+        window.dispatchEvent(new CustomEvent('nelov_auth_changed', { detail: { user: null } }));
       } catch (e) {}
-    },
-
-    async resetPassword(email, newPassword) {
-      const trimmedEmail = (email || '').trim().toLowerCase();
-      if (!newPassword || newPassword.length < 6) {
-        throw new Error('New password must be at least 6 characters long.');
-      }
-
-      const users = getStoredUsers();
-      const idx = users.findIndex(u => u.email === trimmedEmail);
-      if (idx === -1) {
-        throw new Error('No registered account found with this email.');
-      }
-
-      users[idx].passwordHash = await hashPassword(newPassword);
-      saveStoredUsers(users);
-      return true;
     }
   };
 
-  // Student storage scoped per user ID
+  // ============================================================================
+  // STUDENT STORAGE & CLOUD SYNC
+  // ============================================================================
   window.studentStorage = {
     saveSession(userId, testId, sessionData) {
       if (!userId || !testId) return;
@@ -172,13 +366,45 @@
       } catch (e) {}
     },
 
-    saveAttempt(userId, attemptRecord) {
+    async saveAttempt(userId, attemptRecord) {
       if (!userId) return;
+
+      // 1. Save to local storage cache immediately
       try {
         const attempts = this.getAttempts(userId);
-        attempts.unshift(attemptRecord);
+        const idx = attempts.findIndex(a => a.id === attemptRecord.id);
+        if (idx !== -1) {
+          attempts[idx] = attemptRecord;
+        } else {
+          attempts.unshift(attemptRecord);
+        }
         localStorage.setItem(`nelov_${userId}_attempts`, JSON.stringify(attempts));
       } catch (e) {}
+
+      // 2. Cloud sync to Supabase
+      if (window.authService.isCloudConnected()) {
+        try {
+          await supabaseClient.from('test_attempts').insert({
+            id: attemptRecord.id,
+            user_id: userId,
+            test_id: attemptRecord.testId,
+            exam_type: attemptRecord.examType,
+            code: attemptRecord.testCode,
+            obtained_marks: attemptRecord.totalMarksScored,
+            total_marks: attemptRecord.totalMaxMarks,
+            percentage: attemptRecord.percentage,
+            accuracy: attemptRecord.accuracy,
+            estimated_rank_label: attemptRecord.predictedAirDisplay || 'AIR Qualified',
+            subject_breakdown: attemptRecord.subjectStats || {},
+            responses: attemptRecord.responses || {},
+            time_per_question: attemptRecord.timePerQuestion || {},
+            mistake_tags: attemptRecord.mistakeTags || {},
+            submitted_at: attemptRecord.completedAt || new Date().toISOString()
+          });
+        } catch (err) {
+          console.warn('[Supabase] Failed to sync attempt:', err);
+        }
+      }
     },
 
     getAttempts(userId) {
@@ -191,6 +417,58 @@
       }
     },
 
+    getAllAttempts() {
+      // Admin inspection across all users
+      const all = [];
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('nelov_') && key.endsWith('_attempts')) {
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
+            all.push(...list);
+          }
+        }
+      } catch (e) {}
+      return all.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
+    },
+
+    async fetchAttemptsFromCloud(userId) {
+      if (!userId) return [];
+      if (!window.authService.isCloudConnected()) {
+        return this.getAttempts(userId);
+      }
+      try {
+        const { data, error } = await supabaseClient
+          .from('test_attempts')
+          .select('*')
+          .eq('user_id', userId)
+          .order('submitted_at', { ascending: false });
+
+        if (!error && data) {
+          const records = data.map(d => ({
+            id: d.id,
+            testId: d.test_id,
+            testCode: d.code,
+            testTitle: `${d.exam_type} – ${d.code} Mock Test`,
+            examType: d.exam_type,
+            totalMarksScored: Number(d.obtained_marks),
+            totalMaxMarks: Number(d.total_marks),
+            percentage: Number(d.percentage),
+            accuracy: Number(d.accuracy),
+            predictedAirDisplay: d.estimated_rank_label,
+            completedAt: d.submitted_at,
+            subjectStats: d.subject_breakdown,
+            responses: d.responses,
+            timePerQuestion: d.time_per_question,
+            mistakeTags: d.mistake_tags
+          }));
+          localStorage.setItem(`nelov_${userId}_attempts`, JSON.stringify(records));
+          return records;
+        }
+      } catch (e) {}
+      return this.getAttempts(userId);
+    },
+
     getBookmarks(userId) {
       if (!userId) return [];
       try {
@@ -201,40 +479,256 @@
       }
     },
 
-    toggleBookmark(userId, item) {
-      if (!userId) return false;
-      try {
-        const bookmarks = this.getBookmarks(userId);
-        const idx = bookmarks.findIndex(b => b.id === item.id);
-        if (idx !== -1) {
-          bookmarks.splice(idx, 1);
-          localStorage.setItem(`nelov_${userId}_bookmarks`, JSON.stringify(bookmarks));
-          return false;
-        } else {
-          bookmarks.unshift({ ...item, userId, addedAt: new Date().toISOString() });
-          localStorage.setItem(`nelov_${userId}_bookmarks`, JSON.stringify(bookmarks));
-          return true;
+    async toggleBookmark(userId, question) {
+      if (!userId || !question) return false;
+      const testId = question.testId || 'jee-advanced-pta-04';
+      const uniqueKey = question.uniqueKey || `${testId}_${question.id}`;
+      const bookmarks = this.getBookmarks(userId);
+      const idx = bookmarks.findIndex(b => b.uniqueKey === uniqueKey);
+
+      let isNowBookmarked = false;
+      if (idx !== -1) {
+        bookmarks.splice(idx, 1);
+        isNowBookmarked = false;
+
+        if (window.authService.isCloudConnected()) {
+          try {
+            await supabaseClient
+              .from('bookmarks')
+              .delete()
+              .match({ user_id: userId, test_id: testId, question_id: String(question.id) });
+          } catch (e) {}
         }
-      } catch (e) {
-        return false;
+      } else {
+        const newBookmark = {
+          id: question.id,
+          uniqueKey,
+          testId,
+          testCode: question.testCode || 'PTA 04',
+          subject: question.subject || 'General',
+          section: question.section || '',
+          type: question.type || 'Single Correct',
+          question: question.question || '',
+          images: question.images || [],
+          options: question.options || [],
+          answer: question.answer,
+          explanation: question.explanation || '',
+          solution: question.solution || question.explanation || '',
+          addedAt: new Date().toISOString(),
+          mistakeTag: question.mistakeTag,
+          personalNote: question.personalNote
+        };
+        bookmarks.unshift(newBookmark);
+        isNowBookmarked = true;
+
+        if (window.authService.isCloudConnected()) {
+          try {
+            await supabaseClient.from('bookmarks').upsert({
+              user_id: userId,
+              test_id: testId,
+              question_id: String(question.id),
+              exam_type: question.examType || 'JEE Advanced',
+              subject: question.subject || 'General',
+              question_type: question.type || 'Single Correct',
+              mistake_tag: question.mistakeTag || null,
+              personal_note: question.personalNote || null,
+              created_at: new Date().toISOString()
+            });
+          } catch (e) {}
+        }
+      }
+
+      try {
+        localStorage.setItem(`nelov_${userId}_bookmarks`, JSON.stringify(bookmarks));
+      } catch (e) {}
+      return isNowBookmarked;
+    },
+
+    async updateMistakeTag(userId, uniqueKey, tag, personalNote) {
+      if (!userId || !uniqueKey) return;
+      const bookmarks = this.getBookmarks(userId);
+      const item = bookmarks.find(b => b.uniqueKey === uniqueKey);
+      if (item) {
+        item.mistakeTag = tag;
+        if (personalNote !== undefined) item.personalNote = personalNote;
+        try {
+          localStorage.setItem(`nelov_${userId}_bookmarks`, JSON.stringify(bookmarks));
+        } catch (e) {}
+
+        if (window.authService.isCloudConnected()) {
+          try {
+            await supabaseClient
+              .from('bookmarks')
+              .update({
+                mistake_tag: tag,
+                personal_note: personalNote || item.personalNote
+              })
+              .match({ user_id: userId, test_id: item.testId, question_id: String(item.id) });
+          } catch (e) {}
+        }
       }
     },
 
-    isBookmarked(userId, bookmarkId) {
-      if (!userId) return false;
-      const bookmarks = this.getBookmarks(userId);
-      return bookmarks.some(b => b.id === bookmarkId || b.uniqueKey === bookmarkId);
+    // --------------------------------------------------------------------------
+    // ERROR REPORTS WORKFLOW
+    // --------------------------------------------------------------------------
+    async submitErrorReport(report) {
+      const item = {
+        id: 'rep_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+        userId: report.userId || null,
+        reporterName: report.reporterName || 'Anonymous Aspirant',
+        reporterEmail: report.reporterEmail || '',
+        testId: report.testId || '',
+        examType: report.examType || '',
+        testCode: report.testCode || '',
+        questionId: String(report.questionId || ''),
+        questionNumber: Number(report.questionNumber || 1),
+        issueType: report.issueType || 'other',
+        description: report.description || '',
+        status: 'open',
+        adminNote: '',
+        createdAt: new Date().toISOString()
+      };
+
+      if (window.authService.isCloudConnected()) {
+        try {
+          await supabaseClient.from('error_reports').insert({
+            user_id: item.userId,
+            reporter_name: item.reporterName,
+            reporter_email: item.reporterEmail,
+            test_id: item.testId,
+            exam_type: item.examType,
+            test_code: item.testCode,
+            question_id: item.questionId,
+            question_number: item.questionNumber,
+            issue_type: item.issueType,
+            description: item.description,
+            status: 'open',
+            created_at: item.createdAt
+          });
+        } catch (e) {
+          console.warn('Failed to insert error report in cloud:', e);
+        }
+      }
+
+      try {
+        const raw = localStorage.getItem(ERROR_REPORTS_KEY);
+        const list = raw ? JSON.parse(raw) : [];
+        list.unshift(item);
+        localStorage.setItem(ERROR_REPORTS_KEY, JSON.stringify(list));
+      } catch (e) {}
+
+      return item;
     },
 
-    updateMistakeTag(userId, bookmarkId, tag) {
-      if (!userId) return;
+    async getAllErrorReports() {
+      if (window.authService.isCloudConnected()) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('error_reports')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+          if (!error && data) {
+            return data.map(d => ({
+              id: d.id,
+              userId: d.user_id,
+              reporterName: d.reporter_name,
+              reporterEmail: d.reporter_email,
+              testId: d.test_id,
+              examType: d.exam_type,
+              testCode: d.test_code,
+              questionId: d.question_id,
+              questionNumber: d.question_number,
+              issueType: d.issue_type,
+              description: d.description,
+              status: d.status,
+              adminNote: d.admin_note,
+              createdAt: d.created_at
+            }));
+          }
+        } catch (e) {}
+      }
+
       try {
-        const bookmarks = this.getBookmarks(userId);
-        const target = bookmarks.find(b => b.id === bookmarkId || b.uniqueKey === bookmarkId);
-        if (target) {
-          target.mistakeTag = tag;
-          localStorage.setItem(`nelov_${userId}_bookmarks`, JSON.stringify(bookmarks));
+        const raw = localStorage.getItem(ERROR_REPORTS_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    },
+
+    async updateErrorReportStatus(reportId, status, adminNote) {
+      if (window.authService.isCloudConnected()) {
+        try {
+          await supabaseClient
+            .from('error_reports')
+            .update({
+              status,
+              admin_note: adminNote
+            })
+            .eq('id', reportId);
+        } catch (e) {}
+      }
+
+      try {
+        const raw = localStorage.getItem(ERROR_REPORTS_KEY);
+        const list = raw ? JSON.parse(raw) : [];
+        const item = list.find(r => r.id === reportId);
+        if (item) {
+          item.status = status;
+          if (adminNote !== undefined) item.adminNote = adminNote;
+          localStorage.setItem(ERROR_REPORTS_KEY, JSON.stringify(list));
         }
+      } catch (e) {}
+    },
+
+    // --------------------------------------------------------------------------
+    // DYNAMIC TEST CONFIGS
+    // --------------------------------------------------------------------------
+    async getTestConfigs() {
+      const defaults = {
+        'jee-advanced-pta-04': 'live',
+        'jee-advanced-pta-05': 'live'
+      };
+
+      if (window.authService.isCloudConnected()) {
+        try {
+          const { data, error } = await supabaseClient.from('test_configs').select('test_id, status');
+          if (!error && data) {
+            const map = {};
+            data.forEach(r => { map[r.test_id] = r.status; });
+            return map;
+          }
+        } catch (e) {}
+      }
+
+      try {
+        const local = localStorage.getItem(TEST_CONFIGS_OVERRIDE_KEY);
+        if (local) {
+          return { ...defaults, ...JSON.parse(local) };
+        }
+      } catch (e) {}
+
+      return defaults;
+    },
+
+    async updateTestConfigStatus(testId, status) {
+      if (window.authService.isCloudConnected()) {
+        try {
+          await supabaseClient
+            .from('test_configs')
+            .update({ status, updated_at: new Date().toISOString() })
+            .eq('test_id', testId);
+        } catch (e) {}
+      }
+
+      try {
+        const local = localStorage.getItem(TEST_CONFIGS_OVERRIDE_KEY);
+        const cur = local ? JSON.parse(local) : {};
+        cur[testId] = status;
+        localStorage.setItem(TEST_CONFIGS_OVERRIDE_KEY, JSON.stringify(cur));
+        window.dispatchEvent(new CustomEvent('nelov_test_configs_changed', { detail: { testId, status } }));
       } catch (e) {}
     },
 
@@ -247,25 +741,48 @@
           bestScorePct: 0,
           totalQuestionsAttempted: 0,
           overallAccuracy: 0,
-          recentPredictedAir: 'Not Attempted Yet'
+          recentPredictedAir: 'Not Available'
         };
       }
-      const totalTests = attempts.length;
-      const totalScorePct = attempts.reduce((acc, a) => acc + (a.percentage || 0), 0);
-      const averageScorePct = Math.round(totalScorePct / totalTests);
-      const bestScorePct = Math.max(...attempts.map(a => a.percentage || 0));
-      const totalQuestionsAttempted = attempts.reduce((acc, a) => acc + (a.attemptedCount || 0), 0);
-      const totalCorrect = attempts.reduce((acc, a) => acc + (a.correctCount || 0) + (a.partialCount || 0), 0);
-      const overallAccuracy = totalQuestionsAttempted > 0 ? Math.round((totalCorrect / totalQuestionsAttempted) * 100) : 0;
-      const recentPredictedAir = attempts[0].predictedAirDisplay || 'N/A';
+
+      const totalPct = attempts.reduce((acc, a) => acc + (a.percentage || 0), 0);
+      const bestPct = Math.max(...attempts.map(a => a.percentage || 0));
+      const totalAttemptedQuestions = attempts.reduce((acc, a) => acc + (a.attemptedCount || 0), 0);
+      const avgAccuracy = Math.round(attempts.reduce((acc, a) => acc + (a.accuracy || 0), 0) / attempts.length);
+
       return {
-        totalTests,
-        averageScorePct,
-        bestScorePct,
-        totalQuestionsAttempted,
-        overallAccuracy,
-        recentPredictedAir
+        totalTests: attempts.length,
+        averageScorePct: Math.round(totalPct / attempts.length),
+        bestScorePct: Math.round(bestPct),
+        totalQuestionsAttempted: totalAttemptedQuestions,
+        overallAccuracy: avgAccuracy,
+        recentPredictedAir: attempts[0]?.predictedAirDisplay || 'Qualified'
       };
     }
   };
+
+  // Listen for Supabase session changes if initialized
+  if (supabaseClient) {
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session && session.user) {
+        const user = {
+          id: session.user.id,
+          name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+          email: session.user.email,
+          targetExam: session.user.user_metadata?.target_exam || 'JEE Advanced',
+          role: 'student',
+          createdAt: session.user.created_at
+        };
+        window.authService.setActiveSession(user);
+
+        const saved = sessionStorage.getItem(REDIRECT_KEY);
+        if (saved) {
+          sessionStorage.removeItem(REDIRECT_KEY);
+          window.location.hash = saved;
+        }
+      } else if (event === 'SIGNED_OUT') {
+        window.authService.logOut();
+      }
+    });
+  }
 })();
