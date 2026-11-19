@@ -45,3 +45,6 @@ Thumbs.db
 .system_generated/
 browser_evidence/
 scratch/
+
+.vercel
+.env*
