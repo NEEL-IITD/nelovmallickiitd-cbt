@@ -12,7 +12,7 @@ export const RevisionNotebook: React.FC = () => {
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [selectedTag, setSelectedTag] = useState<string>('all');
 
-  const mistakeTags: BookmarkedQuestion['mistakeTag'][] = [
+  const mistakeTags: string[] = [
     'Calculation Error',
     'Conceptual Gap',
     'Misread Question',
@@ -25,8 +25,8 @@ export const RevisionNotebook: React.FC = () => {
     setBookmarks(studentStorage.getBookmarks(user.id));
   };
 
-  const handleTagChange = (uniqueKey: string, tag: BookmarkedQuestion['mistakeTag']) => {
-    studentStorage.updateMistakeTag(user.id, uniqueKey, tag);
+  const handleTagChange = (uniqueKey: string, tag: any) => {
+    studentStorage.updateMistakeTag(user.id, uniqueKey, tag || '');
     setBookmarks(studentStorage.getBookmarks(user.id));
   };
 

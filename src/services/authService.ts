@@ -6,6 +6,7 @@
 
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { User, TargetExam, UserRole } from '../types';
+export type { User, TargetExam, UserRole };
 
 export interface StoredUser extends User {
   passwordHash: string;

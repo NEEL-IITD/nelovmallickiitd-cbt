@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { allChapters, ChapterPlaylist, YOUTUBE_CHANNEL_URL } from '../data/lectures/lecturesIndex';
+import { allChapters, YOUTUBE_CHANNEL_URL } from '../data/lectures/lecturesIndex';
 import { Tilt3DCard } from './ui/Tilt3DCard';
 
 interface LecturesSectionProps {

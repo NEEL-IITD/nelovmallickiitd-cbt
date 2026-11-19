@@ -1,4 +1,4 @@
-export type ExamType = 'jee' | 'neet';
+export type ExamType = 'jee' | 'neet' | 'JEE Mains' | 'JEE Advanced';
 
 export type TargetExam = 'JEE Mains' | 'JEE Advanced' | 'Both';
 export type UserRole = 'student' | 'admin';

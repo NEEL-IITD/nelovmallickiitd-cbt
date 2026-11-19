@@ -4,13 +4,12 @@ import { MockTestPreview } from './MockTestPreview';
 
 interface HeroProps {
   exam: ExamType;
-  onOpenAuth: (title?: string) => void;
+  onOpenAuth?: (title?: string) => void;
   onOpenQuestionPaper?: () => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
   exam,
-  onOpenAuth,
   onOpenQuestionPaper,
 }) => {
   return (

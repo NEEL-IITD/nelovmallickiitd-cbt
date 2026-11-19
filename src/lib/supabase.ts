@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 // ==============================================================================
 // NelovMallickIITD CBT Platform - Supabase Client Interface
 // Mentored by Nelov Mallick (IIT Delhi) · 100% Free Forever

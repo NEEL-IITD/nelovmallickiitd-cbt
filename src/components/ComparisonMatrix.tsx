@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExamType } from '../types';
+import { ExamType, ComparisonRow } from '../types';
 import { comparisonRows } from '../data/siteData';
 
 interface ComparisonMatrixProps {
@@ -48,7 +48,7 @@ export const ComparisonMatrix: React.FC<ComparisonMatrixProps> = ({ exam }) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60 text-xs sm:text-sm">
-              {rows.map((row, idx) => (
+              {rows.map((row: ComparisonRow, idx: number) => (
                 <tr
                   key={idx}
                   className={`hover:bg-slate-50/80 dark:hover:bg-zinc-800/30 transition-colors ${

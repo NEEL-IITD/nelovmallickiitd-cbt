@@ -5,7 +5,7 @@ import { Tilt3DCard } from './ui/Tilt3DCard';
 
 interface ResourcesProps {
   exam: ExamType;
-  onOpenAuth: (title?: string) => void;
+  onOpenAuth?: (title?: string) => void;
   onOpenResource?: (resource: StudyResource) => void;
 }
 
@@ -198,7 +198,7 @@ export const Resources: React.FC<ResourcesProps> = ({ exam, onOpenAuth, onOpenRe
                       if (onOpenResource) {
                         onOpenResource(item);
                       } else {
-                        onOpenAuth(`Access ${item.title}`);
+                        onOpenAuth?.(`Access ${item.title}`);
                       }
                     }}
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/70 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold transition-all shadow-sm"

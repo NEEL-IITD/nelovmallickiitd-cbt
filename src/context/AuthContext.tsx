@@ -119,16 +119,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           let targetExam = session.user.user_metadata?.target_exam || 'JEE Advanced';
 
           try {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('full_name, target_exam, role')
-              .eq('id', session.user.id)
-              .single();
+            if (supabase) {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('full_name, target_exam, role')
+                .eq('id', session.user.id)
+                .single();
 
-            if (profile) {
-              if (profile.role === 'admin') role = 'admin';
-              if (profile.full_name) fullName = profile.full_name;
-              if (profile.target_exam) targetExam = profile.target_exam;
+              if (profile) {
+                if (profile.role === 'admin') role = 'admin';
+                if (profile.full_name) fullName = profile.full_name;
+                if (profile.target_exam) targetExam = profile.target_exam;
+              }
             }
           } catch (err) {}
 

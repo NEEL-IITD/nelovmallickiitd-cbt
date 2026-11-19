@@ -1,3 +1,5 @@
+import { ComparisonRow } from '../types';
+
 export interface LiveTestInfo {
   id: string;
   code: string;
@@ -167,4 +169,13 @@ export const faqsData = [
     question: "Can I review solutions and my score report after submitting?",
     answer: "Yes. Immediately upon submitting, you receive a full diagnostic scorecard showing total marks, subject-wise scores, accuracy percentage, time spent, and a complete question-by-question review with correct answers and step-by-step explanations."
   }
+];
+
+export const comparisonRows = (_exam?: any): ComparisonRow[] => [
+  { feature: "Full CBT Screen & Palette Simulation", otherCreators: false, otherCoaching: true, ourPlatform: true },
+  { feature: "100% Free Full Syllabus Tests (PTA 01–10)", otherCreators: false, otherCoaching: false, ourPlatform: true },
+  { feature: "Exact Partial Marking & Negative Marking", otherCreators: false, otherCoaching: true, ourPlatform: true },
+  { feature: "Step-by-step KaTeX LaTeX Solutions", otherCreators: false, otherCoaching: false, ourPlatform: true },
+  { feature: "Instant Projected AIR & Error Diagnosis", otherCreators: false, otherCoaching: false, ourPlatform: true },
+  { feature: "Zero Paywalls, Ads, or Upsells", otherCreators: false, otherCoaching: false, ourPlatform: true },
 ];

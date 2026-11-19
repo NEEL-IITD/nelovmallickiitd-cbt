@@ -7,11 +7,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { studentStorage } from '../utils/studentStorage';
-import { authService } from '../services/authService';
 import { ErrorReportItem, ErrorReportStatus } from '../types';
 
 export const AdminDashboard: React.FC = () => {
-  const { user, isCloudConnected } = useAuth();
+  const { isCloudConnected } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'tests' | 'reports' | 'students'>('overview');
 
   // Test configs state
@@ -233,6 +232,9 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Main Tab Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        {loading && (
+          <div className="py-4 text-center text-xs font-bold text-slate-400 animate-pulse">Syncing admin data...</div>
+        )}
         
         {/* TAB 1: OVERVIEW */}
         {activeTab === 'overview' && (

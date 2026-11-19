@@ -3,7 +3,7 @@ import { ExamType } from '../types';
 
 interface FooterProps {
   exam: ExamType;
-  onOpenAuth: (title?: string) => void;
+  onOpenAuth?: (title?: string) => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ exam, onOpenAuth }) => {
@@ -47,7 +47,7 @@ export const Footer: React.FC<FooterProps> = ({ exam, onOpenAuth }) => {
             <ul className="space-y-2">
               <li>
                 <button
-                  onClick={() => onOpenAuth('Access Dashboard')}
+                  onClick={() => onOpenAuth?.('Access Dashboard')}
                   className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
                   Student Dashboard
@@ -55,7 +55,7 @@ export const Footer: React.FC<FooterProps> = ({ exam, onOpenAuth }) => {
               </li>
               <li>
                 <button
-                  onClick={() => onOpenAuth('Practice Mode')}
+                  onClick={() => onOpenAuth?.('Practice Mode')}
                   className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
                   Timed Practice Drills
@@ -63,7 +63,7 @@ export const Footer: React.FC<FooterProps> = ({ exam, onOpenAuth }) => {
               </li>
               <li>
                 <button
-                  onClick={() => onOpenAuth('PYQ Analysis')}
+                  onClick={() => onOpenAuth?.('PYQ Analysis')}
                   className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
                   PYQ Question Bank
@@ -71,7 +71,7 @@ export const Footer: React.FC<FooterProps> = ({ exam, onOpenAuth }) => {
               </li>
               <li>
                 <button
-                  onClick={() => onOpenAuth('Formula Book')}
+                  onClick={() => onOpenAuth?.('Formula Book')}
                   className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
                   70+ Formula Sheets

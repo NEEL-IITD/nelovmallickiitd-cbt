@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { allChapters, ChapterPlaylist, YOUTUBE_CHANNEL_URL, YOUTUBE_CHANNEL_ID } from '../data/lectures/lecturesIndex';
+import { allChapters, YOUTUBE_CHANNEL_URL, YOUTUBE_CHANNEL_ID } from '../data/lectures/lecturesIndex';
 import { Tilt3DCard } from './ui/Tilt3DCard';
 import { studentStorage } from '../utils/studentStorage';
 

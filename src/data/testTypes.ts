@@ -1,5 +1,5 @@
 export type ExamCategory = 'jee-mains' | 'jee-advanced';
-export type ExamType = 'JEE Mains' | 'JEE Advanced';
+export type ExamType = 'jee' | 'neet' | 'JEE Mains' | 'JEE Advanced';
 export type TestStatus = 'live' | 'coming_soon';
 export type QuestionType = 'single_correct' | 'multiple_correct' | 'numerical' | 'integer' | 'matching_list' | 'comprehension';
 
@@ -10,7 +10,8 @@ export interface QuestionOption {
 }
 
 export interface MatchingListItem {
-  label: string; // "P", "Q", "R", "S" or "1", "2", "3", "4"
+  label?: string; // "P", "Q", "R", "S" or "1", "2", "3", "4"
+  key?: string;
   text: string;
   image?: string;
 }
@@ -23,7 +24,7 @@ export interface MatchingList {
 export interface QuestionMarking {
   positive: number;
   negative: number;
-  partial?: boolean;
+  partial?: boolean | number;
 }
 
 export interface Question {
@@ -31,6 +32,7 @@ export interface Question {
   subject: 'Mathematics' | 'Physics' | 'Chemistry';
   section: string;
   sectionInstruction?: string;
+  paragraph?: string;
   type: QuestionType;
   marking: QuestionMarking;
   question: string;

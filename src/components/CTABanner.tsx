@@ -2,11 +2,11 @@ import React from 'react';
 import { ExamType } from '../types';
 
 interface CTABannerProps {
-  exam: ExamType;
-  onOpenAuth: (title?: string) => void;
+  exam?: ExamType;
+  onOpenAuth?: (title?: string) => void;
 }
 
-export const CTABanner: React.FC<CTABannerProps> = ({ exam }) => {
+export const CTABanner: React.FC<CTABannerProps> = ({ onOpenAuth: _onOpenAuth }) => {
   return (
     <section className="py-16 sm:py-24 relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">

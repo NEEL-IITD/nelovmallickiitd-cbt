@@ -113,7 +113,7 @@ export const LecturePlayer: React.FC<LecturePlayerProps> = ({
       chapter.slug,
       currentLecture.videoId,
       currentLecture.lectureNumber,
-      isCompleted,
+      Boolean(isCompleted),
       personalNote
     );
 

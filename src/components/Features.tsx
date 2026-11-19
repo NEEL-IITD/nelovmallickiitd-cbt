@@ -1,13 +1,13 @@
 import React from 'react';
-import { ExamType } from '../types';
+import { ExamType, FeatureItem } from '../types';
 import { featuresData } from '../data/siteData';
 
 interface FeaturesProps {
-  exam: ExamType;
+  exam?: ExamType;
 }
 
-export const Features: React.FC<FeaturesProps> = ({ exam }) => {
-  const features = featuresData(exam);
+export const Features: React.FC<FeaturesProps> = () => {
+  const features: FeatureItem[] = featuresData;
 
   // Helper to render icon SVGs cleanly
   const renderIcon = (iconName: string) => {
@@ -109,7 +109,7 @@ export const Features: React.FC<FeaturesProps> = ({ exam }) => {
 
         {/* 4x3 Grid (12 Feature Cards) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature) => (
+          {features.map((feature: FeatureItem) => (
             <div
               key={feature.id}
               className="group relative rounded-2xl border border-slate-200/90 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden"

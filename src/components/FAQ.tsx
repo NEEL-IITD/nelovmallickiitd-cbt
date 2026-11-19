@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { ExamType } from '../types';
+import { ExamType, FAQItem } from '../types';
 import { faqsData } from '../data/siteData';
 
 interface FAQProps {
-  exam: ExamType;
+  exam?: ExamType;
 }
 
-export const FAQ: React.FC<FAQProps> = ({ exam }) => {
-  const faqs = faqsData(exam);
+export const FAQ: React.FC<FAQProps> = () => {
+  const faqs: FAQItem[] = faqsData;
   const [openIndex, setOpenIndex] = useState<number | null>(0); // First item open by default
 
   const toggleAccordion = (idx: number) => {
@@ -39,7 +39,7 @@ export const FAQ: React.FC<FAQProps> = ({ exam }) => {
 
         {/* Accordion Container */}
         <div className="space-y-3.5">
-          {faqs.map((faq, idx) => {
+          {faqs.map((faq: FAQItem, idx: number) => {
             const isOpen = openIndex === idx;
             return (
               <div

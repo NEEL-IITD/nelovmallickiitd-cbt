@@ -5,7 +5,7 @@
 // ==============================================================================
 
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { TestConfigItem, ErrorReportItem, ErrorReportStatus, MistakeTagType } from '../types';
+import { ErrorReportItem, ErrorReportStatus, ErrorIssueType, MistakeTagType } from '../types';
 
 export interface TestAttemptRecord {
   id: string;
@@ -334,12 +334,13 @@ export const studentStorage = {
     testCode: string;
     questionId: string;
     questionNumber: number;
-    issueType: string;
+    issueType: ErrorIssueType | string;
     description: string;
   }): Promise<void> {
     const reportItem: ErrorReportItem = {
       id: 'rep_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
       ...report,
+      issueType: report.issueType as ErrorIssueType,
       status: 'open',
       createdAt: new Date().toISOString()
     };
