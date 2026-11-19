@@ -2993,6 +2993,90 @@
       );
     }
 
+    // -------------------------------------------------------------
+    // CBT TEST ERROR BOUNDARY COMPONENT
+    // -------------------------------------------------------------
+    class CBTErrorBoundary extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null };
+      }
+
+      static getDerivedStateFromError(error) {
+        return { hasError: true, error };
+      }
+
+      componentDidCatch(error, errorInfo) {
+        console.error("CBT Engine ErrorBoundary caught an error:", error, errorInfo);
+      }
+
+      handleReset = () => {
+        this.setState({ hasError: false, error: null });
+        if (this.props.onReset) {
+          this.props.onReset();
+        } else {
+          window.location.reload();
+        }
+      };
+
+      handleReturnHome = () => {
+        this.setState({ hasError: false, error: null });
+        if (this.props.onReturnHome) {
+          this.props.onReturnHome();
+        } else {
+          window.location.hash = '#/';
+          window.location.reload();
+        }
+      };
+
+      render() {
+        if (this.state.hasError) {
+          return (
+            <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] flex items-center justify-center p-4">
+              <div className="w-full max-w-lg bg-white dark:bg-[#121318] border border-red-200 dark:border-red-900/60 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-5 animate-in fade-in">
+                <div className="w-16 h-16 rounded-2xl bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 text-3xl flex items-center justify-center mx-auto shadow-inner">
+                  ⚠️
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-zinc-50">
+                    CBT Test Engine Encountered an Issue
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 leading-relaxed">
+                    An unexpected render error occurred. Your candidate session is preserved in local storage.
+                  </p>
+                </div>
+                {this.state.error && (
+                  <div className="text-left bg-slate-100 dark:bg-zinc-900/80 p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 text-[11px] font-mono text-red-600 dark:text-red-400 overflow-x-auto max-h-36">
+                    {this.state.error.message || String(this.state.error)}
+                  </div>
+                )}
+                <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={this.handleReset}
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all hover:scale-105 active:scale-95"
+                  >
+                    ↺ Retry / Reload Test
+                  </button>
+                  <button
+                    type="button"
+                    onClick={this.handleReturnHome}
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl border border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-bold text-xs transition-colors"
+                  >
+                    ← Return to Test Library
+                  </button>
+                </div>
+                <p className="text-[11px] text-slate-400 dark:text-zinc-500">
+                  NelovMallickIITD CBT Platform · 100% Free · Mentored by Nelov Mallick (IIT Delhi)
+                </p>
+              </div>
+            </div>
+          );
+        }
+        return this.props.children;
+      }
+    }
+
     // MAIN APP COMPONENT
     function NelovMallickApp() {
       const [view, setView] = useState('home'); // 'home' | 'instructions' | 'exam' | 'result' | 'progress' | 'notebook'
@@ -3117,8 +3201,19 @@
 
       const isQuestionBookmarked = (qId) => {
         if (!currentUser) return false;
-        return window.studentStorage.isBookmarked(currentUser.id, `${activeTestId}_${qId}`) ||
-               window.studentStorage.isBookmarked(currentUser.id, qId);
+        try {
+          if (typeof window.studentStorage?.isBookmarked === 'function') {
+            return window.studentStorage.isBookmarked(currentUser.id, `${activeTestId}_${qId}`) ||
+                   window.studentStorage.isBookmarked(currentUser.id, qId);
+          }
+          if (typeof window.studentStorage?.getBookmarks === 'function') {
+            const bms = window.studentStorage.getBookmarks(currentUser.id) || [];
+            return bms.some(b => b.uniqueKey === `${activeTestId}_${qId}` || String(b.id) === String(qId));
+          }
+        } catch (e) {
+          console.warn("isQuestionBookmarked error:", e);
+        }
+        return false;
       };
       const [isDark, setIsDark] = useState(false);
       const [agreeTerms, setAgreeTerms] = useState(false);
@@ -3234,6 +3329,9 @@
             setView('home');
             return;
           }
+          if (activeTestId === 'jee-advanced-pta-04' && (view === 'instructions' || view === 'exam' || view === 'result')) {
+            return;
+          }
           handleSelectTest('jee-advanced-pta-04', activeUser);
           return;
         }
@@ -3242,6 +3340,9 @@
           if (!activeUser) {
             openAuth('login', '#/test/jee-advanced/pta-05', 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.');
             setView('home');
+            return;
+          }
+          if (activeTestId === 'jee-advanced-pta-05' && (view === 'instructions' || view === 'exam' || view === 'result')) {
             return;
           }
           handleSelectTest('jee-advanced-pta-05', activeUser);
@@ -3330,27 +3431,32 @@
           return;
         }
 
+        // Standardize canonical ID
+        let canonicalId = testId;
+        if (testId.includes('pta-04') || testId.includes('pta04')) canonicalId = 'jee-advanced-pta-04';
+        else if (testId.includes('pta-05') || testId.includes('pta05')) canonicalId = 'jee-advanced-pta-05';
+
         // Check if test is coming soon
         const all = window.allTests || [];
-        const meta = all.find(t => t.id === testId);
-        if (meta && meta.status === 'coming_soon') {
+        const meta = window.getTestById ? window.getTestById(canonicalId) : all.find(t => t.id === canonicalId);
+        const configuredStatus = testConfigs[canonicalId] || (meta ? meta.status : 'live');
+        if (configuredStatus === 'coming_soon') {
           setNoticeModal({
-            title: `${meta.title} — Coming Soon`,
+            title: `${meta ? meta.title : 'Mock Paper'} — Coming Soon`,
             message: `This paper is currently being digitized and verified with step-by-step KaTeX solutions. In the meantime, please attempt the live papers JEE Advanced PTA 04 and PTA 05!`,
-            activeCategory: meta.examCategory
+            activeCategory: meta ? meta.examCategory : 'jee-advanced'
           });
           return;
         }
 
-        setActiveTestId(testId);
-        if (testId.includes('pta-04')) {
-          window.location.hash = '#/test/jee-advanced/pta-04';
-        } else if (testId.includes('pta-05')) {
-          window.location.hash = '#/test/jee-advanced/pta-05';
+        setActiveTestId(canonicalId);
+        const targetHash = canonicalId === 'jee-advanced-pta-04' ? '#/test/jee-advanced/pta-04' : '#/test/jee-advanced/pta-05';
+        if (window.location.hash !== targetHash) {
+          window.location.hash = targetHash;
         }
 
         // Check for saved session scoped strictly to this user
-        const saved = window.studentStorage.getSession(user.id, testId);
+        const saved = window.studentStorage.getSession(user.id, canonicalId);
         if (saved && saved.responses) {
           setResponses(saved.responses);
           setStatuses(saved.statuses || {});
@@ -3592,6 +3698,7 @@
         const currentAns = q ? responses[qId] : null;
 
         return (
+          <CBTErrorBoundary onReturnHome={() => { setView('home'); window.location.hash = '#/'; }}>
           <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0c0d12] text-slate-900 dark:text-zinc-100 select-none">
             {/* Top Examination Hall Banner */}
             <header className="bg-white dark:bg-[#12131a] border-b border-slate-200 dark:border-zinc-800 px-4 py-2.5 sticky top-0 z-40 shadow-sm">
@@ -4137,6 +4244,7 @@
               </div>
             )}
           </div>
+          </CBTErrorBoundary>
         );
       }
 
@@ -4146,6 +4254,7 @@
       if (view === 'instructions') {
         const isMains = currentPaper && (currentPaper.examType === 'JEE Mains' || currentPaper.examCategory === 'jee-mains');
         return (
+          <CBTErrorBoundary onReturnHome={() => { setView('home'); window.location.hash = '#/'; }}>
           <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto space-y-8">
               
@@ -4309,6 +4418,7 @@
               </div>
             </div>
           </div>
+          </CBTErrorBoundary>
         );
       }
 
@@ -4332,6 +4442,7 @@
         const chemCount = ev.questionBreakdown.filter(i => i.question.subject === 'Chemistry').length;
 
         return (
+          <CBTErrorBoundary onReturnHome={() => { setView('home'); window.location.hash = '#/'; }}>
           <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 py-10 px-4 sm:px-6 lg:px-8">
             <div className="max-w-5xl mx-auto space-y-8">
               
@@ -4826,6 +4937,7 @@
               </div>
             </div>
           </div>
+          </CBTErrorBoundary>
         );
       }
 
@@ -5567,7 +5679,11 @@
 
     // Mount Application
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<NelovMallickApp />);
+    root.render(
+      <CBTErrorBoundary>
+        <NelovMallickApp />
+      </CBTErrorBoundary>
+    );
   </script>
 </body>
 </html>

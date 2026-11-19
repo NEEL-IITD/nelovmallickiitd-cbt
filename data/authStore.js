@@ -479,6 +479,21 @@
       }
     },
 
+    isBookmarked(userId, keyOrId) {
+      if (!userId || !keyOrId) return false;
+      try {
+        const bookmarks = this.getBookmarks(userId);
+        const strKey = String(keyOrId);
+        return bookmarks.some(b => 
+          b.uniqueKey === strKey || 
+          String(b.id) === strKey || 
+          (b.uniqueKey && b.uniqueKey.endsWith(`_${strKey}`))
+        );
+      } catch (e) {
+        return false;
+      }
+    },
+
     async toggleBookmark(userId, question) {
       if (!userId || !question) return false;
       const testId = question.testId || 'jee-advanced-pta-04';

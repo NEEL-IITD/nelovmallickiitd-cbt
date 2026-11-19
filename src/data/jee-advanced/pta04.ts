@@ -6,7 +6,7 @@ export const pta04Data: TestPaper = {
   examType: "JEE Advanced",
   code: "PTA 04",
   status: "live",
-  id: "pta-04",
+  aliasId: "pta-04",
   title: "JEE Advanced Test Series — PTA-04",
   subtitle: "Full Syllabus Comprehensive Mock Examination",
   date: "23-08-2026",

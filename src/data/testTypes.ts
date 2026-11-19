@@ -55,7 +55,8 @@ export interface SubjectSectionSummary {
 }
 
 export interface TestPaper {
-  id: string; // e.g. "jee-advanced-pta-04" or "pta-04"
+  id: string; // e.g. "jee-advanced-pta-04"
+  aliasId?: string; // e.g. "pta-04"
   examCategory: ExamCategory;
   examType: ExamType;
   code: string; // "PTA 01" ... "PTA 10"
