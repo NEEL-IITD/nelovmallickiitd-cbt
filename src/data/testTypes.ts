@@ -38,6 +38,8 @@ export interface Question {
   options?: QuestionOption[];
   matchingList?: MatchingList;
   answer: string | number | string[];
+  hasKey?: boolean;
+  solution?: string;
   explanation?: string;
 }
 

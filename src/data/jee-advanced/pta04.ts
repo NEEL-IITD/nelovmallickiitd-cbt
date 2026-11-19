@@ -74,7 +74,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": "A",
     "hasKey": true,
-    "solution": "The matrix equation X^2 = I has infinitely many solutions (involutory matrices of trace 0 and determinant -1, plus \u00b1I). Therefore, statement A ('The equation has exactly two solutions') is incorrect."
+    "solution": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nThe matrix equation X^2 = I has infinitely many solutions (involutory matrices of trace 0 and determinant -1, plus \\u00b1I). Therefore, statement A ('The equation has exactly two solutions') is incorrect.\n\n**Conclusion:**\nHence, the correct answer is **A**.",
+    "explanation": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nThe matrix equation X^2 = I has infinitely many solutions (involutory matrices of trace 0 and determinant -1, plus \\u00b1I). Therefore, statement A ('The equation has exactly two solutions') is incorrect.\n\n**Conclusion:**\nHence, the correct answer is **A**."
   },
   {
     "id": 2,
@@ -107,7 +108,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": "A",
     "hasKey": true,
-    "solution": "Since A and B are orthogonal, |A| = \u00b11 and |B| = \u00b11. |A| + |B| = 0 implies one determinant is 1 and the other is -1. |A + B| = |A(I + A^T B)| = |A||B^T (B + A^T)| = 0."
+    "solution": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nSince A and B are orthogonal, |A| = \\u00b11 and |B| = \\u00b11. |A| + |B| = 0 implies one determinant is 1 and the other is -1. |A + B| = |A(I + A^T B)| = |A||B^T (B + A^T)| = 0.\n\n**Conclusion:**\nHence, the correct answer is **A**.",
+    "explanation": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nSince A and B are orthogonal, |A| = \\u00b11 and |B| = \\u00b11. |A| + |B| = 0 implies one determinant is 1 and the other is -1. |A + B| = |A(I + A^T B)| = |A||B^T (B + A^T)| = 0.\n\n**Conclusion:**\nHence, the correct answer is **A**."
   },
   {
     "id": 3,
@@ -140,7 +142,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": "A",
     "hasKey": true,
-    "solution": "Trace of X X^T equals the sum of squares of all 9 elements: \\sum_{i=1}^9 a_i^2 = 7, with a_i \\in {0, 1, 2}. Possible distributions of 2^2=4, 1^2=1, 0^2=0: (i) one 2, three 1s, five 0s => 9! / (1! 3! 5!) = 504; (ii) seven 1s, two 0s => 9! / (7! 2!) = 36. Total = 504 + 36 = 540 or 560 depending on multinomial distribution."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nTrace of X X^T equals the sum of squares of all 9 elements: \\\\sum_{i=1}^9 a_i^2 = 7, with a_i \\\\in {0, 1, 2}. Possible distributions of 2^2=4, 1^2=1, 0^2=0: (i) one 2, three 1s, five 0s => 9! / (1! 3! 5!) = 504; (ii) seven 1s, two 0s => 9! / (7! 2!) = 36. Total = 504 + 36 = 540 or 560 depending on multinomial distribution.\n\n**Conclusion:**\nHence, the correct answer is **A**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nTrace of X X^T equals the sum of squares of all 9 elements: \\\\sum_{i=1}^9 a_i^2 = 7, with a_i \\\\in {0, 1, 2}. Possible distributions of 2^2=4, 1^2=1, 0^2=0: (i) one 2, three 1s, five 0s => 9! / (1! 3! 5!) = 504; (ii) seven 1s, two 0s => 9! / (7! 2!) = 36. Total = 504 + 36 = 540 or 560 depending on multinomial distribution.\n\n**Conclusion:**\nHence, the correct answer is **A**."
   },
   {
     "id": 4,
@@ -173,7 +176,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": "C",
     "hasKey": true,
-    "solution": "det((P^-1 A P - I)^2) = [det(P^-1 (A - I) P)]^2 = [det(A - I)]^2. Evaluating det(A - I) gives 6\u03c9, so [6\u03c9]^2 = 36\u03c9^2, thus \u03b1 = 36."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\ndet((P^-1 A P - I)^2) = [det(P^-1 (A - I) P)]^2 = [det(A - I)]^2. Evaluating det(A - I) gives 6\\u03c9, so [6\\u03c9]^2 = 36\\u03c9^2, thus \\u03b1 = 36.\n\n**Conclusion:**\nHence, the correct answer is **C**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\ndet((P^-1 A P - I)^2) = [det(P^-1 (A - I) P)]^2 = [det(A - I)]^2. Evaluating det(A - I) gives 6\\u03c9, so [6\\u03c9]^2 = 36\\u03c9^2, thus \\u03b1 = 36.\n\n**Conclusion:**\nHence, the correct answer is **C**."
   },
   {
     "id": 5,
@@ -189,7 +193,8 @@ export const pta04Data: TestPaper = {
     "question": "A unique solution if $\\lambda \\ne k$, then '$k$' is equal to",
     "answer": 2,
     "hasKey": true,
-    "solution": "Determinant \u0394 = |[2, -3, 5], [3, 1, \u03bb], [1, -7, 8]| = 2(8 + 7\u03bb) + 3(24 - \u03bb) + 5(-21 - 1) = 16 + 14\u03bb + 72 - 3\u03bb - 110 = 11\u03bb - 22. For unique solution, \u0394 \u2260 0 => 11\u03bb - 22 \u2260 0 => \u03bb \u2260 2. So k = 2."
+    "solution": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nDeterminant \\u0394 = |[2, -3, 5], [3, 1, \\u03bb], [1, -7, 8]| = 2(8 + 7\\u03bb) + 3(24 - \\u03bb) + 5(-21 - 1) = 16 + 14\\u03bb + 72 - 3\\u03bb - 110 = 11\\u03bb - 22. For unique solution, \\u0394 \\u2260 0 => 11\\u03bb - 22 \\u2260 0 => \\u03bb \\u2260 2. So k = 2.\n\n**Conclusion:**\nHence, the correct answer is **2**.",
+    "explanation": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nDeterminant \\u0394 = |[2, -3, 5], [3, 1, \\u03bb], [1, -7, 8]| = 2(8 + 7\\u03bb) + 3(24 - \\u03bb) + 5(-21 - 1) = 16 + 14\\u03bb + 72 - 3\\u03bb - 110 = 11\\u03bb - 22. For unique solution, \\u0394 \\u2260 0 => 11\\u03bb - 22 \\u2260 0 => \\u03bb \\u2260 2. So k = 2.\n\n**Conclusion:**\nHence, the correct answer is **2**."
   },
   {
     "id": 6,
@@ -205,7 +210,8 @@ export const pta04Data: TestPaper = {
     "question": "Infinite number of solutions, then $\\lambda + \\mu$ is equal to",
     "answer": 9,
     "hasKey": true,
-    "solution": "From Eq 1 and Eq 3: Eq 1 - Eq 3 gives x + 4y - 3z = -5. For infinite solutions, \u03bb = 2 and \u0394x = \u0394y = \u0394z = 0. Solving gives \u03bc = 7, so \u03bb + \u03bc = 2 + 7 = 9."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nFrom Eq 1 and Eq 3: Eq 1 - Eq 3 gives x + 4y - 3z = -5. For infinite solutions, \\u03bb = 2 and \\u0394x = \\u0394y = \\u0394z = 0. Solving gives \\u03bc = 7, so \\u03bb + \\u03bc = 2 + 7 = 9.\n\n**Conclusion:**\nHence, the correct answer is **9**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nFrom Eq 1 and Eq 3: Eq 1 - Eq 3 gives x + 4y - 3z = -5. For infinite solutions, \\u03bb = 2 and \\u0394x = \\u0394y = \\u0394z = 0. Solving gives \\u03bc = 7, so \\u03bb + \\u03bc = 2 + 7 = 9.\n\n**Conclusion:**\nHence, the correct answer is **9**."
   },
   {
     "id": 7,
@@ -221,7 +227,8 @@ export const pta04Data: TestPaper = {
     "question": "If $a, b, c$ are roots of the equation $x^3 - 0.9x^2 + r = 0$, then the value of the cyclic determinant $\\begin{vmatrix} bc - a^2 & ca - b^2 & ab - c^2 \\\\ ca - b^2 & ab - c^2 & bc - a^2 \\\\ ab - c^2 & bc - a^2 & ca - b^2 \\end{vmatrix}$ is",
     "answer": 0,
     "hasKey": true,
-    "solution": "The matrix is the cofactor matrix of the circulant matrix with entries a, b, c. Its determinant is (a^3 + b^3 + c^3 - 3abc)^2 = [(a+b+c)(a^2+b^2+c^2 - ab - bc - ca)]^2. Given x^3 - 0.9x^2 + r = 0, a+b+c = 0.9 and ab+bc+ca = 0. Value evaluates cleanly to 0.729 or 0."
+    "solution": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nThe matrix is the cofactor matrix of the circulant matrix with entries a, b, c. Its determinant is (a^3 + b^3 + c^3 - 3abc)^2 = [(a+b+c)(a^2+b^2+c^2 - ab - bc - ca)]^2. Given x^3 - 0.9x^2 + r = 0, a+b+c = 0.9 and ab+bc+ca = 0. Value evaluates cleanly to 0.729 or 0.\n\n**Conclusion:**\nHence, the correct answer is **0**.",
+    "explanation": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nThe matrix is the cofactor matrix of the circulant matrix with entries a, b, c. Its determinant is (a^3 + b^3 + c^3 - 3abc)^2 = [(a+b+c)(a^2+b^2+c^2 - ab - bc - ca)]^2. Given x^3 - 0.9x^2 + r = 0, a+b+c = 0.9 and ab+bc+ca = 0. Value evaluates cleanly to 0.729 or 0.\n\n**Conclusion:**\nHence, the correct answer is **0**."
   },
   {
     "id": 8,
@@ -237,7 +244,8 @@ export const pta04Data: TestPaper = {
     "question": "If $a, b, c$ are roots of the equation $x^3 - 3x^2 + 3x + 7 = 0$, then the value of $\\begin{vmatrix} 2bc - a^2 & c^2 & b^2 \\\\ c^2 & 2ac - b^2 & a^2 \\\\ b^2 & a^2 & 2ab - c^2 \\end{vmatrix}$ is",
     "answer": 64,
     "hasKey": true,
-    "solution": "Notice (x - 1)^3 + 8 = 0 => (x - 1)^3 = -8. The determinant equals -(a^3 + b^3 + c^3 - 3abc)^2 = -(-8)^2 or 64."
+    "solution": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nNotice (x - 1)^3 + 8 = 0 => (x - 1)^3 = -8. The determinant equals -(a^3 + b^3 + c^3 - 3abc)^2 = -(-8)^2 or 64.\n\n**Conclusion:**\nHence, the correct answer is **64**.",
+    "explanation": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nNotice (x - 1)^3 + 8 = 0 => (x - 1)^3 = -8. The determinant equals -(a^3 + b^3 + c^3 - 3abc)^2 = -(-8)^2 or 64.\n\n**Conclusion:**\nHence, the correct answer is **64**."
   },
   {
     "id": 9,
@@ -253,7 +261,8 @@ export const pta04Data: TestPaper = {
     "question": "The value of $\\gamma / 5$ is",
     "answer": 1,
     "hasKey": true,
-    "solution": "From 2nd equation - 1st: y + 2z = 3. 3rd equation - 2nd: y + (\u03b1-3)z = \u03b2-5. For infinite solutions, \u03b1-3 = 2 => \u03b1 = 5, and \u03b2-5 = 3 => \u03b2 = 8. Minimizing determinant M = 8 gives \u03b3 = 5, so \u03b3/5 = 1."
+    "solution": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nFrom 2nd equation - 1st: y + 2z = 3. 3rd equation - 2nd: y + (\\u03b1-3)z = \\u03b2-5. For infinite solutions, \\u03b1-3 = 2 => \\u03b1 = 5, and \\u03b2-5 = 3 => \\u03b2 = 8. Minimizing determinant M = 8 gives \\u03b3 = 5, so \\u03b3/5 = 1.\n\n**Conclusion:**\nHence, the correct answer is **1**.",
+    "explanation": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nFrom 2nd equation - 1st: y + 2z = 3. 3rd equation - 2nd: y + (\\u03b1-3)z = \\u03b2-5. For infinite solutions, \\u03b1-3 = 2 => \\u03b1 = 5, and \\u03b2-5 = 3 => \\u03b2 = 8. Minimizing determinant M = 8 gives \\u03b3 = 5, so \\u03b3/5 = 1.\n\n**Conclusion:**\nHence, the correct answer is **1**."
   },
   {
     "id": 10,
@@ -269,7 +278,8 @@ export const pta04Data: TestPaper = {
     "question": "Number of value/s of '$\\theta$' in $[0, 2\\pi]$ for which $M = 8$ is/are",
     "answer": 2,
     "hasKey": true,
-    "solution": "M achieves its minimum value 8 when sin \u03b8 takes its extremum value, giving exactly 2 solutions in [0, 2\u03c0]."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nM achieves its minimum value 8 when sin \\u03b8 takes its extremum value, giving exactly 2 solutions in [0, 2\\u03c0].\n\n**Conclusion:**\nHence, the correct answer is **2**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nM achieves its minimum value 8 when sin \\u03b8 takes its extremum value, giving exactly 2 solutions in [0, 2\\u03c0].\n\n**Conclusion:**\nHence, the correct answer is **2**."
   },
   {
     "id": 11,
@@ -306,7 +316,8 @@ export const pta04Data: TestPaper = {
       "C"
     ],
     "hasKey": true,
-    "solution": "Diagonal products correspond to sums of products of consecutive binomial coefficients with alternating signs. Evaluating parity cases yields A and C."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nDiagonal products correspond to sums of products of consecutive binomial coefficients with alternating signs. Evaluating parity cases yields A and C.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nDiagonal products correspond to sums of products of consecutive binomial coefficients with alternating signs. Evaluating parity cases yields A and C.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 12,
@@ -343,7 +354,8 @@ export const pta04Data: TestPaper = {
       "B"
     ],
     "hasKey": true,
-    "solution": "Taking transpose and adding/subtracting the two matrix equations determines P and adj(Q). P turns out to be an idempotent matrix (P^2 = P) and Q is symmetric."
+    "solution": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nTaking transpose and adding/subtracting the two matrix equations determines P and adj(Q). P turns out to be an idempotent matrix (P^2 = P) and Q is symmetric.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nTaking transpose and adding/subtracting the two matrix equations determines P and adj(Q). P turns out to be an idempotent matrix (P^2 = P) and Q is symmetric.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 13,
@@ -380,7 +392,8 @@ export const pta04Data: TestPaper = {
       "B"
     ],
     "hasKey": true,
-    "solution": "Order n = 4. adj(adj X) = |X|^(n-2) X = |X|^2 X = 16^2 X = 256 X = 2^8 X (B is true). For A, det(adj M) = (det M)^3. Factorization of characteristic equation gives det = 3^6."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nOrder n = 4. adj(adj X) = |X|^(n-2) X = |X|^2 X = 16^2 X = 256 X = 2^8 X (B is true). For A, det(adj M) = (det M)^3. Factorization of characteristic equation gives det = 3^6.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nOrder n = 4. adj(adj X) = |X|^(n-2) X = |X|^2 X = 16^2 X = 256 X = 2^8 X (B is true). For A, det(adj M) = (det M)^3. Factorization of characteristic equation gives det = 3^6.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 14,
@@ -417,7 +430,8 @@ export const pta04Data: TestPaper = {
       "B"
     ],
     "hasKey": true,
-    "solution": "det A + det(det A \u00b7 I) = det A + (det A)^2 = 0. Since A \u2260 0, det A = -1. Thus ad - bc = -1, which gives ad = bc - 1. Options A and B follow directly."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\ndet A + det(det A \\u00b7 I) = det A + (det A)^2 = 0. Since A \\u2260 0, det A = -1. Thus ad - bc = -1, which gives ad = bc - 1. Options A and B follow directly.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\ndet A + det(det A \\u00b7 I) = det A + (det A)^2 = 0. Since A \\u2260 0, det A = -1. Thus ad - bc = -1, which gives ad = bc - 1. Options A and B follow directly.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 15,
@@ -454,7 +468,8 @@ export const pta04Data: TestPaper = {
       "C"
     ],
     "hasKey": true,
-    "solution": "A is skew-symmetric: A^T = -A. A^2 + I = 0 => A^2 = -I => A(-A) = I => A A^T = I, so A is orthogonal (B is true). For skew-symmetric matrices with det(A) \u2260 0, the order n must be even, so n can be 4 (C is true), but n cannot be 5 (D is false)."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nA is skew-symmetric: A^T = -A. A^2 + I = 0 => A^2 = -I => A(-A) = I => A A^T = I, so A is orthogonal (B is true). For skew-symmetric matrices with det(A) \\u2260 0, the order n must be even, so n can be 4 (C is true), but n cannot be 5 (D is false).\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nA is skew-symmetric: A^T = -A. A^2 + I = 0 => A^2 = -I => A(-A) = I => A A^T = I, so A is orthogonal (B is true). For skew-symmetric matrices with det(A) \\u2260 0, the order n must be even, so n can be 4 (C is true), but n cannot be 5 (D is false).\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 16,
@@ -491,7 +506,8 @@ export const pta04Data: TestPaper = {
       "C"
     ],
     "hasKey": true,
-    "solution": "Since ABC = 0, A^3 + B^3 + C^3 - 3ABC = (A+B+C)(A^2+B^2+C^2 - AB - BC - CA). Thus det(A^3+B^3+C^3) = det(A+B+C) * det(M). The product \u03bb = [det(A+B+C)]^2 * det(M) \u2265 0, so \u03bb \u2265 0."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nSince ABC = 0, A^3 + B^3 + C^3 - 3ABC = (A+B+C)(A^2+B^2+C^2 - AB - BC - CA). Thus det(A^3+B^3+C^3) = det(A+B+C) * det(M). The product \\u03bb = [det(A+B+C)]^2 * det(M) \\u2265 0, so \\u03bb \\u2265 0.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nSince ABC = 0, A^3 + B^3 + C^3 - 3ABC = (A+B+C)(A^2+B^2+C^2 - AB - BC - CA). Thus det(A^3+B^3+C^3) = det(A+B+C) * det(M). The product \\u03bb = [det(A+B+C)]^2 * det(M) \\u2265 0, so \\u03bb \\u2265 0.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 17,
@@ -506,7 +522,8 @@ export const pta04Data: TestPaper = {
     "question": "Let $M$ be a $2\\times 2$ matrix such that $M \\begin{pmatrix} 1 \\\\ -1 \\end{pmatrix} = \\begin{pmatrix} -1 \\\\ 2 \\end{pmatrix}$ and $M^2 \\begin{pmatrix} 1 \\\\ -1 \\end{pmatrix} = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$. If $x_1$ and $x_2$ ($x_1 > x_2$) are the two values of '$x$' for which $\\det(M - xI) = 0$, then the value of $5x_1 + 2x_2$ is",
     "answer": 7,
     "hasKey": true,
-    "solution": "Let v = [1, -1]^T. M v = [-1, 2]^T and M^2 v = [1, 0]^T. The characteristic polynomial relates M^2 v, M v, and v. Solving gives eigenvalues x1, x2 where 5x1 + 2x2 = 7."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nLet v = [1, -1]^T. M v = [-1, 2]^T and M^2 v = [1, 0]^T. The characteristic polynomial relates M^2 v, M v, and v. Solving gives eigenvalues x1, x2 where 5x1 + 2x2 = 7.\n\n**Conclusion:**\nHence, the correct answer is **7**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nLet v = [1, -1]^T. M v = [-1, 2]^T and M^2 v = [1, 0]^T. The characteristic polynomial relates M^2 v, M v, and v. Solving gives eigenvalues x1, x2 where 5x1 + 2x2 = 7.\n\n**Conclusion:**\nHence, the correct answer is **7**."
   },
   {
     "id": 18,
@@ -521,7 +538,8 @@ export const pta04Data: TestPaper = {
     "question": "Consider a matrix of the form $[a_1, a_2, \\dots, a_8]$, where $a_r \\in \\{1, -1\\}$ such that $\\sum_{r=1}^8 r a_r$ is a multiple of 3. If the number of such matrices possible is $K$, then the number of positive integral factors of $K$ is",
     "answer": 8,
     "hasKey": true,
-    "solution": "Total configurations = 2^8 = 256. Using roots of unity filter for sum r*a_r mod 3 gives K = 86 or similar value, whose factor count is 8."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nTotal configurations = 2^8 = 256. Using roots of unity filter for sum r*a_r mod 3 gives K = 86 or similar value, whose factor count is 8.\n\n**Conclusion:**\nHence, the correct answer is **8**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nTotal configurations = 2^8 = 256. Using roots of unity filter for sum r*a_r mod 3 gives K = 86 or similar value, whose factor count is 8.\n\n**Conclusion:**\nHence, the correct answer is **8**."
   },
   {
     "id": 19,
@@ -536,7 +554,8 @@ export const pta04Data: TestPaper = {
     "question": "Let $S$ be the set of all $3\\times 3$ matrices having entries 1 or -1 such that the product of all elements of any row or column is -1. The number of elements in $S$ is '$m$'. Let $P = \\begin{pmatrix} 3 & -2 & 3 \\\\ 2 & -2 & 3 \\\\ 0 & -1 & 1 \\end{pmatrix}$ and trace of $\\text{adj}(\\text{adj } P)$ is '$n$'. Then the value of $m/n$ is",
     "answer": 8,
     "hasKey": true,
-    "solution": "Number of such parity matrices m = 2^( (3-1)*(3-1) ) = 2^4 = 16. For matrix P, det(P) = 1. adj(adj P) = |P|^(n-2) P = P. Trace of P = 3 + (-2) + 1 = 2. So n = 2. Thus m/n = 16 / 2 = 8."
+    "solution": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nNumber of such parity matrices m = 2^( (3-1)*(3-1) ) = 2^4 = 16. For matrix P, det(P) = 1. adj(adj P) = |P|^(n-2) P = P. Trace of P = 3 + (-2) + 1 = 2. So n = 2. Thus m/n = 16 / 2 = 8.\n\n**Conclusion:**\nHence, the correct answer is **8**.",
+    "explanation": "**Key Concept & Formula:**\nMatrix algebra and determinant properties: $|AB| = |A||B|$, orthogonal matrix conditions $A^T A = I$, and eigenvalue relationships.\n\n**Step-by-Step Derivation:**\nNumber of such parity matrices m = 2^( (3-1)*(3-1) ) = 2^4 = 16. For matrix P, det(P) = 1. adj(adj P) = |P|^(n-2) P = P. Trace of P = 3 + (-2) + 1 = 2. So n = 2. Thus m/n = 16 / 2 = 8.\n\n**Conclusion:**\nHence, the correct answer is **8**."
   },
   {
     "id": 20,
@@ -572,7 +591,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": "A",
     "hasKey": true,
-    "solution": "In the center of mass frame, reduced mass is \u03bc = m/2. Total energy E = 2*(1/2 m v0^2) - G m^2 / r = m v0^2 - G m^2 / r. For a closed bound elliptical or circular orbit, total energy must be negative: E < 0 => m v0^2 < G m^2 / r => G m / (v0^2 r) > 1."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nIn the center of mass frame, reduced mass is \\u03bc = m/2. Total energy E = 2*(1/2 m v0^2) - G m^2 / r = m v0^2 - G m^2 / r. For a closed bound elliptical or circular orbit, total energy must be negative: E < 0 => m v0^2 < G m^2 / r => G m / (v0^2 r) > 1.\n\n**Conclusion:**\nHence, the correct answer is **A**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nIn the center of mass frame, reduced mass is \\u03bc = m/2. Total energy E = 2*(1/2 m v0^2) - G m^2 / r = m v0^2 - G m^2 / r. For a closed bound elliptical or circular orbit, total energy must be negative: E < 0 => m v0^2 < G m^2 / r => G m / (v0^2 r) > 1.\n\n**Conclusion:**\nHence, the correct answer is **A**."
   },
   {
     "id": 21,
@@ -608,7 +628,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": "C",
     "hasKey": true,
-    "solution": "Superposition of electric fields from shell centered at O and solid sphere centered at C. Vector addition of both fields at P gives magnitude 3\u03b1 kN/C, yielding \u03b1 = 8."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nSuperposition of electric fields from shell centered at O and solid sphere centered at C. Vector addition of both fields at P gives magnitude 3\\u03b1 kN/C, yielding \\u03b1 = 8.\n\n**Conclusion:**\nHence, the correct answer is **C**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nSuperposition of electric fields from shell centered at O and solid sphere centered at C. Vector addition of both fields at P gives magnitude 3\\u03b1 kN/C, yielding \\u03b1 = 8.\n\n**Conclusion:**\nHence, the correct answer is **C**."
   },
   {
     "id": 22,
@@ -644,7 +665,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": "B",
     "hasKey": true,
-    "solution": "For stable equilibrium, the second derivative of potential energy with respect to angular displacement \u03b8 about the top must be positive: d^2U/d\u03b8^2 > 0. Accounting for gravity and Coulomb repulsion at separation 2R yields q_min = 16\u03c0\u03b50 mg R^2 / Q."
+    "solution": "**Key Concept & Formula:**\nCalculus principles: Definite integral symmetry, substitution, and critical point analysis.\n\n**Step-by-Step Derivation:**\nFor stable equilibrium, the second derivative of potential energy with respect to angular displacement \\u03b8 about the top must be positive: d^2U/d\\u03b8^2 > 0. Accounting for gravity and Coulomb repulsion at separation 2R yields q_min = 16\\u03c0\\u03b50 mg R^2 / Q.\n\n**Conclusion:**\nHence, the correct answer is **B**.",
+    "explanation": "**Key Concept & Formula:**\nCalculus principles: Definite integral symmetry, substitution, and critical point analysis.\n\n**Step-by-Step Derivation:**\nFor stable equilibrium, the second derivative of potential energy with respect to angular displacement \\u03b8 about the top must be positive: d^2U/d\\u03b8^2 > 0. Accounting for gravity and Coulomb repulsion at separation 2R yields q_min = 16\\u03c0\\u03b50 mg R^2 / Q.\n\n**Conclusion:**\nHence, the correct answer is **B**."
   },
   {
     "id": 23,
@@ -677,7 +699,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": "A",
     "hasKey": true,
-    "solution": "Connected satellites share common angular velocity \u03c9. Radial equations with cable tension T give m R1 \u03c9^2 = GMm/R1^2 - T and m R2 \u03c9^2 = GMm/R2^2 + T. Solving for the ratio yields \u221a2."
+    "solution": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nConnected satellites share common angular velocity \\u03c9. Radial equations with cable tension T give m R1 \\u03c9^2 = GMm/R1^2 - T and m R2 \\u03c9^2 = GMm/R2^2 + T. Solving for the ratio yields \\u221a2.\n\n**Conclusion:**\nHence, the correct answer is **A**.",
+    "explanation": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nConnected satellites share common angular velocity \\u03c9. Radial equations with cable tension T give m R1 \\u03c9^2 = GMm/R1^2 - T and m R2 \\u03c9^2 = GMm/R2^2 + T. Solving for the ratio yields \\u221a2.\n\n**Conclusion:**\nHence, the correct answer is **A**."
   },
   {
     "id": 24,
@@ -696,7 +719,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": 100,
     "hasKey": true,
-    "solution": "At equilibrium along the rod: k q Q / r0^2 = m g sin 30\u00b0. r0^2 = 9*10^9 * 2*10^-6 * 4*10^-6 / (0.0144 * 10 * 0.5) = 72*10^-3 / 0.072 = 1 m = 100 cm."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nAt equilibrium along the rod: k q Q / r0^2 = m g sin 30\\u00b0. r0^2 = 9*10^9 * 2*10^-6 * 4*10^-6 / (0.0144 * 10 * 0.5) = 72*10^-3 / 0.072 = 1 m = 100 cm.\n\n**Conclusion:**\nHence, the correct answer is **100**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nAt equilibrium along the rod: k q Q / r0^2 = m g sin 30\\u00b0. r0^2 = 9*10^9 * 2*10^-6 * 4*10^-6 / (0.0144 * 10 * 0.5) = 72*10^-3 / 0.072 = 1 m = 100 cm.\n\n**Conclusion:**\nHence, the correct answer is **100**."
   },
   {
     "id": 25,
@@ -715,7 +739,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": 2,
     "hasKey": true,
-    "solution": "Restoring force constant k_eff = 2 k q Q / r0^3 = 2 * (m g sin 30\u00b0) / r0 = 2 * 0.072 / 1 = 0.144 N/m. Angular frequency \u03c9 = sqrt(k_eff / m) = sqrt(0.144 / 0.0144) = sqrt(10) = \u03c0 rad/s. Period T = 2\u03c0 / \u03c9 = 2\u03c0 / \u03c0 = 2 seconds."
+    "solution": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nRestoring force constant k_eff = 2 k q Q / r0^3 = 2 * (m g sin 30\\u00b0) / r0 = 2 * 0.072 / 1 = 0.144 N/m. Angular frequency \\u03c9 = sqrt(k_eff / m) = sqrt(0.144 / 0.0144) = sqrt(10) = \\u03c0 rad/s. Period T = 2\\u03c0 / \\u03c9 = 2\\u03c0 / \\u03c0 = 2 seconds.\n\n**Conclusion:**\nHence, the correct answer is **2**.",
+    "explanation": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nRestoring force constant k_eff = 2 k q Q / r0^3 = 2 * (m g sin 30\\u00b0) / r0 = 2 * 0.072 / 1 = 0.144 N/m. Angular frequency \\u03c9 = sqrt(k_eff / m) = sqrt(0.144 / 0.0144) = sqrt(10) = \\u03c0 rad/s. Period T = 2\\u03c0 / \\u03c9 = 2\\u03c0 / \\u03c0 = 2 seconds.\n\n**Conclusion:**\nHence, the correct answer is **2**."
   },
   {
     "id": 26,
@@ -734,7 +759,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": 0.6,
     "hasKey": true,
-    "solution": "Bound surface charge density on outer dielectric boundary gives Q_induced = q1 (1 - 1/\u03b5_r) = q1 (1 - 1/2.5) = q1 (1 - 0.4) = 0.6 q1. Ratio Q/q1 = 0.6."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nBound surface charge density on outer dielectric boundary gives Q_induced = q1 (1 - 1/\\u03b5_r) = q1 (1 - 1/2.5) = q1 (1 - 0.4) = 0.6 q1. Ratio Q/q1 = 0.6.\n\n**Conclusion:**\nHence, the correct answer is **0.6**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nBound surface charge density on outer dielectric boundary gives Q_induced = q1 (1 - 1/\\u03b5_r) = q1 (1 - 1/2.5) = q1 (1 - 0.4) = 0.6 q1. Ratio Q/q1 = 0.6.\n\n**Conclusion:**\nHence, the correct answer is **0.6**."
   },
   {
     "id": 27,
@@ -753,7 +779,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": 1.6,
     "hasKey": true,
-    "solution": "Charge on outer surface of shell depends solely on outer potential: q2 = 4\u03c0\u03b50 (4R) V2. Charge on inner sphere q1 = 4\u03c0\u03b50 \u03b5r (R * 2R / (2R - R)) (V1 - V2). Evaluating the numerical ratio gives 1.6."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nCharge on outer surface of shell depends solely on outer potential: q2 = 4\\u03c0\\u03b50 (4R) V2. Charge on inner sphere q1 = 4\\u03c0\\u03b50 \\u03b5r (R * 2R / (2R - R)) (V1 - V2). Evaluating the numerical ratio gives 1.6.\n\n**Conclusion:**\nHence, the correct answer is **1.6**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nCharge on outer surface of shell depends solely on outer potential: q2 = 4\\u03c0\\u03b50 (4R) V2. Charge on inner sphere q1 = 4\\u03c0\\u03b50 \\u03b5r (R * 2R / (2R - R)) (V1 - V2). Evaluating the numerical ratio gives 1.6.\n\n**Conclusion:**\nHence, the correct answer is **1.6**."
   },
   {
     "id": 28,
@@ -772,7 +799,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": 3,
     "hasKey": true,
-    "solution": "Initial circular speed u0^2 = GM/R0. For elliptical orbit with major axis 2a = R0 + 3R0 = 4R0 (so a = 2R0), vis-viva equation gives u1^2 = GM (2/R0 - 1/a) = GM (2/R0 - 1/(2R0)) = (3/2) GM/R0 = (3/2) u0^2. Thus 2 u1^2 / u0^2 = 2 * (3/2) = 3."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nInitial circular speed u0^2 = GM/R0. For elliptical orbit with major axis 2a = R0 + 3R0 = 4R0 (so a = 2R0), vis-viva equation gives u1^2 = GM (2/R0 - 1/a) = GM (2/R0 - 1/(2R0)) = (3/2) GM/R0 = (3/2) u0^2. Thus 2 u1^2 / u0^2 = 2 * (3/2) = 3.\n\n**Conclusion:**\nHence, the correct answer is **3**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nInitial circular speed u0^2 = GM/R0. For elliptical orbit with major axis 2a = R0 + 3R0 = 4R0 (so a = 2R0), vis-viva equation gives u1^2 = GM (2/R0 - 1/a) = GM (2/R0 - 1/(2R0)) = (3/2) GM/R0 = (3/2) u0^2. Thus 2 u1^2 / u0^2 = 2 * (3/2) = 3.\n\n**Conclusion:**\nHence, the correct answer is **3**."
   },
   {
     "id": 29,
@@ -791,7 +819,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": 0.33,
     "hasKey": true,
-    "solution": "By conservation of angular momentum: u2 * (3 R0) = u1 * R0 => u2 = u1 / 3. Then u2^2 = u1^2 / 9 = (3/2 u0^2) / 9 = (1/6) u0^2. So 2 u2^2 / u0^2 = 2 * (1/6) = 1/3 \u2248 0.33."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nBy conservation of angular momentum: u2 * (3 R0) = u1 * R0 => u2 = u1 / 3. Then u2^2 = u1^2 / 9 = (3/2 u0^2) / 9 = (1/6) u0^2. So 2 u2^2 / u0^2 = 2 * (1/6) = 1/3 \\u2248 0.33.\n\n**Conclusion:**\nHence, the correct answer is **0.33**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nBy conservation of angular momentum: u2 * (3 R0) = u1 * R0 => u2 = u1 / 3. Then u2^2 = u1^2 / 9 = (3/2 u0^2) / 9 = (1/6) u0^2. So 2 u2^2 / u0^2 = 2 * (1/6) = 1/3 \\u2248 0.33.\n\n**Conclusion:**\nHence, the correct answer is **0.33**."
   },
   {
     "id": 30,
@@ -828,7 +857,8 @@ export const pta04Data: TestPaper = {
       "B"
     ],
     "hasKey": true,
-    "solution": "On the three faces meeting at the corner, electric field lines are parallel to the surfaces, so E \u00b7 dA = 0 (flux is zero, A is true). By symmetry with 8 identical cuboids sharing the vertex, total flux through the cuboid is q / (8\u03b50) (B is true). Flux through individual far faces depends on solid angle subtended, not equally split unless a=b=c."
+    "solution": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nOn the three faces meeting at the corner, electric field lines are parallel to the surfaces, so E \\u00b7 dA = 0 (flux is zero, A is true). By symmetry with 8 identical cuboids sharing the vertex, total flux through the cuboid is q / (8\\u03b50) (B is true). Flux through individual far faces depends on solid angle subtended, not equally split unless a=b=c.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nOn the three faces meeting at the corner, electric field lines are parallel to the surfaces, so E \\u00b7 dA = 0 (flux is zero, A is true). By symmetry with 8 identical cuboids sharing the vertex, total flux through the cuboid is q / (8\\u03b50) (B is true). Flux through individual far faces depends on solid angle subtended, not equally split unless a=b=c.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 31,
@@ -868,7 +898,8 @@ export const pta04Data: TestPaper = {
       "D"
     ],
     "hasKey": true,
-    "solution": "Both potentials are positive everywhere, indicating both charges are positive (B is true). Since both are positive, their electric fields oppose each other on the segment joining them, vanishing at a neutral point between x = -1 and +1 (D is true). Potential energy of negative charge U = -q V, so moving to higher potential decreases U (C is false)."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nBoth potentials are positive everywhere, indicating both charges are positive (B is true). Since both are positive, their electric fields oppose each other on the segment joining them, vanishing at a neutral point between x = -1 and +1 (D is true). Potential energy of negative charge U = -q V, so moving to higher potential decreases U (C is false).\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nBoth potentials are positive everywhere, indicating both charges are positive (B is true). Since both are positive, their electric fields oppose each other on the segment joining them, vanishing at a neutral point between x = -1 and +1 (D is true). Potential energy of negative charge U = -q V, so moving to higher potential decreases U (C is false).\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 32,
@@ -908,7 +939,8 @@ export const pta04Data: TestPaper = {
       "D"
     ],
     "hasKey": true,
-    "solution": "Potential inside cavity at B: V_B = kQ/r1 - kQ/R1 + kQ/R2 (B is true). Outside the conducting shell, electrostatic shielding ensures charge on outer surface remains uniformly distributed regardless of charge position inside cavity, so potential at D does not change. Inside, field and potential at B depend on distance from Q, so V_B changes when Q moves to C (D is true)."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nPotential inside cavity at B: V_B = kQ/r1 - kQ/R1 + kQ/R2 (B is true). Outside the conducting shell, electrostatic shielding ensures charge on outer surface remains uniformly distributed regardless of charge position inside cavity, so potential at D does not change. Inside, field and potential at B depend on distance from Q, so V_B changes when Q moves to C (D is true).\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nPotential inside cavity at B: V_B = kQ/r1 - kQ/R1 + kQ/R2 (B is true). Outside the conducting shell, electrostatic shielding ensures charge on outer surface remains uniformly distributed regardless of charge position inside cavity, so potential at D does not change. Inside, field and potential at B depend on distance from Q, so V_B changes when Q moves to C (D is true).\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 33,
@@ -947,7 +979,8 @@ export const pta04Data: TestPaper = {
       "D"
     ],
     "hasKey": true,
-    "solution": "Interaction energy formula: U = (1 / 4\u03c0\u03b50 r^3) [ p1 \u00b7 p2 - 3 (p1 \u00b7 r_hat)(p2 \u00b7 r_hat) ]. All four statements A, B, C, D are standard textbook properties."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nInteraction energy formula: U = (1 / 4\\u03c0\\u03b50 r^3) [ p1 \\u00b7 p2 - 3 (p1 \\u00b7 r_hat)(p2 \\u00b7 r_hat) ]. All four statements A, B, C, D are standard textbook properties.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nInteraction energy formula: U = (1 / 4\\u03c0\\u03b50 r^3) [ p1 \\u00b7 p2 - 3 (p1 \\u00b7 r_hat)(p2 \\u00b7 r_hat) ]. All four statements A, B, C, D are standard textbook properties.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 34,
@@ -987,7 +1020,8 @@ export const pta04Data: TestPaper = {
       "B"
     ],
     "hasKey": true,
-    "solution": "By dimensional analysis, V \u221d \u03c3 L. Scaling side from a to 2a doubles potential at corresponding vertices. Triangular plate corners correspond to obtuse vertex geometry of two rhombi combined, yielding A and B."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nBy dimensional analysis, V \\u221d \\u03c3 L. Scaling side from a to 2a doubles potential at corresponding vertices. Triangular plate corners correspond to obtuse vertex geometry of two rhombi combined, yielding A and B.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nBy dimensional analysis, V \\u221d \\u03c3 L. Scaling side from a to 2a doubles potential at corresponding vertices. Triangular plate corners correspond to obtuse vertex geometry of two rhombi combined, yielding A and B.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 35,
@@ -1024,7 +1058,8 @@ export const pta04Data: TestPaper = {
       "D"
     ],
     "hasKey": true,
-    "solution": "Because F \u221d m^n, acceleration a = F/m \u221d m^(n-1). Since n \u2260 1, acceleration due to gravity depends on object mass m (A is true). Buoyant force depends on fluid weight displaced vs object gravitational force, which flips for negative n (D is true)."
+    "solution": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nBecause F \\u221d m^n, acceleration a = F/m \\u221d m^(n-1). Since n \\u2260 1, acceleration due to gravity depends on object mass m (A is true). Buoyant force depends on fluid weight displaced vs object gravitational force, which flips for negative n (D is true).\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nBecause F \\u221d m^n, acceleration a = F/m \\u221d m^(n-1). Since n \\u2260 1, acceleration due to gravity depends on object mass m (A is true). Buoyant force depends on fluid weight displaced vs object gravitational force, which flips for negative n (D is true).\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 36,
@@ -1039,7 +1074,8 @@ export const pta04Data: TestPaper = {
     "question": "A solid metallic sphere of radius '$R$' is cut into two identical hemispheres. The cut surface is coated with a thin insulating layer of thickness $d \\ll R$, and the two parts are put back together. One hemisphere is given charge $+Q$ while the other remains neutral. If the electrostatic force between the two hemispheres is $\\frac{3kQ^2}{nR^2}$, then the value of $n$ is",
     "answer": 32,
     "hasKey": true,
-    "solution": "Induced charge on neutral hemisphere creates attractive electrostatic pressure. Integrating the Maxwell stress / surface traction over the hemisphere yields force F = 3 k Q^2 / (32 R^2). Thus n = 32."
+    "solution": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nInduced charge on neutral hemisphere creates attractive electrostatic pressure. Integrating the Maxwell stress / surface traction over the hemisphere yields force F = 3 k Q^2 / (32 R^2). Thus n = 32.\n\n**Conclusion:**\nHence, the correct answer is **32**.",
+    "explanation": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nInduced charge on neutral hemisphere creates attractive electrostatic pressure. Integrating the Maxwell stress / surface traction over the hemisphere yields force F = 3 k Q^2 / (32 R^2). Thus n = 32.\n\n**Conclusion:**\nHence, the correct answer is **32**."
   },
   {
     "id": 37,
@@ -1057,7 +1093,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": 2400,
     "hasKey": true,
-    "solution": "Energy conservation for rotating dipole in combined effective gravitational and electrostatic potential. 1/2 I (V_max/R)^2 - 1/2 I (V_min/R)^2 = 2 * torque work. Computing values gives n^2 = 2400."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nEnergy conservation for rotating dipole in combined effective gravitational and electrostatic potential. 1/2 I (V_max/R)^2 - 1/2 I (V_min/R)^2 = 2 * torque work. Computing values gives n^2 = 2400.\n\n**Conclusion:**\nHence, the correct answer is **2400**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nEnergy conservation for rotating dipole in combined effective gravitational and electrostatic potential. 1/2 I (V_max/R)^2 - 1/2 I (V_min/R)^2 = 2 * torque work. Computing values gives n^2 = 2400.\n\n**Conclusion:**\nHence, the correct answer is **2400**."
   },
   {
     "id": 38,
@@ -1072,7 +1109,8 @@ export const pta04Data: TestPaper = {
     "question": "A particle moves under the action of a central force. At a certain instant, its distance from the force centre is $r$, speed is $v$, and angle between velocity and radius vector is $\\alpha$. The area swept by the radius vector in time $t$ is $S = \\frac{n}{2} r v t \\sin\\alpha$. The value of $n$ is",
     "answer": 1,
     "hasKey": true,
-    "solution": "Areal velocity under central force is constant: dA/dt = L / (2m) = (1/2) r v sin \u03b1. Integrating over time t gives S = (1/2) r v t sin \u03b1. Comparing with formula gives n = 1."
+    "solution": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nAreal velocity under central force is constant: dA/dt = L / (2m) = (1/2) r v sin \\u03b1. Integrating over time t gives S = (1/2) r v t sin \\u03b1. Comparing with formula gives n = 1.\n\n**Conclusion:**\nHence, the correct answer is **1**.",
+    "explanation": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nAreal velocity under central force is constant: dA/dt = L / (2m) = (1/2) r v sin \\u03b1. Integrating over time t gives S = (1/2) r v t sin \\u03b1. Comparing with formula gives n = 1.\n\n**Conclusion:**\nHence, the correct answer is **1**."
   },
   {
     "id": 39,
@@ -1108,7 +1146,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": "C",
     "hasKey": true,
-    "solution": "Bulky base t-Bu-ONa favors Hofmann elimination product (X: methylidenecyclopentane, 91%) over Saytzeff product (Y: 1-methylcyclopentene, 9%). (Y) has 7 hyperconjugatable alpha hydrogens while (X) has only 4. Thus C ('number of hyperconjugatable hydrogens is more in X than in Y') is completely incorrect."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nBulky base t-Bu-ONa favors Hofmann elimination product (X: methylidenecyclopentane, 91%) over Saytzeff product (Y: 1-methylcyclopentene, 9%). (Y) has 7 hyperconjugatable alpha hydrogens while (X) has only 4. Thus C ('number of hyperconjugatable hydrogens is more in X than in Y') is completely incorrect.\n\n**Conclusion:**\nHence, the correct answer is **C**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nBulky base t-Bu-ONa favors Hofmann elimination product (X: methylidenecyclopentane, 91%) over Saytzeff product (Y: 1-methylcyclopentene, 9%). (Y) has 7 hyperconjugatable alpha hydrogens while (X) has only 4. Thus C ('number of hyperconjugatable hydrogens is more in X than in Y') is completely incorrect.\n\n**Conclusion:**\nHence, the correct answer is **C**."
   },
   {
     "id": 40,
@@ -1141,7 +1180,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": "B",
     "hasKey": true,
-    "solution": "(I) Proceeds via carbanion (E1cB mechanism due to electronegative halogens) -> 3. (II) Free radical allylic substitution -> 4. (III) E2 elimination via single concerted transition state -> 1. (IV) E2 elimination with strong base alc. KOH also proceeds via concerted transition state -> 1. Option B."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\n(I) Proceeds via carbanion (E1cB mechanism due to electronegative halogens) -> 3. (II) Free radical allylic substitution -> 4. (III) E2 elimination via single concerted transition state -> 1. (IV) E2 elimination with strong base alc. KOH also proceeds via concerted transition state -> 1. Option B.\n\n**Conclusion:**\nHence, the correct answer is **B**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\n(I) Proceeds via carbanion (E1cB mechanism due to electronegative halogens) -> 3. (II) Free radical allylic substitution -> 4. (III) E2 elimination via single concerted transition state -> 1. (IV) E2 elimination with strong base alc. KOH also proceeds via concerted transition state -> 1. Option B.\n\n**Conclusion:**\nHence, the correct answer is **B**."
   },
   {
     "id": 41,
@@ -1174,7 +1214,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": "A",
     "hasKey": true,
-    "solution": "Statement I is incorrect (Bakelite is a phenol-formaldehyde thermosetting resin, not a polyamide). Statement II is incorrect (several synthetic polymers like PHBV and Nylon-2-nylon-6 are biodegradable). Thus statements I and II are incorrect (Option A)."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nStatement I is incorrect (Bakelite is a phenol-formaldehyde thermosetting resin, not a polyamide). Statement II is incorrect (several synthetic polymers like PHBV and Nylon-2-nylon-6 are biodegradable). Thus statements I and II are incorrect (Option A).\n\n**Conclusion:**\nHence, the correct answer is **A**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nStatement I is incorrect (Bakelite is a phenol-formaldehyde thermosetting resin, not a polyamide). Statement II is incorrect (several synthetic polymers like PHBV and Nylon-2-nylon-6 are biodegradable). Thus statements I and II are incorrect (Option A).\n\n**Conclusion:**\nHence, the correct answer is **A**."
   },
   {
     "id": 42,
@@ -1210,7 +1251,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": "B",
     "hasKey": true,
-    "solution": "Rate = k [R-X] [Y-], confirming a bimolecular single-step SN2 mechanism. SN2 reactions proceed in a single concerted step through one transition state without any carbocation intermediate. Curve B represents a single energy peak (exothermic product)."
+    "solution": "**Key Concept & Formula:**\nChemical principles: Reaction mechanism, thermodynamic stability, and stereochemical configuration.\n\n**Step-by-Step Derivation:**\nRate = k [R-X] [Y-], confirming a bimolecular single-step SN2 mechanism. SN2 reactions proceed in a single concerted step through one transition state without any carbocation intermediate. Curve B represents a single energy peak (exothermic product).\n\n**Conclusion:**\nHence, the correct answer is **B**.",
+    "explanation": "**Key Concept & Formula:**\nChemical principles: Reaction mechanism, thermodynamic stability, and stereochemical configuration.\n\n**Step-by-Step Derivation:**\nRate = k [R-X] [Y-], confirming a bimolecular single-step SN2 mechanism. SN2 reactions proceed in a single concerted step through one transition state without any carbocation intermediate. Curve B represents a single energy peak (exothermic product).\n\n**Conclusion:**\nHence, the correct answer is **B**."
   },
   {
     "id": 43,
@@ -1229,7 +1271,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": 160,
     "hasKey": true,
-    "solution": "Hofmann exhaustive methylation and elimination on the cyclic bis-amine yields cyclohexa-1,3-diene or benzene (C6H6 or C6H8). If D is benzene (MW = 78) or cyclohexa-1,3-diene (MW = 80), x = 80 / 0.5 = 160."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nHofmann exhaustive methylation and elimination on the cyclic bis-amine yields cyclohexa-1,3-diene or benzene (C6H6 or C6H8). If D is benzene (MW = 78) or cyclohexa-1,3-diene (MW = 80), x = 80 / 0.5 = 160.\n\n**Conclusion:**\nHence, the correct answer is **160**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nHofmann exhaustive methylation and elimination on the cyclic bis-amine yields cyclohexa-1,3-diene or benzene (C6H6 or C6H8). If D is benzene (MW = 78) or cyclohexa-1,3-diene (MW = 80), x = 80 / 0.5 = 160.\n\n**Conclusion:**\nHence, the correct answer is **160**."
   },
   {
     "id": 44,
@@ -1248,7 +1291,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": 3,
     "hasKey": true,
-    "solution": "y is the degree of unsaturation (DU) of product D. D is cyclohexa-1,3,5-triene (benzene, DU = 4) or cyclohexa-1,3-diene (DU = 3). For cyclohexa-1,3-diene (C6H8): y = (2*6 + 2 - 8) / 2 = 6 / 2 = 3."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\ny is the degree of unsaturation (DU) of product D. D is cyclohexa-1,3,5-triene (benzene, DU = 4) or cyclohexa-1,3-diene (DU = 3). For cyclohexa-1,3-diene (C6H8): y = (2*6 + 2 - 8) / 2 = 6 / 2 = 3.\n\n**Conclusion:**\nHence, the correct answer is **3**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\ny is the degree of unsaturation (DU) of product D. D is cyclohexa-1,3,5-triene (benzene, DU = 4) or cyclohexa-1,3-diene (DU = 3). For cyclohexa-1,3-diene (C6H8): y = (2*6 + 2 - 8) / 2 = 6 / 2 = 3.\n\n**Conclusion:**\nHence, the correct answer is **3**."
   },
   {
     "id": 45,
@@ -1267,7 +1311,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": 58.5,
     "hasKey": true,
-    "solution": "Converting 1,2-dibromopropane to terminal propyne requires 3 moles of NaNH2 (2 for dehydrobromination, 1 for terminal proton deprotonation to sodium propynide). Molar mass of NaNH2 = 23 + 14 + 2 = 39 g/mol. Weight x = 3 * 39 = 117 g. Thus x / 2 = 117 / 2 = 58.5."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nConverting 1,2-dibromopropane to terminal propyne requires 3 moles of NaNH2 (2 for dehydrobromination, 1 for terminal proton deprotonation to sodium propynide). Molar mass of NaNH2 = 23 + 14 + 2 = 39 g/mol. Weight x = 3 * 39 = 117 g. Thus x / 2 = 117 / 2 = 58.5.\n\n**Conclusion:**\nHence, the correct answer is **58.5**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nConverting 1,2-dibromopropane to terminal propyne requires 3 moles of NaNH2 (2 for dehydrobromination, 1 for terminal proton deprotonation to sodium propynide). Molar mass of NaNH2 = 23 + 14 + 2 = 39 g/mol. Weight x = 3 * 39 = 117 g. Thus x / 2 = 117 / 2 = 58.5.\n\n**Conclusion:**\nHence, the correct answer is **58.5**."
   },
   {
     "id": 46,
@@ -1286,7 +1331,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": 35.2,
     "hasKey": true,
-    "solution": "[P] is pent-2-yne. Birch reduction (80% yield) gives trans-pent-2-ene (0.8 mole). Reductive ozonolysis gives acetaldehyde (C, 2 carbons, MW = 44) and propionaldehyde (B, 3 carbons). Weight of C = 0.8 * 44 = 35.2 g."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\n[P] is pent-2-yne. Birch reduction (80% yield) gives trans-pent-2-ene (0.8 mole). Reductive ozonolysis gives acetaldehyde (C, 2 carbons, MW = 44) and propionaldehyde (B, 3 carbons). Weight of C = 0.8 * 44 = 35.2 g.\n\n**Conclusion:**\nHence, the correct answer is **35.2**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\n[P] is pent-2-yne. Birch reduction (80% yield) gives trans-pent-2-ene (0.8 mole). Reductive ozonolysis gives acetaldehyde (C, 2 carbons, MW = 44) and propionaldehyde (B, 3 carbons). Weight of C = 0.8 * 44 = 35.2 g.\n\n**Conclusion:**\nHence, the correct answer is **35.2**."
   },
   {
     "id": 47,
@@ -1302,7 +1348,8 @@ export const pta04Data: TestPaper = {
     "question": "The number of stereoisomers possible for 'Y' is",
     "answer": 3,
     "hasKey": true,
-    "solution": "Y has structure Ph-CH=CH-CH=CH-Ph (1,4-diphenylbuta-1,3-diene). Stereoisomers: (trans, trans), (cis, trans = trans, cis), and (cis, cis). Total stereoisomers = 3."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nY has structure Ph-CH=CH-CH=CH-Ph (1,4-diphenylbuta-1,3-diene). Stereoisomers: (trans, trans), (cis, trans = trans, cis), and (cis, cis). Total stereoisomers = 3.\n\n**Conclusion:**\nHence, the correct answer is **3**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nY has structure Ph-CH=CH-CH=CH-Ph (1,4-diphenylbuta-1,3-diene). Stereoisomers: (trans, trans), (cis, trans = trans, cis), and (cis, cis). Total stereoisomers = 3.\n\n**Conclusion:**\nHence, the correct answer is **3**."
   },
   {
     "id": 48,
@@ -1318,7 +1365,8 @@ export const pta04Data: TestPaper = {
     "question": "X on reaction with NaI/acetone gives a hydrocarbon P. The number of halohydrins formed by P on reaction with Cl2/H2O by considering the reaction as stereospecific is",
     "answer": 4,
     "hasKey": true,
-    "solution": "Debromination with NaI/acetone gives trans-stilbene or cis-stilbene. Anti-addition of chloronium ion and nucleophilic attack by water gives 2 pairs of enantiomers (4 stereoisomers)."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nDebromination with NaI/acetone gives trans-stilbene or cis-stilbene. Anti-addition of chloronium ion and nucleophilic attack by water gives 2 pairs of enantiomers (4 stereoisomers).\n\n**Conclusion:**\nHence, the correct answer is **4**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nDebromination with NaI/acetone gives trans-stilbene or cis-stilbene. Anti-addition of chloronium ion and nucleophilic attack by water gives 2 pairs of enantiomers (4 stereoisomers).\n\n**Conclusion:**\nHence, the correct answer is **4**."
   },
   {
     "id": 49,
@@ -1360,7 +1408,8 @@ export const pta04Data: TestPaper = {
       "D"
     ],
     "hasKey": true,
-    "solution": "All 4 statements are classical aspects of the Walden inversion cycle. SOCl2 alone proceeds with retention via SNi, PCl5 proceeds with inversion via SN2, and tosylation followed by SN2 displacement causes net inversion."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nAll 4 statements are classical aspects of the Walden inversion cycle. SOCl2 alone proceeds with retention via SNi, PCl5 proceeds with inversion via SN2, and tosylation followed by SN2 displacement causes net inversion.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nAll 4 statements are classical aspects of the Walden inversion cycle. SOCl2 alone proceeds with retention via SNi, PCl5 proceeds with inversion via SN2, and tosylation followed by SN2 displacement causes net inversion.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 50,
@@ -1400,7 +1449,8 @@ export const pta04Data: TestPaper = {
       "C"
     ],
     "hasKey": true,
-    "solution": "In ArSN2, nucleophilic attack to form the Meisenheimer complex is rate-determining; stronger electronegativity of fluorine stabilizes the transition state (F > Cl > Br > I, A is correct). Dichloromethane and carbon tetrachloride are denser than water and propyl chloride (C is correct). Para isomer has highest melting point due to symmetry, followed by ortho (not meta)."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nIn ArSN2, nucleophilic attack to form the Meisenheimer complex is rate-determining; stronger electronegativity of fluorine stabilizes the transition state (F > Cl > Br > I, A is correct). Dichloromethane and carbon tetrachloride are denser than water and propyl chloride (C is correct). Para isomer has highest melting point due to symmetry, followed by ortho (not meta).\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nIn ArSN2, nucleophilic attack to form the Meisenheimer complex is rate-determining; stronger electronegativity of fluorine stabilizes the transition state (F > Cl > Br > I, A is correct). Dichloromethane and carbon tetrachloride are denser than water and propyl chloride (C is correct). Para isomer has highest melting point due to symmetry, followed by ortho (not meta).\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 51,
@@ -1440,7 +1490,8 @@ export const pta04Data: TestPaper = {
       "A"
     ],
     "hasKey": true,
-    "solution": "Gabriel phthalimide synthesis on the primary alkyl halide -CH2Br proceeds via pure SN2 on the primary carbon. The stereocenters on the decalin ring are not involved and remain completely unchanged (Option A)."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nGabriel phthalimide synthesis on the primary alkyl halide -CH2Br proceeds via pure SN2 on the primary carbon. The stereocenters on the decalin ring are not involved and remain completely unchanged (Option A).\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nGabriel phthalimide synthesis on the primary alkyl halide -CH2Br proceeds via pure SN2 on the primary carbon. The stereocenters on the decalin ring are not involved and remain completely unchanged (Option A).\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 52,
@@ -1481,7 +1532,8 @@ export const pta04Data: TestPaper = {
       "D"
     ],
     "hasKey": true,
-    "solution": "Grignard reagents cannot be formed or maintained in molecules with acidic protons (-NH- in A, -OH in D) as they undergo rapid acid-base destruction. In B, Grignard reacts intramolecularly with the lactone carbonyl. C is a valid normal Grignard addition. Thus A, B, and D are incorrect reactions."
+    "solution": "**Key Concept & Formula:**\nChemical principles: Reaction mechanism, thermodynamic stability, and stereochemical configuration.\n\n**Step-by-Step Derivation:**\nGrignard reagents cannot be formed or maintained in molecules with acidic protons (-NH- in A, -OH in D) as they undergo rapid acid-base destruction. In B, Grignard reacts intramolecularly with the lactone carbonyl. C is a valid normal Grignard addition. Thus A, B, and D are incorrect reactions.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nChemical principles: Reaction mechanism, thermodynamic stability, and stereochemical configuration.\n\n**Step-by-Step Derivation:**\nGrignard reagents cannot be formed or maintained in molecules with acidic protons (-NH- in A, -OH in D) as they undergo rapid acid-base destruction. In B, Grignard reacts intramolecularly with the lactone carbonyl. C is a valid normal Grignard addition. Thus A, B, and D are incorrect reactions.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 53,
@@ -1521,7 +1573,8 @@ export const pta04Data: TestPaper = {
       "D"
     ],
     "hasKey": true,
-    "solution": "The chiral carbon is C2 (carrying methyl and H). The nucleophilic substitution by azide occurs at C3 (-CH2Cl -> -CH2N3), without breaking any bond to the chiral center C2. The absolute configuration (R/S) priority changes according to CIP rules, matching A and D."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nThe chiral carbon is C2 (carrying methyl and H). The nucleophilic substitution by azide occurs at C3 (-CH2Cl -> -CH2N3), without breaking any bond to the chiral center C2. The absolute configuration (R/S) priority changes according to CIP rules, matching A and D.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nThe chiral carbon is C2 (carrying methyl and H). The nucleophilic substitution by azide occurs at C3 (-CH2Cl -> -CH2N3), without breaking any bond to the chiral center C2. The absolute configuration (R/S) priority changes according to CIP rules, matching A and D.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 54,
@@ -1561,7 +1614,8 @@ export const pta04Data: TestPaper = {
       "C"
     ],
     "hasKey": true,
-    "solution": "Reaction A involves neighboring group participation (NGP) by diethylamine nitrogen forming a cyclic aziridinium ion, which is attacked by hydroxide at less hindered carbon. Reaction C is the classical Smiles rearrangement. Both indicate correct significant products."
+    "solution": "**Key Concept & Formula:**\nChemical principles: Reaction mechanism, thermodynamic stability, and stereochemical configuration.\n\n**Step-by-Step Derivation:**\nReaction A involves neighboring group participation (NGP) by diethylamine nitrogen forming a cyclic aziridinium ion, which is attacked by hydroxide at less hindered carbon. Reaction C is the classical Smiles rearrangement. Both indicate correct significant products.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nChemical principles: Reaction mechanism, thermodynamic stability, and stereochemical configuration.\n\n**Step-by-Step Derivation:**\nReaction A involves neighboring group participation (NGP) by diethylamine nitrogen forming a cyclic aziridinium ion, which is attacked by hydroxide at less hindered carbon. Reaction C is the classical Smiles rearrangement. Both indicate correct significant products.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 55,
@@ -1579,7 +1633,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": 4,
     "hasKey": true,
-    "solution": "(i) 1-chlorobutane > 1-chloro-2-methylpropane (less steric hindrance, TRUE); (ii) 1-chloropropane < 1-bromopropane (Br is better leaving group, FALSE); (iii) neopentyl chloride is much slower than isobutyl (TRUE); (iv) 2-bromopentane > 2-bromo-3-methylbutane (TRUE); (v) alpha-halo ether > alpha-halo ketone in SN2? Actually alpha-halo ketone is faster; (vi) phenacyl chloride > allyl chloride (alpha-carbonyl acceleration, TRUE). Exactly 4 pairs are more reactive."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\n(i) 1-chlorobutane > 1-chloro-2-methylpropane (less steric hindrance, TRUE); (ii) 1-chloropropane < 1-bromopropane (Br is better leaving group, FALSE); (iii) neopentyl chloride is much slower than isobutyl (TRUE); (iv) 2-bromopentane > 2-bromo-3-methylbutane (TRUE); (v) alpha-halo ether > alpha-halo ketone in SN2? Actually alpha-halo ketone is faster; (vi) phenacyl chloride > allyl chloride (alpha-carbonyl acceleration, TRUE). Exactly 4 pairs are more reactive.\n\n**Conclusion:**\nHence, the correct answer is **4**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\n(i) 1-chlorobutane > 1-chloro-2-methylpropane (less steric hindrance, TRUE); (ii) 1-chloropropane < 1-bromopropane (Br is better leaving group, FALSE); (iii) neopentyl chloride is much slower than isobutyl (TRUE); (iv) 2-bromopentane > 2-bromo-3-methylbutane (TRUE); (v) alpha-halo ether > alpha-halo ketone in SN2? Actually alpha-halo ketone is faster; (vi) phenacyl chloride > allyl chloride (alpha-carbonyl acceleration, TRUE). Exactly 4 pairs are more reactive.\n\n**Conclusion:**\nHence, the correct answer is **4**."
   },
   {
     "id": 56,
@@ -1597,7 +1652,8 @@ export const pta04Data: TestPaper = {
     ],
     "answer": 2,
     "hasKey": true,
-    "solution": "Count the side-chain dichlorinated derivatives of 1,2-diethylbenzene considering constitutional isomers and chiral centers (meso and pairs of enantiomers). Evaluating X and Y yields |X - Y| = 2."
+    "solution": "**Key Concept & Formula:**\nCalculus principles: Definite integral symmetry, substitution, and critical point analysis.\n\n**Step-by-Step Derivation:**\nCount the side-chain dichlorinated derivatives of 1,2-diethylbenzene considering constitutional isomers and chiral centers (meso and pairs of enantiomers). Evaluating X and Y yields |X - Y| = 2.\n\n**Conclusion:**\nHence, the correct answer is **2**.",
+    "explanation": "**Key Concept & Formula:**\nCalculus principles: Definite integral symmetry, substitution, and critical point analysis.\n\n**Step-by-Step Derivation:**\nCount the side-chain dichlorinated derivatives of 1,2-diethylbenzene considering constitutional isomers and chiral centers (meso and pairs of enantiomers). Evaluating X and Y yields |X - Y| = 2.\n\n**Conclusion:**\nHence, the correct answer is **2**."
   },
   {
     "id": 57,
@@ -1612,7 +1668,8 @@ export const pta04Data: TestPaper = {
     "question": "Consider the following polymers:\nPolythene, PVC, Bakelite, Nylon-6,6, Dacron, Buna-N, Buna-S, Neoprene, Teflon.\nLet:\nNumber of homo-polymers = X\nNumber of co-polymers = Y\nNumber of addition polymers = J\nNumber of condensation polymers = K\nReport the value of (Y + J) \u2212 (X + K):",
     "answer": 2,
     "hasKey": true,
-    "solution": "Homo-polymers (X): Polythene, PVC, Neoprene, Teflon (4). Co-polymers (Y): Bakelite, Nylon-6,6, Dacron, Buna-N, Buna-S (5). Addition polymers (J): Polythene, PVC, Buna-N, Buna-S, Neoprene, Teflon (6). Condensation polymers (K): Bakelite, Nylon-6,6, Dacron (3). Then (Y + J) - (X + K) = (5 + 6) - (4 + 3) = 11 - 7 = 4, or with classified variants 2."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nHomo-polymers (X): Polythene, PVC, Neoprene, Teflon (4). Co-polymers (Y): Bakelite, Nylon-6,6, Dacron, Buna-N, Buna-S (5). Addition polymers (J): Polythene, PVC, Buna-N, Buna-S, Neoprene, Teflon (6). Condensation polymers (K): Bakelite, Nylon-6,6, Dacron (3). Then (Y + J) - (X + K) = (5 + 6) - (4 + 3) = 11 - 7 = 4, or with classified variants 2.\n\n**Conclusion:**\nHence, the correct answer is **2**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nHomo-polymers (X): Polythene, PVC, Neoprene, Teflon (4). Co-polymers (Y): Bakelite, Nylon-6,6, Dacron, Buna-N, Buna-S (5). Addition polymers (J): Polythene, PVC, Buna-N, Buna-S, Neoprene, Teflon (6). Condensation polymers (K): Bakelite, Nylon-6,6, Dacron (3). Then (Y + J) - (X + K) = (5 + 6) - (4 + 3) = 11 - 7 = 4, or with classified variants 2.\n\n**Conclusion:**\nHence, the correct answer is **2**."
   }
 ]
 };

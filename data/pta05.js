@@ -1,4 +1,9 @@
 window.pta05Data = {
+  id: "jee-advanced-pta-05",
+  examCategory: "jee-advanced",
+  examType: "JEE Advanced",
+  code: "PTA 05",
+  status: "live",
   id: "pta-05",
   title: "JEE Advanced Test Series — PTA-05 (Model-A)",
   subtitle: "Full Syllabus Comprehensive Mock Examination",
@@ -46,7 +51,8 @@ window.pta05Data = {
     "question": "Ten distinct persons including A, B, C, D, E, F are arranged in a row. Their positions satisfy A is to the left of B, B is to the left of C, D is to the left of E and E is to the left of F. The number of such arrangements in which exactly two among D, E, F lie strictly between A and C, with no restriction on the positions of the remaining four persons, is $5\\tau$, then '$\\tau$' is equal to",
     "answer": "10080",
     "hasKey": true,
-    "solution": "There are 10 persons. The relative orders of (A, B, C) and (D, E, F) are fixed. Exactly two among {D, E, F} must lie between A and C. Solving the combinatorial configurations gives 5\u03c4 = 50400, hence \u03c4 = 10080."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nThere are 10 persons. The relative orders of (A, B, C) and (D, E, F) are fixed. Exactly two among {D, E, F} must lie between A and C. Solving the combinatorial configurations gives 5\\u03c4 = 50400, hence \\u03c4 = 10080.\n\n**Conclusion:**\nHence, the correct answer is **10080**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nThere are 10 persons. The relative orders of (A, B, C) and (D, E, F) are fixed. Exactly two among {D, E, F} must lie between A and C. Solving the combinatorial configurations gives 5\\u03c4 = 50400, hence \\u03c4 = 10080.\n\n**Conclusion:**\nHence, the correct answer is **10080**."
   },
   {
     "id": 2,
@@ -61,7 +67,8 @@ window.pta05Data = {
     "question": "The number of ordered 6-tuples $(x_1, x_2, \\dots, x_6)$ of integers satisfying $x_1 + x_2 + x_3 + x_4 + x_5 + x_6 = 14$, $0 \\le x_i \\le 4$ $\\forall\\ i = 1,2,3,4,5,6$ such that exactly two among $x_1, x_2, x_3, x_4, x_5, x_6$ are odd, is",
     "answer": "135",
     "hasKey": true,
-    "solution": "Choose the 2 odd positions in $\\binom{6}{2} = 15$ ways. Let $x_1, x_2$ be odd (1 or 3) and $x_3, x_4, x_5, x_6$ be even (0, 2, or 4). Generating functions or substitution yields 135 valid tuples."
+    "solution": "**Key Concept & Formula:**\nCalculus principles: Definite integral symmetry, substitution, and critical point analysis.\n\n**Step-by-Step Derivation:**\nChoose the 2 odd positions in $\\\\binom{6}{2} = 15$ ways. Let $x_1, x_2$ be odd (1 or 3) and $x_3, x_4, x_5, x_6$ be even (0, 2, or 4). Generating functions or substitution yields 135 valid tuples.\n\n**Conclusion:**\nHence, the correct answer is **135**.",
+    "explanation": "**Key Concept & Formula:**\nCalculus principles: Definite integral symmetry, substitution, and critical point analysis.\n\n**Step-by-Step Derivation:**\nChoose the 2 odd positions in $\\\\binom{6}{2} = 15$ ways. Let $x_1, x_2$ be odd (1 or 3) and $x_3, x_4, x_5, x_6$ be even (0, 2, or 4). Generating functions or substitution yields 135 valid tuples.\n\n**Conclusion:**\nHence, the correct answer is **135**."
   },
   {
     "id": 3,
@@ -76,7 +83,8 @@ window.pta05Data = {
     "question": "Let $S = \\{1,2,3,\\dots,10\\}$ and $f : S \\to S$ satisfying all of the following conditions:\n(i) $f(f(f(f(x)))) = x$ for every $x \\in S$;\n(ii) exactly two elements $x \\in S$ satisfy $f(x) = x$;\n(iii) the elements satisfying $f(f(x)) = x$ are exactly the same two elements that satisfy $f(x) = x$.\nIf the number of such functions is $100\\psi$, then '$\\psi$' is equal to",
     "answer": "315",
     "hasKey": true,
-    "solution": "The cycle decomposition of $f$ must consist of two 1-cycles (fixed points) and two 4-cycles (no 2-cycles since condition (iii) forbids extra points with $f^2(x)=x$). Number of ways is $\\binom{10}{2} \\times \\frac{1}{2} \\binom{8}{4} \\times 3! \\times 3! = 45 \\times 35 \\times 36 / 2 = 31500 = 100\\psi$, so $\\psi = 315$."
+    "solution": "**Key Concept & Formula:**\nCombinatorics & Permutations: Systematic grouping, circular gap theorem, and multinomial coefficients.\n\n**Step-by-Step Derivation:**\nThe cycle decomposition of $f$ must consist of two 1-cycles (fixed points) and two 4-cycles (no 2-cycles since condition (iii) forbids extra points with $f^2(x)=x$). Number of ways is $\\\\binom{10}{2} \\\\times \\\\frac{1}{2} \\\\binom{8}{4} \\\\times 3! \\\\times 3! = 45 \\\\times 35 \\\\times 36 / 2 = 31500 = 100\\\\psi$, so $\\\\psi = 315$.\n\n**Conclusion:**\nHence, the correct answer is **315**.",
+    "explanation": "**Key Concept & Formula:**\nCombinatorics & Permutations: Systematic grouping, circular gap theorem, and multinomial coefficients.\n\n**Step-by-Step Derivation:**\nThe cycle decomposition of $f$ must consist of two 1-cycles (fixed points) and two 4-cycles (no 2-cycles since condition (iii) forbids extra points with $f^2(x)=x$). Number of ways is $\\\\binom{10}{2} \\\\times \\\\frac{1}{2} \\\\binom{8}{4} \\\\times 3! \\\\times 3! = 45 \\\\times 35 \\\\times 36 / 2 = 31500 = 100\\\\psi$, so $\\\\psi = 315$.\n\n**Conclusion:**\nHence, the correct answer is **315**."
   },
   {
     "id": 4,
@@ -91,7 +99,8 @@ window.pta05Data = {
     "question": "Consider a circle with $1,2,3,\\dots,18$ written clockwise on it. For two distinct integers $a$ and $b$, their cyclic distance is defined as $\\min(|a - b|, 18 - |a - b|)$. Number of ways in which six integers are chosen on the circle such that no two of them have cyclic distance 1 and exactly one unordered pair of them has cyclic distance 2, is",
     "answer": "180",
     "hasKey": true,
-    "solution": "Using circular gap theorem with specified spacing constraints gives 180 ways."
+    "solution": "**Key Concept & Formula:**\nCombinatorics & Permutations: Systematic grouping, circular gap theorem, and multinomial coefficients.\n\n**Step-by-Step Derivation:**\nUsing circular gap theorem with specified spacing constraints gives 180 ways.\n\n**Conclusion:**\nHence, the correct answer is **180**.",
+    "explanation": "**Key Concept & Formula:**\nCombinatorics & Permutations: Systematic grouping, circular gap theorem, and multinomial coefficients.\n\n**Step-by-Step Derivation:**\nUsing circular gap theorem with specified spacing constraints gives 180 ways.\n\n**Conclusion:**\nHence, the correct answer is **180**."
   },
   {
     "id": 5,
@@ -106,7 +115,8 @@ window.pta05Data = {
     "question": "Using each of the digits $0,1,2,\\dots,7$ exactly once, the number of arrangements that form 8-digit positive integers (first digit is non-zero) divisible by 11, is",
     "answer": "3456",
     "hasKey": true,
-    "solution": "Sum of digits $0+1+\\dots+7 = 28$. Divisibility by 11 requires $S_{odd} - S_{even} = 0$ or $\\pm 11$ or $22$. Since parity requires both sums to be 14, partition {0,1,2,3,4,5,6,7} into two sets of 4 summing to 14. Accounting for leading zero exclusions yields 3456."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nSum of digits $0+1+\\\\dots+7 = 28$. Divisibility by 11 requires $S_{odd} - S_{even} = 0$ or $\\\\pm 11$ or $22$. Since parity requires both sums to be 14, partition {0,1,2,3,4,5,6,7} into two sets of 4 summing to 14. Accounting for leading zero exclusions yields 3456.\n\n**Conclusion:**\nHence, the correct answer is **3456**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nSum of digits $0+1+\\\\dots+7 = 28$. Divisibility by 11 requires $S_{odd} - S_{even} = 0$ or $\\\\pm 11$ or $22$. Since parity requires both sums to be 14, partition {0,1,2,3,4,5,6,7} into two sets of 4 summing to 14. Accounting for leading zero exclusions yields 3456.\n\n**Conclusion:**\nHence, the correct answer is **3456**."
   },
   {
     "id": 6,
@@ -121,7 +131,8 @@ window.pta05Data = {
     "question": "A sequence consisting of 16 symbols is formed using exactly nine symbols R and seven symbols B. For $k = 1,2,3,\\dots,16$, define $d_k = (\\text{Number of 'R's among the first } k \\text{ symbols}) - (\\text{number of 'B's among the first } k \\text{ symbols})$. The number of such sequences satisfying $d_k \\in \\{0,1,2\\}$ for every $k = 1,2,3,\\dots,16$ is",
     "answer": "1",
     "hasKey": true,
-    "solution": "The random walk must stay within boundary {0,1,2} at all times. Since total R = 9 and B = 7, the difference at end is 2. The only valid path alternates: R, B/R... strictly forcing 1 unique path."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nThe random walk must stay within boundary {0,1,2} at all times. Since total R = 9 and B = 7, the difference at end is 2. The only valid path alternates: R, B/R... strictly forcing 1 unique path.\n\n**Conclusion:**\nHence, the correct answer is **1**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nThe random walk must stay within boundary {0,1,2} at all times. Since total R = 9 and B = 7, the difference at end is 2. The only valid path alternates: R, B/R... strictly forcing 1 unique path.\n\n**Conclusion:**\nHence, the correct answer is **1**."
   },
   {
     "id": 7,
@@ -136,7 +147,8 @@ window.pta05Data = {
     "question": "Let $S = \\{1,2,3,\\dots,8\\}$. A division of $S$ means an unordered collection of four pairwise disjoint 2-element subsets whose union is $S$; within each 2-element subset, the order of its elements is ignored. The number of such divisions in which none of the four subsets is one of $\\{1,2\\}, \\{2,3\\}, \\dots, \\{7,8\\}, \\{8,1\\}$, is",
     "answer": "34",
     "hasKey": true,
-    "solution": "Total unrestricted 2-partitions of 8 elements is $\\frac{8!}{2^4 \\cdot 4!} = 105$. Applying principle of inclusion-exclusion for the 8 forbidden circular edges yields 34."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nTotal unrestricted 2-partitions of 8 elements is $\\\\frac{8!}{2^4 \\\\cdot 4!} = 105$. Applying principle of inclusion-exclusion for the 8 forbidden circular edges yields 34.\n\n**Conclusion:**\nHence, the correct answer is **34**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nTotal unrestricted 2-partitions of 8 elements is $\\\\frac{8!}{2^4 \\\\cdot 4!} = 105$. Applying principle of inclusion-exclusion for the 8 forbidden circular edges yields 34.\n\n**Conclusion:**\nHence, the correct answer is **34**."
   },
   {
     "id": 8,
@@ -151,7 +163,8 @@ window.pta05Data = {
     "question": "Consider seven cards $C_1, C_2, C_3, C_4, C_5, C_6, C_7$ and their corresponding seven envelopes $\\varepsilon_1, \\varepsilon_2, \\varepsilon_3, \\varepsilon_4, \\varepsilon_5, \\varepsilon_6, \\varepsilon_7$ respectively, all the cards are to be placed in envelopes so that each envelope contains exactly one card. If $C_i$ is placed in envelope $\\varepsilon_i$, then exactly '$i$' cards are placed in their corresponding envelope and the remaining cards are not placed in their corresponding envelope, then the number of ways in which this can be done is",
     "answer": "0",
     "hasKey": true,
-    "solution": "Self-referential condition requires that if card Ci is in envelope \u03b5i, then the total number of fixed points must be i. If i=1, exactly 1 card in correct envelope: C1 must be in \u03b51 (giving 1 match). Total ways = !6 = 265 for i=1, etc. Summing valid configurations gives 265 or specific formulation."
+    "solution": "**Key Concept & Formula:**\nCombinatorics & Permutations: Systematic grouping, circular gap theorem, and multinomial coefficients.\n\n**Step-by-Step Derivation:**\nSelf-referential condition requires that if card Ci is in envelope \\u03b5i, then the total number of fixed points must be i. If i=1, exactly 1 card in correct envelope: C1 must be in \\u03b51 (giving 1 match). Total ways = !6 = 265 for i=1, etc. Summing valid configurations gives 265 or specific formulation.\n\n**Conclusion:**\nHence, the correct answer is **0**.",
+    "explanation": "**Key Concept & Formula:**\nCombinatorics & Permutations: Systematic grouping, circular gap theorem, and multinomial coefficients.\n\n**Step-by-Step Derivation:**\nSelf-referential condition requires that if card Ci is in envelope \\u03b5i, then the total number of fixed points must be i. If i=1, exactly 1 card in correct envelope: C1 must be in \\u03b51 (giving 1 match). Total ways = !6 = 265 for i=1, etc. Summing valid configurations gives 265 or specific formulation.\n\n**Conclusion:**\nHence, the correct answer is **0**."
   },
   {
     "id": 9,
@@ -190,7 +203,8 @@ window.pta05Data = {
       "D"
     ],
     "hasKey": true,
-    "solution": "Using PIE or rook polynomials, the total number of valid strings is 39480 = 2^3 * 3 * 5 * 7 * 47 or divisible by 3, 5, 7, 43."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nUsing PIE or rook polynomials, the total number of valid strings is 39480 = 2^3 * 3 * 5 * 7 * 47 or divisible by 3, 5, 7, 43.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nUsing PIE or rook polynomials, the total number of valid strings is 39480 = 2^3 * 3 * 5 * 7 * 47 or divisible by 3, 5, 7, 43.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 10,
@@ -228,7 +242,8 @@ window.pta05Data = {
       "D"
     ],
     "hasKey": true,
-    "solution": "Number of ordered pairs with lcm(a,b)=N is (2*4+1)(2*3+1)(2*2+1) = 9*7*5 = 315. Unordered pairs: (315+1)/2 = 158. gcd=1 gives 2^3 = 8 pairs. Exactly one equal to N is 2*d(N) - 2 = 2*(5*4*3) - 2 = 120 - 2 = 118."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nNumber of ordered pairs with lcm(a,b)=N is (2*4+1)(2*3+1)(2*2+1) = 9*7*5 = 315. Unordered pairs: (315+1)/2 = 158. gcd=1 gives 2^3 = 8 pairs. Exactly one equal to N is 2*d(N) - 2 = 2*(5*4*3) - 2 = 120 - 2 = 118.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nNumber of ordered pairs with lcm(a,b)=N is (2*4+1)(2*3+1)(2*2+1) = 9*7*5 = 315. Unordered pairs: (315+1)/2 = 158. gcd=1 gives 2^3 = 8 pairs. Exactly one equal to N is 2*d(N) - 2 = 2*(5*4*3) - 2 = 120 - 2 = 118.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 11,
@@ -266,7 +281,8 @@ window.pta05Data = {
       "D"
     ],
     "hasKey": true,
-    "solution": "Grid lines: 5 horizontal, 6 vertical. Total rectangles = C(5,2)*C(6,2) = 10*15 = 150. Squares = 4*5 + 3*4 + 2*3 + 1*2 = 20+12+6+2 = 40."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nGrid lines: 5 horizontal, 6 vertical. Total rectangles = C(5,2)*C(6,2) = 10*15 = 150. Squares = 4*5 + 3*4 + 2*3 + 1*2 = 20+12+6+2 = 40.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nGrid lines: 5 horizontal, 6 vertical. Total rectangles = C(5,2)*C(6,2) = 10*15 = 150. Squares = 4*5 + 3*4 + 2*3 + 1*2 = 20+12+6+2 = 40.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 12,
@@ -303,7 +319,8 @@ window.pta05Data = {
       "D"
     ],
     "hasKey": true,
-    "solution": "Total onto functions = 4! * S(9,4) = 24 * 7770 = 186480. Sum of N_i = 9. Sum of four odd numbers must be even, but 9 is odd, so D is true."
+    "solution": "**Key Concept & Formula:**\nCalculus principles: Definite integral symmetry, substitution, and critical point analysis.\n\n**Step-by-Step Derivation:**\nTotal onto functions = 4! * S(9,4) = 24 * 7770 = 186480. Sum of N_i = 9. Sum of four odd numbers must be even, but 9 is odd, so D is true.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nCalculus principles: Definite integral symmetry, substitution, and critical point analysis.\n\n**Step-by-Step Derivation:**\nTotal onto functions = 4! * S(9,4) = 24 * 7770 = 186480. Sum of N_i = 9. Sum of four odd numbers must be even, but 9 is odd, so D is true.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 13,
@@ -341,7 +358,8 @@ window.pta05Data = {
       "C"
     ],
     "hasKey": true,
-    "solution": "Partitions of 12 into at most 5 parts: p_5(12) = 47. No box empty = p_5(12-5) = p_5(7) = 13. Exactly two empty = p_3(12 - 3) = p_3(9) = 12."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nPartitions of 12 into at most 5 parts: p_5(12) = 47. No box empty = p_5(12-5) = p_5(7) = 13. Exactly two empty = p_3(12 - 3) = p_3(9) = 12.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nPartitions of 12 into at most 5 parts: p_5(12) = 47. No box empty = p_5(12-5) = p_5(7) = 13. Exactly two empty = p_3(12 - 3) = p_3(9) = 12.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 14,
@@ -379,7 +397,8 @@ window.pta05Data = {
       "C"
     ],
     "hasKey": true,
-    "solution": "Standard derangement recurrence relations: D_n = (n-1)(D_{n-1}+D_{n-2}) and D_n = n D_{n-1} + (-1)^n. Also n! = sum C(n,k) D_k."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nStandard derangement recurrence relations: D_n = (n-1)(D_{n-1}+D_{n-2}) and D_n = n D_{n-1} + (-1)^n. Also n! = sum C(n,k) D_k.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nStandard derangement recurrence relations: D_n = (n-1)(D_{n-1}+D_{n-2}) and D_n = n D_{n-1} + (-1)^n. Also n! = sum C(n,k) D_k.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 15,
@@ -454,7 +473,8 @@ window.pta05Data = {
     ],
     "answer": "B",
     "hasKey": true,
-    "solution": "(I) = 7*6*2^5 = 1344 -> S; (II) = C(7,3)*2^4 = 35*16 = 560 or 420; matching yields B."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\n(I) = 7*6*2^5 = 1344 -> S; (II) = C(7,3)*2^4 = 35*16 = 560 or 420; matching yields B.\n\n**Conclusion:**\nHence, the correct answer is **B**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\n(I) = 7*6*2^5 = 1344 -> S; (II) = C(7,3)*2^4 = 35*16 = 560 or 420; matching yields B.\n\n**Conclusion:**\nHence, the correct answer is **B**."
   },
   {
     "id": 16,
@@ -529,7 +549,8 @@ window.pta05Data = {
     ],
     "answer": "B",
     "hasKey": true,
-    "solution": "(I) = C(6,2)*C(4,2)*2^2 = 15*6*4 = 360 -> R. (IV) = C(12,6) - C(6,6)*2^6 = 924 - 64 = 860 -> T. Hence B: (I)\u2192(R), (II)\u2192(P), (III)\u2192(Q), (IV)\u2192(T)."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\n(I) = C(6,2)*C(4,2)*2^2 = 15*6*4 = 360 -> R. (IV) = C(12,6) - C(6,6)*2^6 = 924 - 64 = 860 -> T. Hence B: (I)\\u2192(R), (II)\\u2192(P), (III)\\u2192(Q), (IV)\\u2192(T).\n\n**Conclusion:**\nHence, the correct answer is **B**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\n(I) = C(6,2)*C(4,2)*2^2 = 15*6*4 = 360 -> R. (IV) = C(12,6) - C(6,6)*2^6 = 924 - 64 = 860 -> T. Hence B: (I)\\u2192(R), (II)\\u2192(P), (III)\\u2192(Q), (IV)\\u2192(T).\n\n**Conclusion:**\nHence, the correct answer is **B**."
   },
   {
     "id": 17,
@@ -604,7 +625,8 @@ window.pta05Data = {
     ],
     "answer": "A",
     "hasKey": true,
-    "solution": "Total matrices = 9! / (3! 4! 2!) = 1260 -> S. For trace 0, diagonal sum is 0 (one 0, one 1, one -1). Symmetric matrices count is 30 -> Q. Hence A: (I)\u2192(S), (II)\u2192(Q), (III)\u2192(R), (IV)\u2192(P)."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nTotal matrices = 9! / (3! 4! 2!) = 1260 -> S. For trace 0, diagonal sum is 0 (one 0, one 1, one -1). Symmetric matrices count is 30 -> Q. Hence A: (I)\\u2192(S), (II)\\u2192(Q), (III)\\u2192(R), (IV)\\u2192(P).\n\n**Conclusion:**\nHence, the correct answer is **A**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nTotal matrices = 9! / (3! 4! 2!) = 1260 -> S. For trace 0, diagonal sum is 0 (one 0, one 1, one -1). Symmetric matrices count is 30 -> Q. Hence A: (I)\\u2192(S), (II)\\u2192(Q), (III)\\u2192(R), (IV)\\u2192(P).\n\n**Conclusion:**\nHence, the correct answer is **A**."
   },
   {
     "id": 18,
@@ -679,7 +701,8 @@ window.pta05Data = {
     ],
     "answer": "B",
     "hasKey": true,
-    "solution": "BALLOON has letters A, B, L, L, N, O, O. Rank calculation of LBOONAL gives 479 -> S. Non-decreasing functions with |Im|=3 is C(6,3)*C(4,2) = 20*6 = 120 -> P. Hence B."
+    "solution": "**Key Concept & Formula:**\nCalculus principles: Definite integral symmetry, substitution, and critical point analysis.\n\n**Step-by-Step Derivation:**\nBALLOON has letters A, B, L, L, N, O, O. Rank calculation of LBOONAL gives 479 -> S. Non-decreasing functions with |Im|=3 is C(6,3)*C(4,2) = 20*6 = 120 -> P. Hence B.\n\n**Conclusion:**\nHence, the correct answer is **B**.",
+    "explanation": "**Key Concept & Formula:**\nCalculus principles: Definite integral symmetry, substitution, and critical point analysis.\n\n**Step-by-Step Derivation:**\nBALLOON has letters A, B, L, L, N, O, O. Rank calculation of LBOONAL gives 479 -> S. Non-decreasing functions with |Im|=3 is C(6,3)*C(4,2) = 20*6 = 120 -> P. Hence B.\n\n**Conclusion:**\nHence, the correct answer is **B**."
   },
   {
     "id": 19,
@@ -697,7 +720,8 @@ window.pta05Data = {
     ],
     "answer": "3",
     "hasKey": true,
-    "solution": "In steady state, capacitors act as open circuits. Find the Thevenin equivalent resistance across resistor R. Maximum power transfer theorem states R = R_th. Calculating R_th across the terminals gives R = 3 \u03a9."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nIn steady state, capacitors act as open circuits. Find the Thevenin equivalent resistance across resistor R. Maximum power transfer theorem states R = R_th. Calculating R_th across the terminals gives R = 3 \\u03a9.\n\n**Conclusion:**\nHence, the correct answer is **3**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nIn steady state, capacitors act as open circuits. Find the Thevenin equivalent resistance across resistor R. Maximum power transfer theorem states R = R_th. Calculating R_th across the terminals gives R = 3 \\u03a9.\n\n**Conclusion:**\nHence, the correct answer is **3**."
   },
   {
     "id": 20,
@@ -715,7 +739,8 @@ window.pta05Data = {
     ],
     "answer": "1.7",
     "hasKey": true,
-    "solution": "Calculate initial and final equivalent capacitance. The heat generated H = W_battery - \u0394U = 1/2 C_eq V_0^2. Evaluating with given C = (1/340) \u03bcF and V_0 = 17V yields 1.7 \u03bcJ."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nCalculate initial and final equivalent capacitance. The heat generated H = W_battery - \\u0394U = 1/2 C_eq V_0^2. Evaluating with given C = (1/340) \\u03bcF and V_0 = 17V yields 1.7 \\u03bcJ.\n\n**Conclusion:**\nHence, the correct answer is **1.7**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nCalculate initial and final equivalent capacitance. The heat generated H = W_battery - \\u0394U = 1/2 C_eq V_0^2. Evaluating with given C = (1/340) \\u03bcF and V_0 = 17V yields 1.7 \\u03bcJ.\n\n**Conclusion:**\nHence, the correct answer is **1.7**."
   },
   {
     "id": 21,
@@ -733,7 +758,8 @@ window.pta05Data = {
     ],
     "answer": "0.85",
     "hasKey": true,
-    "solution": "By exploiting symmetry across the perpendicular bisector plane of PQ and folding symmetry between front and back faces, simplify the bridge network to find equivalent resistance R_eq = (17/20)R = 0.85R, so n = 0.85."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nBy exploiting symmetry across the perpendicular bisector plane of PQ and folding symmetry between front and back faces, simplify the bridge network to find equivalent resistance R_eq = (17/20)R = 0.85R, so n = 0.85.\n\n**Conclusion:**\nHence, the correct answer is **0.85**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nBy exploiting symmetry across the perpendicular bisector plane of PQ and folding symmetry between front and back faces, simplify the bridge network to find equivalent resistance R_eq = (17/20)R = 0.85R, so n = 0.85.\n\n**Conclusion:**\nHence, the correct answer is **0.85**."
   },
   {
     "id": 22,
@@ -751,7 +777,8 @@ window.pta05Data = {
     ],
     "answer": "5",
     "hasKey": true,
-    "solution": "Find potential difference across PQ and RS in the upper circuit using nodal analysis, then relate balancing lengths l1 and l2 to potentiometer gradient. 3(l1/l2) = 5."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nFind potential difference across PQ and RS in the upper circuit using nodal analysis, then relate balancing lengths l1 and l2 to potentiometer gradient. 3(l1/l2) = 5.\n\n**Conclusion:**\nHence, the correct answer is **5**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nFind potential difference across PQ and RS in the upper circuit using nodal analysis, then relate balancing lengths l1 and l2 to potentiometer gradient. 3(l1/l2) = 5.\n\n**Conclusion:**\nHence, the correct answer is **5**."
   },
   {
     "id": 23,
@@ -769,7 +796,8 @@ window.pta05Data = {
     ],
     "answer": "2",
     "hasKey": true,
-    "solution": "Dimensional analysis and physical derivation of bound charge transport: current charging dome I = dq/dt = \u03c3_bound * b * v. Leaking current through air of resistivity \u03c1 gives steady state voltage V_dome = q / (4\u03c0\u03b50 R) = I R_air = I (\u03c1 / 4\u03c0R). Equating gives q = I \u03c1 \u03b50. Thus x = 1, y = 1, giving x + y = 2."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nDimensional analysis and physical derivation of bound charge transport: current charging dome I = dq/dt = \\u03c3_bound * b * v. Leaking current through air of resistivity \\u03c1 gives steady state voltage V_dome = q / (4\\u03c0\\u03b50 R) = I R_air = I (\\u03c1 / 4\\u03c0R). Equating gives q = I \\u03c1 \\u03b50. Thus x = 1, y = 1, giving x + y = 2.\n\n**Conclusion:**\nHence, the correct answer is **2**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nDimensional analysis and physical derivation of bound charge transport: current charging dome I = dq/dt = \\u03c3_bound * b * v. Leaking current through air of resistivity \\u03c1 gives steady state voltage V_dome = q / (4\\u03c0\\u03b50 R) = I R_air = I (\\u03c1 / 4\\u03c0R). Equating gives q = I \\u03c1 \\u03b50. Thus x = 1, y = 1, giving x + y = 2.\n\n**Conclusion:**\nHence, the correct answer is **2**."
   },
   {
     "id": 24,
@@ -787,7 +815,8 @@ window.pta05Data = {
     ],
     "answer": "3",
     "hasKey": true,
-    "solution": "Due to symmetry and identical resistances of voltmeters, solve the bridge network potentials across V1, V2, and V3. Reading of V3 is 3 V."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nDue to symmetry and identical resistances of voltmeters, solve the bridge network potentials across V1, V2, and V3. Reading of V3 is 3 V.\n\n**Conclusion:**\nHence, the correct answer is **3**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nDue to symmetry and identical resistances of voltmeters, solve the bridge network potentials across V1, V2, and V3. Reading of V3 is 3 V.\n\n**Conclusion:**\nHence, the correct answer is **3**."
   },
   {
     "id": 25,
@@ -802,7 +831,8 @@ window.pta05Data = {
     "question": "The temperature dependence of the resistance of a non linear resistor is investigated in a laboratory having constant ambient temperature $T_0 = 20^\\circ\\text{C}$. As the temperature is raised to $T_1 = 100^\\circ\\text{C}$, the resistance changes abruptly from $R_1 = 50\\,\\Omega$ to $R_2 = 100\\,\\Omega$ at $100^\\circ\\text{C}$. On cooling, the reverse abrupt change from $100\\,\\Omega$ to $50\\,\\Omega$ takes place at $T_2 = 90^\\circ\\text{C}$. When a voltage $V = 80\\text{ volt}$ is applied to the resistor, a periodically varying current is established in the circuit after some time. Assume Newton's law of cooling is applicable to the resistor, the proportionality constant being $d = 1.2\\text{ J}\\,\\text{K}^{-1}\\text{s}^{-1}$. The heat capacity of the resistor is $c = 3\\text{ J/K}$. Calculate the time period of the current oscillation (in sec). [Take $\\ln(2.2) = 0.8$]",
     "answer": "2.4",
     "hasKey": true,
-    "solution": "Heating phase from 90\u00b0C to 100\u00b0C with R=50\u03a9 gives t1. Cooling phase from 100\u00b0C to 90\u00b0C with R=100\u03a9 gives t2. Total period T = t1 + t2 = 2.4 sec."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nHeating phase from 90\\u00b0C to 100\\u00b0C with R=50\\u03a9 gives t1. Cooling phase from 100\\u00b0C to 90\\u00b0C with R=100\\u03a9 gives t2. Total period T = t1 + t2 = 2.4 sec.\n\n**Conclusion:**\nHence, the correct answer is **2.4**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nHeating phase from 90\\u00b0C to 100\\u00b0C with R=50\\u03a9 gives t1. Cooling phase from 100\\u00b0C to 90\\u00b0C with R=100\\u03a9 gives t2. Total period T = t1 + t2 = 2.4 sec.\n\n**Conclusion:**\nHence, the correct answer is **2.4**."
   },
   {
     "id": 26,
@@ -820,7 +850,8 @@ window.pta05Data = {
     ],
     "answer": "16",
     "hasKey": true,
-    "solution": "As r_v \u2192 \u221e, PD = 16V = 20*R/(R+r), so r = R/4. At r_v = 8\u03a9, parallel combination R' = 8R/(R+8). PD = 20*R'/(R'+r) = 40/3. Solving for R gives R = 16 \u03a9."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nAs r_v \\u2192 \\u221e, PD = 16V = 20*R/(R+r), so r = R/4. At r_v = 8\\u03a9, parallel combination R' = 8R/(R+8). PD = 20*R'/(R'+r) = 40/3. Solving for R gives R = 16 \\u03a9.\n\n**Conclusion:**\nHence, the correct answer is **16**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nAs r_v \\u2192 \\u221e, PD = 16V = 20*R/(R+r), so r = R/4. At r_v = 8\\u03a9, parallel combination R' = 8R/(R+8). PD = 20*R'/(R'+r) = 40/3. Solving for R gives R = 16 \\u03a9.\n\n**Conclusion:**\nHence, the correct answer is **16**."
   },
   {
     "id": 27,
@@ -861,7 +892,8 @@ window.pta05Data = {
       "C"
     ],
     "hasKey": true,
-    "solution": "Nodal equation at node 1: (V0 - V1)/R1 = V1/R2 + (V1 - V2)/R1. Since V0 = kV1 and V2 = V1/k: (k - 1)/R1 = 1/R2 + (1 - 1/k)/R1. Simplifying yields R1/R2 = (k-1)^2/k. For the end termination, R2/R3 = k/(k-1). Current is I = V1/R2 = (V0/k)/R2 = ((k-1)/k^2) * V0/R3."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nNodal equation at node 1: (V0 - V1)/R1 = V1/R2 + (V1 - V2)/R1. Since V0 = kV1 and V2 = V1/k: (k - 1)/R1 = 1/R2 + (1 - 1/k)/R1. Simplifying yields R1/R2 = (k-1)^2/k. For the end termination, R2/R3 = k/(k-1). Current is I = V1/R2 = (V0/k)/R2 = ((k-1)/k^2) * V0/R3.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nNodal equation at node 1: (V0 - V1)/R1 = V1/R2 + (V1 - V2)/R1. Since V0 = kV1 and V2 = V1/k: (k - 1)/R1 = 1/R2 + (1 - 1/k)/R1. Simplifying yields R1/R2 = (k-1)^2/k. For the end termination, R2/R3 = k/(k-1). Current is I = V1/R2 = (V0/k)/R2 = ((k-1)/k^2) * V0/R3.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 28,
@@ -900,7 +932,8 @@ window.pta05Data = {
       "A"
     ],
     "hasKey": true,
-    "solution": "Initial charges are zero. Final steady state current through r is zero since capacitors block DC. Integrate current through r over time: total charge transferred Q depends only on terminal states when r=0: Q = CV/3."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nInitial charges are zero. Final steady state current through r is zero since capacitors block DC. Integrate current through r over time: total charge transferred Q depends only on terminal states when r=0: Q = CV/3.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nInitial charges are zero. Final steady state current through r is zero since capacitors block DC. Integrate current through r over time: total charge transferred Q depends only on terminal states when r=0: Q = CV/3.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 29,
@@ -940,7 +973,8 @@ window.pta05Data = {
       "C"
     ],
     "hasKey": true,
-    "solution": "Steady state analysis with capacitors open. Solve loop equations for voltages across C1 and C2, and transient currents upon switching S1 and S2."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nSteady state analysis with capacitors open. Solve loop equations for voltages across C1 and C2, and transient currents upon switching S1 and S2.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nSteady state analysis with capacitors open. Solve loop equations for voltages across C1 and C2, and transient currents upon switching S1 and S2.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 30,
@@ -980,7 +1014,8 @@ window.pta05Data = {
       "C"
     ],
     "hasKey": true,
-    "solution": "Force between parallel plates is F = (1/2) \u03b50 A E^2 = (1/2) \u03b50 \u03c0 R^2 (V/d)^2 (A is true). Charge on small disk q = \u03b50 (\u03c0 r^2) E. Electrostatic lift occurs when qE > mg => Vt = sqrt(mg d^2 / (\u03b50 \u03c0 r^2)) or with factor 2 based on contact redistribution."
+    "solution": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nForce between parallel plates is F = (1/2) \\u03b50 A E^2 = (1/2) \\u03b50 \\u03c0 R^2 (V/d)^2 (A is true). Charge on small disk q = \\u03b50 (\\u03c0 r^2) E. Electrostatic lift occurs when qE > mg => Vt = sqrt(mg d^2 / (\\u03b50 \\u03c0 r^2)) or with factor 2 based on contact redistribution.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nForce between parallel plates is F = (1/2) \\u03b50 A E^2 = (1/2) \\u03b50 \\u03c0 R^2 (V/d)^2 (A is true). Charge on small disk q = \\u03b50 (\\u03c0 r^2) E. Electrostatic lift occurs when qE > mg => Vt = sqrt(mg d^2 / (\\u03b50 \\u03c0 r^2)) or with factor 2 based on contact redistribution.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 31,
@@ -1020,7 +1055,8 @@ window.pta05Data = {
       "C"
     ],
     "hasKey": true,
-    "solution": "Battery maintains constant voltage V across the capacitor plates at all times (C is true). When half filled with dielectric and half with air, equivalent capacitance C' = (C/2) + K(C/2) = (K+1)C/2. Charge Q = C'V = (K+1)CV/2 (A is true)."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nBattery maintains constant voltage V across the capacitor plates at all times (C is true). When half filled with dielectric and half with air, equivalent capacitance C' = (C/2) + K(C/2) = (K+1)C/2. Charge Q = C'V = (K+1)CV/2 (A is true).\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nBattery maintains constant voltage V across the capacitor plates at all times (C is true). When half filled with dielectric and half with air, equivalent capacitance C' = (C/2) + K(C/2) = (K+1)C/2. Charge Q = C'V = (K+1)CV/2 (A is true).\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 32,
@@ -1061,7 +1097,8 @@ window.pta05Data = {
       "C"
     ],
     "hasKey": true,
-    "solution": "In Case A, resistors are in series: R = 1/(4\u03c0\u03c31)(1/R1 - 1/R2) + 1/(4\u03c0\u03c32)(1/R2 - 1/R3). Boundary charge follows from boundary condition for electric displacement and current continuity. In Case B, resistors are in parallel across hemispheres: G = 2\u03c0\u03c31 R1R3/(R3-R1) + 2\u03c0\u03c32 R1R3/(R3-R1)."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nIn Case A, resistors are in series: R = 1/(4\\u03c0\\u03c31)(1/R1 - 1/R2) + 1/(4\\u03c0\\u03c32)(1/R2 - 1/R3). Boundary charge follows from boundary condition for electric displacement and current continuity. In Case B, resistors are in parallel across hemispheres: G = 2\\u03c0\\u03c31 R1R3/(R3-R1) + 2\\u03c0\\u03c32 R1R3/(R3-R1).\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nIn Case A, resistors are in series: R = 1/(4\\u03c0\\u03c31)(1/R1 - 1/R2) + 1/(4\\u03c0\\u03c32)(1/R2 - 1/R3). Boundary charge follows from boundary condition for electric displacement and current continuity. In Case B, resistors are in parallel across hemispheres: G = 2\\u03c0\\u03c31 R1R3/(R3-R1) + 2\\u03c0\\u03c32 R1R3/(R3-R1).\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 33,
@@ -1132,7 +1169,8 @@ window.pta05Data = {
     ],
     "answer": "A",
     "hasKey": true,
-    "solution": "Charge relaxation time \u03c4 = \u03c1\u03b50. Current decays exponentially: I(t) = (q0/\u03c4) e^(-t/\u03c4). Charge on outer surface Q(t) = q0(1 - e^(-t/\u03c4)). Matching gives A."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nCharge relaxation time \\u03c4 = \\u03c1\\u03b50. Current decays exponentially: I(t) = (q0/\\u03c4) e^(-t/\\u03c4). Charge on outer surface Q(t) = q0(1 - e^(-t/\\u03c4)). Matching gives A.\n\n**Conclusion:**\nHence, the correct answer is **A**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nCharge relaxation time \\u03c4 = \\u03c1\\u03b50. Current decays exponentially: I(t) = (q0/\\u03c4) e^(-t/\\u03c4). Charge on outer surface Q(t) = q0(1 - e^(-t/\\u03c4)). Matching gives A.\n\n**Conclusion:**\nHence, the correct answer is **A**."
   },
   {
     "id": 34,
@@ -1210,7 +1248,8 @@ window.pta05Data = {
     ],
     "answer": "B",
     "hasKey": true,
-    "solution": "When K is closed, current source is shorted. Circuit operates with remaining batteries and resistors. When K is open, 2mA current is forced through the branch. Matching gives B."
+    "solution": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nWhen K is closed, current source is shorted. Circuit operates with remaining batteries and resistors. When K is open, 2mA current is forced through the branch. Matching gives B.\n\n**Conclusion:**\nHence, the correct answer is **B**.",
+    "explanation": "**Key Concept & Formula:**\nFundamental Physics laws: Conservation of energy/momentum, Gauss's Law, and electromagnetic induction.\n\n**Step-by-Step Derivation:**\nWhen K is closed, current source is shorted. Circuit operates with remaining batteries and resistors. When K is open, 2mA current is forced through the branch. Matching gives B.\n\n**Conclusion:**\nHence, the correct answer is **B**."
   },
   {
     "id": 35,
@@ -1285,7 +1324,8 @@ window.pta05Data = {
     ],
     "answer": "B",
     "hasKey": true,
-    "solution": "Analyze node connections for each capacitor ladder: Circuit P gives 3C/2 -> (4); Circuit Q gives 3C/4 -> (1); Circuit R gives 5C/12 -> (2); Circuit S gives 2C/3 -> (3). Hence B."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nAnalyze node connections for each capacitor ladder: Circuit P gives 3C/2 -> (4); Circuit Q gives 3C/4 -> (1); Circuit R gives 5C/12 -> (2); Circuit S gives 2C/3 -> (3). Hence B.\n\n**Conclusion:**\nHence, the correct answer is **B**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nAnalyze node connections for each capacitor ladder: Circuit P gives 3C/2 -> (4); Circuit Q gives 3C/4 -> (1); Circuit R gives 5C/12 -> (2); Circuit S gives 2C/3 -> (3). Hence B.\n\n**Conclusion:**\nHence, the correct answer is **B**."
   },
   {
     "id": 36,
@@ -1363,7 +1403,8 @@ window.pta05Data = {
     ],
     "answer": "A",
     "hasKey": true,
-    "solution": "In steady state, capacitor branch carries zero current. Loop currents in outer loops determine potentials at E, B, C, D. Potential difference across capacitor gives Q = C \u0394V. Matches option A."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nIn steady state, capacitor branch carries zero current. Loop currents in outer loops determine potentials at E, B, C, D. Potential difference across capacitor gives Q = C \\u0394V. Matches option A.\n\n**Conclusion:**\nHence, the correct answer is **A**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nIn steady state, capacitor branch carries zero current. Loop currents in outer loops determine potentials at E, B, C, D. Potential difference across capacitor gives Q = C \\u0394V. Matches option A.\n\n**Conclusion:**\nHence, the correct answer is **A**."
   },
   {
     "id": 37,
@@ -1381,7 +1422,8 @@ window.pta05Data = {
     ],
     "answer": 5,
     "hasKey": true,
-    "solution": "X is 2,4,6-trinitrophenol (picric acid, %N = 18.34). Y is 2,4-dibromophenol (%O = 9.25). Picric acid has pKa ~ 0.38 (<1), liberates CO2 from NaHCO3, and is stronger than Y. Count of correct statements = 5."
+    "solution": "**Key Concept & Formula:**\nChemical principles: Reaction mechanism, thermodynamic stability, and stereochemical configuration.\n\n**Step-by-Step Derivation:**\nX is 2,4,6-trinitrophenol (picric acid, %N = 18.34). Y is 2,4-dibromophenol (%O = 9.25). Picric acid has pKa ~ 0.38 (<1), liberates CO2 from NaHCO3, and is stronger than Y. Count of correct statements = 5.\n\n**Conclusion:**\nHence, the correct answer is **5**.",
+    "explanation": "**Key Concept & Formula:**\nChemical principles: Reaction mechanism, thermodynamic stability, and stereochemical configuration.\n\n**Step-by-Step Derivation:**\nX is 2,4,6-trinitrophenol (picric acid, %N = 18.34). Y is 2,4-dibromophenol (%O = 9.25). Picric acid has pKa ~ 0.38 (<1), liberates CO2 from NaHCO3, and is stronger than Y. Count of correct statements = 5.\n\n**Conclusion:**\nHence, the correct answer is **5**."
   },
   {
     "id": 38,
@@ -1400,7 +1442,8 @@ window.pta05Data = {
     ],
     "answer": 1,
     "hasKey": true,
-    "solution": "Method (1) uses sodium phenoxide reacting with 1-bromopropane in polar aprotic solvent via SN2 pathway, which gives high yield. Bromobenzene does not undergo SN2 displacement with propoxide."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nMethod (1) uses sodium phenoxide reacting with 1-bromopropane in polar aprotic solvent via SN2 pathway, which gives high yield. Bromobenzene does not undergo SN2 displacement with propoxide.\n\n**Conclusion:**\nHence, the correct answer is **1**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nMethod (1) uses sodium phenoxide reacting with 1-bromopropane in polar aprotic solvent via SN2 pathway, which gives high yield. Bromobenzene does not undergo SN2 displacement with propoxide.\n\n**Conclusion:**\nHence, the correct answer is **1**."
   },
   {
     "id": 39,
@@ -1418,7 +1461,8 @@ window.pta05Data = {
     ],
     "answer": 4,
     "hasKey": true,
-    "solution": "Reactant A oxidizes with 4 moles of PCC to give the cyclic dicarbonyl dialdehyde. Reactant A must have 2 secondary alcohol groups and 2 primary alcohol groups (total 4 hydroxyl groups), consuming 4 moles of acetic anhydride."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nReactant A oxidizes with 4 moles of PCC to give the cyclic dicarbonyl dialdehyde. Reactant A must have 2 secondary alcohol groups and 2 primary alcohol groups (total 4 hydroxyl groups), consuming 4 moles of acetic anhydride.\n\n**Conclusion:**\nHence, the correct answer is **4**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nReactant A oxidizes with 4 moles of PCC to give the cyclic dicarbonyl dialdehyde. Reactant A must have 2 secondary alcohol groups and 2 primary alcohol groups (total 4 hydroxyl groups), consuming 4 moles of acetic anhydride.\n\n**Conclusion:**\nHence, the correct answer is **4**."
   },
   {
     "id": 40,
@@ -1436,7 +1480,8 @@ window.pta05Data = {
     ],
     "answer": 6,
     "hasKey": true,
-    "solution": "Grignard reagent CH3MgBr adds to the carbonyl of 5-chloropentan-2-one to form a tertiary alkoxide, which undergoes intramolecular nucleophilic substitution (SNi/SN2) displacing chloride to form 2,2-dimethyltetrahydrofuran (a 5-membered cyclic ether containing 1 oxygen atom and 4 carbon atoms). Thus x = 1, y = 5, giving x + y = 6."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nGrignard reagent CH3MgBr adds to the carbonyl of 5-chloropentan-2-one to form a tertiary alkoxide, which undergoes intramolecular nucleophilic substitution (SNi/SN2) displacing chloride to form 2,2-dimethyltetrahydrofuran (a 5-membered cyclic ether containing 1 oxygen atom and 4 carbon atoms). Thus x = 1, y = 5, giving x + y = 6.\n\n**Conclusion:**\nHence, the correct answer is **6**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nGrignard reagent CH3MgBr adds to the carbonyl of 5-chloropentan-2-one to form a tertiary alkoxide, which undergoes intramolecular nucleophilic substitution (SNi/SN2) displacing chloride to form 2,2-dimethyltetrahydrofuran (a 5-membered cyclic ether containing 1 oxygen atom and 4 carbon atoms). Thus x = 1, y = 5, giving x + y = 6.\n\n**Conclusion:**\nHence, the correct answer is **6**."
   },
   {
     "id": 41,
@@ -1454,7 +1499,8 @@ window.pta05Data = {
     ],
     "answer": 4,
     "hasKey": true,
-    "solution": "For pent-2-ene derivatives: A (hydration) gives pentan-2-ol and pentan-3-ol (1 chiral center); B (OMDM) gives pentan-2-ol (1 chiral center); C (hydroboration with BD3) introduces chiral centers with deuterium; D (hydroboration) gives pentan-1-ol and pentan-2-ol. Summing yields 4."
+    "solution": "**Key Concept & Formula:**\nCalculus principles: Definite integral symmetry, substitution, and critical point analysis.\n\n**Step-by-Step Derivation:**\nFor pent-2-ene derivatives: A (hydration) gives pentan-2-ol and pentan-3-ol (1 chiral center); B (OMDM) gives pentan-2-ol (1 chiral center); C (hydroboration with BD3) introduces chiral centers with deuterium; D (hydroboration) gives pentan-1-ol and pentan-2-ol. Summing yields 4.\n\n**Conclusion:**\nHence, the correct answer is **4**.",
+    "explanation": "**Key Concept & Formula:**\nCalculus principles: Definite integral symmetry, substitution, and critical point analysis.\n\n**Step-by-Step Derivation:**\nFor pent-2-ene derivatives: A (hydration) gives pentan-2-ol and pentan-3-ol (1 chiral center); B (OMDM) gives pentan-2-ol (1 chiral center); C (hydroboration with BD3) introduces chiral centers with deuterium; D (hydroboration) gives pentan-1-ol and pentan-2-ol. Summing yields 4.\n\n**Conclusion:**\nHence, the correct answer is **4**."
   },
   {
     "id": 42,
@@ -1472,7 +1518,8 @@ window.pta05Data = {
     ],
     "answer": 3,
     "hasKey": true,
-    "solution": "Reaction A is SN2 with NaOH: complete inversion of configuration at chiral center yields 1 enantiomer (x = 1). Reaction B is solvolysis with H2O via planar carbocation (SN1): yields racemic mixture of 2 enantiomers (y = 2). Total x + y = 3."
+    "solution": "**Key Concept & Formula:**\nChemical principles: Reaction mechanism, thermodynamic stability, and stereochemical configuration.\n\n**Step-by-Step Derivation:**\nReaction A is SN2 with NaOH: complete inversion of configuration at chiral center yields 1 enantiomer (x = 1). Reaction B is solvolysis with H2O via planar carbocation (SN1): yields racemic mixture of 2 enantiomers (y = 2). Total x + y = 3.\n\n**Conclusion:**\nHence, the correct answer is **3**.",
+    "explanation": "**Key Concept & Formula:**\nChemical principles: Reaction mechanism, thermodynamic stability, and stereochemical configuration.\n\n**Step-by-Step Derivation:**\nReaction A is SN2 with NaOH: complete inversion of configuration at chiral center yields 1 enantiomer (x = 1). Reaction B is solvolysis with H2O via planar carbocation (SN1): yields racemic mixture of 2 enantiomers (y = 2). Total x + y = 3.\n\n**Conclusion:**\nHence, the correct answer is **3**."
   },
   {
     "id": 43,
@@ -1490,7 +1537,8 @@ window.pta05Data = {
     ],
     "answer": 9,
     "hasKey": true,
-    "solution": "Protonation occurs preferentially at primary OH, followed by hydride/phenyl migration to form diphenylacetaldehyde Ph2CH-CHO. The degree of unsaturation = 2*(benzene ring: 4) + (carbonyl group: 1) = 4 + 4 + 1 = 9."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nProtonation occurs preferentially at primary OH, followed by hydride/phenyl migration to form diphenylacetaldehyde Ph2CH-CHO. The degree of unsaturation = 2*(benzene ring: 4) + (carbonyl group: 1) = 4 + 4 + 1 = 9.\n\n**Conclusion:**\nHence, the correct answer is **9**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nProtonation occurs preferentially at primary OH, followed by hydride/phenyl migration to form diphenylacetaldehyde Ph2CH-CHO. The degree of unsaturation = 2*(benzene ring: 4) + (carbonyl group: 1) = 4 + 4 + 1 = 9.\n\n**Conclusion:**\nHence, the correct answer is **9**."
   },
   {
     "id": 44,
@@ -1508,7 +1556,8 @@ window.pta05Data = {
     ],
     "answer": 3,
     "hasKey": true,
-    "solution": "Aqueous bromine causes electrophilic aromatic substitution at the ortho positions, followed by ipso-substitution (desulfonation) at the para position to form 2,4,6-tribromophenol. The product has 3 bromine atoms."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nAqueous bromine causes electrophilic aromatic substitution at the ortho positions, followed by ipso-substitution (desulfonation) at the para position to form 2,4,6-tribromophenol. The product has 3 bromine atoms.\n\n**Conclusion:**\nHence, the correct answer is **3**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nAqueous bromine causes electrophilic aromatic substitution at the ortho positions, followed by ipso-substitution (desulfonation) at the para position to form 2,4,6-tribromophenol. The product has 3 bromine atoms.\n\n**Conclusion:**\nHence, the correct answer is **3**."
   },
   {
     "id": 45,
@@ -1548,7 +1597,8 @@ window.pta05Data = {
       "B"
     ],
     "hasKey": true,
-    "solution": "Phthalein dye test requires condensation with phthalic anhydride at the para position to the -OH group. Phenols with an unsubstituted para position (like o-cresol and m-cresol) give positive phthalein tests. p-Cresol has its para position blocked and does not form phthalein dyes."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nPhthalein dye test requires condensation with phthalic anhydride at the para position to the -OH group. Phenols with an unsubstituted para position (like o-cresol and m-cresol) give positive phthalein tests. p-Cresol has its para position blocked and does not form phthalein dyes.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nPhthalein dye test requires condensation with phthalic anhydride at the para position to the -OH group. Phenols with an unsubstituted para position (like o-cresol and m-cresol) give positive phthalein tests. p-Cresol has its para position blocked and does not form phthalein dyes.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 46,
@@ -1590,7 +1640,8 @@ window.pta05Data = {
       "D"
     ],
     "hasKey": true,
-    "solution": "A is sodium phenoxide, B is ethyl phenyl ether (phenetole). Cleavage with HI gives phenol (C) and ethyl iodide (D). Phenol gives violet color with FeCl3. Ethyl iodide hydrolyzes with aq NaOH to ethanol."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nA is sodium phenoxide, B is ethyl phenyl ether (phenetole). Cleavage with HI gives phenol (C) and ethyl iodide (D). Phenol gives violet color with FeCl3. Ethyl iodide hydrolyzes with aq NaOH to ethanol.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nA is sodium phenoxide, B is ethyl phenyl ether (phenetole). Cleavage with HI gives phenol (C) and ethyl iodide (D). Phenol gives violet color with FeCl3. Ethyl iodide hydrolyzes with aq NaOH to ethanol.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 47,
@@ -1630,7 +1681,8 @@ window.pta05Data = {
       "D"
     ],
     "hasKey": true,
-    "solution": "Protonation and loss of water creates a carbocation adjacent to the 4- or 5-membered ring (in A and D), triggering ring expansion to relieve angle strain (cyclobutane to cyclopentane, and cyclopentane to cyclohexane)."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nProtonation and loss of water creates a carbocation adjacent to the 4- or 5-membered ring (in A and D), triggering ring expansion to relieve angle strain (cyclobutane to cyclopentane, and cyclopentane to cyclohexane).\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nProtonation and loss of water creates a carbocation adjacent to the 4- or 5-membered ring (in A and D), triggering ring expansion to relieve angle strain (cyclobutane to cyclopentane, and cyclopentane to cyclohexane).\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 48,
@@ -1671,7 +1723,8 @@ window.pta05Data = {
       "D"
     ],
     "hasKey": true,
-    "solution": "In asymmetrical alkenes, HBO gives anti-Markovnikov alcohol without rearrangement, OMDM gives Markovnikov alcohol without rearrangement, while acid-catalysed hydration gives rearranged carbocation products. Only symmetrical cyclohexene (C) gives cyclohexanol in all three."
+    "solution": "**Key Concept & Formula:**\nChemical principles: Reaction mechanism, thermodynamic stability, and stereochemical configuration.\n\n**Step-by-Step Derivation:**\nIn asymmetrical alkenes, HBO gives anti-Markovnikov alcohol without rearrangement, OMDM gives Markovnikov alcohol without rearrangement, while acid-catalysed hydration gives rearranged carbocation products. Only symmetrical cyclohexene (C) gives cyclohexanol in all three.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nChemical principles: Reaction mechanism, thermodynamic stability, and stereochemical configuration.\n\n**Step-by-Step Derivation:**\nIn asymmetrical alkenes, HBO gives anti-Markovnikov alcohol without rearrangement, OMDM gives Markovnikov alcohol without rearrangement, while acid-catalysed hydration gives rearranged carbocation products. Only symmetrical cyclohexene (C) gives cyclohexanol in all three.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 49,
@@ -1712,7 +1765,8 @@ window.pta05Data = {
       "C"
     ],
     "hasKey": true,
-    "solution": "Williamson ether synthesis requires an SN2 attack on an unhindered primary/methyl halide. A involves tertiary halide (elimination dominates); B and C involve vinyl/aryl halides which are inert to SN2 displacement. Diallyl ether (D) can be prepared easily from allyl bromide."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nWilliamson ether synthesis requires an SN2 attack on an unhindered primary/methyl halide. A involves tertiary halide (elimination dominates); B and C involve vinyl/aryl halides which are inert to SN2 displacement. Diallyl ether (D) can be prepared easily from allyl bromide.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nWilliamson ether synthesis requires an SN2 attack on an unhindered primary/methyl halide. A involves tertiary halide (elimination dominates); B and C involve vinyl/aryl halides which are inert to SN2 displacement. Diallyl ether (D) can be prepared easily from allyl bromide.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 50,
@@ -1753,7 +1807,8 @@ window.pta05Data = {
       "C"
     ],
     "hasKey": true,
-    "solution": "Tert-butyl ethers form stable 3\u00b0 carbocations and undergo cleavage via SN1 mechanism (A and B). Primary and secondary ethers cleave via SN2 attack by iodide on less hindered carbon (C). D undergoes SN2, not SN1."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nTert-butyl ethers form stable 3\\u00b0 carbocations and undergo cleavage via SN1 mechanism (A and B). Primary and secondary ethers cleave via SN2 attack by iodide on less hindered carbon (C). D undergoes SN2, not SN1.\n\n**Conclusion:**\nHence, the correct answer is **[**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nTert-butyl ethers form stable 3\\u00b0 carbocations and undergo cleavage via SN1 mechanism (A and B). Primary and secondary ethers cleave via SN2 attack by iodide on less hindered carbon (C). D undergoes SN2, not SN1.\n\n**Conclusion:**\nHence, the correct answer is **[**."
   },
   {
     "id": 51,
@@ -1824,7 +1879,8 @@ window.pta05Data = {
     ],
     "answer": "A",
     "hasKey": true,
-    "solution": "SOCl2 alone acts via SNi with internal nucleophilic return (Retention: II). In presence of pyridine, pyridinium chloride provides free chloride for backside attack (Inversion: I). PBr3 proceeds via SN2 (Inversion: I). HBr forms carbocation (Racemization: III). Option A."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nSOCl2 alone acts via SNi with internal nucleophilic return (Retention: II). In presence of pyridine, pyridinium chloride provides free chloride for backside attack (Inversion: I). PBr3 proceeds via SN2 (Inversion: I). HBr forms carbocation (Racemization: III). Option A.\n\n**Conclusion:**\nHence, the correct answer is **A**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nSOCl2 alone acts via SNi with internal nucleophilic return (Retention: II). In presence of pyridine, pyridinium chloride provides free chloride for backside attack (Inversion: I). PBr3 proceeds via SN2 (Inversion: I). HBr forms carbocation (Racemization: III). Option A.\n\n**Conclusion:**\nHence, the correct answer is **A**."
   },
   {
     "id": 52,
@@ -1902,7 +1958,8 @@ window.pta05Data = {
     ],
     "answer": "B",
     "hasKey": true,
-    "solution": "P gives salicylic acid then acetylation gives Aspirin (IV). Q oxidizes ethanol to acetaldehyde + MeMgBr gives 2-propanol (Isopropyl alcohol: I). R gives isopropyl Grignard + formaldehyde gives isobutyl alcohol (II). S is Reimer-Tiemann giving salicylaldehyde (III). Option B."
+    "solution": "**Key Concept & Formula:**\nChemical principles: Reaction mechanism, thermodynamic stability, and stereochemical configuration.\n\n**Step-by-Step Derivation:**\nP gives salicylic acid then acetylation gives Aspirin (IV). Q oxidizes ethanol to acetaldehyde + MeMgBr gives 2-propanol (Isopropyl alcohol: I). R gives isopropyl Grignard + formaldehyde gives isobutyl alcohol (II). S is Reimer-Tiemann giving salicylaldehyde (III). Option B.\n\n**Conclusion:**\nHence, the correct answer is **B**.",
+    "explanation": "**Key Concept & Formula:**\nChemical principles: Reaction mechanism, thermodynamic stability, and stereochemical configuration.\n\n**Step-by-Step Derivation:**\nP gives salicylic acid then acetylation gives Aspirin (IV). Q oxidizes ethanol to acetaldehyde + MeMgBr gives 2-propanol (Isopropyl alcohol: I). R gives isopropyl Grignard + formaldehyde gives isobutyl alcohol (II). S is Reimer-Tiemann giving salicylaldehyde (III). Option B.\n\n**Conclusion:**\nHence, the correct answer is **B**."
   },
   {
     "id": 53,
@@ -1973,7 +2030,8 @@ window.pta05Data = {
     ],
     "answer": "A",
     "hasKey": true,
-    "solution": "P rearranges to tetrasubstituted 2,3-dimethyl-2-butene (III). Q expands ring to cyclopentene (II). R undergoes hydride shift to 1-methylcyclohexene (I). S undergoes methyl shift to 1,2-dimethylcyclopentene (IV). Option A."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nP rearranges to tetrasubstituted 2,3-dimethyl-2-butene (III). Q expands ring to cyclopentene (II). R undergoes hydride shift to 1-methylcyclohexene (I). S undergoes methyl shift to 1,2-dimethylcyclopentene (IV). Option A.\n\n**Conclusion:**\nHence, the correct answer is **A**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nP rearranges to tetrasubstituted 2,3-dimethyl-2-butene (III). Q expands ring to cyclopentene (II). R undergoes hydride shift to 1-methylcyclohexene (I). S undergoes methyl shift to 1,2-dimethylcyclopentene (IV). Option A.\n\n**Conclusion:**\nHence, the correct answer is **A**."
   },
   {
     "id": 54,
@@ -2044,7 +2102,8 @@ window.pta05Data = {
     ],
     "answer": "B",
     "hasKey": true,
-    "solution": "P proceeds via carbocation (II). Q proceeds via nucleophilic acyl substitution tetrahedral intermediate (I). R produces alkoxide anion (III). S involves electrophilic dichlorocarbene :CCl2 (IV). Option B."
+    "solution": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nP proceeds via carbocation (II). Q proceeds via nucleophilic acyl substitution tetrahedral intermediate (I). R produces alkoxide anion (III). S involves electrophilic dichlorocarbene :CCl2 (IV). Option B.\n\n**Conclusion:**\nHence, the correct answer is **B**.",
+    "explanation": "**Key Concept & Formula:**\nApplication of core competitive examination principles and analytical problem decomposition.\n\n**Step-by-Step Derivation:**\nP proceeds via carbocation (II). Q proceeds via nucleophilic acyl substitution tetrahedral intermediate (I). R produces alkoxide anion (III). S involves electrophilic dichlorocarbene :CCl2 (IV). Option B.\n\n**Conclusion:**\nHence, the correct answer is **B**."
   }
 ]
 };
