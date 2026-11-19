@@ -249,15 +249,15 @@
     examCategory: "jee-advanced",
     examType: "JEE Advanced",
     code: "PTA 06",
-    title: "JEE Advanced Test Series — PTA 06",
+    title: "JEE Advanced Test Series — PTA 06 (Model-A)",
     subtitle: "Full Syllabus Comprehensive Mock Examination",
-    status: "coming_soon",
+    status: "live",
     durationMinutes: 180,
     totalMarks: 180,
-    totalQuestions: 54,
-    subjects: ["Mathematics", "Physics", "Chemistry"],
-    description: "Advanced analytical mock paper focusing on tricky multi-correct options and numerical traps.",
-    isLive: false,
+    totalQuestions: 51,
+    subjects: ["Mathematics (17 Qs)", "Physics (17 Qs)", "Chemistry (17 Qs)"],
+    description: "Authentic JEE Advanced CBT simulation featuring Multiple Correct Choice (+4, -2 with partial marking), Single Correct (+3, -1), Non-Negative Integer (+4, 0), and Matching List (+3, -1).",
+    isLive: true,
     isFree: true
   },
   {
@@ -347,6 +347,9 @@
     }
     if (cleanId.includes('pta05') || cleanId.includes('pta5')) {
       return window.pta05Data;
+    }
+    if (cleanId.includes('pta06') || cleanId.includes('pta6')) {
+      return window.pta06Data;
     }
     return undefined;
   };

@@ -1,6 +1,7 @@
 import { TestMetadata, TestPaper } from './testTypes';
 import { pta04Data } from './jee-advanced/pta04';
 import { pta05Data } from './jee-advanced/pta05';
+import { pta06Data } from './jee-advanced/pta06';
 
 export const jeeMainsTests: TestMetadata[] = [
   {
@@ -251,15 +252,15 @@ export const jeeAdvancedTests: TestMetadata[] = [
     examCategory: "jee-advanced",
     examType: "JEE Advanced",
     code: "PTA 06",
-    title: "JEE Advanced Test Series — PTA 06",
+    title: "JEE Advanced Test Series — PTA 06 (Model-A)",
     subtitle: "Full Syllabus Comprehensive Mock Examination",
-    status: "coming_soon",
+    status: "live",
     durationMinutes: 180,
     totalMarks: 180,
-    totalQuestions: 54,
-    subjects: ["Mathematics", "Physics", "Chemistry"],
-    description: "Advanced analytical mock paper focusing on tricky multi-correct options and numerical traps.",
-    isLive: false,
+    totalQuestions: 51,
+    subjects: ["Mathematics (17 Qs)", "Physics (17 Qs)", "Chemistry (17 Qs)"],
+    description: "Authentic JEE Advanced CBT simulation featuring Multiple Correct Choice (+4, -2 with partial marking), Single Correct (+3, -1), Non-Negative Integer (+4, 0), and Matching List (+3, -1).",
+    isLive: true,
     isFree: true
   },
   {
@@ -342,6 +343,9 @@ export function getLiveTestPaper(id: string): TestPaper | undefined {
   }
   if (id === 'jee-advanced-pta-05' || id === 'pta-05' || id === 'pta05') {
     return pta05Data;
+  }
+  if (id === 'jee-advanced-pta-06' || id === 'pta-06' || id === 'pta06') {
+    return pta06Data;
   }
   return undefined;
 }
