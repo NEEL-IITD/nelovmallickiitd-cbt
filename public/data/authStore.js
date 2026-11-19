@@ -12,8 +12,8 @@
   const TEST_CONFIGS_OVERRIDE_KEY = 'nelov_test_configs_overrides';
 
   // Environment detection
-  const envUrl = (window.__ENV__ && window.__ENV__.VITE_SUPABASE_URL) || localStorage.getItem('VITE_SUPABASE_URL') || '';
-  const envAnonKey = (window.__ENV__ && window.__ENV__.VITE_SUPABASE_ANON_KEY) || localStorage.getItem('VITE_SUPABASE_ANON_KEY') || '';
+  const envUrl = (window.__ENV__ && window.__ENV__.VITE_SUPABASE_URL) || localStorage.getItem('VITE_SUPABASE_URL') || 'https://lyzmismtmtsvlqpzdruy.supabase.co';
+  const envAnonKey = (window.__ENV__ && window.__ENV__.VITE_SUPABASE_ANON_KEY) || localStorage.getItem('VITE_SUPABASE_ANON_KEY') || 'sb_publishable_NqVe4faHT7ccXhQoj8r6ng_KT4hmaSy';
 
   const isConfigured = Boolean(
     envUrl &&
