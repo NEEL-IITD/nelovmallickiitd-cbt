@@ -33,6 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { name: 'JEE Advanced (PTA 01–10)', href: '#/tests/jee-advanced' },
     { name: 'JEE Mains (PTA 01–10)', href: '#/tests/jee-mains' },
     { name: 'Live Tests', href: '#/test/jee-advanced/pta-04' },
+    { name: 'Lectures', href: '#/lectures', badge: 'New' },
     { name: 'Study Resources', href: '#/resources', badge: 'Free' },
     { name: 'My Progress', href: '#/progress', protected: true },
     { name: 'Revision Notebook', href: '#/notebook', protected: true },

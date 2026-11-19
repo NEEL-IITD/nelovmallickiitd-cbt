@@ -35,7 +35,7 @@ window.founderData = {
   name: "Nelov Mallick",
   college: "IIT Delhi",
   role: "Founder & Academic Director · 8+ yrs Mentoring JEE Aspirants",
-  avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+  avatar: "/images/nelov-mallick.png",
   bio: "IIT Delhi alumnus dedicated to democratizing top-tier competitive exam preparation. Has guided thousands of students to double-digit and triple-digit JEE Advanced ranks through scientific problem-solving frameworks, real exam simulators, and error diagnostic analytics.",
   highlights: [
     "Mentored 10,000+ JEE Aspirants",

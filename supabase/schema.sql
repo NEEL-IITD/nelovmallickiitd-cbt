@@ -350,7 +350,48 @@ CREATE POLICY "error_reports_update_admin"
   WITH CHECK (public.is_admin());
 
 -- ==============================================================================
--- 9. How to elevate your account to Admin
+-- 9. Lecture Progress Table (Video Lectures Hub)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.lecture_progress (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  chapter_slug TEXT NOT NULL,
+  video_id TEXT NOT NULL,
+  lecture_number TEXT NOT NULL,
+  completed BOOLEAN NOT NULL DEFAULT FALSE,
+  personal_note TEXT,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT unique_user_video UNIQUE (user_id, video_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_lecture_progress_user ON public.lecture_progress(user_id);
+CREATE INDEX IF NOT EXISTS idx_lecture_progress_chapter ON public.lecture_progress(chapter_slug);
+
+ALTER TABLE public.lecture_progress ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "lecture_progress_select_policy"
+  ON public.lecture_progress
+  FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "lecture_progress_insert_policy"
+  ON public.lecture_progress
+  FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "lecture_progress_update_policy"
+  ON public.lecture_progress
+  FOR UPDATE
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "lecture_progress_delete_policy"
+  ON public.lecture_progress
+  FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- ==============================================================================
+-- 10. How to elevate your account to Admin
 -- Run the following command in Supabase SQL Editor with your email:
 -- UPDATE public.profiles SET role = 'admin' WHERE email = 'your-email@example.com';
 -- ==============================================================================

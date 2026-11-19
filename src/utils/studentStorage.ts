@@ -534,5 +534,93 @@ export const studentStorage = {
       overallAccuracy: avgAccuracy,
       recentPredictedAir: attempts[0]?.predictedAirDisplay || 'Qualified'
     };
+  },
+
+  // ----------------------------------------------------------------------------
+  // LECTURE PROGRESS & NOTES
+  // ----------------------------------------------------------------------------
+  async saveLectureProgress(
+    userId: string,
+    chapterSlug: string,
+    videoId: string,
+    lectureNumber: string,
+    completed: boolean,
+    personalNote?: string
+  ): Promise<void> {
+    const updatedAt = new Date().toISOString();
+    // 1. Supabase sync if configured
+    if (isSupabaseConfigured && supabase && userId) {
+      try {
+        await supabase.from('lecture_progress').upsert(
+          {
+            user_id: userId,
+            chapter_slug: chapterSlug,
+            video_id: videoId,
+            lecture_number: lectureNumber,
+            completed,
+            personal_note: personalNote || null,
+            updated_at: updatedAt
+          },
+          { onConflict: 'user_id,video_id' }
+        );
+      } catch (e) {}
+    }
+
+    // 2. LocalStorage fallback
+    try {
+      const key = `nelov_${userId}_lecture_progress`;
+      const raw = localStorage.getItem(key);
+      const current = raw ? JSON.parse(raw) : {};
+      current[videoId] = {
+        userId,
+        chapterSlug,
+        videoId,
+        lectureNumber,
+        completed,
+        personalNote: personalNote !== undefined ? personalNote : current[videoId]?.personalNote || '',
+        updatedAt
+      };
+      localStorage.setItem(key, JSON.stringify(current));
+    } catch (e) {}
+  },
+
+  getLectureProgress(userId: string): Record<string, any> {
+    if (!userId) return {};
+    try {
+      const raw = localStorage.getItem(`nelov_${userId}_lecture_progress`);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  },
+
+  getTotalLecturesCompleted(userId: string): number {
+    const progress = this.getLectureProgress(userId);
+    return Object.values(progress).filter((p: any) => p && p.completed).length;
+  },
+
+  async loadCloudLectureProgress(userId: string): Promise<void> {
+    if (!isSupabaseConfigured || !supabase || !userId) return;
+    try {
+      const { data, error } = await supabase
+        .from('lecture_progress')
+        .select('*')
+        .eq('user_id', userId);
+      if (!error && data && data.length > 0) {
+        const local = this.getLectureProgress(userId);
+        data.forEach((row: any) => {
+          local[row.video_id] = {
+            userId,
+            chapterSlug: row.chapter_slug,
+            videoId: row.video_id,
+            lectureNumber: row.lecture_number,
+            completed: row.completed,
+            personalNote: row.personal_note || '',
+            updatedAt: row.updated_at
+          };
+        });
+        localStorage.setItem(`nelov_${userId}_lecture_progress`, JSON.stringify(local));
+      }
+    } catch (e) {}
   }
 };

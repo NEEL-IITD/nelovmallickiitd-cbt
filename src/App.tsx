@@ -25,6 +25,9 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { MyProgress } from './components/MyProgress';
 import { RevisionNotebook } from './components/RevisionNotebook';
 import { ResourcesHub } from './components/ResourcesHub';
+import { LecturesHub } from './components/LecturesHub';
+import { LecturePlayer } from './components/LecturePlayer';
+import { LecturesSection } from './components/LecturesSection';
 
 export const AppContent: React.FC = () => {
   const { user, isCloudConnected, openAuthModal } = useAuth();
@@ -112,6 +115,32 @@ export const AppContent: React.FC = () => {
           onOpenAuth={(title) => openAuthModal('login', '#/resources', title)}
           user={user}
         />
+      ) : currentHash.startsWith('#/lectures/') ? (
+        (() => {
+          const rawPath = currentHash.replace('#/lectures/', '');
+          const [slugPart, queryPart] = rawPath.split('?');
+          let lecIdx = 1;
+          if (queryPart && queryPart.includes('lec=')) {
+            const m = queryPart.match(/lec=(\d+)/);
+            if (m) lecIdx = parseInt(m[1], 10);
+          }
+          return (
+            <LecturePlayer
+              chapterSlug={slugPart}
+              initialLectureIndex={lecIdx}
+              currentUser={user}
+              onBackToHub={() => handleNavigate('#/lectures')}
+              openAuth={(mode) => openAuthModal(mode, currentHash)}
+            />
+          );
+        })()
+      ) : currentHash === '#/lectures' ? (
+        <LecturesHub
+          currentUser={user}
+          onSelectChapter={(slug) => handleNavigate(`#/lectures/${slug}`)}
+          onBackToHome={() => handleNavigate('#/')}
+          openAuth={(mode) => openAuthModal(mode, '#/lectures')}
+        />
       ) : (
         <main>
           {/* 1. Hero Section with Live CBT Mock Test */}
@@ -140,6 +169,12 @@ export const AppContent: React.FC = () => {
 
           {/* 8. Free Study Resources Grid */}
           <Resources exam={exam} />
+
+          {/* 8.5. Video Lectures & Chapter Masterclasses */}
+          <LecturesSection
+            onSelectChapter={(slug) => handleNavigate(`#/lectures/${slug}`)}
+            onBrowseAll={() => handleNavigate('#/lectures')}
+          />
 
           {/* 9. Collapsible FAQ Section */}
           <FAQ exam={exam} />

@@ -16,6 +16,7 @@ export const MyProgress: React.FC<MyProgressProps> = ({
 
   const stats = studentStorage.getUserStats(user.id);
   const attempts = studentStorage.getAttempts(user.id);
+  const lecturesCompleted = studentStorage.getTotalLecturesCompleted(user.id);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 py-10 px-4 sm:px-6 lg:px-8">
@@ -47,8 +48,8 @@ export const MyProgress: React.FC<MyProgressProps> = ({
           </div>
         </div>
 
-        {/* 4 KPI Metrics Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* 5 KPI Metrics Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] shadow-sm space-y-1">
             <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400">Total Tests Attempted</p>
             <p className="text-3xl font-black text-slate-900 dark:text-zinc-50">{stats.totalTests}</p>
@@ -71,6 +72,12 @@ export const MyProgress: React.FC<MyProgressProps> = ({
             <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400">Overall Accuracy</p>
             <p className="text-3xl font-black text-amber-500">{stats.overallAccuracy}%</p>
             <p className="text-[11px] text-slate-500">{stats.totalQuestionsAttempted} Questions attempted</p>
+          </div>
+
+          <div className="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] shadow-sm space-y-1 col-span-2 lg:col-span-1">
+            <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400">Lectures Completed</p>
+            <p className="text-3xl font-black text-rose-600 dark:text-rose-400">{lecturesCompleted}</p>
+            <p className="text-[11px] text-slate-500">YouTube chapter sessions</p>
           </div>
         </div>
 

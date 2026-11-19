@@ -30,7 +30,7 @@ export const Founders: React.FC = () => {
                 <img
                   src={founderData.avatar}
                   alt={founderData.name}
-                  className="w-32 h-32 sm:w-40 sm:h-40 rounded-3xl object-cover ring-4 ring-indigo-500/20 shadow-xl"
+                  className="w-32 h-32 sm:w-40 sm:h-40 rounded-3xl object-cover object-top ring-4 ring-indigo-500/20 shadow-xl"
                 />
                 <span className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-indigo-600 text-white text-[11px] font-extrabold uppercase tracking-wider shadow-lg">
                   {founderData.college}
