@@ -33,6 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { name: 'JEE Advanced (PTA 01–10)', href: '#/tests/jee-advanced' },
     { name: 'JEE Mains (PTA 01–10)', href: '#/tests/jee-mains' },
     { name: 'Live Tests', href: '#/test/jee-advanced/pta-04' },
+    { name: 'Study Resources', href: '#/resources', badge: 'Free' },
     { name: 'My Progress', href: '#/progress', protected: true },
     { name: 'Revision Notebook', href: '#/notebook', protected: true },
     { name: 'Rank Insights', href: '#ranks' },
@@ -90,9 +91,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 key={idx}
                 type="button"
                 onClick={() => handleLinkClick(link)}
-                className="text-xs sm:text-sm font-semibold text-slate-600 hover:text-indigo-600 dark:text-zinc-300 dark:hover:text-indigo-400 transition-colors"
+                className="relative text-xs sm:text-sm font-semibold text-slate-600 hover:text-indigo-600 dark:text-zinc-300 dark:hover:text-indigo-400 transition-colors flex items-center gap-1.5"
               >
-                {link.name}
+                <span>{link.name}</span>
+                {link.badge && (
+                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                    {link.badge}
+                  </span>
+                )}
               </button>
             ))}
           </div>

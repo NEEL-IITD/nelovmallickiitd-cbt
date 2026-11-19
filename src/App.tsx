@@ -24,9 +24,10 @@ import { QuestionPaperModal } from './components/QuestionPaperModal';
 import { AdminDashboard } from './components/AdminDashboard';
 import { MyProgress } from './components/MyProgress';
 import { RevisionNotebook } from './components/RevisionNotebook';
+import { ResourcesHub } from './components/ResourcesHub';
 
 export const AppContent: React.FC = () => {
-  const { isCloudConnected } = useAuth();
+  const { user, isCloudConnected, openAuthModal } = useAuth();
 
   // Global State
   const [exam, setExam] = useState<ExamType>('jee');
@@ -105,6 +106,12 @@ export const AppContent: React.FC = () => {
         <ProtectedRoute redirectUrl="#/notebook" fallbackMessage="Sign in or create a free account to view your bookmarked questions and derivations.">
           <RevisionNotebook />
         </ProtectedRoute>
+      ) : currentHash === '#/resources' ? (
+        <ResourcesHub
+          onBackToHome={() => handleNavigate('#/')}
+          onOpenAuth={(title) => openAuthModal('login', '#/resources', title)}
+          user={user}
+        />
       ) : (
         <main>
           {/* 1. Hero Section with Live CBT Mock Test */}

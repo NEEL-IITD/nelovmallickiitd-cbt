@@ -64,6 +64,7 @@
   <script src="/data/jee-advanced/pta06.js"></script>
   <script src="/data/rankPredictor.js"></script>
   <script src="/data/authStore.js"></script>
+  <script src="/data/resourcesIndex.js"></script>
 
   <style>
     body {
@@ -180,6 +181,850 @@
       const secs = seconds % 60;
       return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
     }
+
+    
+    // ==============================================================================
+    // REUSABLE 3D PERSPECTIVE TILT CARD (TestonGo 3D Depth Engine)
+    // ==============================================================================
+    function Tilt3DCard({
+      children,
+      className = '',
+      maxTilt = 7,
+      perspective = 1000,
+      glare = true,
+      scale = 1.015,
+      style = {},
+      ...props
+    }) {
+      const cardRef = useRef(null);
+      const [transformStyle, setTransformStyle] = useState({
+        transform: `perspective(${perspective}px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`,
+        transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
+      });
+      const [glareStyle, setGlareStyle] = useState({
+        opacity: 0,
+        background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 65%)'
+      });
+      const [canTilt, setCanTilt] = useState(true);
+
+      useEffect(() => {
+        const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const isTouch = 'ontouchstart' in window || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
+        if (prefersReducedMotion || isTouch) {
+          setCanTilt(false);
+        }
+      }, []);
+
+      const handlePointerMove = (e) => {
+        if (!canTilt || !cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const xRatio = x / rect.width - 0.5;
+        const yRatio = y / rect.height - 0.5;
+        const rotX = (-yRatio * (maxTilt * 2)).toFixed(2);
+        const rotY = (xRatio * (maxTilt * 2)).toFixed(2);
+        const glareX = ((xRatio + 0.5) * 100).toFixed(1);
+        const glareY = ((yRatio + 0.5) * 100).toFixed(1);
+
+        setTransformStyle({
+          transform: `perspective(${perspective}px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(${scale}, ${scale}, ${scale})`,
+          transition: 'transform 0.08s ease-out'
+        });
+
+        if (glare) {
+          setGlareStyle({
+            opacity: 1,
+            background: `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 65%)`,
+            transition: 'opacity 0.2s ease-out'
+          });
+        }
+      };
+
+      const handlePointerLeave = () => {
+        if (!canTilt) return;
+        setTransformStyle({
+          transform: `perspective(${perspective}px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`,
+          transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
+        });
+        if (glare) {
+          setGlareStyle(prev => ({
+            ...prev,
+            opacity: 0,
+            transition: 'opacity 0.4s ease-out'
+          }));
+        }
+      };
+
+      return (
+        <div
+          ref={cardRef}
+          onPointerMove={handlePointerMove}
+          onPointerLeave={handlePointerLeave}
+          className={`relative select-none ${className}`}
+          style={{
+            ...style,
+            ...transformStyle,
+            transformStyle: 'preserve-3d',
+            willChange: 'transform'
+          }}
+          {...props}
+        >
+          {glare && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 rounded-[inherit] z-20 overflow-hidden"
+              style={glareStyle}
+            />
+          )}
+          {children}
+        </div>
+      );
+    }
+
+    // Helper: Subject Color Token Resolver
+    function getSubjectTokens(subject) {
+      switch (subject) {
+        case 'Physics':
+          return {
+            tab: 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400',
+            watermark: 'text-blue-600',
+            dot: 'bg-blue-500',
+            pill: 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200 dark:border-blue-800'
+          };
+        case 'Chemistry':
+          return {
+            tab: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+            watermark: 'text-emerald-600',
+            dot: 'bg-emerald-500',
+            pill: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+          };
+        case 'Mathematics':
+        default:
+          return {
+            tab: 'bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400',
+            watermark: 'text-purple-600',
+            dot: 'bg-purple-500',
+            pill: 'bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-800'
+          };
+      }
+    }
+
+    function SubjectIconRenderer({ subject, className = "w-4 h-4" }) {
+      if (subject === 'Physics') {
+        return (
+          <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        );
+      }
+      if (subject === 'Chemistry') {
+        return (
+          <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+          </svg>
+        );
+      }
+      return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+      );
+    }
+
+    // ==============================================================================
+    // INTERACTIVE RESOURCE READER MODAL WITH KATEX MATH RENDERING
+    // ==============================================================================
+    function InteractiveResourceReaderModal({ resource, isBookmarked, onToggleBookmark, onClose }) {
+      const contentRef = useRef(null);
+
+      useEffect(() => {
+        if (contentRef.current && window.renderMathInElement) {
+          try {
+            window.renderMathInElement(contentRef.current, {
+              delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '$', right: '$', display: false },
+                { left: '\\[', right: '\\]', display: true },
+                { left: '\\(', right: '\\)', display: false }
+              ],
+              throwOnError: false
+            });
+          } catch (e) {
+            console.error('KaTeX rendering error in reader modal:', e);
+          }
+        }
+      }, [resource]);
+
+      if (!resource) return null;
+
+      return (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/65 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
+          <div className="relative w-full max-w-4xl bg-white dark:bg-[#111218] rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+            
+            {/* Header */}
+            <div className="sticky top-0 z-30 px-6 py-4 bg-white/95 dark:bg-[#111218]/95 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                  {resource.subject} · {resource.resourceType}
+                </span>
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white line-clamp-1">
+                  {resource.title}
+                </h2>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => onToggleBookmark(resource.id)}
+                  className="p-2 rounded-xl border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800 text-sm transition-colors"
+                  title={isBookmarked ? 'Remove Bookmark' : 'Bookmark this Sheet'}
+                >
+                  {isBookmarked ? '⭐' : '☆'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="px-3.5 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/60 flex items-center gap-1.5 transition-colors shadow-sm"
+                  title="Print or Save as PDF"
+                >
+                  <span>🖨️</span>
+                  <span>Print / PDF</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors text-base"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Meta Bar */}
+            <div className="px-6 py-3 bg-slate-50 dark:bg-zinc-900/50 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between flex-wrap gap-2 text-xs text-slate-600 dark:text-zinc-400">
+              <span className="flex items-center gap-1.5">
+                <span>👨‍🏫</span>
+                <strong>Curated by:</strong> Nelov Mallick (IIT Delhi)
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span>⏱️</span>
+                <strong>Read Time:</strong> {resource.readTime}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span>🎯</span>
+                <strong>Target:</strong> {resource.examTarget}
+              </span>
+            </div>
+
+            {/* Reader Content Body with KaTeX Math Rendering */}
+            <div
+              ref={contentRef}
+              className="p-6 sm:p-10 overflow-y-auto space-y-6 text-slate-800 dark:text-zinc-200 leading-relaxed font-sans text-sm sm:text-base"
+            >
+              {/* Render formatted markdown lines */}
+              <div className="prose prose-slate dark:prose-invert max-w-none space-y-4">
+                {resource.content.split('\n\n').map((paragraph, idx) => {
+                  if (paragraph.startsWith('# ')) {
+                    return <h1 key={idx} className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-zinc-50 border-b border-slate-200 dark:border-zinc-800 pb-3 mt-4">{paragraph.replace('# ', '')}</h1>;
+                  }
+                  if (paragraph.startsWith('## ')) {
+                    return <h2 key={idx} className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-zinc-50 border-b border-slate-100 dark:border-zinc-800/80 pb-2 mt-6">{paragraph.replace('## ', '')}</h2>;
+                  }
+                  if (paragraph.startsWith('### ')) {
+                    return <h3 key={idx} className="text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-4">{paragraph.replace('### ', '')}</h3>;
+                  }
+                  if (paragraph.startsWith('---')) {
+                    return <hr key={idx} className="border-slate-200 dark:border-zinc-800 my-6" />;
+                  }
+                  return (
+                    <div key={idx} className="leading-relaxed text-slate-700 dark:text-zinc-300">
+                      {paragraph.split('\n').map((line, lIdx) => {
+                        if (line.startsWith('- ')) {
+                          return <div key={lIdx} className="pl-4 py-1 flex items-start gap-2"><span className="text-indigo-500 font-bold">•</span><span>{line.replace('- ', '')}</span></div>;
+                        }
+                        return <div key={lIdx} className="py-0.5">{line}</div>;
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 bg-slate-50 dark:bg-zinc-900/80 border-t border-slate-200 dark:border-zinc-800 flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400">
+              <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                100% Free Educational Material · NelovMallickIITD
+              </span>
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-5 py-2 rounded-xl bg-slate-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold hover:opacity-90 transition-opacity"
+              >
+                Close Sheet
+              </button>
+            </div>
+
+          </div>
+        </div>
+      );
+    }
+
+    // ==============================================================================
+    // HOMEPAGE STUDY RESOURCES SECTION WITH 3D TILT CARDS
+    // ==============================================================================
+    function StudyResourcesSection({ currentUser, openAuth, setView }) {
+      const [activeSubject, setActiveSubject] = useState('All');
+      const [activeResource, setActiveResource] = useState(null);
+      const [bookmarkedIds, setBookmarkedIds] = useState([]);
+
+      const allItems = window.allResources || [];
+
+      useEffect(() => {
+        try {
+          const key = currentUser ? `nelov_bookmarks_${currentUser.id}` : 'nelov_bookmarks_guest';
+          const saved = localStorage.getItem(key);
+          if (saved) setBookmarkedIds(JSON.parse(saved));
+        } catch (e) {}
+      }, [currentUser]);
+
+      const toggleBookmark = (id) => {
+        try {
+          const key = currentUser ? `nelov_bookmarks_${currentUser.id}` : 'nelov_bookmarks_guest';
+          const updated = bookmarkedIds.includes(id)
+            ? bookmarkedIds.filter(bId => bId !== id)
+            : [...bookmarkedIds, id];
+          setBookmarkedIds(updated);
+          localStorage.setItem(key, JSON.stringify(updated));
+        } catch (e) {}
+      };
+
+      const handleOpenItem = (item) => {
+        if (!currentUser) {
+          openAuth('login', '#/resources', `Sign in or create a free account to read ${item.title}`);
+          return;
+        }
+        setActiveResource(item);
+      };
+
+      const filtered = allItems.filter(item => {
+        if (activeSubject !== 'All' && item.subject !== activeSubject) return false;
+        return true;
+      });
+
+      return (
+        <section id="resources" className="py-20 sm:py-28 bg-slate-50/70 dark:bg-[#0c0d12] border-y border-slate-200/80 dark:border-zinc-800/80 relative overflow-hidden">
+          {/* Subtle Ambient Radial Glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[450px] bg-indigo-500/5 dark:bg-indigo-500/10 blur-[130px] pointer-events-none rounded-full" />
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
+            
+            {/* Header */}
+            <div className="text-center max-w-3xl mx-auto space-y-3">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                100% Free Materials · Curated by Nelov Mallick (IIT Delhi)
+              </div>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-zinc-50 tracking-tight">
+                Study <span className="text-indigo-600 dark:text-indigo-400">Resources</span> & Formula Vault
+              </h2>
+              <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400">
+                Notes, formula sheets, reaction mechanisms, and NCERT trends. Free with any NelovMallickIITD account — sign in and they are yours, no purchase required.
+              </p>
+            </div>
+
+            {/* Subject Filter Tabs */}
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              {['All', 'Physics', 'Chemistry', 'Mathematics'].map((sub) => (
+                <button
+                  key={sub}
+                  type="button"
+                  onClick={() => setActiveSubject(sub)}
+                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm ${
+                    activeSubject === sub
+                      ? 'bg-indigo-600 text-white shadow-indigo-500/25 shadow-md scale-105'
+                      : 'bg-white dark:bg-zinc-800/80 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 hover:border-indigo-400 dark:hover:border-indigo-500'
+                  }`}
+                >
+                  {sub === 'All' ? '⚡ All Resources' : sub === 'Physics' ? '⚛️ Physics' : sub === 'Chemistry' ? '🧪 Chemistry' : '📐 Mathematics'}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => { setView('resources'); window.location.hash = '#/resources'; }}
+                className="ml-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 transition-colors"
+              >
+                Explore Full Hub
+                <span>→</span>
+              </button>
+            </div>
+
+            {/* 3D Tilt Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+              {filtered.slice(0, 6).map((item) => {
+                const colors = getSubjectTokens(item.subject);
+                const isBookmarked = bookmarkedIds.includes(item.id);
+
+                return (
+                  <Tilt3DCard
+                    key={item.id}
+                    maxTilt={6}
+                    perspective={1000}
+                    className="group relative rounded-2xl border border-slate-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#111217] shadow-[0_1px_3px_rgba(15,17,23,0.05)] hover:border-indigo-500/40 hover:shadow-[0_16px_36px_-16px_rgba(79,70,229,0.22)] transition-[box-shadow,border-color] duration-500 overflow-hidden flex flex-col justify-between p-6 sm:p-7 min-h-[310px]"
+                  >
+                    {/* Subtle Blueprint Grid Pattern Watermark */}
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 opacity-40 dark:opacity-20 transition-opacity duration-700 group-hover:opacity-75 dark:group-hover:opacity-40"
+                      style={{
+                        backgroundImage:
+                          'radial-gradient(ellipse 95% 85% at 100% 0%, transparent 2%, rgba(255,255,255,0.05) 66%), linear-gradient(rgba(100,116,139,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(100,116,139,0.1) 1px, transparent 1px)',
+                        backgroundSize: '100% 100%, 20px 20px, 20px 20px'
+                      }}
+                    />
+
+                    {/* Hanging Top-Left Bookmark Tab with Icon */}
+                    <div
+                      className={`absolute top-0 left-6 w-9 h-11 ${colors.tab} rounded-b-xl flex items-end justify-center pb-2 shadow-sm border-b border-x border-black/5 dark:border-white/5 transition-transform duration-300 group-hover:translate-y-0.5`}
+                      style={{ transform: 'translateZ(25px)' }}
+                    >
+                      <SubjectIconRenderer subject={item.subject} />
+                    </div>
+
+                    {/* Top-Right Indicator Dot */}
+                    <div
+                      className="absolute top-5 right-6 flex h-4 w-4 items-center justify-center rounded-full border border-slate-200 dark:border-zinc-700"
+                      style={{ transform: 'translateZ(15px)' }}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${colors.dot} opacity-70 group-hover:opacity-100 group-hover:scale-125 transition-all duration-300`} />
+                    </div>
+
+                    {/* Card Content */}
+                    <div className="pt-6 relative z-10 space-y-3" style={{ transform: 'translateZ(18px)' }}>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-bold border ${colors.pill}`}>
+                          {item.subject}
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400">
+                          {item.resourceType}
+                        </span>
+                        <span className="text-[11px] text-slate-500 dark:text-zinc-500 font-medium ml-auto">
+                          ⏱️ {item.readTime}
+                        </span>
+                      </div>
+
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 leading-relaxed line-clamp-2">
+                        {item.subtitle}
+                      </p>
+
+                      {/* Topic Tags */}
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {item.topicsCovered.slice(0, 3).map((topic, i) => (
+                          <span
+                            key={i}
+                            className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-50 dark:bg-zinc-800/80 text-slate-600 dark:text-zinc-400 border border-slate-200/60 dark:border-zinc-700/60"
+                          >
+                            {topic}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Bottom Action Footer */}
+                    <div
+                      className="pt-5 mt-5 border-t border-slate-100 dark:border-zinc-800/80 relative z-10 flex items-center justify-between"
+                      style={{ transform: 'translateZ(20px)' }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handleOpenItem(item)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/70 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold transition-all shadow-sm"
+                      >
+                        <span>Read Free Sheet</span>
+                        <span className="group-hover:translate-x-1 transition-transform">→</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => { setView('resources'); window.location.hash = '#/resources'; }}
+                        className="text-xs font-semibold text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
+                      >
+                        All Details
+                      </button>
+                    </div>
+
+                    {/* Rotated Watermark Icon in bottom right */}
+                    <div
+                      className={`pointer-events-none absolute -bottom-8 -right-8 w-28 h-28 opacity-[0.06] group-hover:opacity-[0.14] group-hover:-rotate-12 group-hover:scale-110 transition-all duration-500 ${colors.watermark}`}
+                      style={{ transform: 'translateZ(5px)' }}
+                    >
+                      <SubjectIconRenderer subject={item.subject} className="w-full h-full" />
+                    </div>
+                  </Tilt3DCard>
+                );
+              })}
+            </div>
+
+            {/* View All CTA Banner */}
+            <div className="text-center pt-4">
+              <button
+                type="button"
+                onClick={() => { setView('resources'); window.location.hash = '#/resources'; }}
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] transition-all"
+              >
+                <span>📚 Browse Complete Formula Vault & Revision Sheets (9 Modules)</span>
+                <span>→</span>
+              </button>
+            </div>
+
+          </div>
+
+          {/* Interactive Resource Reader Modal */}
+          {activeResource && (
+            <InteractiveResourceReaderModal
+              resource={activeResource}
+              isBookmarked={bookmarkedIds.includes(activeResource.id)}
+              onToggleBookmark={toggleBookmark}
+              onClose={() => setActiveResource(null)}
+            />
+          )}
+        </section>
+      );
+    }
+
+    // ==============================================================================
+    // DEDICATED FULL-PAGE RESOURCES HUB VIEW (#/resources)
+    // ==============================================================================
+    function StudyResourcesHubView({ currentUser, openAuth, setView }) {
+      const [searchQuery, setSearchQuery] = useState('');
+      const [selectedExam, setSelectedExam] = useState('All');
+      const [selectedSubject, setSelectedSubject] = useState('All');
+      const [selectedCategory, setSelectedCategory] = useState('All');
+      const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
+      const [bookmarkedIds, setBookmarkedIds] = useState([]);
+      const [activeReadingResource, setActiveReadingResource] = useState(null);
+
+      const allItems = window.allResources || [];
+
+      useEffect(() => {
+        try {
+          const key = currentUser ? `nelov_bookmarks_${currentUser.id}` : 'nelov_bookmarks_guest';
+          const saved = localStorage.getItem(key);
+          if (saved) setBookmarkedIds(JSON.parse(saved));
+        } catch (e) {}
+      }, [currentUser]);
+
+      const toggleBookmark = (id, e) => {
+        if (e) e.stopPropagation();
+        try {
+          const key = currentUser ? `nelov_bookmarks_${currentUser.id}` : 'nelov_bookmarks_guest';
+          const updated = bookmarkedIds.includes(id)
+            ? bookmarkedIds.filter(bId => bId !== id)
+            : [...bookmarkedIds, id];
+          setBookmarkedIds(updated);
+          localStorage.setItem(key, JSON.stringify(updated));
+        } catch (e) {}
+      };
+
+      const handleOpenResource = (item) => {
+        if (!currentUser) {
+          openAuth('login', '#/resources', `Sign in or create a free account to read ${item.title}`);
+          return;
+        }
+        setActiveReadingResource(item);
+      };
+
+      const filtered = useMemo(() => {
+        return allItems.filter(item => {
+          if (showBookmarksOnly && !bookmarkedIds.includes(item.id)) return false;
+          if (selectedExam !== 'All' && item.examTarget !== 'Both' && item.examTarget !== selectedExam) return false;
+          if (selectedSubject !== 'All' && item.subject !== selectedSubject) return false;
+          if (selectedCategory !== 'All' && item.resourceType !== selectedCategory) return false;
+          if (searchQuery.trim()) {
+            const q = searchQuery.toLowerCase();
+            const matchesTitle = item.title.toLowerCase().includes(q);
+            const matchesSubtitle = item.subtitle.toLowerCase().includes(q);
+            const matchesSubject = item.subject.toLowerCase().includes(q);
+            const matchesTopic = item.topicsCovered.some(t => t.toLowerCase().includes(q));
+            if (!matchesTitle && !matchesSubtitle && !matchesSubject && !matchesTopic) return false;
+          }
+          return true;
+        });
+      }, [allItems, selectedExam, selectedSubject, selectedCategory, showBookmarksOnly, bookmarkedIds, searchQuery]);
+
+      return (
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0e] text-slate-900 dark:text-zinc-50 pt-6 pb-28">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            
+            {/* Top Navigation Bar */}
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => { setView('home'); window.location.hash = '#/'; }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-zinc-300 bg-white dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 hover:border-indigo-500 shadow-sm transition-all"
+              >
+                <span>←</span>
+                <span>Back to Homepage</span>
+              </button>
+
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                100% Free Materials Forever
+              </div>
+            </div>
+
+            {/* Header */}
+            <div className="text-center max-w-3xl mx-auto space-y-3">
+              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Study Resources & <span className="text-indigo-600 dark:text-indigo-400">Formula Vault</span>
+              </h1>
+              <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400">
+                High-yield formula sheets, reaction mechanisms, and NCERT trends. Derived with full KaTeX mathematical rigor by <strong className="font-semibold text-slate-900 dark:text-zinc-100">Nelov Mallick (IIT Delhi)</strong>.
+              </p>
+            </div>
+
+            {/* Search & Filter Bar */}
+            <div className="bg-white dark:bg-[#12131a] rounded-2xl border border-slate-200 dark:border-zinc-800 p-5 sm:p-6 shadow-sm space-y-5">
+              {/* Search Field */}
+              <div className="relative">
+                <svg
+                  className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search formulas, mechanisms, conics, calculus, electrostatics..."
+                  className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-zinc-300"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+
+              {/* Multi-Filters Grid */}
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-100 dark:border-zinc-800/80">
+                {/* Subject Filter Pills */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase mr-1">Subject:</span>
+                  {['All', 'Physics', 'Chemistry', 'Mathematics'].map(sub => (
+                    <button
+                      key={sub}
+                      type="button"
+                      onClick={() => setSelectedSubject(sub)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        selectedSubject === sub
+                          ? 'bg-indigo-600 text-white shadow-sm'
+                          : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-zinc-700'
+                      }`}
+                    >
+                      {sub}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Exam Target Pills */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase mr-1">Exam:</span>
+                  {['All', 'JEE Mains', 'JEE Advanced'].map(ex => (
+                    <button
+                      key={ex}
+                      type="button"
+                      onClick={() => setSelectedExam(ex)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        selectedExam === ex
+                          ? 'bg-indigo-600 text-white shadow-sm'
+                          : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-zinc-700'
+                      }`}
+                    >
+                      {ex}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Bookmarks Toggle Pill */}
+                <button
+                  type="button"
+                  onClick={() => setShowBookmarksOnly(!showBookmarksOnly)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+                    showBookmarksOnly
+                      ? 'bg-amber-500 text-white shadow-sm'
+                      : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-zinc-700'
+                  }`}
+                >
+                  <span>⭐</span>
+                  <span>Bookmarks ({bookmarkedIds.length})</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Cards Grid */}
+            {filtered.length === 0 ? (
+              <div className="text-center py-20 bg-white dark:bg-[#12131a] rounded-2xl border border-slate-200 dark:border-zinc-800">
+                <span className="text-4xl">🔍</span>
+                <h3 className="mt-4 text-lg font-bold text-slate-800 dark:text-zinc-200">No resources matched your criteria</h3>
+                <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">Try clearing your search query or adjusting your filters.</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedExam('All');
+                    setSelectedSubject('All');
+                    setSelectedCategory('All');
+                    setShowBookmarksOnly(false);
+                  }}
+                  className="mt-4 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700"
+                >
+                  Reset All Filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filtered.map((item) => {
+                  const colors = getSubjectTokens(item.subject);
+                  const isBookmarked = bookmarkedIds.includes(item.id);
+
+                  return (
+                    <Tilt3DCard
+                      key={item.id}
+                      maxTilt={7}
+                      perspective={1000}
+                      className="group relative rounded-2xl border border-slate-200/90 dark:border-zinc-800/90 bg-white dark:bg-[#111217] shadow-[0_1px_3px_rgba(15,17,23,0.05)] hover:border-indigo-500/40 hover:shadow-[0_16px_36px_-16px_rgba(79,70,229,0.22)] transition-[box-shadow,border-color] duration-500 overflow-hidden flex flex-col justify-between p-6 sm:p-7 min-h-[320px]"
+                    >
+                      {/* Subtle Blueprint Grid Pattern */}
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 opacity-40 dark:opacity-20 transition-opacity duration-700 group-hover:opacity-75 dark:group-hover:opacity-40"
+                        style={{
+                          backgroundImage:
+                            'radial-gradient(ellipse 95% 85% at 100% 0%, transparent 2%, rgba(255,255,255,0.05) 66%), linear-gradient(rgba(100,116,139,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(100,116,139,0.1) 1px, transparent 1px)',
+                          backgroundSize: '100% 100%, 20px 20px, 20px 20px'
+                        }}
+                      />
+
+                      {/* Hanging Top-Left Bookmark Tab */}
+                      <div
+                        className={`absolute top-0 left-6 w-9 h-11 ${colors.tab} rounded-b-xl flex items-end justify-center pb-2 shadow-sm border-b border-x border-black/5 dark:border-white/5 transition-transform duration-300 group-hover:translate-y-0.5`}
+                        style={{ transform: 'translateZ(25px)' }}
+                      >
+                        <SubjectIconRenderer subject={item.subject} />
+                      </div>
+
+                      {/* Top-Right Bookmark Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => toggleBookmark(item.id, e)}
+                        className="absolute top-5 right-6 w-8 h-8 rounded-full border border-slate-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-800/80 hover:bg-slate-100 dark:hover:bg-zinc-700 flex items-center justify-center text-xs transition-colors shadow-sm z-20"
+                        title={isBookmarked ? 'Remove Bookmark' : 'Bookmark Sheet'}
+                        style={{ transform: 'translateZ(20px)' }}
+                      >
+                        {isBookmarked ? '⭐' : '☆'}
+                      </button>
+
+                      {/* Card Main Info */}
+                      <div className="pt-6 relative z-10 space-y-3" style={{ transform: 'translateZ(18px)' }}>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-bold border ${colors.pill}`}>
+                            {item.subject}
+                          </span>
+                          <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400">
+                            {item.resourceType}
+                          </span>
+                          <span className="text-[11px] text-slate-500 dark:text-zinc-500 font-medium ml-auto">
+                            ⏱️ {item.readTime}
+                          </span>
+                        </div>
+
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">
+                          {item.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 leading-relaxed line-clamp-2">
+                          {item.subtitle}
+                        </p>
+
+                        {/* Topic Badges */}
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {item.topicsCovered.map((topic, i) => (
+                            <span
+                              key={i}
+                              className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-50 dark:bg-zinc-800/80 text-slate-600 dark:text-zinc-400 border border-slate-200/60 dark:border-zinc-700/60"
+                            >
+                              {topic}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Bottom Action Footer */}
+                      <div
+                        className="pt-5 mt-5 border-t border-slate-100 dark:border-zinc-800/80 relative z-10 flex items-center justify-between gap-3"
+                        style={{ transform: 'translateZ(20px)' }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => handleOpenResource(item)}
+                          className="flex-1 py-2 px-3 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/70 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5"
+                        >
+                          <span>Read Online</span>
+                          <span className="group-hover:translate-x-1 transition-transform">→</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleOpenResource(item);
+                            setTimeout(() => window.print(), 600);
+                          }}
+                          className="px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 hover:border-slate-300 dark:hover:border-zinc-600 text-slate-600 dark:text-zinc-400 text-xs font-bold transition-colors flex items-center gap-1"
+                          title="Print or Save as PDF"
+                        >
+                          <span>🖨️</span>
+                          <span>PDF</span>
+                        </button>
+                      </div>
+
+                      {/* Rotated Watermark Icon in bottom-right */}
+                      <div
+                        className={`pointer-events-none absolute -bottom-8 -right-8 w-28 h-28 opacity-[0.06] group-hover:opacity-[0.14] group-hover:-rotate-12 group-hover:scale-110 transition-all duration-500 ${colors.watermark}`}
+                        style={{ transform: 'translateZ(5px)' }}
+                      >
+                        <SubjectIconRenderer subject={item.subject} className="w-full h-full" />
+                      </div>
+                    </Tilt3DCard>
+                  );
+                })}
+              </div>
+            )}
+
+          </div>
+
+          {/* Interactive Resource Reader Modal */}
+          {activeReadingResource && (
+            <InteractiveResourceReaderModal
+              resource={activeReadingResource}
+              isBookmarked={bookmarkedIds.includes(activeReadingResource.id)}
+              onToggleBookmark={toggleBookmark}
+              onClose={() => setActiveReadingResource(null)}
+            />
+          )}
+        </div>
+      );
+    }
+
 
     // COMPONENT: Estimated JEE Rank Predictor Card
     function RankPredictorCard({ prediction, candidateName }) {
@@ -1506,6 +2351,7 @@
       openAuth,
       handleLogOut,
       setView,
+      view = 'home',
       userDropdownOpen,
       setUserDropdownOpen
     }) {
@@ -1585,6 +2431,16 @@
                 className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-1"
               >
                 <span>⭐</span> Revision Notebook
+              </button>
+              <button
+                type="button"
+                onClick={() => { setView('resources'); window.location.hash = '#/resources'; }}
+                className={`transition-colors flex items-center gap-1.5 ${view === 'resources' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'hover:text-indigo-600'}`}
+              >
+                <span>Study Resources</span>
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                  Free
+                </span>
               </button>
               <a href="#mentorship" onClick={() => setView('home')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Mentorship</a>
               <a href="#ranks" onClick={() => setView('home')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Rank Insights</a>
@@ -1704,6 +2560,14 @@
           {mobileMenuOpen && (
             <div className="lg:hidden border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0c0d12] p-4 space-y-3">
               <div className="flex flex-col space-y-1">
+                <button
+                  type="button"
+                  onClick={() => { setMobileMenuOpen(false); setView('resources'); window.location.hash = '#/resources'; }}
+                  className="text-left py-2 px-3 rounded-lg text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 flex items-center justify-between"
+                >
+                  <span>📚 Study Resources & Formula Vault</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">Free</span>
+                </button>
                 <button
                   type="button"
                   onClick={() => { setMobileMenuOpen(false); setActiveCategory('jee-advanced'); setView('home'); window.location.hash = '#/tests/jee-advanced'; }}
@@ -3296,6 +4160,12 @@
             return;
           }
           setView('progress');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+
+        if (hash === '#/resources' || hash === '#resources') {
+          setView('resources');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
@@ -5088,7 +5958,40 @@
       // -------------------------------------------------------------
       // RENDER: REVISION NOTEBOOK VIEW
       // -------------------------------------------------------------
-      if (view === 'notebook') {
+      if (view === 'resources') {
+        return (
+          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+            <MainNavbar
+              currentUser={currentUser}
+              activeCategory={activeCategory}
+              setActiveCategory={setActiveCategory}
+              isDark={isDark}
+              setIsDark={setIsDark}
+              openAuth={openAuth}
+              handleLogOut={handleLogOut}
+              setView={setView}
+              view={view}
+              userDropdownOpen={userDropdownOpen}
+              setUserDropdownOpen={setUserDropdownOpen}
+            />
+            <StudyResourcesHubView
+              currentUser={currentUser}
+              openAuth={openAuth}
+              setView={setView}
+            />
+            <AuthModalDialog
+              isOpen={authModal.isOpen}
+              mode={authModal.mode}
+              redirectUrl={authModal.redirectUrl}
+              message={authModal.message}
+              onClose={closeAuth}
+              onAuthSuccess={handleAuthSuccess}
+            />
+          </div>
+        );
+      }
+
+            if (view === 'notebook') {
         return (
           <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
             <MainNavbar
@@ -5150,6 +6053,7 @@
             openAuth={openAuth}
             handleLogOut={handleLogOut}
             setView={setView}
+            view={view}
             userDropdownOpen={userDropdownOpen}
             setUserDropdownOpen={setUserDropdownOpen}
           />
@@ -5238,6 +6142,106 @@
                     <span>Attempt PTA 06 (Live)</span>
                     <span>→</span>
                   </button>
+                </div>
+
+                {/* 3D Interactive CBT Preview Card (TestonGo 3D Style) */}
+                <div className="pt-10 max-w-3xl mx-auto" style={{ perspective: '1400px' }}>
+                  <Tilt3DCard
+                    maxTilt={5}
+                    perspective={1400}
+                    className="relative rounded-3xl border border-indigo-200/80 dark:border-indigo-900/60 bg-gradient-to-br from-white via-slate-50 to-indigo-50/40 dark:from-[#111218] dark:via-[#0e0f14] dark:to-indigo-950/20 p-6 sm:p-8 shadow-2xl shadow-indigo-500/10 text-left overflow-hidden"
+                    style={{
+                      transform: 'rotateX(3deg) rotateY(-4deg)'
+                    }}
+                  >
+                    {/* Left Binder Holes Simulation */}
+                    <div className="absolute left-3 top-8 bottom-8 flex flex-col justify-between pointer-events-none opacity-40">
+                      {[...Array(6)].map((_, i) => (
+                        <div key={i} className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-zinc-700 shadow-inner border border-black/10 dark:border-white/10" />
+                      ))}
+                    </div>
+
+                    {/* Subtle Blueprint Grid Background */}
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 opacity-30 dark:opacity-20"
+                      style={{
+                        backgroundImage: 'radial-gradient(ellipse 95% 85% at 100% 0%, transparent 2%, rgba(255,255,255,0.05) 66%), linear-gradient(rgba(99,102,241,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.08) 1px, transparent 1px)',
+                        backgroundSize: '100% 100%, 20px 20px, 20px 20px'
+                      }}
+                    />
+
+                    {/* Card Inner Content */}
+                    <div className="pl-6 space-y-5 relative z-10" style={{ transform: 'translateZ(20px)' }}>
+                      {/* Top Status Bar */}
+                      <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-200/80 dark:border-zinc-800/80 pb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                          <span className="text-xs font-extrabold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+                            CBT Examination Simulator
+                          </span>
+                          <span className="text-slate-300 dark:text-zinc-700">·</span>
+                          <span className="text-xs font-mono font-bold text-slate-500 dark:text-zinc-400">
+                            PTA 06 · Section 2
+                          </span>
+                        </div>
+                        <div className="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-mono font-bold">
+                          ⏱️ Time Left: 02:54:18
+                        </div>
+                      </div>
+
+                      {/* Question Header & Body */}
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-600 text-white">
+                            Question 12
+                          </span>
+                          <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300">
+                            Multiple Correct (+4, -2 with Partial Marking)
+                          </span>
+                          <span className="text-[11px] text-slate-400 ml-auto">Physics</span>
+                        </div>
+                        <div className="text-xs sm:text-sm text-slate-800 dark:text-zinc-200 leading-relaxed font-serif">
+                          <MathSpan text={"A uniform solid cylinder of mass $M$ and radius $R$ rolls without slipping down a rough inclined plane of inclination $\\theta$. If the linear acceleration of the center of mass is given by $a_{\\text{cm}} = \\frac{g\\sin\\theta}{1 + \\frac{I_{\\text{cm}}}{MR^2}}$, which of the following statements are correct?"} />
+                        </div>
+                      </div>
+
+                      {/* 4 Interactive Option Pills */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <div className="p-2.5 rounded-xl border border-indigo-500/40 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-950 dark:text-indigo-200 flex items-center gap-2.5 shadow-sm">
+                          <span className="w-5 h-5 rounded-md bg-indigo-600 text-white flex items-center justify-center font-bold text-[10px]">A</span>
+                          <MathSpan text={"$\\mu_s \\ge \\frac{1}{3}\\tan\\theta$ for pure rolling"} />
+                        </div>
+                        <div className="p-2.5 rounded-xl border border-indigo-500/40 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-950 dark:text-indigo-200 flex items-center gap-2.5 shadow-sm">
+                          <span className="w-5 h-5 rounded-md bg-indigo-600 text-white flex items-center justify-center font-bold text-[10px]">B</span>
+                          <span>Friction force acts upwards along the incline</span>
+                        </div>
+                        <div className="p-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 text-slate-700 dark:text-zinc-300 flex items-center gap-2.5">
+                          <span className="w-5 h-5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 flex items-center justify-center font-bold text-[10px]">C</span>
+                          <span>Work done by static friction is strictly zero</span>
+                        </div>
+                        <div className="p-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 text-slate-700 dark:text-zinc-300 flex items-center gap-2.5">
+                          <span className="w-5 h-5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 flex items-center justify-center font-bold text-[10px]">D</span>
+                          <span>Total mechanical energy of the system is conserved</span>
+                        </div>
+                      </div>
+
+                      {/* Card Bottom Controls */}
+                      <div className="pt-2 flex items-center justify-between border-t border-slate-200/80 dark:border-zinc-800/80 text-xs">
+                        <span className="text-[11px] text-slate-500 dark:text-zinc-400">
+                          🎯 100% Authentic NTA/IIT Exam Interface
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectTest('jee-advanced-pta-06')}
+                          className="px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
+                        >
+                          <span>Open Live Paper</span>
+                          <span>→</span>
+                        </button>
+                      </div>
+                    </div>
+                  </Tilt3DCard>
                 </div>
 
                 {/* 4 Pillars */}
@@ -5358,13 +6362,16 @@
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
                   {activeCategoryList.map((t) => {
                     const isLive = (testConfigs[t.id] || t.status) === 'live';
+                    const CardComponent = isLive ? Tilt3DCard : 'div';
+                    const cardProps = isLive ? { maxTilt: 6, perspective: 1000 } : {};
 
                     return (
-                      <div
+                      <CardComponent
                         key={t.id}
+                        {...cardProps}
                         className={`relative rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 ${
                           isLive
-                            ? 'bg-white dark:bg-[#121318] border-2 border-indigo-600 shadow-xl hover:shadow-2xl hover:-translate-y-1 ring-4 ring-indigo-500/10'
+                            ? 'bg-white dark:bg-[#121318] border-2 border-indigo-600 shadow-xl hover:shadow-2xl ring-4 ring-indigo-500/10'
                             : 'bg-white/60 dark:bg-zinc-900/40 border border-slate-200/80 dark:border-zinc-800/80 shadow-sm opacity-90'
                         }`}
                       >
@@ -5435,13 +6442,20 @@
                             </button>
                           )}
                         </div>
-                      </div>
+                      </CardComponent>
                     );
                   })}
                 </div>
 
               </div>
             </section>
+
+            {/* STUDY RESOURCES & FORMULA VAULT (TestonGo 3D Style) */}
+            <StudyResourcesSection
+              currentUser={currentUser}
+              openAuth={openAuth}
+              setView={setView}
+            />
 
             {/* 3. MENTORSHIP BY NELOV MALLICK */}
             <section id="mentorship" className="py-20 sm:py-28 relative">
