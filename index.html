@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NelovMallickIITD · Authentic JEE Advanced CBT Test Series & Mentorship</title>
-  <meta name="description" content="Official preparation platform by Nelov Mallick (IIT Delhi). Authentic JEE Advanced CBT exam interface, full mock papers PTA-04 & PTA-05, real partial marking, countdown timer, and AI error diagnostics. 100% Free." />
+  <title>NelovMallickIITD · Authentic JEE Mains & Advanced CBT Test Series</title>
+  <meta name="description" content="Official test preparation platform by Nelov Mallick (IIT Delhi). Authentic Computer-Based Test (CBT) engine for JEE Mains & JEE Advanced. Full mock series PTA 01 to PTA 10, with PTA 04 and PTA 05 live now. 100% Free." />
 
   <!-- Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,10 +51,13 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- Loaded Test Papers and Site Data -->
+  <!-- Loaded Test Registries and Test Papers -->
   <script src="/data/siteData.js"></script>
+  <script src="/data/testsIndex.js"></script>
   <script src="/data/pta04.js"></script>
   <script src="/data/pta05.js"></script>
+  <script src="/data/jee-advanced/pta04.js"></script>
+  <script src="/data/jee-advanced/pta05.js"></script>
 
   <style>
     body {
@@ -124,10 +127,11 @@
       return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     }
 
-    // JEE Advanced Evaluation Engine (including exact partial marking)
+    // Adaptive Scoring Engine: supports JEE Mains (+4 / -1) and JEE Advanced (multi-correct partials)
     function evaluatePaper(testPaper, responses) {
+      const isJeeMains = testPaper.examType === 'JEE Mains' || testPaper.examCategory === 'jee-mains';
       let totalMarksScored = 0;
-      let totalMaxMarks = testPaper.maxMarks || 180;
+      let totalMaxMarks = testPaper.maxMarks || (isJeeMains ? 300 : 180);
       let attemptedCount = 0;
       let correctCount = 0;
       let partialCount = 0;
@@ -143,8 +147,8 @@
       const questionBreakdown = testPaper.questions.map((q) => {
         const studentResp = responses[q.id];
         const marking = q.marking || {};
-        const pos = marking.positive !== undefined ? marking.positive : (q.type === 'multiple_correct' ? 4 : 3);
-        const neg = marking.negative !== undefined ? marking.negative : (q.type === 'multiple_correct' ? 2 : 1);
+        const pos = marking.positive !== undefined ? marking.positive : (isJeeMains ? 4 : (q.type === 'multiple_correct' ? 4 : 3));
+        const neg = marking.negative !== undefined ? marking.negative : (isJeeMains ? 1 : (q.type === 'multiple_correct' ? 2 : 1));
         const correctAns = q.answer;
 
         const subj = q.subject || 'Mathematics';
@@ -225,7 +229,7 @@
           };
         }
 
-        // 3. Multiple Correct Option (Official JEE Advanced Partial Marking)
+        // 3. Multiple Correct Option (JEE Advanced Official Partial Marking)
         if (q.type === 'multiple_correct') {
           const correctArr = Array.isArray(correctAns) ? correctAns : [correctAns];
           const studentArr = Array.isArray(studentResp) ? studentResp : [studentResp];
@@ -233,7 +237,6 @@
           const correctSet = new Set(correctArr.map(s => String(s).trim().toUpperCase()));
           const studentSet = new Set(studentArr.map(s => String(s).trim().toUpperCase()));
 
-          // If any chosen option is wrong -> -2
           let hasWrong = false;
           for (const opt of studentSet) {
             if (!correctSet.has(opt)) {
@@ -254,11 +257,11 @@
               correctAns: Array.from(correctSet).sort(),
               marksAwarded: marks,
               status: 'incorrect',
-              statusLabel: 'Incorrect (-2)'
+              statusLabel: `Incorrect (-${neg})`
             };
           }
 
-          // All selected are correct!
+          // All correct selected!
           if (studentSet.size === correctSet.size) {
             totalMarksScored += pos;
             subjectStats[subj].scored += pos;
@@ -274,10 +277,7 @@
             };
           }
 
-          // Partial Marking Rule:
-          // If 4 options correct and 3 chosen -> +3
-          // If 3 or more correct and 2 chosen -> +2
-          // If 2 or more correct and 1 chosen -> +1
+          // Partial Marking
           let partialMarks = 1;
           if (correctSet.size === 4 && studentSet.size === 3) {
             partialMarks = 3;
@@ -335,7 +335,8 @@
     // MAIN APP COMPONENT
     function NelovMallickApp() {
       const [view, setView] = useState('home'); // 'home' | 'instructions' | 'exam' | 'result'
-      const [activeTestId, setActiveTestId] = useState('pta-04');
+      const [activeCategory, setActiveCategory] = useState('jee-advanced'); // 'jee-advanced' | 'jee-mains'
+      const [activeTestId, setActiveTestId] = useState('jee-advanced-pta-04');
       const [candidateName, setCandidateName] = useState('Guest Aspirant');
       const [isDark, setIsDark] = useState(false);
       const [agreeTerms, setAgreeTerms] = useState(false);
@@ -344,18 +345,30 @@
       const [currentQIndex, setCurrentQIndex] = useState(0);
       const [activeSubject, setActiveSubject] = useState('Mathematics');
       const [responses, setResponses] = useState({});
-      const [statuses, setStatuses] = useState({}); // 'unvisited' | 'not_answered' | 'answered' | 'marked' | 'marked_answered'
+      const [statuses, setStatuses] = useState({});
       const [timeLeft, setTimeLeft] = useState(180 * 60);
       const [showSubmitModal, setShowSubmitModal] = useState(false);
       const [evaluationData, setEvaluationData] = useState(null);
-      const [reviewFilter, setReviewFilter] = useState('all'); // 'all' | 'correct' | 'partial' | 'incorrect' | 'unattempted'
+      const [reviewFilter, setReviewFilter] = useState('all');
       const [mobilePaletteOpen, setMobilePaletteOpen] = useState(false);
       const [faqOpenIdx, setFaqOpenIdx] = useState(null);
+      const [noticeModal, setNoticeModal] = useState(null);
 
-      // Test Papers
-      const pta04 = window.pta04Data || null;
-      const pta05 = window.pta05Data || null;
-      const currentPaper = activeTestId === 'pta-04' ? pta04 : pta05;
+      // Registries
+      const mainsList = window.jeeMainsTests || [];
+      const advancedList = window.jeeAdvancedTests || [];
+      const liveList = (window.allTests || []).filter(t => t.status === 'live');
+
+      // Resolve Active Paper
+      const currentPaper = useMemo(() => {
+        if (!activeTestId) return window.pta04Data || null;
+        const clean = activeTestId.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (clean.includes('pta05') || clean.includes('pta5')) {
+          return window.pta05Data || null;
+        }
+        return window.pta04Data || null;
+      }, [activeTestId]);
+
       const currentQuestions = currentPaper ? currentPaper.questions : [];
       const currentQuestion = currentQuestions[currentQIndex] || null;
 
@@ -367,6 +380,32 @@
           document.documentElement.classList.remove('dark');
         }
       }, [isDark]);
+
+      // Handle Hash Routing
+      const handleHashRoute = () => {
+        const hash = window.location.hash.toLowerCase();
+        if (hash === '#/tests/jee-mains') {
+          setActiveCategory('jee-mains');
+          setView('home');
+          const el = document.getElementById('tests');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        } else if (hash === '#/tests/jee-advanced') {
+          setActiveCategory('jee-advanced');
+          setView('home');
+          const el = document.getElementById('tests');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        } else if (hash.includes('pta-04') || hash.includes('pta04')) {
+          handleSelectTest('jee-advanced-pta-04');
+        } else if (hash.includes('pta-05') || hash.includes('pta05')) {
+          handleSelectTest('jee-advanced-pta-05');
+        }
+      };
+
+      useEffect(() => {
+        handleHashRoute();
+        window.addEventListener('hashchange', handleHashRoute);
+        return () => window.removeEventListener('hashchange', handleHashRoute);
+      }, []);
 
       // Timer Effect in Exam Mode
       useEffect(() => {
@@ -386,7 +425,7 @@
         return () => clearInterval(timer);
       }, [view, currentPaper]);
 
-      // Auto-save to localStorage
+      // Auto-save session
       useEffect(() => {
         if (view === 'exam' && currentPaper) {
           const sessionData = {
@@ -403,7 +442,7 @@
         }
       }, [responses, statuses, currentQIndex, timeLeft, view, activeTestId]);
 
-      // Switch question subject tabs automatically when jumping across questions
+      // Switch question subject tabs automatically
       useEffect(() => {
         if (currentQuestion && currentQuestion.subject) {
           setActiveSubject(currentQuestion.subject);
@@ -412,8 +451,27 @@
 
       // Start Test Flow
       const handleSelectTest = (testId) => {
+        // Check if test is coming soon
+        const all = window.allTests || [];
+        const meta = all.find(t => t.id === testId);
+        if (meta && meta.status === 'coming_soon') {
+          setNoticeModal({
+            title: `${meta.title} — Coming Soon`,
+            message: `This paper is currently being digitized and verified with step-by-step KaTeX solutions. In the meantime, please attempt the live papers JEE Advanced PTA 04 and PTA 05!`,
+            activeCategory: meta.examCategory
+          });
+          return;
+        }
+
         setActiveTestId(testId);
-        // Check for saved attempt
+        // Set hash
+        if (testId.includes('pta-04')) {
+          window.location.hash = '#/test/jee-advanced/pta-04';
+        } else if (testId.includes('pta-05')) {
+          window.location.hash = '#/test/jee-advanced/pta-05';
+        }
+
+        // Check for saved session
         const saved = localStorage.getItem(`nelov_cbt_session_${testId}`);
         if (saved) {
           try {
@@ -427,7 +485,6 @@
             }
           } catch (e) {}
         } else {
-          // Initialize empty
           setResponses({});
           setStatuses({});
           setCurrentQIndex(0);
@@ -442,7 +499,6 @@
           alert('Please check the declaration box to proceed.');
           return;
         }
-        // Mark first question as not answered if unvisited
         setStatuses((prev) => {
           const next = { ...prev };
           if (!next[1]) next[1] = 'not_answered';
@@ -488,7 +544,6 @@
         } else if (char === 'backspace') {
           setResponses((prev) => ({ ...prev, [qId]: currentVal.slice(0, -1) }));
         } else {
-          // Prevent multiple dots or invalid characters
           if (char === '.' && currentVal.includes('.')) return;
           if (char === '-' && currentVal.length > 0) return;
           setResponses((prev) => ({ ...prev, [qId]: currentVal + char }));
@@ -580,7 +635,6 @@
         setShowSubmitModal(false);
         setView('result');
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        // Clean session
         try {
           localStorage.removeItem(`nelov_cbt_session_${activeTestId}`);
         } catch (e) {}
@@ -606,12 +660,10 @@
         return { answered, notAnswered, notVisited, marked, markedAnswered };
       }, [currentQuestions, statuses]);
 
-      // Subject Filtered Questions
       const subjectQuestions = useMemo(() => {
         return currentQuestions.filter((q) => q.subject === activeSubject);
       }, [currentQuestions, activeSubject]);
 
-      // Status button styling
       const getButtonStatusClass = (qId) => {
         const s = statuses[qId];
         const isActive = currentQuestion && currentQuestion.id === qId;
@@ -629,7 +681,6 @@
         if (s === 'marked_answered') {
           return `bg-purple-700 hover:bg-purple-800 text-white relative rounded-full ${activeRing}`;
         }
-        // not visited
         return `bg-slate-200 hover:bg-slate-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 ${activeRing}`;
       };
 
@@ -654,7 +705,7 @@
                   </div>
                   <div>
                     <h1 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white line-clamp-1">
-                      {currentPaper ? currentPaper.title : 'JEE Advanced CBT Examination'}
+                      {currentPaper ? currentPaper.title : 'JEE CBT Examination'}
                     </h1>
                     <p className="text-[11px] text-slate-500 dark:text-zinc-400 font-medium">
                       Candidate: <span className="font-bold text-indigo-600 dark:text-indigo-400">{candidateName}</span> · Nelov Mallick (IIT Delhi) Platform
@@ -662,9 +713,8 @@
                   </div>
                 </div>
 
-                {/* Live Countdown Timer & Actions */}
+                {/* Countdown Timer & Actions */}
                 <div className="flex items-center gap-3 sm:gap-4">
-                  {/* Countdown Timer Display */}
                   <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border font-mono font-bold text-sm sm:text-base shadow-sm ${
                     timeLeft < 900
                       ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-300 dark:border-rose-800 text-rose-600 dark:text-rose-400 animate-pulse'
@@ -678,7 +728,6 @@
                     <span>{formatTime(timeLeft)}</span>
                   </div>
 
-                  {/* Submit Exam Button */}
                   <button
                     onClick={() => setShowSubmitModal(true)}
                     className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/30 transition-all hover:scale-105 active:scale-95"
@@ -686,7 +735,6 @@
                     Submit Test
                   </button>
 
-                  {/* Mobile Palette Toggle */}
                   <button
                     onClick={() => setMobilePaletteOpen(!mobilePaletteOpen)}
                     className="lg:hidden p-2 rounded-xl border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-200"
@@ -742,7 +790,7 @@
               <div className="lg:col-span-8 flex flex-col justify-between rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] shadow-sm p-6 sm:p-8 min-h-[580px]">
                 {q ? (
                   <div className="space-y-6">
-                    {/* Question Header: Subject, Section, Question Number, Marking Rules */}
+                    {/* Question Header */}
                     <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-zinc-800">
                       <div>
                         <div className="flex items-center gap-2">
@@ -805,11 +853,10 @@
                       </div>
                     )}
 
-                    {/* Matching List Table Display if applicable */}
+                    {/* Matching List Table Display */}
                     {q.type === 'matching_list' && q.matchingList && (
                       <div className="my-4 rounded-2xl border border-slate-200 dark:border-zinc-800 overflow-hidden bg-slate-50/60 dark:bg-zinc-900/40">
                         <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200 dark:divide-zinc-800">
-                          {/* List I */}
                           <div className="p-4 space-y-3">
                             <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                               List - I
@@ -829,7 +876,6 @@
                             </div>
                           </div>
 
-                          {/* List II */}
                           <div className="p-4 space-y-3">
                             <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                               List - II
@@ -853,7 +899,6 @@
                     )}
 
                     {/* OPTION SELECTION INPUTS */}
-                    {/* A. Single Correct / Matching List Radio Options */}
                     {(q.type === 'single_correct' || q.type === 'matching_list') && q.options && (
                       <div className="pt-2 space-y-3">
                         <p className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
@@ -893,7 +938,6 @@
                       </div>
                     )}
 
-                    {/* B. Multiple Correct Option Checkboxes */}
                     {q.type === 'multiple_correct' && q.options && (
                       <div className="pt-2 space-y-3">
                         <div className="flex items-center justify-between">
@@ -938,14 +982,12 @@
                       </div>
                     )}
 
-                    {/* C. Numerical / Integer Type with Virtual On-Screen Keypad */}
                     {(q.type === 'numerical' || q.type === 'integer') && (
                       <div className="pt-4 max-w-md mx-auto space-y-4">
                         <p className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider text-center">
-                          Enter Numerical Value (Use On-Screen Keypad or Keyboard):
+                          Enter Numerical Value (Virtual Keypad or Keyboard):
                         </p>
                         
-                        {/* Numerical Value Input Box */}
                         <div className="relative">
                           <input
                             type="text"
@@ -956,7 +998,6 @@
                           />
                         </div>
 
-                        {/* Virtual Keypad */}
                         <div className="p-4 rounded-2xl bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-sm space-y-2">
                           <div className="grid grid-cols-3 gap-2">
                             {['1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '0', '.'].map((key) => (
@@ -994,7 +1035,7 @@
                   <div className="py-20 text-center text-slate-400">Loading question...</div>
                 )}
 
-                {/* BOTTOM ACTION BAR (Save & Next, Clear, Mark for Review) */}
+                {/* BOTTOM ACTION BAR */}
                 <div className="pt-6 mt-8 border-t border-slate-100 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <button
@@ -1033,11 +1074,10 @@
                 </div>
               </div>
 
-              {/* Right Column: JEE Advanced Question Palette */}
+              {/* Right Column: Question Palette */}
               <div className={`lg:col-span-4 flex flex-col rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] shadow-sm p-6 space-y-6 ${
                 mobilePaletteOpen ? 'fixed inset-x-4 top-20 bottom-6 z-50 overflow-y-auto block' : 'hidden lg:flex'
               }`}>
-                {/* Palette Header & Mobile Close */}
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
                   <h3 className="text-sm font-extrabold text-slate-900 dark:text-zinc-50 uppercase tracking-wider">
                     Question Palette ({activeSubject})
@@ -1088,12 +1128,12 @@
                       <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400" />
                     </span>
                     <span className="text-[11px] text-slate-600 dark:text-zinc-400">
-                      Answered & Marked for Review (Evaluated)
+                      Answered & Marked (Evaluated)
                     </span>
                   </div>
                 </div>
 
-                {/* Question Buttons Grid (Current Subject Questions) */}
+                {/* Question Buttons Grid */}
                 <div className="flex-1 space-y-3">
                   <div className="flex items-center justify-between text-xs text-slate-400 font-semibold">
                     <span>Questions in {activeSubject}:</span>
@@ -1117,7 +1157,6 @@
                   </div>
                 </div>
 
-                {/* Final Submit Trigger */}
                 <div className="pt-4 border-t border-slate-100 dark:border-zinc-800">
                   <button
                     type="button"
@@ -1148,7 +1187,6 @@
                     </p>
                   </div>
 
-                  {/* Summary Breakdown Table */}
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 flex justify-between items-center">
                       <span className="text-slate-500">Total Questions:</span>
@@ -1195,37 +1233,43 @@
       // RENDER: INSTRUCTIONS VIEW
       // -------------------------------------------------------------
       if (view === 'instructions') {
+        const isMains = currentPaper && (currentPaper.examType === 'JEE Mains' || currentPaper.examCategory === 'jee-mains');
         return (
           <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto space-y-8">
               
-              {/* Back to Home Button */}
               <div>
                 <button
-                  onClick={() => setView('home')}
+                  onClick={() => {
+                    setView('home');
+                    window.location.hash = `#/tests/${currentPaper ? currentPaper.examCategory : activeCategory}`;
+                  }}
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
                 >
-                  ← Back to Home
+                  ← Back to Test Library
                 </button>
               </div>
 
-              {/* Instructions Card */}
               <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] p-8 sm:p-12 shadow-xl space-y-8">
                 
-                {/* Header */}
                 <div className="space-y-3 border-b border-slate-100 dark:border-zinc-800 pb-6">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
-                    Official JEE Advanced CBT Guidelines
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                      Official {isMains ? 'JEE Mains' : 'JEE Advanced'} CBT Guidelines
+                    </span>
+                    <span className="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 text-xs font-bold">
+                      {currentPaper ? currentPaper.code : 'PTA'}
+                    </span>
                   </div>
+
                   <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-zinc-50">
-                    {currentPaper ? currentPaper.title : 'JEE Advanced Mock Test'}
+                    {currentPaper ? currentPaper.title : 'JEE CBT Mock Examination'}
                   </h1>
                   <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400">
                     {currentPaper ? currentPaper.subtitle : 'Full Syllabus Mock Examination'} · Mentorship by Nelov Mallick (IIT Delhi)
                   </p>
                 </div>
 
-                {/* Candidate Name Input */}
                 <div className="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200/60 dark:border-indigo-800/60 space-y-2">
                   <label className="block text-xs font-bold text-indigo-950 dark:text-indigo-200 uppercase tracking-wider">
                     Candidate Name (For Personalized Scorecard):
@@ -1239,15 +1283,14 @@
                   />
                 </div>
 
-                {/* Test Parameters Grid */}
                 <div className="grid grid-cols-3 gap-3 text-center">
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800">
                     <p className="text-xs text-slate-400">Duration</p>
-                    <p className="text-xl font-extrabold text-slate-900 dark:text-zinc-100">180 Mins</p>
+                    <p className="text-xl font-extrabold text-slate-900 dark:text-zinc-100">{currentPaper?.durationMinutes || 180} Mins</p>
                   </div>
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800">
                     <p className="text-xs text-slate-400">Max Marks</p>
-                    <p className="text-xl font-extrabold text-indigo-600 dark:text-indigo-400">180 Marks</p>
+                    <p className="text-xl font-extrabold text-indigo-600 dark:text-indigo-400">{currentPaper?.maxMarks || 180} Marks</p>
                   </div>
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800">
                     <p className="text-xs text-slate-400">Total Questions</p>
@@ -1255,7 +1298,6 @@
                   </div>
                 </div>
 
-                {/* Section Summary */}
                 {currentPaper && currentPaper.sectionsSummary && (
                   <div className="space-y-4">
                     <h3 className="text-sm font-extrabold text-slate-900 dark:text-zinc-100 uppercase tracking-wider">
@@ -1292,7 +1334,6 @@
                   </div>
                 )}
 
-                {/* Question Palette Color Legend */}
                 <div className="space-y-3">
                   <h3 className="text-sm font-extrabold text-slate-900 dark:text-zinc-100 uppercase tracking-wider">
                     Navigating to a Question:
@@ -1324,7 +1365,6 @@
                   </div>
                 </div>
 
-                {/* Declaration Checkbox */}
                 <div className="pt-4 border-t border-slate-100 dark:border-zinc-800">
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input
@@ -1339,7 +1379,6 @@
                   </label>
                 </div>
 
-                {/* Start Examination Button */}
                 <div className="pt-2">
                   <button
                     type="button"
@@ -1373,10 +1412,12 @@
           <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-5xl mx-auto space-y-8">
               
-              {/* Top Navigation */}
               <div className="flex items-center justify-between">
                 <button
-                  onClick={() => setView('home')}
+                  onClick={() => {
+                    setView('home');
+                    window.location.hash = `#/tests/${currentPaper ? currentPaper.examCategory : activeCategory}`;
+                  }}
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
                 >
                   ← Back to Platform Home
@@ -1386,24 +1427,22 @@
                 </span>
               </div>
 
-              {/* Grand Score Card Banner */}
               <div className="relative rounded-3xl bg-gradient-to-br from-indigo-700 via-indigo-800 to-purple-900 p-8 sm:p-12 text-white shadow-2xl shadow-indigo-900/40 overflow-hidden">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:28px_28px] pointer-events-none" />
 
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
                   <div className="space-y-2">
                     <span className="px-3 py-1 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider text-indigo-100">
-                      JEE Advanced Diagnostic Scorecard
+                      {currentPaper ? currentPaper.examType : 'JEE'} Diagnostic Scorecard
                     </span>
                     <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
                       {candidateName}
                     </h1>
                     <p className="text-xs sm:text-sm text-indigo-200">
-                      {currentPaper ? currentPaper.title : 'JEE Advanced Mock Test'} · Mentored by Nelov Mallick (IIT Delhi)
+                      {currentPaper ? currentPaper.title : 'CBT Mock Test'} · Mentored by Nelov Mallick (IIT Delhi)
                     </p>
                   </div>
 
-                  {/* Main Score Display */}
                   <div className="p-6 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 text-center min-w-[220px] shadow-xl">
                     <p className="text-xs font-bold uppercase tracking-wider text-indigo-200">Total Marks Scored</p>
                     <div className="text-5xl sm:text-6xl font-black pt-1">
@@ -1417,7 +1456,6 @@
                   </div>
                 </div>
 
-                {/* 4 Quick Metric Pills */}
                 <div className="relative z-10 mt-8 pt-6 border-t border-white/20 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
                   <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-sm">
                     <p className="text-xs text-indigo-200">Attempted</p>
@@ -1438,7 +1476,7 @@
                 </div>
               </div>
 
-              {/* Subject Breakdown Cards (3 Cards) */}
+              {/* Subject Breakdown */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {Object.entries(ev.subjectStats).map(([subj, data]) => {
                   const subjAcc = data.attempted > 0 ? Math.round(((data.correct + data.partial) / data.attempted) * 100) : 0;
@@ -1474,21 +1512,18 @@
                 })}
               </div>
 
-              {/* QUESTION-BY-QUESTION SOLUTIONS REVIEW */}
+              {/* Solution Review */}
               <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] p-6 sm:p-8 shadow-sm space-y-6">
-                
-                {/* Header & Filter Pills */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-zinc-800">
                   <div>
                     <h3 className="text-lg font-extrabold text-slate-900 dark:text-zinc-50">
                       Question-by-Question Solution Review
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-zinc-400">
-                      Step-by-step mathematical explanations & KaTeX derivations for every question.
+                      Step-by-step mathematical explanations & KaTeX derivations.
                     </p>
                   </div>
 
-                  {/* Filter Pills */}
                   <div className="flex flex-wrap gap-1.5 p-1 rounded-2xl bg-slate-100 dark:bg-zinc-800/80 text-xs font-bold">
                     {[
                       { id: 'all', label: `All (${ev.questionBreakdown.length})` },
@@ -1513,9 +1548,8 @@
                   </div>
                 </div>
 
-                {/* List of Solution Cards */}
                 <div className="space-y-6">
-                  {filteredQuestions.map((item, idx) => {
+                  {filteredQuestions.map((item) => {
                     const qObj = item.question;
                     const isCorr = item.status === 'correct';
                     const isPart = item.status === 'partial';
@@ -1534,7 +1568,6 @@
                         key={qObj.id}
                         className="rounded-2xl border border-slate-200 dark:border-zinc-800 p-6 space-y-4 hover:border-slate-300 dark:hover:border-zinc-700 transition-colors"
                       >
-                        {/* Top Info Bar */}
                         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                           <div className="flex items-center gap-2">
                             <span className="font-extrabold text-slate-900 dark:text-zinc-100">
@@ -1546,19 +1579,15 @@
                             <span className="text-slate-500">{qObj.section}</span>
                           </div>
 
-                          <div className="flex items-center gap-2">
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold border ${badgeColor}`}>
-                              {item.statusLabel} ({item.marksAwarded > 0 ? `+${item.marksAwarded}` : item.marksAwarded} Mks)
-                            </span>
-                          </div>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold border ${badgeColor}`}>
+                            {item.statusLabel} ({item.marksAwarded > 0 ? `+${item.marksAwarded}` : item.marksAwarded} Mks)
+                          </span>
                         </div>
 
-                        {/* Question Text */}
                         <div className="text-xs sm:text-sm text-slate-800 dark:text-zinc-200 leading-relaxed">
                           <MathSpan text={qObj.question} />
                         </div>
 
-                        {/* Diagrams */}
                         {qObj.images && qObj.images.length > 0 && (
                           <div className="flex flex-wrap gap-3 py-2">
                             {qObj.images.map((img, iIdx) => (
@@ -1567,7 +1596,6 @@
                           </div>
                         )}
 
-                        {/* Response vs Answer Comparison */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800 text-xs">
                           <div>
                             <span className="font-bold text-slate-500">Your Response: </span>
@@ -1586,7 +1614,6 @@
                           </div>
                         </div>
 
-                        {/* Step-by-Step Explanation */}
                         {qObj.explanation && (
                           <div className="p-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/60 dark:border-indigo-900/40 space-y-1.5 text-xs text-slate-700 dark:text-zinc-300">
                             <p className="font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
@@ -1602,22 +1629,21 @@
                   })}
                 </div>
 
-                {/* Retake & Action Buttons */}
                 <div className="pt-6 border-t border-slate-100 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-4">
                   <button
                     type="button"
                     onClick={() => handleSelectTest(activeTestId)}
                     className="px-6 py-3 rounded-xl border border-slate-300 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-200 font-bold text-xs transition-colors"
                   >
-                    Retake {activeTestId === 'pta-04' ? 'PTA 04' : 'PTA 05'}
+                    Retake This Paper
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => handleSelectTest(activeTestId === 'pta-04' ? 'pta-05' : 'pta-04')}
+                    onClick={() => handleSelectTest(activeTestId.includes('pta-04') ? 'jee-advanced-pta-05' : 'jee-advanced-pta-04')}
                     className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition-all"
                   >
-                    Attempt {activeTestId === 'pta-04' ? 'PTA 05' : 'PTA 04'} Free →
+                    Attempt {activeTestId.includes('pta-04') ? 'PTA 05' : 'PTA 04'} Free →
                   </button>
                 </div>
 
@@ -1630,11 +1656,11 @@
       // -------------------------------------------------------------
       // RENDER: HOMEPAGE (Default View)
       // -------------------------------------------------------------
-      const liveTests = window.liveTestsList || [];
+      const activeCategoryList = activeCategory === 'jee-advanced' ? advancedList : mainsList;
       const founder = window.founderData || {
         name: "Nelov Mallick",
         college: "IIT Delhi",
-        role: "Founder & Lead Mentor",
+        role: "Founder & Academic Director",
         bio: "IIT Delhi alumnus mentoring JEE aspirants.",
         socials: { instagram: "850K+", youtube: "650K+", linkedin: "Nelov Mallick" },
         highlights: ["Mentored 10,000+ JEE Aspirants", "AI-Driven Error Diagnosis", "100% Free Live Tests"]
@@ -1651,8 +1677,7 @@
             <div className="h-[2px] w-full bg-gradient-to-r from-indigo-600 via-violet-500 to-fuchsia-500" />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
               
-              {/* Brand Logo */}
-              <a href="#" className="flex items-center gap-2.5 group">
+              <a href="#/" onClick={() => setView('home')} className="flex items-center gap-2.5 group">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-indigo-500/25 group-hover:scale-105 transition-transform">
                   NM
                 </div>
@@ -1661,29 +1686,35 @@
                     NelovMallick<span className="text-indigo-600 dark:text-indigo-400">IITD</span>
                   </span>
                   <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-zinc-400 -mt-1">
-                    Mentorship & 100% Free CBT Tests
+                    JEE Mains & Advanced · 100% Free CBT
                   </span>
                 </div>
               </a>
 
-              {/* Navigation Links */}
               <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-600 dark:text-zinc-300">
-                <a href="#tests" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Live Tests</a>
-                <button onClick={() => handleSelectTest('pta-04')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">PTA 04</button>
-                <button onClick={() => handleSelectTest('pta-05')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">PTA 05</button>
+                <button
+                  onClick={() => { setActiveCategory('jee-advanced'); window.location.hash = '#/tests/jee-advanced'; }}
+                  className={`transition-colors ${activeCategory === 'jee-advanced' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'hover:text-indigo-600'}`}
+                >
+                  JEE Advanced (PTA 01-10)
+                </button>
+                <button
+                  onClick={() => { setActiveCategory('jee-mains'); window.location.hash = '#/tests/jee-mains'; }}
+                  className={`transition-colors ${activeCategory === 'jee-mains' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'hover:text-indigo-600'}`}
+                >
+                  JEE Mains (PTA 01-10)
+                </button>
+                <a href="#tests" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Test Library</a>
                 <a href="#mentorship" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Mentorship</a>
-                <a href="#ranks" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Rank Highlights</a>
-                <a href="#features" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Features</a>
+                <a href="#ranks" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Rank Insights</a>
                 <a href="#faq" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">FAQs</a>
               </nav>
 
-              {/* Controls */}
               <div className="flex items-center gap-3">
                 <span className="hidden sm:inline-flex px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
                   100% Free Platform
                 </span>
 
-                {/* Dark mode switch */}
                 <button
                   onClick={() => setIsDark(!isDark)}
                   className="p-2 rounded-xl border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
@@ -1692,18 +1723,46 @@
                   {isDark ? '☀️' : '🌙'}
                 </button>
 
-                <a
-                  href="#tests"
+                <button
+                  onClick={() => handleSelectTest('jee-advanced-pta-04')}
                   className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-xl shadow-md shadow-indigo-600/20 transition-all hover:scale-105 active:scale-95"
                 >
                   Attempt Live Tests Free
-                </a>
+                </button>
               </div>
 
             </div>
           </header>
 
-          {/* MAIN HOMEPAGE SECTIONS */}
+          {/* QUICK-ACCESS LIVE NOW STRIP (Always visible on homepage) */}
+          <div className="bg-gradient-to-r from-indigo-900 via-indigo-950 to-purple-950 border-b border-indigo-800/80 py-3 px-4 text-white">
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+              <div className="flex items-center gap-2.5">
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500 text-white font-extrabold text-[11px] uppercase tracking-wider animate-pulse">
+                  Live Now
+                </span>
+                <span className="font-semibold text-indigo-100">
+                  JEE Advanced Mock Papers <strong className="text-white">PTA 04</strong> (57 Qs, 180 Mks) and <strong className="text-white">PTA 05</strong> (54 Qs, 180 Mks) are open to everyone!
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleSelectTest('jee-advanced-pta-04')}
+                  className="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-sm transition-all"
+                >
+                  Start PTA 04 →
+                </button>
+                <button
+                  onClick={() => handleSelectTest('jee-advanced-pta-05')}
+                  className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs transition-all"
+                >
+                  Start PTA 05 →
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* MAIN HOMEPAGE CONTENT */}
           <main>
             {/* 1. HERO SECTION */}
             <section className="relative pt-16 pb-20 sm:pt-24 sm:pb-32 overflow-hidden">
@@ -1712,156 +1771,240 @@
 
               <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
                 
-                {/* Badge */}
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-200 dark:border-indigo-800/80 bg-indigo-50/80 dark:bg-indigo-950/50 shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="text-xs font-bold text-indigo-900 dark:text-indigo-300">
-                    JEE Advanced 2026 Test Series · PTA-04 & PTA-05 Live Now · 100% Free
+                    Structured Test Series · JEE Mains (PTA 01–10) & JEE Advanced (PTA 01–10)
                   </span>
                 </div>
 
-                {/* Main H1 */}
                 <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-zinc-50 leading-[1.1] max-w-4xl mx-auto">
-                  Master JEE Advanced with <br className="hidden sm:inline" />
+                  Master JEE with <br className="hidden sm:inline" />
                   <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
                     Authentic CBT Simulation.
                   </span>
                 </h1>
 
-                {/* Subtitle */}
                 <p className="text-base sm:text-xl text-slate-600 dark:text-zinc-300 max-w-2xl mx-auto leading-relaxed">
-                  Real computer-based exam interface, official countdown timer, KaTeX formulas, and JEE Advanced partial marking (+4, +3, +2, +1, -2). Mentorship and question papers curated by <span className="font-bold text-indigo-600 dark:text-indigo-400">Nelov Mallick (IIT Delhi)</span>.
+                  Practice with the exact computer-based testing environment. 10 Full-Length Mocks for <strong>JEE Mains</strong> and 10 Full-Length Mocks for <strong>JEE Advanced</strong>. Academic direction by <span className="font-bold text-indigo-600 dark:text-indigo-400">Nelov Mallick (IIT Delhi)</span>.
                 </p>
 
-                {/* CTAs */}
                 <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
                   <button
-                    onClick={() => handleSelectTest('pta-04')}
+                    onClick={() => handleSelectTest('jee-advanced-pta-04')}
                     className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm sm:text-base shadow-xl shadow-indigo-600/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
                   >
-                    <span>Attempt PTA 04 Free</span>
+                    <span>Attempt PTA 04 (Advanced)</span>
                     <span>→</span>
                   </button>
 
                   <button
-                    onClick={() => handleSelectTest('pta-05')}
+                    onClick={() => handleSelectTest('jee-advanced-pta-05')}
                     className="w-full sm:w-auto px-8 py-4 rounded-2xl border-2 border-indigo-600 dark:border-indigo-500 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 font-extrabold text-sm sm:text-base transition-all flex items-center justify-center gap-2"
                   >
-                    <span>Attempt PTA 05 Free</span>
+                    <span>Attempt PTA 05 (Advanced)</span>
                     <span>→</span>
                   </button>
                 </div>
 
-                {/* Key Pillars Grid */}
+                {/* 4 Pillars */}
                 <div className="pt-8 max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800">
-                    <p className="text-xs text-slate-400">Marking Scheme</p>
-                    <p className="text-sm font-extrabold text-slate-900 dark:text-zinc-100">+4, +3, +2, +1, -2</p>
-                    <p className="text-[11px] text-emerald-600 dark:text-emerald-400 pt-0.5">Real Partial Marks</p>
+                    <p className="text-xs text-slate-400">Categories</p>
+                    <p className="text-sm font-extrabold text-slate-900 dark:text-zinc-100">Mains & Advanced</p>
+                    <p className="text-[11px] text-indigo-600 dark:text-indigo-400 pt-0.5">2 Dedicated Folders</p>
                   </div>
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800">
-                    <p className="text-xs text-slate-400">Total Marks</p>
-                    <p className="text-sm font-extrabold text-slate-900 dark:text-zinc-100">180 Marks / Paper</p>
-                    <p className="text-[11px] text-indigo-600 dark:text-indigo-400 pt-0.5">Official JEE Pattern</p>
+                    <p className="text-xs text-slate-400">Test Capacity</p>
+                    <p className="text-sm font-extrabold text-slate-900 dark:text-zinc-100">PTA 01 to PTA 10</p>
+                    <p className="text-[11px] text-purple-600 dark:text-purple-400 pt-0.5">10 Slots Per Category</p>
                   </div>
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800">
-                    <p className="text-xs text-slate-400">Exam Experience</p>
-                    <p className="text-sm font-extrabold text-slate-900 dark:text-zinc-100">Exact CBT Screen</p>
-                    <p className="text-[11px] text-purple-600 dark:text-purple-400 pt-0.5">5-Status Palette</p>
+                    <p className="text-xs text-slate-400">Scoring Engine</p>
+                    <p className="text-sm font-extrabold text-slate-900 dark:text-zinc-100">Adaptive Scoring</p>
+                    <p className="text-[11px] text-emerald-600 dark:text-emerald-400 pt-0.5">Mains & Adv Rules</p>
                   </div>
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800">
-                    <p className="text-xs text-slate-400">Registration</p>
-                    <p className="text-sm font-extrabold text-slate-900 dark:text-zinc-100">Zero Paywall</p>
-                    <p className="text-[11px] text-emerald-600 dark:text-emerald-400 pt-0.5">100% Free Open Access</p>
+                    <p className="text-xs text-slate-400">Access</p>
+                    <p className="text-sm font-extrabold text-slate-900 dark:text-zinc-100">100% Free</p>
+                    <p className="text-[11px] text-emerald-600 dark:text-emerald-400 pt-0.5">Zero Paywalls</p>
                   </div>
                 </div>
 
               </div>
             </section>
 
-            {/* 2. LIVE TESTS SECTION */}
+            {/* 2. REORGANIZED TEST LIBRARY SECTION */}
             <section id="tests" className="py-20 sm:py-28 bg-slate-50/70 dark:bg-zinc-900/40 border-y border-slate-200/80 dark:border-zinc-800/80 relative">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
                 
+                {/* Heading */}
                 <div className="text-center max-w-3xl mx-auto space-y-3">
                   <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
-                    ⚡ Live Now · 100% Free for Everyone
+                    ⚡ Complete Test Library (PTA 01 – PTA 10)
                   </div>
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-zinc-50 tracking-tight">
-                    Official JEE Advanced Papers (PTA 04 & PTA 05)
+                    Structured Test Series Categories
                   </h2>
                   <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400">
-                    Click any test below to start immediately with guest mode. Instant post-test score computation with official partial marking rules.
+                    Explore full-syllabus test papers categorized for <strong>JEE Mains</strong> and <strong>JEE Advanced</strong>. PTA 04 & PTA 05 are live now.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                  {liveTests.map((t) => (
-                    <div
-                      key={t.id}
-                      className="relative rounded-3xl bg-white dark:bg-[#121318] border-2 border-indigo-600/30 hover:border-indigo-600 p-8 flex flex-col justify-between shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
-                    >
-                      <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                          <span className="px-3.5 py-1 rounded-full text-xs font-extrabold bg-emerald-500 text-white shadow-sm">
-                            {t.tag}
-                          </span>
-                          <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-full border border-indigo-200 dark:border-indigo-800">
-                            {t.exam}
-                          </span>
-                        </div>
-
-                        <div>
-                          <h3 className="text-2xl font-bold text-slate-900 dark:text-zinc-50">
-                            {t.title}
-                          </h3>
-                          <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 leading-relaxed pt-2">
-                            {t.description}
-                          </p>
-                        </div>
-
-                        {/* Metric Tiles */}
-                        <div className="grid grid-cols-3 gap-2 py-4 border-y border-slate-100 dark:border-zinc-800 text-center">
-                          <div className="p-2.5 rounded-2xl bg-slate-50 dark:bg-zinc-900/60">
-                            <p className="text-[11px] text-slate-400">Questions</p>
-                            <p className="text-lg font-extrabold text-slate-900 dark:text-zinc-100">{t.totalQuestions}</p>
-                          </div>
-                          <div className="p-2.5 rounded-2xl bg-slate-50 dark:bg-zinc-900/60">
-                            <p className="text-[11px] text-slate-400">Total Marks</p>
-                            <p className="text-lg font-extrabold text-indigo-600 dark:text-indigo-400">{t.maxMarks}</p>
-                          </div>
-                          <div className="p-2.5 rounded-2xl bg-slate-50 dark:bg-zinc-900/60">
-                            <p className="text-[11px] text-slate-400">Duration</p>
-                            <p className="text-lg font-extrabold text-slate-900 dark:text-zinc-100">{t.durationMinutes}m</p>
-                          </div>
-                        </div>
-
-                        {/* Subjects */}
-                        <div className="space-y-1.5">
-                          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Subjects Included:</p>
-                          <div className="flex flex-wrap gap-2">
-                            {t.subjects.map((sub, sIdx) => (
-                              <span key={sIdx} className="text-xs px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200/50 dark:border-indigo-800/50">
-                                {sub}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
+                {/* 2 Category Folder Tabs */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-xl mx-auto">
+                  <button
+                    type="button"
+                    onClick={() => { setActiveCategory('jee-advanced'); window.location.hash = '#/tests/jee-advanced'; }}
+                    className={`w-full sm:w-1/2 p-4 rounded-2xl border-2 transition-all flex items-center justify-between text-left ${
+                      activeCategory === 'jee-advanced'
+                        ? 'border-indigo-600 bg-white dark:bg-zinc-900 shadow-lg ring-2 ring-indigo-500/20'
+                        : 'border-slate-200 dark:border-zinc-800 bg-slate-100/60 dark:bg-zinc-800/60 hover:border-slate-300'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">📁</span>
+                        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-zinc-100">
+                          JEE Advanced
+                        </h3>
                       </div>
-
-                      {/* Action Button */}
-                      <div className="pt-8">
-                        <button
-                          type="button"
-                          onClick={() => handleSelectTest(t.id)}
-                          className="w-full py-4 rounded-2xl font-bold text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                        >
-                          <span>Attempt {t.code} Free Now</span>
-                          <span>→</span>
-                        </button>
-                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-zinc-400 pt-0.5">
+                        PTA 01 to PTA 10 (180 Mks)
+                      </p>
                     </div>
-                  ))}
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400">
+                      2 Live
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => { setActiveCategory('jee-mains'); window.location.hash = '#/tests/jee-mains'; }}
+                    className={`w-full sm:w-1/2 p-4 rounded-2xl border-2 transition-all flex items-center justify-between text-left ${
+                      activeCategory === 'jee-mains'
+                        ? 'border-indigo-600 bg-white dark:bg-zinc-900 shadow-lg ring-2 ring-indigo-500/20'
+                        : 'border-slate-200 dark:border-zinc-800 bg-slate-100/60 dark:bg-zinc-800/60 hover:border-slate-300'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">📁</span>
+                        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-zinc-100">
+                          JEE Mains
+                        </h3>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-zinc-400 pt-0.5">
+                        PTA 01 to PTA 10 (300 Mks)
+                      </p>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 dark:bg-zinc-700 text-slate-600 dark:text-zinc-400">
+                      10 Slots
+                    </span>
+                  </button>
+                </div>
+
+                {/* Subtitle / Active Category Info */}
+                <div className="flex items-center justify-between max-w-6xl mx-auto border-b border-slate-200 dark:border-zinc-800 pb-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                      Category: {activeCategory === 'jee-advanced' ? 'JEE Advanced Test Series' : 'JEE Mains Test Series'}
+                    </span>
+                    <span className="text-slate-300 dark:text-zinc-700">·</span>
+                    <span className="text-xs text-slate-500 dark:text-zinc-400">
+                      Showing PTA 01 to PTA 10 in numbered order
+                    </span>
+                  </div>
+
+                  <span className="text-xs font-semibold text-slate-500">
+                    Total: {activeCategoryList.length} Tests
+                  </span>
+                </div>
+
+                {/* 10 Tests Grid (Numbered PTA 01 -> PTA 10) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                  {activeCategoryList.map((t) => {
+                    const isLive = t.status === 'live';
+
+                    return (
+                      <div
+                        key={t.id}
+                        className={`relative rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 ${
+                          isLive
+                            ? 'bg-white dark:bg-[#121318] border-2 border-indigo-600 shadow-xl hover:shadow-2xl hover:-translate-y-1 ring-4 ring-indigo-500/10'
+                            : 'bg-white/60 dark:bg-zinc-900/40 border border-slate-200/80 dark:border-zinc-800/80 shadow-sm opacity-90'
+                        }`}
+                      >
+                        <div className="space-y-4">
+                          {/* Top Badges */}
+                          <div className="flex items-center justify-between">
+                            <span className="font-mono text-xs font-extrabold px-3 py-1 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700">
+                              {t.code}
+                            </span>
+
+                            {isLive ? (
+                              <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-500 text-white shadow-sm flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                                Live Now · Free
+                              </span>
+                            ) : (
+                              <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700">
+                                Coming Soon
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Title & Description */}
+                          <div>
+                            <h4 className="text-lg font-bold text-slate-900 dark:text-zinc-50">
+                              {t.title}
+                            </h4>
+                            <p className="text-xs text-slate-600 dark:text-zinc-400 line-clamp-2 pt-1.5 leading-relaxed">
+                              {t.description}
+                            </p>
+                          </div>
+
+                          {/* Quick Specs */}
+                          <div className="grid grid-cols-3 gap-1.5 py-3 border-y border-slate-100 dark:border-zinc-800 text-center">
+                            <div className="p-2 rounded-xl bg-slate-50 dark:bg-zinc-900/60">
+                              <p className="text-[10px] text-slate-400">Questions</p>
+                              <p className="text-xs font-extrabold text-slate-800 dark:text-zinc-200">{t.totalQuestions}</p>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-50 dark:bg-zinc-900/60">
+                              <p className="text-[10px] text-slate-400">Total Marks</p>
+                              <p className="text-xs font-extrabold text-indigo-600 dark:text-indigo-400">{t.totalMarks}</p>
+                            </div>
+                            <div className="p-2 rounded-xl bg-slate-50 dark:bg-zinc-900/60">
+                              <p className="text-[10px] text-slate-400">Duration</p>
+                              <p className="text-xs font-extrabold text-slate-800 dark:text-zinc-200">{t.durationMinutes}m</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Card CTA */}
+                        <div className="pt-6">
+                          {isLive ? (
+                            <button
+                              type="button"
+                              onClick={() => handleSelectTest(t.id)}
+                              className="w-full py-3.5 rounded-xl font-bold text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-1.5"
+                            >
+                              <span>Attempt Test Free</span>
+                              <span>→</span>
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleSelectTest(t.id)}
+                              className="w-full py-3 rounded-xl font-semibold text-xs border border-slate-200 dark:border-zinc-700 text-slate-400 dark:text-zinc-500 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
+                            >
+                              Coming Soon · Upload Slot
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
 
               </div>
@@ -1888,7 +2031,6 @@
                     <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
                     <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-                      {/* Avatar */}
                       <div className="relative flex-shrink-0">
                         <img
                           src={founder.avatar}
@@ -1900,7 +2042,6 @@
                         </span>
                       </div>
 
-                      {/* Bio */}
                       <div className="flex-1 text-center md:text-left space-y-4">
                         <div>
                           <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-zinc-50">
@@ -1989,42 +2130,8 @@
               </div>
             </section>
 
-            {/* 5. PLATFORM FEATURES GRID */}
-            <section id="features" className="py-20 sm:py-28 relative">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-                
-                <div className="text-center max-w-3xl mx-auto space-y-3">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider">
-                    High-Performance Platform
-                  </div>
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-zinc-50 tracking-tight">
-                    Engineered for Serious IIT Aspirants
-                  </h2>
-                  <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400">
-                    Everything you need to eliminate silly mistakes, master partial marking, and conquer test day.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                  {features.map((f) => (
-                    <div
-                      key={f.id}
-                      className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 sm:p-8 shadow-sm hover:shadow-xl transition-all duration-300 space-y-3"
-                    >
-                      <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold flex items-center justify-center text-sm shadow-sm">
-                        0{f.id}
-                      </div>
-                      <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-50">{f.title}</h3>
-                      <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 leading-relaxed">{f.description}</p>
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-            </section>
-
-            {/* 6. INTERACTIVE FAQS */}
-            <section id="faq" className="py-20 sm:py-28 bg-slate-50/70 dark:bg-zinc-900/40 border-y border-slate-200/80 dark:border-zinc-800/80 relative">
+            {/* 5. INTERACTIVE FAQS */}
+            <section id="faq" className="py-20 sm:py-28 relative">
               <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
                 
                 <div className="text-center space-y-3">
@@ -2067,13 +2174,13 @@
               </div>
             </section>
 
-            {/* 7. CTA FOOTER BANNER */}
+            {/* 6. CTA FOOTER BANNER */}
             <section className="py-16 sm:py-24 relative">
               <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="relative rounded-3xl sm:rounded-[36px] bg-gradient-to-br from-indigo-700 via-indigo-800 to-purple-900 p-8 sm:p-14 text-white shadow-2xl shadow-indigo-900/40 text-center space-y-6 overflow-hidden">
                   <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider text-indigo-100">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    100% Free · Lead Mentorship by Nelov Mallick (IIT Delhi)
+                    100% Free · Mentorship by Nelov Mallick (IIT Delhi)
                   </div>
                   <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
                     Start Your Authentic JEE Advanced Attempt Now.
@@ -2084,14 +2191,14 @@
                   <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
                     <button
                       type="button"
-                      onClick={() => handleSelectTest('pta-04')}
+                      onClick={() => handleSelectTest('jee-advanced-pta-04')}
                       className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white hover:bg-slate-100 text-indigo-950 font-extrabold text-sm shadow-xl hover:scale-105 active:scale-95 transition-all"
                     >
                       Attempt PTA 04 Free →
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleSelectTest('pta-05')}
+                      onClick={() => handleSelectTest('jee-advanced-pta-05')}
                       className="w-full sm:w-auto px-8 py-4 rounded-xl border border-white/30 hover:bg-white/10 text-white font-extrabold text-sm transition-all"
                     >
                       Attempt PTA 05 Free →
@@ -2112,7 +2219,7 @@
                 <span className="font-extrabold text-sm text-slate-900 dark:text-zinc-100">
                   NelovMallick<span className="text-indigo-600 dark:text-indigo-400">IITD</span>
                 </span>
-                <span className="text-slate-400">· 100% Free JEE Advanced CBT Platform</span>
+                <span className="text-slate-400">· 100% Free JEE CBT Platform</span>
               </div>
 
               <p className="text-center sm:text-right">
@@ -2121,11 +2228,49 @@
             </div>
           </footer>
 
+          {/* PLACEHOLDER / COMING SOON MODAL */}
+          {noticeModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+              <div className="w-full max-w-md rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 sm:p-8 shadow-2xl space-y-5">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-2xl flex items-center justify-center mx-auto shadow-md">
+                  📄
+                </div>
+                <div className="text-center space-y-2">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-50">
+                    {noticeModal.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 leading-relaxed">
+                    {noticeModal.message}
+                  </p>
+                </div>
+                <div className="pt-2 flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNoticeModal(null);
+                      handleSelectTest('jee-advanced-pta-04');
+                    }}
+                    className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all"
+                  >
+                    Start Live Test PTA 04 Now
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNoticeModal(null)}
+                    className="w-full py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-zinc-800"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       );
     }
 
-    // Mount the Application
+    // Mount Application
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<NelovMallickApp />);
   </script>
