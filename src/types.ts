@@ -74,3 +74,13 @@ export interface FAQItem {
   question: string;
   answer: string;
 }
+
+export type TargetExam = 'JEE Mains' | 'JEE Advanced' | 'Both';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  targetExam: TargetExam;
+  createdAt: string;
+}

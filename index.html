@@ -59,6 +59,7 @@
   <script src="/data/jee-advanced/pta04.js"></script>
   <script src="/data/jee-advanced/pta05.js"></script>
   <script src="/data/rankPredictor.js"></script>
+  <script src="/data/authStore.js"></script>
 
   <style>
     body {
@@ -1102,12 +1103,1138 @@
       };
     }
 
+
+    // COMPONENT: Free User Authentication Modal (Log In / Sign Up / Forgot Password)
+    function AuthModalDialog({ isOpen, mode: initialMode, redirectUrl, message, onClose, onAuthSuccess }) {
+      const [authMode, setAuthMode] = useState(initialMode || 'login');
+      const [name, setName] = useState('');
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [confirmPassword, setConfirmPassword] = useState('');
+      const [targetExam, setTargetExam] = useState('JEE Advanced');
+      const [showPassword, setShowPassword] = useState(false);
+      const [error, setError] = useState('');
+      const [successMsg, setSuccessMsg] = useState('');
+      const [loading, setLoading] = useState(false);
+
+      useEffect(() => {
+        if (initialMode) setAuthMode(initialMode);
+        setError('');
+        setSuccessMsg('');
+      }, [initialMode, isOpen]);
+
+      if (!isOpen) return null;
+
+      const handleLoginSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        try {
+          const user = await window.authService.logIn({ email, password });
+          setSuccessMsg('Logged in successfully!');
+          onAuthSuccess(user, redirectUrl);
+        } catch (err) {
+          setError(err.message || 'Login failed. Please check your credentials.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const handleSignUpSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        if (password !== confirmPassword) {
+          setError('Passwords do not match. Please verify and re-enter.');
+          return;
+        }
+        setLoading(true);
+        try {
+          const user = await window.authService.signUp({ name, email, password, targetExam });
+          setSuccessMsg('Free account created successfully!');
+          onAuthSuccess(user, redirectUrl);
+        } catch (err) {
+          setError(err.message || 'Failed to create account.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const handleForgotSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        if (password !== confirmPassword) {
+          setError('Passwords do not match.');
+          return;
+        }
+        setLoading(true);
+        try {
+          await window.authService.resetPassword(email, password);
+          setSuccessMsg('Password reset successfully! You can now log in.');
+          setAuthMode('login');
+          setPassword('');
+          setConfirmPassword('');
+        } catch (err) {
+          setError(err.message || 'Failed to reset password.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-md rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 sm:p-8 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+
+            <div className="text-center space-y-1.5">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold text-sm flex items-center justify-center mx-auto shadow-md shadow-indigo-600/30">
+                NM
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-zinc-50 tracking-tight">
+                {authMode === 'login' && 'Student Log In'}
+                {authMode === 'signup' && 'Create Free Account'}
+                {authMode === 'forgot' && 'Reset Password'}
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-zinc-400">
+                {message || (authMode === 'login'
+                  ? 'Sign in to attempt CBT live tests, view solutions & track rank'
+                  : '100% Free Forever · No payment or credit card required')}
+              </p>
+              <div className="pt-1">
+                <span className="inline-flex px-3 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                  ✓ 100% Free Access · Mentored by Nelov Mallick (IIT Delhi)
+                </span>
+              </div>
+            </div>
+
+            {error && (
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-rose-600 dark:text-rose-400 flex items-start gap-2">
+                <span>⚠️</span>
+                <span>{error}</span>
+              </div>
+            )}
+            {successMsg && (
+              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 text-xs text-emerald-600 dark:text-emerald-400 flex items-start gap-2">
+                <span>✓</span>
+                <span>{successMsg}</span>
+              </div>
+            )}
+
+            {authMode === 'login' && (
+              <form onSubmit={handleLoginSubmit} className="space-y-4 text-xs">
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 dark:text-zinc-300">Email Address</label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="student@example.com"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <label className="font-bold text-slate-700 dark:text-zinc-300">Password</label>
+                    <button
+                      type="button"
+                      onClick={() => { setAuthMode('forgot'); setError(''); }}
+                      className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-12"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[11px] font-semibold"
+                    >
+                      {showPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all disabled:opacity-50"
+                >
+                  {loading ? 'Authenticating...' : 'Sign In Free →'}
+                </button>
+
+                <div className="pt-2 text-center text-slate-500 dark:text-zinc-400">
+                  New student?{' '}
+                  <button
+                    type="button"
+                    onClick={() => { setAuthMode('signup'); setError(''); }}
+                    className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    Sign Up 100% Free
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {authMode === 'signup' && (
+              <form onSubmit={handleSignUpSubmit} className="space-y-3.5 text-xs">
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 dark:text-zinc-300">Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. Arjun Sharma"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 dark:text-zinc-300">Email Address</label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="student@example.com"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 dark:text-zinc-300">Target Exam</label>
+                  <select
+                    value={targetExam}
+                    onChange={(e) => setTargetExam(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="JEE Advanced">JEE Advanced</option>
+                    <option value="JEE Mains">JEE Mains</option>
+                    <option value="Both">Both (Mains & Advanced)</option>
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div className="space-y-1">
+                    <label className="font-bold text-slate-700 dark:text-zinc-300">Password</label>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      minLength={6}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Min 6 chars"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold text-slate-700 dark:text-zinc-300">Confirm</label>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      minLength={6}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Repeat password"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="showPass"
+                    checked={showPassword}
+                    onChange={() => setShowPassword(!showPassword)}
+                    className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <label htmlFor="showPass" className="text-slate-500 text-[11px] cursor-pointer">
+                    Show Passwords
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all disabled:opacity-50"
+                >
+                  {loading ? 'Creating Free Account...' : 'Complete Free Registration →'}
+                </button>
+
+                <div className="pt-1.5 text-center text-slate-500 dark:text-zinc-400">
+                  Already registered?{' '}
+                  <button
+                    type="button"
+                    onClick={() => { setAuthMode('login'); setError(''); }}
+                    className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    Log In
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {authMode === 'forgot' && (
+              <form onSubmit={handleForgotSubmit} className="space-y-3.5 text-xs">
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 dark:text-zinc-300">Registered Email</label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="student@example.com"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 dark:text-zinc-300">New Password</label>
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Min 6 characters"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 dark:text-zinc-300">Confirm New Password</label>
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repeat new password"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all disabled:opacity-50"
+                >
+                  {loading ? 'Resetting Password...' : 'Reset Password Free →'}
+                </button>
+
+                <div className="pt-1.5 text-center text-slate-500 dark:text-zinc-400">
+                  <button
+                    type="button"
+                    onClick={() => { setAuthMode('login'); setError(''); }}
+                    className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    ← Back to Log In
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Reusable Top Navigation Bar
+    function MainNavbar({
+      currentUser,
+      activeCategory,
+      setActiveCategory,
+      isDark,
+      setIsDark,
+      openAuth,
+      handleLogOut,
+      setView,
+      userDropdownOpen,
+      setUserDropdownOpen
+    }) {
+      const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+      const getInitials = (name) => {
+        if (!name) return 'U';
+        const parts = name.trim().split(' ');
+        if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+        return name.substring(0, 2).toUpperCase();
+      };
+
+      return (
+        <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-white/90 dark:bg-[#0a0a0c]/90 border-b border-slate-200/80 dark:border-zinc-800/80 transition-colors">
+          <div className="h-[2px] w-full bg-gradient-to-r from-indigo-600 via-violet-500 to-fuchsia-500" />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            
+            {/* Brand Logo */}
+            <a
+              href="#/"
+              onClick={() => { setView('home'); window.location.hash = '#/'; }}
+              className="flex items-center gap-2.5 group"
+            >
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-indigo-500/25 group-hover:scale-105 transition-transform">
+                NM
+              </div>
+              <div className="flex flex-col">
+                <span className="font-extrabold text-base tracking-tight text-zinc-950 dark:text-zinc-50 flex items-center gap-1">
+                  NelovMallick<span className="text-indigo-600 dark:text-indigo-400">IITD</span>
+                </span>
+                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-zinc-400 -mt-1">
+                  JEE Mains & Advanced · 100% Free CBT
+                </span>
+              </div>
+            </a>
+
+            {/* Desktop Navigation Links */}
+            <nav className="hidden lg:flex items-center gap-5 text-sm font-semibold text-slate-600 dark:text-zinc-300">
+              <button
+                type="button"
+                onClick={() => { setActiveCategory('jee-advanced'); setView('home'); window.location.hash = '#/tests/jee-advanced'; }}
+                className={`transition-colors ${activeCategory === 'jee-advanced' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'hover:text-indigo-600'}`}
+              >
+                JEE Advanced (PTA 01-10)
+              </button>
+              <button
+                type="button"
+                onClick={() => { setActiveCategory('jee-mains'); setView('home'); window.location.hash = '#/tests/jee-mains'; }}
+                className={`transition-colors ${activeCategory === 'jee-mains' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'hover:text-indigo-600'}`}
+              >
+                JEE Mains (PTA 01-10)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!currentUser) {
+                    openAuth('login', '#/progress', 'Sign in or create a free account to view your My Progress dashboard.');
+                  } else {
+                    setView('progress');
+                    window.location.hash = '#/progress';
+                  }
+                }}
+                className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-1"
+              >
+                <span>📊</span> My Progress
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!currentUser) {
+                    openAuth('login', '#/notebook', 'Sign in or create a free account to access your personal Revision Notebook.');
+                  } else {
+                    setView('notebook');
+                    window.location.hash = '#/notebook';
+                  }
+                }}
+                className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-1"
+              >
+                <span>⭐</span> Revision Notebook
+              </button>
+              <a href="#mentorship" onClick={() => setView('home')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Mentorship</a>
+              <a href="#ranks" onClick={() => setView('home')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Rank Insights</a>
+              <a href="#faq" onClick={() => setView('home')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">FAQs</a>
+            </nav>
+
+            {/* Right Controls */}
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <span className="hidden sm:inline-flex px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                100% Free Platform
+              </span>
+
+              {/* Theme toggle */}
+              <button
+                onClick={() => setIsDark(!isDark)}
+                className="p-2 rounded-xl border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+                aria-label="Toggle Theme"
+              >
+                {isDark ? '☀️' : '🌙'}
+              </button>
+
+              {/* Logged in vs Logged out buttons */}
+              {currentUser ? (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                    className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/60 dark:bg-indigo-950/30 text-slate-900 dark:text-zinc-100 hover:border-indigo-400 transition-all text-xs font-bold"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-black text-xs shadow-sm">
+                      {getInitials(currentUser.name)}
+                    </div>
+                    <span className="hidden sm:inline max-w-[110px] truncate">{currentUser.name.split(' ')[0]}</span>
+                    <span className="text-[10px] text-slate-400">▼</span>
+                  </button>
+
+                  {userDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-2 shadow-2xl z-50 text-xs space-y-1">
+                      <div className="p-2.5 border-b border-slate-100 dark:border-zinc-800/80">
+                        <p className="font-extrabold text-slate-900 dark:text-zinc-100 truncate">{currentUser.name}</p>
+                        <p className="text-[11px] text-slate-500 dark:text-zinc-400 truncate">{currentUser.email}</p>
+                        <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold">
+                          {currentUser.targetExam || 'JEE Advanced'}
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => { setUserDropdownOpen(false); setView('progress'); window.location.hash = '#/progress'; }}
+                        className="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/60 text-slate-700 dark:text-zinc-300 font-semibold text-left transition-colors"
+                      >
+                        <span>📊</span> My Progress
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => { setUserDropdownOpen(false); setView('notebook'); window.location.hash = '#/notebook'; }}
+                        className="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/60 text-slate-700 dark:text-zinc-300 font-semibold text-left transition-colors"
+                      >
+                        <span>⭐</span> Revision Notebook
+                      </button>
+
+                      <div className="border-t border-slate-100 dark:border-zinc-800/80 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => { setUserDropdownOpen(false); handleLogOut(); }}
+                          className="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold text-left transition-colors"
+                        >
+                          <span>🚪</span> Log Out
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openAuth('login')}
+                    className="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+                  >
+                    Log In
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openAuth('signup')}
+                    className="px-3.5 sm:px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold shadow-md shadow-indigo-600/25 transition-all hover:scale-105 active:scale-95"
+                  >
+                    Sign Up Free
+                  </button>
+                </div>
+              )}
+
+              {/* Mobile menu toggle */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden p-2 rounded-xl border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300"
+                aria-label="Menu"
+              >
+                {mobileMenuOpen ? '✕' : '☰'}
+              </button>
+            </div>
+
+          </div>
+
+          {/* Mobile Drawer */}
+          {mobileMenuOpen && (
+            <div className="lg:hidden border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0c0d12] p-4 space-y-3">
+              <div className="flex flex-col space-y-1">
+                <button
+                  type="button"
+                  onClick={() => { setMobileMenuOpen(false); setActiveCategory('jee-advanced'); setView('home'); window.location.hash = '#/tests/jee-advanced'; }}
+                  className="text-left py-2 px-3 rounded-lg text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                >
+                  JEE Advanced (PTA 01-10)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setMobileMenuOpen(false); setActiveCategory('jee-mains'); setView('home'); window.location.hash = '#/tests/jee-mains'; }}
+                  className="text-left py-2 px-3 rounded-lg text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                >
+                  JEE Mains (PTA 01-10)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    if (!currentUser) openAuth('login', '#/progress', 'Sign in to access your My Progress dashboard.');
+                    else { setView('progress'); window.location.hash = '#/progress'; }
+                  }}
+                  className="text-left py-2 px-3 rounded-lg text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                >
+                  📊 My Progress
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    if (!currentUser) openAuth('login', '#/notebook', 'Sign in to access your Revision Notebook.');
+                    else { setView('notebook'); window.location.hash = '#/notebook'; }
+                  }}
+                  className="text-left py-2 px-3 rounded-lg text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                >
+                  ⭐ Revision Notebook
+                </button>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 dark:border-zinc-800">
+                {currentUser ? (
+                  <div className="space-y-2">
+                    <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-xs">
+                      <p className="font-bold text-slate-900 dark:text-zinc-100">{currentUser.name}</p>
+                      <p className="text-[11px] text-slate-500">{currentUser.email}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setMobileMenuOpen(false); handleLogOut(); }}
+                      className="w-full py-2 rounded-xl border border-rose-200 dark:border-rose-900 text-rose-600 font-bold text-xs"
+                    >
+                      Log Out
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => { setMobileMenuOpen(false); openAuth('login'); }}
+                      className="py-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 font-bold text-xs"
+                    >
+                      Log In
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setMobileMenuOpen(false); openAuth('signup'); }}
+                      className="py-2.5 rounded-xl bg-indigo-600 text-white font-extrabold text-xs shadow-md"
+                    >
+                      Sign Up Free
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </header>
+      );
+    }
+
+    // VIEW: My Progress Dashboard (Scoped strictly per user)
+    function MyProgressView({ currentUser, setView, handleSelectTest, setEvaluationData, openAuth }) {
+      if (!currentUser) return null;
+
+      const stats = window.studentStorage.getUserStats(currentUser.id);
+      const attempts = window.studentStorage.getAttempts(currentUser.id);
+
+      const handleReviewAttempt = (attempt) => {
+        const evalData = {
+          totalMarksScored: attempt.totalMarksScored,
+          totalMaxMarks: attempt.totalMaxMarks,
+          attemptedCount: attempt.attemptedCount,
+          correctCount: attempt.correctCount,
+          partialCount: attempt.partialCount,
+          incorrectCount: attempt.incorrectCount,
+          unattemptedCount: attempt.unattemptedCount,
+          percentage: attempt.percentage,
+          accuracy: attempt.accuracy,
+          subjectStats: attempt.subjectStats || {
+            Mathematics: { scored: 0, max: 60, attempted: 0, correct: 0, partial: 0, incorrect: 0, timeSpent: 0 },
+            Physics: { scored: 0, max: 60, attempted: 0, correct: 0, partial: 0, incorrect: 0, timeSpent: 0 },
+            Chemistry: { scored: 0, max: 60, attempted: 0, correct: 0, partial: 0, incorrect: 0, timeSpent: 0 },
+          },
+          timeAnalysis: attempt.timeAnalysis || {
+            totalTimeSpent: 1800,
+            avgCorrectTime: 90,
+            avgIncorrectTime: 75,
+            avgUnattemptedTime: 0,
+            isTimeTrap: false
+          },
+          rankPrediction: attempt.rankPrediction || {
+            examType: attempt.examType,
+            marksScored: attempt.totalMarksScored,
+            totalMarks: attempt.totalMaxMarks,
+            percentage: attempt.percentage,
+            predictedAirMin: 2200,
+            predictedAirMax: 5000,
+            predictedAirDisplay: attempt.predictedAirDisplay || 'N/A',
+            tierLabel: attempt.tierLabel || 'Rank Projection',
+            statusColor: attempt.percentage >= 50 ? 'indigo' : 'amber',
+            milestones: [
+              { name: 'Qualifying Cutoff', targetPercent: 22, achieved: attempt.percentage >= 22 },
+              { name: 'Top 10,000 (IIT Seat)', targetPercent: 40, achieved: attempt.percentage >= 40 },
+              { name: 'Top 5,000 (Core IITs)', targetPercent: 50, achieved: attempt.percentage >= 50 },
+              { name: 'Top 2,200 (Top Branches)', targetPercent: 60, achieved: attempt.percentage >= 60 },
+              { name: 'Top 500 (Gen-1 CS/Elec)', targetPercent: 75, achieved: attempt.percentage >= 75 },
+            ]
+          },
+          questionBreakdown: attempt.questionBreakdown || []
+        };
+        setEvaluationData(evalData);
+        setView('result');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      return (
+        <div className="py-10 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-8 animate-in fade-in">
+          {/* Header Card */}
+          <div className="relative rounded-3xl bg-gradient-to-br from-indigo-800 via-indigo-900 to-slate-950 p-8 sm:p-10 text-white shadow-xl overflow-hidden">
+            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div className="space-y-2">
+                <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-bold uppercase tracking-wider text-indigo-200 border border-white/10">
+                  Personal Study Dashboard · 100% Free
+                </span>
+                <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
+                  {currentUser.name}
+                </h1>
+                <p className="text-xs sm:text-sm text-indigo-200">
+                  Email: <strong className="text-white">{currentUser.email}</strong> · Target Exam: <strong className="text-white">{currentUser.targetExam || 'JEE Advanced'}</strong> · Mentored by Nelov Mallick (IIT Delhi)
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-center min-w-[200px]">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-indigo-200">Latest Projected AIR</p>
+                <div className="text-2xl sm:text-3xl font-black pt-0.5 text-white">
+                  {stats.recentPredictedAir}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 4 KPI Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] shadow-sm space-y-1">
+              <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400">Total Tests Attempted</p>
+              <p className="text-3xl font-black text-slate-900 dark:text-zinc-50">{stats.totalTests}</p>
+              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">100% Free Access</p>
+            </div>
+
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] shadow-sm space-y-1">
+              <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400">Average Score</p>
+              <p className="text-3xl font-black text-indigo-600 dark:text-indigo-400">{stats.averageScorePct}%</p>
+              <p className="text-[11px] text-slate-500">Across all completed tests</p>
+            </div>
+
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] shadow-sm space-y-1">
+              <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400">Best Score</p>
+              <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{stats.bestScorePct}%</p>
+              <p className="text-[11px] text-slate-500">Peak mock achievement</p>
+            </div>
+
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] shadow-sm space-y-1">
+              <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400">Overall Accuracy</p>
+              <p className="text-3xl font-black text-amber-500">{stats.overallAccuracy}%</p>
+              <p className="text-[11px] text-slate-500">{stats.totalQuestionsAttempted} Questions attempted</p>
+            </div>
+          </div>
+
+          {/* Past Attempts Section */}
+          <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-zinc-800 pb-4">
+              <div>
+                <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-zinc-50 flex items-center gap-2">
+                  <span>📑</span> Attempt History & Scorecards
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-zinc-400">
+                  Review complete question breakdowns, time analytics, and derivations for any past attempt
+                </p>
+              </div>
+              <span className="text-xs font-mono font-bold text-slate-500">
+                {attempts.length} Test Attempt{attempts.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+
+            {attempts.length === 0 ? (
+              <div className="text-center py-12 space-y-4">
+                <div className="w-16 h-16 rounded-3xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-3xl mx-auto">
+                  📝
+                </div>
+                <div className="space-y-1 max-w-md mx-auto">
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-zinc-50">
+                    No Mock Tests Attempted Yet
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-zinc-400">
+                    Attempt live test PTA 04 or PTA 05 to view your diagnostic scorecard, rank projection, and personalized mistake analytics!
+                  </p>
+                </div>
+                <div className="flex justify-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => handleSelectTest('jee-advanced-pta-04')}
+                    className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition-all"
+                  >
+                    Attempt PTA 04 Free →
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSelectTest('jee-advanced-pta-05')}
+                    className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-bold text-xs transition-colors"
+                  >
+                    Attempt PTA 05 Free →
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {attempts.map((attempt) => (
+                  <div
+                    key={attempt.id}
+                    className="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 hover:border-indigo-300 dark:hover:border-indigo-800/80 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-slate-50/50 dark:bg-zinc-900/30"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-[10px] font-extrabold">
+                          {attempt.testCode}
+                        </span>
+                        <span className="text-xs font-bold text-slate-900 dark:text-zinc-100">
+                          {attempt.testTitle}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500">
+                        Completed on {new Date(attempt.completedAt).toLocaleDateString()} at{' '}
+                        {new Date(attempt.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-4 text-xs">
+                      <div className="text-center min-w-[70px]">
+                        <p className="text-[10px] uppercase text-slate-400 font-bold">Score</p>
+                        <p className="font-mono font-extrabold text-indigo-600 dark:text-indigo-400 text-sm">
+                          {attempt.totalMarksScored} / {attempt.totalMaxMarks}
+                        </p>
+                      </div>
+
+                      <div className="text-center min-w-[60px]">
+                        <p className="text-[10px] uppercase text-slate-400 font-bold">Accuracy</p>
+                        <p className="font-mono font-extrabold text-emerald-600 text-sm">
+                          {attempt.accuracy}%
+                        </p>
+                      </div>
+
+                      <div className="text-center min-w-[90px]">
+                        <p className="text-[10px] uppercase text-slate-400 font-bold">Predicted AIR</p>
+                        <p className="font-mono font-extrabold text-slate-800 dark:text-zinc-200 text-xs">
+                          {attempt.predictedAirDisplay || 'N/A'}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleReviewAttempt(attempt)}
+                          className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm transition-all"
+                        >
+                          Review Scorecard
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // VIEW: Revision Notebook & Mistake Analyzer (Scoped per user)
+    function RevisionNotebookView({ currentUser, setView, handleSelectTest }) {
+      if (!currentUser) return null;
+
+      const [bookmarks, setBookmarks] = useState(() =>
+        window.studentStorage.getBookmarks(currentUser.id)
+      );
+      const [selectedSubject, setSelectedSubject] = useState('all');
+      const [selectedTag, setSelectedTag] = useState('all');
+
+      const mistakeTags = [
+        'Calculation Error',
+        'Conceptual Gap',
+        'Misread Question',
+        'Time Trap',
+        'Need Revision'
+      ];
+
+      const handleRemove = (uniqueKey) => {
+        window.studentStorage.toggleBookmark(currentUser.id, { uniqueKey, id: uniqueKey });
+        setBookmarks(window.studentStorage.getBookmarks(currentUser.id));
+      };
+
+      const handleTagChange = (uniqueKey, tag) => {
+        window.studentStorage.updateMistakeTag(currentUser.id, uniqueKey, tag);
+        setBookmarks(window.studentStorage.getBookmarks(currentUser.id));
+      };
+
+      const filtered = bookmarks.filter((b) => {
+        const matchSubj = selectedSubject === 'all' || b.subject === selectedSubject;
+        const matchTag = selectedTag === 'all' || b.mistakeTag === selectedTag;
+        return matchSubj && matchTag;
+      });
+
+      return (
+        <div className="py-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-8 animate-in fade-in">
+          {/* Header Card */}
+          <div className="rounded-3xl bg-gradient-to-br from-indigo-800 via-indigo-900 to-purple-950 p-8 sm:p-10 text-white shadow-xl relative overflow-hidden">
+            <div className="space-y-2">
+              <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-bold uppercase tracking-wider text-indigo-200 border border-white/10">
+                Personal Study Tool · 100% Free
+              </span>
+              <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
+                Revision Notebook & Mistake Analyzer
+              </h1>
+              <p className="text-xs sm:text-sm text-indigo-200 max-w-xl">
+                Curate tough questions, review derivations, and classify mistakes to eliminate negative marking on JEE exam day.
+              </p>
+            </div>
+          </div>
+
+          {/* Filter Bar */}
+          <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 shadow-sm space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Filter by Subject:
+                </span>
+                <div className="flex flex-wrap gap-1.5 p-1 rounded-2xl bg-slate-100 dark:bg-zinc-800/80 text-xs font-bold">
+                  {['all', 'Mathematics', 'Physics', 'Chemistry'].map((subj) => (
+                    <button
+                      key={subj}
+                      onClick={() => setSelectedSubject(subj)}
+                      className={`px-3 py-1.5 rounded-xl transition-all ${
+                        selectedSubject === subj
+                          ? 'bg-indigo-600 text-white shadow-sm'
+                          : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100'
+                      }`}
+                    >
+                      {subj === 'all' ? 'All Subjects' : subj}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Filter by Mistake Tag:
+                </span>
+                <div className="flex flex-wrap gap-1.5 p-1 rounded-2xl bg-slate-100 dark:bg-zinc-800/80 text-xs font-bold">
+                  {['all', ...mistakeTags].map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setSelectedTag(t)}
+                      className={`px-3 py-1.5 rounded-xl transition-all ${
+                        selectedTag === t
+                          ? 'bg-indigo-600 text-white shadow-sm'
+                          : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100'
+                      }`}
+                    >
+                      {t === 'all' ? 'All Tags' : t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="text-xs text-slate-500 font-mono pt-2 border-t border-slate-100 dark:border-zinc-800">
+              Showing {filtered.length} of {bookmarks.length} bookmarked question{bookmarks.length !== 1 ? 's' : ''}
+            </div>
+          </div>
+
+          {/* Bookmarks List */}
+          {filtered.length === 0 ? (
+            <div className="text-center py-16 rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-8 space-y-4">
+              <div className="w-16 h-16 rounded-3xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-3xl mx-auto">
+                ⭐
+              </div>
+              <div className="space-y-1 max-w-md mx-auto">
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-zinc-50">
+                  {bookmarks.length === 0 ? 'Your Revision Notebook is Empty' : 'No Questions Match Filter'}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-zinc-400">
+                  {bookmarks.length === 0
+                    ? 'Star questions during any CBT mock test or in the Answer Review scorecard to compile your personal notebook of high-yield derivations and mistake patterns!'
+                    : 'Try resetting the subject or mistake tag filters to view all bookmarked items.'}
+                </p>
+              </div>
+              {bookmarks.length === 0 && (
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => handleSelectTest('jee-advanced-pta-04')}
+                    className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-md"
+                  >
+                    Attempt Live Tests & Star Questions →
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {filtered.map((item) => (
+                <div
+                  key={item.uniqueKey || item.id}
+                  className="rounded-2xl border border-slate-200 dark:border-zinc-800 p-6 space-y-4 bg-white dark:bg-[#121318] shadow-sm hover:border-indigo-300 dark:hover:border-indigo-800/80 transition-all"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="font-extrabold text-slate-900 dark:text-zinc-100">
+                        {item.testCode} · Question {item.id}
+                      </span>
+                      <span className="text-slate-300 dark:text-zinc-700">·</span>
+                      <span className="text-indigo-600 dark:text-indigo-400 font-bold">{item.subject}</span>
+                      <span className="text-slate-300 dark:text-zinc-700">·</span>
+                      <span className="text-slate-500">{item.section}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={item.mistakeTag || ''}
+                        onChange={(e) => handleTagChange(item.uniqueKey || item.id, e.target.value)}
+                        className="px-2.5 py-1 rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-[11px] font-bold"
+                      >
+                        <option value="">+ Add Mistake Tag</option>
+                        {mistakeTags.map((tag) => (
+                          <option key={tag} value={tag}>{tag}</option>
+                        ))}
+                      </select>
+
+                      <button
+                        type="button"
+                        onClick={() => handleRemove(item.uniqueKey || item.id)}
+                        className="px-2.5 py-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-[11px] font-semibold transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="text-xs sm:text-sm text-slate-800 dark:text-zinc-200 leading-relaxed">
+                    <RichMathContent text={item.question} />
+                  </div>
+
+                  {item.images && item.images.length > 0 && (
+                    <div className="flex flex-wrap gap-3 py-2">
+                      {item.images.map((img, iIdx) => (
+                        <img key={iIdx} src={img} alt="" className="max-h-40 rounded-xl border p-1 bg-white" />
+                      ))}
+                    </div>
+                  )}
+
+                  {(item.explanation || item.solution) && (
+                    <div className="p-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/60 dark:border-indigo-900/40 space-y-1.5 text-xs text-slate-800 dark:text-zinc-200">
+                      <p className="font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400 text-[10px]">
+                        Verified Solution & Derivation:
+                      </p>
+                      <RichMathContent text={item.explanation || item.solution} />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+
     // MAIN APP COMPONENT
     function NelovMallickApp() {
-      const [view, setView] = useState('home'); // 'home' | 'instructions' | 'exam' | 'result'
+      const [view, setView] = useState('home'); // 'home' | 'instructions' | 'exam' | 'result' | 'progress' | 'notebook'
       const [activeCategory, setActiveCategory] = useState('jee-advanced'); // 'jee-advanced' | 'jee-mains'
       const [activeTestId, setActiveTestId] = useState('jee-advanced-pta-04');
-      const [candidateName, setCandidateName] = useState('Guest Aspirant');
+      const [currentUser, setCurrentUser] = useState(() => {
+        try {
+          return window.authService?.getCurrentUser() || null;
+        } catch (e) {
+          return null;
+        }
+      });
+      const [authModal, setAuthModal] = useState({ isOpen: false, mode: 'login', redirectUrl: '', message: '' });
+      const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+      const [bookmarkTrigger, setBookmarkTrigger] = useState(0);
+
+      const candidateName = currentUser ? currentUser.name : 'Guest Aspirant';
+
+      const openAuth = (mode = 'login', redirectUrl = '', message = '') => {
+        setAuthModal({
+          isOpen: true,
+          mode,
+          redirectUrl,
+          message: message || (mode === 'login'
+            ? 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.'
+            : 'Create your 100% free account to attempt live tests and track your JEE rank.')
+        });
+      };
+
+      const closeAuth = () => {
+        setAuthModal(prev => ({ ...prev, isOpen: false }));
+      };
+
+      const handleAuthSuccess = (user, redirect) => {
+        setCurrentUser(user);
+        closeAuth();
+        if (redirect) {
+          if (redirect.includes('pta-04')) {
+            handleSelectTest('jee-advanced-pta-04', user);
+          } else if (redirect.includes('pta-05')) {
+            handleSelectTest('jee-advanced-pta-05', user);
+          } else if (redirect.includes('progress')) {
+            setView('progress');
+            window.location.hash = '#/progress';
+          } else if (redirect.includes('notebook')) {
+            setView('notebook');
+            window.location.hash = '#/notebook';
+          } else {
+            window.location.hash = redirect.startsWith('#') ? redirect : `#${redirect}`;
+          }
+        }
+      };
+
+      const handleLogOut = () => {
+        if (window.authService) window.authService.logOut();
+        setCurrentUser(null);
+        setView('home');
+        window.location.hash = '#/';
+      };
+
+      const handleToggleBookmark = (q) => {
+        if (!currentUser) {
+          openAuth('login', '', 'Sign in or create a free account to bookmark questions in your Revision Notebook.');
+          return;
+        }
+        window.studentStorage.toggleBookmark(currentUser.id, {
+          id: q.id,
+          uniqueKey: `${activeTestId}_${q.id}`,
+          testId: activeTestId,
+          testCode: currentPaper?.code || 'PTA',
+          subject: q.subject,
+          section: q.section,
+          type: q.type,
+          question: q.question,
+          images: q.images,
+          options: q.options,
+          answer: q.answer,
+          explanation: q.explanation,
+          solution: q.solution
+        });
+        setBookmarkTrigger(prev => prev + 1);
+      };
+
+      const isQuestionBookmarked = (qId) => {
+        if (!currentUser) return false;
+        return window.studentStorage.isBookmarked(currentUser.id, `${activeTestId}_${qId}`) ||
+               window.studentStorage.isBookmarked(currentUser.id, qId);
+      };
       const [isDark, setIsDark] = useState(false);
       const [agreeTerms, setAgreeTerms] = useState(false);
 
@@ -1153,9 +2280,73 @@
         }
       }, [isDark]);
 
-      // Handle Hash Routing
+      // Handle Hash Routing with Protected Route Interception
       const handleHashRoute = () => {
         const hash = window.location.hash.toLowerCase();
+        const activeUser = window.authService?.getCurrentUser() || null;
+
+        if (hash === '#/progress' || hash === '#progress') {
+          if (!activeUser) {
+            openAuth('login', '#/progress', 'Sign in or create a free account to access your personal study tools and progress history.');
+            setView('home');
+            return;
+          }
+          setView('progress');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+
+        if (hash === '#/notebook' || hash === '#notebook') {
+          if (!activeUser) {
+            openAuth('login', '#/notebook', 'Sign in or create a free account to access your personal Revision Notebook.');
+            setView('home');
+            return;
+          }
+          setView('notebook');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+
+        if (hash === '#/login') {
+          if (activeUser) {
+            setView('home');
+          } else {
+            openAuth('login', '#/');
+            setView('home');
+          }
+          return;
+        }
+
+        if (hash === '#/signup') {
+          if (activeUser) {
+            setView('home');
+          } else {
+            openAuth('signup', '#/');
+            setView('home');
+          }
+          return;
+        }
+
+        if (hash.includes('pta-04') || hash.includes('pta04')) {
+          if (!activeUser) {
+            openAuth('login', '#/test/jee-advanced/pta-04', 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.');
+            setView('home');
+            return;
+          }
+          handleSelectTest('jee-advanced-pta-04', activeUser);
+          return;
+        }
+
+        if (hash.includes('pta-05') || hash.includes('pta05')) {
+          if (!activeUser) {
+            openAuth('login', '#/test/jee-advanced/pta-05', 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.');
+            setView('home');
+            return;
+          }
+          handleSelectTest('jee-advanced-pta-05', activeUser);
+          return;
+        }
+
         if (hash === '#/tests/jee-mains') {
           setActiveCategory('jee-mains');
           setView('home');
@@ -1166,10 +2357,6 @@
           setView('home');
           const el = document.getElementById('tests');
           if (el) el.scrollIntoView({ behavior: 'smooth' });
-        } else if (hash.includes('pta-04') || hash.includes('pta04')) {
-          handleSelectTest('jee-advanced-pta-04');
-        } else if (hash.includes('pta-05') || hash.includes('pta05')) {
-          handleSelectTest('jee-advanced-pta-05');
         }
       };
 
@@ -1211,22 +2398,21 @@
         return () => clearInterval(timer);
       }, [view, currentPaper]);
 
-      // Auto-save session
+      // Auto-save session scoped to user
       useEffect(() => {
-        if (view === 'exam' && currentPaper) {
+        if (view === 'exam' && currentPaper && currentUser) {
           const sessionData = {
-            candidateName,
+            candidateName: currentUser.name,
             activeTestId,
             responses,
             statuses,
             currentQIndex,
-            timeLeft
+            timeLeft,
+            questionTimes
           };
-          try {
-            localStorage.setItem(`nelov_cbt_session_${activeTestId}`, JSON.stringify(sessionData));
-          } catch (e) {}
+          window.studentStorage.saveSession(currentUser.id, activeTestId, sessionData);
         }
-      }, [responses, statuses, currentQIndex, timeLeft, view, activeTestId]);
+      }, [responses, statuses, currentQIndex, timeLeft, view, activeTestId, currentUser, questionTimes]);
 
       // Switch question subject tabs automatically
       useEffect(() => {
@@ -1235,8 +2421,14 @@
         }
       }, [currentQIndex, currentQuestion]);
 
-      // Start Test Flow
-      const handleSelectTest = (testId) => {
+      // Start Test Flow with strict user authentication guard
+      const handleSelectTest = (testId, explicitUser = null) => {
+        const user = explicitUser || currentUser || window.authService?.getCurrentUser();
+        if (!user) {
+          openAuth('login', testId.includes('pta-04') ? '#/test/jee-advanced/pta-04' : '#/test/jee-advanced/pta-05', 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.');
+          return;
+        }
+
         // Check if test is coming soon
         const all = window.allTests || [];
         const meta = all.find(t => t.id === testId);
@@ -1250,26 +2442,20 @@
         }
 
         setActiveTestId(testId);
-        // Set hash
         if (testId.includes('pta-04')) {
           window.location.hash = '#/test/jee-advanced/pta-04';
         } else if (testId.includes('pta-05')) {
           window.location.hash = '#/test/jee-advanced/pta-05';
         }
 
-        // Check for saved session
-        const saved = localStorage.getItem(`nelov_cbt_session_${testId}`);
-        if (saved) {
-          try {
-            const parsed = JSON.parse(saved);
-            if (parsed && parsed.responses) {
-              setResponses(parsed.responses);
-              setStatuses(parsed.statuses || {});
-              setCurrentQIndex(parsed.currentQIndex || 0);
-              setTimeLeft(parsed.timeLeft || 180 * 60);
-              setCandidateName(parsed.candidateName || 'Guest Aspirant');
-            }
-          } catch (e) {}
+        // Check for saved session scoped strictly to this user
+        const saved = window.studentStorage.getSession(user.id, testId);
+        if (saved && saved.responses) {
+          setResponses(saved.responses);
+          setStatuses(saved.statuses || {});
+          setCurrentQIndex(saved.currentQIndex || 0);
+          setTimeLeft(saved.timeLeft || 180 * 60);
+          setQuestionTimes(saved.questionTimes || {});
         } else {
           setResponses({});
           setStatuses({});
@@ -1418,15 +2604,38 @@
       };
 
       const handleSubmitExam = () => {
-        if (!currentPaper) return;
+        if (!currentPaper || !currentUser) return;
         const evalResults = evaluatePaper(currentPaper, responses, questionTimes);
         setEvaluationData(evalResults);
         setShowSubmitModal(false);
         setView('result');
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        try {
-          localStorage.removeItem(`nelov_cbt_session_${activeTestId}`);
-        } catch (e) {}
+
+        const attemptRecord = {
+          id: 'att_' + Date.now().toString(36),
+          testId: activeTestId,
+          testCode: currentPaper.code,
+          testTitle: currentPaper.title,
+          examType: currentPaper.examType,
+          totalMarksScored: evalResults.totalMarksScored,
+          totalMaxMarks: evalResults.totalMaxMarks,
+          percentage: evalResults.percentage,
+          accuracy: evalResults.accuracy,
+          attemptedCount: evalResults.attemptedCount,
+          correctCount: evalResults.correctCount,
+          partialCount: evalResults.partialCount,
+          incorrectCount: evalResults.incorrectCount,
+          unattemptedCount: evalResults.unattemptedCount,
+          predictedAirDisplay: evalResults.rankPrediction ? evalResults.rankPrediction.predictedAirDisplay : 'N/A',
+          tierLabel: evalResults.rankPrediction ? evalResults.rankPrediction.tierLabel : 'N/A',
+          completedAt: new Date().toISOString(),
+          subjectStats: evalResults.subjectStats,
+          timeAnalysis: evalResults.timeAnalysis,
+          rankPrediction: evalResults.rankPrediction,
+          questionBreakdown: evalResults.questionBreakdown
+        };
+        window.studentStorage.saveAttempt(currentUser.id, attemptRecord);
+        window.studentStorage.clearSession(currentUser.id, activeTestId);
       };
 
       // Palette Count Calculations
@@ -1596,8 +2805,20 @@
                         </h2>
                       </div>
 
-                      {/* Marking Scheme Pill */}
+                      {/* Marking Scheme Pill & Star Bookmark */}
                       <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleBookmark(q)}
+                          className={`px-3 py-1 rounded-full text-xs font-bold border transition-colors flex items-center gap-1.5 ${
+                            isQuestionBookmarked(q.id)
+                              ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-300 dark:border-amber-700'
+                              : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 border-slate-200 dark:border-zinc-700 hover:text-amber-600'
+                          }`}
+                        >
+                          <span>{isQuestionBookmarked(q.id) ? '★' : '☆'}</span>
+                          <span>{isQuestionBookmarked(q.id) ? 'Bookmarked' : 'Star Question'}</span>
+                        </button>
                         <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
                           +{q.marking?.positive || 3} Marks
                         </span>
@@ -2059,17 +3280,21 @@
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200/60 dark:border-indigo-800/60 space-y-2">
-                  <label className="block text-xs font-bold text-indigo-950 dark:text-indigo-200 uppercase tracking-wider">
-                    Candidate Name (For Personalized Scorecard):
-                  </label>
-                  <input
-                    type="text"
-                    value={candidateName}
-                    onChange={(e) => setCandidateName(e.target.value)}
-                    placeholder="Enter your name or leave as Guest Aspirant"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+                <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
+                      Authenticated Candidate (Zero Payment Required):
+                    </span>
+                    <p className="text-base font-extrabold text-slate-900 dark:text-zinc-50">
+                      {currentUser ? currentUser.name : 'Please Log In First'}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-zinc-400">
+                      Email: {currentUser?.email} · Target Exam: {currentUser?.targetExam || 'JEE Advanced'}
+                    </p>
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 self-start sm:self-auto">
+                    ✓ Verified Free Access
+                  </span>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 text-center">
@@ -2512,9 +3737,23 @@
                               </span>
                             </div>
 
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold border ${badgeColor}`}>
-                              {item.statusLabel} ({item.marksAwarded > 0 ? `+${item.marksAwarded}` : item.marksAwarded} Mks)
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleToggleBookmark(qObj)}
+                                className={`px-2.5 py-1 rounded-full text-xs font-bold border transition-colors flex items-center gap-1 ${
+                                  isQuestionBookmarked(qObj.id)
+                                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-300 dark:border-amber-700'
+                                    : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-700 hover:text-amber-600'
+                                }`}
+                              >
+                                <span>{isQuestionBookmarked(qObj.id) ? '★' : '☆'}</span>
+                                <span>{isQuestionBookmarked(qObj.id) ? 'Bookmarked' : 'Bookmark'}</span>
+                              </button>
+                              <span className={`px-3 py-1 rounded-full text-xs font-bold border ${badgeColor}`}>
+                                {item.statusLabel} ({item.marksAwarded > 0 ? `+${item.marksAwarded}` : item.marksAwarded} Mks)
+                              </span>
+                            </div>
                           </div>
 
                           {/* Question Text */}
@@ -2659,6 +3898,14 @@
 
                   <button
                     type="button"
+                    onClick={() => { setView('progress'); window.location.hash = '#/progress'; }}
+                    className="px-6 py-3 rounded-xl border border-indigo-300 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-bold text-xs hover:bg-indigo-100 transition-colors"
+                  >
+                    📊 View My Progress & History
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={() => handleSelectTest(activeTestId.includes('pta-04') ? 'jee-advanced-pta-05' : 'jee-advanced-pta-04')}
                     className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition-all"
                   >
@@ -2668,6 +3915,78 @@
 
               </div>
             </div>
+          </div>
+        );
+      }
+
+      // -------------------------------------------------------------
+      // RENDER: MY PROGRESS VIEW
+      // -------------------------------------------------------------
+      if (view === 'progress') {
+        return (
+          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+            <MainNavbar
+              currentUser={currentUser}
+              activeCategory={activeCategory}
+              setActiveCategory={setActiveCategory}
+              isDark={isDark}
+              setIsDark={setIsDark}
+              openAuth={openAuth}
+              handleLogOut={handleLogOut}
+              setView={setView}
+              userDropdownOpen={userDropdownOpen}
+              setUserDropdownOpen={setUserDropdownOpen}
+            />
+            <MyProgressView
+              currentUser={currentUser}
+              setView={setView}
+              handleSelectTest={handleSelectTest}
+              setEvaluationData={setEvaluationData}
+              openAuth={openAuth}
+            />
+            <AuthModalDialog
+              isOpen={authModal.isOpen}
+              mode={authModal.mode}
+              redirectUrl={authModal.redirectUrl}
+              message={authModal.message}
+              onClose={closeAuth}
+              onAuthSuccess={handleAuthSuccess}
+            />
+          </div>
+        );
+      }
+
+      // -------------------------------------------------------------
+      // RENDER: REVISION NOTEBOOK VIEW
+      // -------------------------------------------------------------
+      if (view === 'notebook') {
+        return (
+          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+            <MainNavbar
+              currentUser={currentUser}
+              activeCategory={activeCategory}
+              setActiveCategory={setActiveCategory}
+              isDark={isDark}
+              setIsDark={setIsDark}
+              openAuth={openAuth}
+              handleLogOut={handleLogOut}
+              setView={setView}
+              userDropdownOpen={userDropdownOpen}
+              setUserDropdownOpen={setUserDropdownOpen}
+            />
+            <RevisionNotebookView
+              currentUser={currentUser}
+              setView={setView}
+              handleSelectTest={handleSelectTest}
+            />
+            <AuthModalDialog
+              isOpen={authModal.isOpen}
+              mode={authModal.mode}
+              redirectUrl={authModal.redirectUrl}
+              message={authModal.message}
+              onClose={closeAuth}
+              onAuthSuccess={handleAuthSuccess}
+            />
           </div>
         );
       }
@@ -2692,66 +4011,18 @@
         <div className="min-h-screen bg-white dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
           
           {/* Top Sticky Header */}
-          <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-white/90 dark:bg-[#0a0a0c]/90 border-b border-slate-200/80 dark:border-zinc-800/80 transition-colors">
-            <div className="h-[2px] w-full bg-gradient-to-r from-indigo-600 via-violet-500 to-fuchsia-500" />
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-              
-              <a href="#/" onClick={() => setView('home')} className="flex items-center gap-2.5 group">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-indigo-500/25 group-hover:scale-105 transition-transform">
-                  NM
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-extrabold text-base tracking-tight text-zinc-950 dark:text-zinc-50 flex items-center gap-1">
-                    NelovMallick<span className="text-indigo-600 dark:text-indigo-400">IITD</span>
-                  </span>
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-zinc-400 -mt-1">
-                    JEE Mains & Advanced · 100% Free CBT
-                  </span>
-                </div>
-              </a>
-
-              <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-600 dark:text-zinc-300">
-                <button
-                  onClick={() => { setActiveCategory('jee-advanced'); window.location.hash = '#/tests/jee-advanced'; }}
-                  className={`transition-colors ${activeCategory === 'jee-advanced' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'hover:text-indigo-600'}`}
-                >
-                  JEE Advanced (PTA 01-10)
-                </button>
-                <button
-                  onClick={() => { setActiveCategory('jee-mains'); window.location.hash = '#/tests/jee-mains'; }}
-                  className={`transition-colors ${activeCategory === 'jee-mains' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'hover:text-indigo-600'}`}
-                >
-                  JEE Mains (PTA 01-10)
-                </button>
-                <a href="#tests" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Test Library</a>
-                <a href="#mentorship" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Mentorship</a>
-                <a href="#ranks" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Rank Insights</a>
-                <a href="#faq" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">FAQs</a>
-              </nav>
-
-              <div className="flex items-center gap-3">
-                <span className="hidden sm:inline-flex px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                  100% Free Platform
-                </span>
-
-                <button
-                  onClick={() => setIsDark(!isDark)}
-                  className="p-2 rounded-xl border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
-                  aria-label="Toggle Theme"
-                >
-                  {isDark ? '☀️' : '🌙'}
-                </button>
-
-                <button
-                  onClick={() => handleSelectTest('jee-advanced-pta-04')}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-xl shadow-md shadow-indigo-600/20 transition-all hover:scale-105 active:scale-95"
-                >
-                  Attempt Live Tests Free
-                </button>
-              </div>
-
-            </div>
-          </header>
+          <MainNavbar
+            currentUser={currentUser}
+            activeCategory={activeCategory}
+            setActiveCategory={setActiveCategory}
+            isDark={isDark}
+            setIsDark={setIsDark}
+            openAuth={openAuth}
+            handleLogOut={handleLogOut}
+            setView={setView}
+            userDropdownOpen={userDropdownOpen}
+            setUserDropdownOpen={setUserDropdownOpen}
+          />
 
           {/* QUICK-ACCESS LIVE NOW STRIP (Always visible on homepage) */}
           <div className="bg-gradient-to-r from-indigo-900 via-indigo-950 to-purple-950 border-b border-indigo-800/80 py-3 px-4 text-white">
@@ -3246,6 +4517,15 @@
               </p>
             </div>
           </footer>
+
+          <AuthModalDialog
+            isOpen={authModal.isOpen}
+            mode={authModal.mode}
+            redirectUrl={authModal.redirectUrl}
+            message={authModal.message}
+            onClose={closeAuth}
+            onAuthSuccess={handleAuthSuccess}
+          />
 
           {/* PLACEHOLDER / COMING SOON MODAL */}
           {noticeModal && (

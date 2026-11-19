@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ExamType } from './types';
+import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { Founders } from './components/Founders';
@@ -16,13 +17,11 @@ import { ExamModal } from './components/ExamModal';
 import { AuthModal } from './components/AuthModal';
 import { QuestionPaperModal } from './components/QuestionPaperModal';
 
-export const App: React.FC = () => {
+export const AppContent: React.FC = () => {
   // Global State
   const [exam, setExam] = useState<ExamType>('jee');
   const [isDark, setIsDark] = useState<boolean>(false);
   const [examModalOpen, setExamModalOpen] = useState<boolean>(false);
-  const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
-  const [authModalTitle, setAuthModalTitle] = useState<string>('Get Started with NelovMallickIITD');
   const [questionPaperOpen, setQuestionPaperOpen] = useState<boolean>(false);
 
   // Sync dark class on document element
@@ -39,21 +38,13 @@ export const App: React.FC = () => {
     setIsDark((prev) => !prev);
   };
 
-  const handleOpenAuth = (title?: string) => {
-    if (title) setAuthModalTitle(title);
-    setAuthModalOpen(true);
-  };
-
   return (
     <div className="min-h-screen bg-white dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
       
       {/* Top Sticky Navigation */}
       <Navbar
-        exam={exam}
-        setExam={setExam}
         isDark={isDark}
         toggleTheme={toggleTheme}
-        onOpenAuth={handleOpenAuth}
       />
 
       {/* Main Content Sections */}
@@ -61,7 +52,6 @@ export const App: React.FC = () => {
         {/* 1. Hero Section with Live CBT Mock Test */}
         <Hero
           exam={exam}
-          onOpenAuth={handleOpenAuth}
           onOpenQuestionPaper={() => setQuestionPaperOpen(true)}
         />
 
@@ -80,21 +70,21 @@ export const App: React.FC = () => {
         {/* 6. Live Tests Section (PTA 04 & PTA 05 - 100% Free) */}
         <Pricing />
 
-        {/* 7. Video Platform Walkthrough & 3-Day Guarantee */}
+        {/* 7. Video Platform Walkthrough */}
         <VideoShowcase exam={exam} />
 
         {/* 8. Free Study Resources Grid */}
-        <Resources exam={exam} onOpenAuth={handleOpenAuth} />
+        <Resources exam={exam} />
 
         {/* 9. Collapsible FAQ Section */}
         <FAQ exam={exam} />
 
         {/* 10. Pre-Footer Call to Action Banner */}
-        <CTABanner exam={exam} onOpenAuth={handleOpenAuth} />
+        <CTABanner exam={exam} />
       </main>
 
       {/* Footer */}
-      <Footer exam={exam} onOpenAuth={handleOpenAuth} />
+      <Footer exam={exam} />
 
       {/* Modals */}
       <ExamModal
@@ -104,11 +94,7 @@ export const App: React.FC = () => {
         onSelectExam={(e) => setExam(e)}
       />
 
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-        title={authModalTitle}
-      />
+      <AuthModal />
 
       <QuestionPaperModal
         isOpen={questionPaperOpen}
@@ -117,6 +103,14 @@ export const App: React.FC = () => {
       />
 
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };
 
