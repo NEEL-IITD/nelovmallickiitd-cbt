@@ -18,6 +18,20 @@ Official JEE Advanced test preparation platform curated by **Nelov Mallick (IIT 
     - *Section I*: Numerical Value ($+3, 0$)
     - *Section II*: Multiple Correct Choice ($+4, -2$ with partial marking)
     - *Section III*: Matching List Type ($+3, -1$) with side-by-side List-I and List-II
+  - **PTA-06 (Comprehensive Model)**: 54 Questions | 180 Marks | 180 Minutes (Full Syllabus)
+    - Real CBT timed exam with deep diagnostic scorecard and solutions
+- **YouTube Video Lecture Hub**:
+  - High-yield concept breakdowns & solution walkthroughs
+  - In-player notepad, timestamps, and playback controls
+- **Study Resources Hub**:
+  - High-yield formula sheets, chapter revision notebooks, and problem sets
+- **Authentication & Cloud Synchronization**:
+  - Supabase Cloud PostgreSQL backend
+  - Google OAuth 2.0 ("Continue with Google") One-Click Sign-In
+  - Email/Password authentication
+  - Dual-mode resilient offline fallback (Web Crypto SHA-256 + LocalStorage)
+- **Admin Dashboard**:
+  - Live student enrollments, exam attempt records, score distributions, and CSV data export
 - **Official JEE Advanced CBT Interface**:
   - **3-Hour Live Countdown Timer**: Starts at `03:00:00` with visual color changes and automatic submission upon completion.
   - **Subject Navigation**: Seamless switching between Mathematics, Physics, and Chemistry tabs with real-time answered counters.
@@ -87,6 +101,17 @@ nelovmallickiitd-web/
 │   └── main.tsx            # Entry point
 └── package.json            # Project dependencies and scripts
 ```
+
+---
+
+## 🌐 Production Architecture & Permanent Reliability
+
+| Layer | Service / Technology | Reliability Guarantee |
+|---|---|---|
+| **Global CDN & Hosting** | Vercel Edge Network | 24/7 uptime, automated SSL, permanent free tier with zero trial expiry |
+| **Authentication** | Google OAuth 2.0 & Supabase Auth | Permanent Google Client Credentials + Cloud Session Token Management |
+| **Database & Analytics** | Supabase Managed PostgreSQL | Real-time RLS protected data storage with automatic failover |
+| **Offline Resilience** | Browser Web Crypto & LocalStorage | Automatic local fallback so no student is ever blocked if offline |
 
 ---
 
