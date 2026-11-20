@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { allStudyResources, StudyResource, SubjectType, ExamTargetType, ResourceCategory } from '../data/resourcesIndex';
 import { Tilt3DCard } from './ui/Tilt3DCard';
-import { Level1PhysicsEntryCard } from './physics/Level1PhysicsEntryCard';
+import { StudyResourcesVaultShowcase } from './vault/StudyResourcesVaultShowcase';
 
 interface ResourcesHubProps {
   onBackToHome: () => void;
@@ -150,11 +150,11 @@ export const ResourcesHub: React.FC<ResourcesHubProps> = ({ onBackToHome, onOpen
           </p>
         </div>
 
-        {/* Level 1: Flagship Physics 3D Resources Module */}
-        <div className="mb-12">
-          <Level1PhysicsEntryCard
-            onOpenPhysics={() => {
-              window.location.hash = '#/resources/physics';
+        {/* Level 1: 3 Subject Vaults 3D Showcase (Physics, Chemistry, Maths) */}
+        <div className="mb-10">
+          <StudyResourcesVaultShowcase
+            onOpenSubject={(subject) => {
+              window.location.hash = `#/resources/${subject}`;
             }}
           />
         </div>

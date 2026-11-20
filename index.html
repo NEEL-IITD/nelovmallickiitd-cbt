@@ -79,6 +79,8 @@
   <script src="/data/resourcesIndex.js"></script>
   <script src="/data/lecturesIndex.js"></script>
   <script src="/data/physicsChapters.js"></script>
+  <script src="/data/chemistryChapters.js"></script>
+  <script src="/data/mathsChapters.js"></script>
 
   <style>
     body {
@@ -1405,6 +1407,180 @@
               <path strokeLinecap="round" strokeWidth={2} d="M10 5.5A7.5 7.5 0 0114 5.5M6 14a7.5 7.5 0 01-1.5-4M18 14a7.5 7.5 0 001.5-4" />
             </svg>
           );
+        case 'Beaker':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.5 3h15M6 3v16a2 2 0 002 2h8a2 2 0 002-2V3M6 14h12" />
+            </svg>
+          );
+        case 'Wine':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 22h8M12 15v7M12 15a5 5 0 005-5V3H7v7a5 5 0 005 5z" />
+            </svg>
+          );
+        case 'FlaskConical':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 2v5.3a2 2 0 01-.3 1.1L3.3 19.3A2 2 0 005 22h14a2 2 0 001.7-2.7l-6.4-10.9a2 2 0 01-.3-1.1V2M8.5 2h7M6 16h12" />
+            </svg>
+          );
+        case 'Orbit':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <circle cx="12" cy="12" r="3" strokeWidth={2} />
+              <ellipse cx="12" cy="12" rx="9" ry="4" strokeWidth={1.5} transform="rotate(45 12 12)" />
+            </svg>
+          );
+        case 'Dna':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeWidth={2} d="M2 15c6.667-6 13.333 0 20-6M2 9c6.667 6 13.333 0 20 6M9 6v12M15 6v12" />
+            </svg>
+          );
+        case 'Link':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+            </svg>
+          );
+        case 'Scale':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v18M3 7l4 9h-8l4-9zm14 0l4 9h-8l4-9zM3 7h18" />
+            </svg>
+          );
+        case 'Wind':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2" />
+            </svg>
+          );
+        case 'Boxes':
+        case 'Box':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+          );
+        case 'Anvil':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 10H2v3l3 2h14l3-2v-3h-5l-2-4H9l-2 4zm0 5v5h10v-5" />
+            </svg>
+          );
+        case 'Sparkles':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.5 6.5L22 9l-6.5 2.5L13 18l-2.5-6.5L4 9l6.5-2.5L13 2z" />
+            </svg>
+          );
+        case 'Sigma':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 7V4H6l6 8-6 8h12v-3" />
+            </svg>
+          );
+        case 'FunctionSquare':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth={2} />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17c2 0 2.5-1 2.5-3V9.5C11.5 8 12.5 7 14 7M8 12h5" />
+            </svg>
+          );
+        case 'Pi':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 7h14M8 7v10M16 7v7a3 3 0 003 3" />
+            </svg>
+          );
+        case 'Calculator':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <rect x="4" y="2" width="16" height="20" rx="2" strokeWidth={2} />
+              <line x1="8" y1="6" x2="16" y2="6" strokeWidth={2} />
+              <line x1="16" y1="14" x2="16" y2="18" strokeWidth={2} />
+              <path strokeLinecap="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01" />
+            </svg>
+          );
+        case 'Maximize2':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+            </svg>
+          );
+        case 'Split':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+            </svg>
+          );
+        case 'TrendingUp':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M23 6l-9.5 9.5-5-5L1 18M17 6h6v6" />
+            </svg>
+          );
+        case 'GitFork':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <circle cx="12" cy="18" r="3" strokeWidth={2} />
+              <circle cx="6" cy="6" r="3" strokeWidth={2} />
+              <circle cx="18" cy="6" r="3" strokeWidth={2} />
+              <path strokeLinecap="round" strokeWidth={2} d="M18 9v2c0 .6-.4 1-1 1H7c-.6 0-1-.4-1-1V9M12 12v3" />
+            </svg>
+          );
+        case 'Grid':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <rect x="3" y="3" width="7" height="7" strokeWidth={2} />
+              <rect x="14" y="3" width="7" height="7" strokeWidth={2} />
+              <rect x="14" y="14" width="7" height="7" strokeWidth={2} />
+              <rect x="3" y="14" width="7" height="7" strokeWidth={2} />
+            </svg>
+          );
+        case 'Shapes':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.3 10a4 4 0 11-4-4 4 4 0 014 4zM14 4l6 10H8zM14 14h6v6h-6z" />
+            </svg>
+          );
+        case 'Percent':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <line x1="19" y1="5" x2="5" y2="19" strokeWidth={2} strokeLinecap="round" />
+              <circle cx="6.5" cy="6.5" r="2.5" strokeWidth={2} />
+              <circle cx="17.5" cy="17.5" r="2.5" strokeWidth={2} />
+            </svg>
+          );
+        case 'CircleDot':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <circle cx="12" cy="12" r="9" strokeWidth={2} />
+              <circle cx="12" cy="12" r="2" fill="currentColor" />
+            </svg>
+          );
+        case 'Triangle':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+          );
+        case 'BarChart3':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3v18h18M18 17V9M13 17V5M8 17v-3" />
+            </svg>
+          );
+        case 'Hash':
+          return (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <line x1="4" y1="9" x2="20" y2="9" strokeWidth={2} strokeLinecap="round" />
+              <line x1="4" y1="15" x2="20" y2="15" strokeWidth={2} strokeLinecap="round" />
+              <line x1="10" y1="3" x2="8" y2="21" strokeWidth={2} strokeLinecap="round" />
+              <line x1="16" y1="3" x2="14" y2="21" strokeWidth={2} strokeLinecap="round" />
+            </svg>
+          );
         case 'Atom':
         default:
           return (
@@ -1528,104 +1704,229 @@
       );
     }
 
-    // LEVEL 1: MAIN ENTRY 3D BOX (Homepage & Hub Standalone Feature)
+    // ==============================================================================
+    // LEVEL 1: STUDY RESOURCES & FORMULA VAULT 3D SHOWCASE (Homepage & Hub Top Feature)
+    // 3 Side-by-Side 3D Cards for Physics (28), Chemistry (29), Mathematics (26)
+    // ==============================================================================
+    function StudyResourcesVaultShowcase({ onOpenSubject, className = '' }) {
+      const subjects = [
+        {
+          id: 'physics',
+          title: 'Physics Resources Chapterwise',
+          examTag: 'JEE MAINS + ADVANCED',
+          subtitle: '28 Chapters • Theory & Chapterwise Tests',
+          badge: '28 Chapters • C1–C28',
+          iconName: 'Atom',
+          iconAnim: 'animate-[spin_14s_linear_infinite]',
+          theme: {
+            primary: '#2563EB',
+            cardBg: 'from-white via-blue-50/40 to-indigo-50/50 dark:from-[#0d1322] dark:via-[#0e1628] dark:to-[#0a0f1d]',
+            border: 'border-blue-200/90 dark:border-blue-900/60',
+            borderBottom: 'border-b-[6px] border-b-blue-600 dark:border-b-blue-500',
+            pedestalBg: 'from-blue-600 via-indigo-600 to-indigo-700',
+            pedestalBorderBottom: 'border-b-[5px] border-b-blue-800 dark:border-b-blue-950',
+            shadow: 'shadow-[0_20px_50px_-15px_rgba(37,99,235,0.22),0_10px_20px_-10px_rgba(0,0,0,0.06)]',
+            hoverShadow: 'hover:shadow-[0_30px_70px_-15px_rgba(37,99,235,0.38),0_15px_30px_-5px_rgba(0,0,0,0.12)]',
+            badgeBg: 'bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+            tagText: 'text-blue-600 dark:text-blue-400',
+            btnBg: 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-blue-500/25',
+            glow: 'rgba(37, 99, 235, 0.25)'
+          },
+          bullets: [
+            'Complete Mechanics & Electrodynamics',
+            'Theory Notes & Formula Sheets',
+            'Online CBT Exercise Shells'
+          ],
+          ctaText: 'Enter Physics Vault (28 Chapters)'
+        },
+        {
+          id: 'chemistry',
+          title: 'Chemistry Resources Chapterwise',
+          examTag: 'JEE MAINS + ADVANCED',
+          subtitle: '29 Chapters • Theory & Chapterwise Tests',
+          badge: '29 Chapters • Ch 1–Ch 29',
+          iconName: 'FlaskConical',
+          iconAnim: 'group-hover:rotate-12 transition-transform duration-500',
+          theme: {
+            primary: '#059669',
+            cardBg: 'from-white via-emerald-50/40 to-teal-50/50 dark:from-[#0b1c16] dark:via-[#0c1f19] dark:to-[#081511]',
+            border: 'border-emerald-200/90 dark:border-emerald-900/60',
+            borderBottom: 'border-b-[6px] border-b-emerald-600 dark:border-b-emerald-500',
+            pedestalBg: 'from-emerald-600 via-teal-600 to-teal-700',
+            pedestalBorderBottom: 'border-b-[5px] border-b-emerald-800 dark:border-b-emerald-950',
+            shadow: 'shadow-[0_20px_50px_-15px_rgba(5,150,105,0.22),0_10px_20px_-10px_rgba(0,0,0,0.06)]',
+            hoverShadow: 'hover:shadow-[0_30px_70px_-15px_rgba(5,150,105,0.38),0_15px_30px_-5px_rgba(0,0,0,0.12)]',
+            badgeBg: 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+            tagText: 'text-emerald-600 dark:text-emerald-400',
+            btnBg: 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-emerald-500/25',
+            glow: 'rgba(5, 150, 105, 0.25)'
+          },
+          bullets: [
+            'Organic Mechanisms & Reagents',
+            'Physical Equilibria & Electrochemistry',
+            'Inorganic Qualitative Salt Analysis'
+          ],
+          ctaText: 'Enter Chemistry Vault (29 Chapters)'
+        },
+        {
+          id: 'mathematics',
+          title: 'Mathematics Resources Chapterwise',
+          examTag: 'JEE MAINS + ADVANCED',
+          subtitle: '26 Chapters • Theory & Chapterwise Tests',
+          badge: '26 Chapters • C01–C28',
+          iconName: 'FunctionSquare',
+          iconAnim: 'group-hover:scale-110 transition-transform duration-500',
+          theme: {
+            primary: '#7C3AED',
+            cardBg: 'from-white via-violet-50/40 to-fuchsia-50/40 dark:from-[#150e24] dark:via-[#19102b] dark:to-[#10091d]',
+            border: 'border-violet-200/90 dark:border-violet-900/60',
+            borderBottom: 'border-b-[6px] border-b-violet-600 dark:border-b-violet-500',
+            pedestalBg: 'from-violet-600 via-purple-600 to-fuchsia-600',
+            pedestalBorderBottom: 'border-b-[5px] border-b-violet-800 dark:border-b-violet-950',
+            shadow: 'shadow-[0_20px_50px_-15px_rgba(124,58,237,0.22),0_10px_20px_-10px_rgba(0,0,0,0.06)]',
+            hoverShadow: 'hover:shadow-[0_30px_70px_-15px_rgba(124,58,237,0.38),0_15px_30px_-5px_rgba(0,0,0,0.12)]',
+            badgeBg: 'bg-violet-100 dark:bg-violet-950/80 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800',
+            tagText: 'text-violet-600 dark:text-violet-400',
+            btnBg: 'bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-violet-500/25',
+            glow: 'rgba(124, 58, 237, 0.25)'
+          },
+          bullets: [
+            'Differential & Integral Calculus',
+            'Vectors, 3D & Conic Sections',
+            'C18 Applications of Derivative (3 Sub-Topics)'
+          ],
+          ctaText: 'Enter Mathematics Vault (26 Chapters)'
+        }
+      ];
+
+      return (
+        <section className={`relative pt-4 pb-8 sm:pt-6 sm:pb-12 overflow-hidden ${className}`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            
+            {/* Showcase Header */}
+            <div className="text-center max-w-3xl mx-auto space-y-3.5">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 dark:bg-zinc-800 text-white border border-slate-700 dark:border-zinc-700 shadow-md">
+                <span className="text-amber-400 animate-pulse text-sm">✨</span>
+                <span className="text-xs font-black uppercase tracking-wider">
+                  Study Resources & Formula Vault · 100% Free Forever
+                </span>
+              </div>
+
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-zinc-50 tracking-tight leading-tight">
+                Chapterwise Resources &{' '}
+                <span className="bg-gradient-to-r from-blue-600 via-emerald-600 to-violet-600 bg-clip-text text-transparent">
+                  CBT Test Vaults
+                </span>
+              </h2>
+
+              <p className="text-sm sm:text-base text-slate-600 dark:text-zinc-400 max-w-2xl mx-auto leading-relaxed">
+                Curated by <strong className="font-bold text-slate-900 dark:text-zinc-200">Nelov Mallick (IIT Delhi)</strong>. Master the complete JEE Mains &amp; Advanced syllabus with deep theory notes and timed online test drills across all three subjects.
+              </p>
+            </div>
+
+            {/* 3 Side-by-Side 3D Boxes (TestOnGo Style) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 pt-2">
+              {subjects.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => onOpenSubject && onOpenSubject(item.id)}
+                  className={`group cursor-pointer relative flex flex-col justify-between rounded-3xl bg-gradient-to-br ${item.theme.cardBg}
+                    border-2 ${item.theme.border}
+                    ${item.theme.borderBottom}
+                    ${item.theme.shadow}
+                    ${item.theme.hoverShadow}
+                    hover:-translate-y-2 transition-all duration-300 ease-out p-6 sm:p-8 select-none`}
+                >
+                  {/* Top Ambient Glow */}
+                  <div
+                    className="absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-28 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{ background: item.theme.glow }}
+                  />
+
+                  {/* Top Badge & Exam Tag */}
+                  <div className="flex items-center justify-between gap-2 mb-4 relative z-10">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-black tracking-wide uppercase border shadow-sm ${item.theme.badgeBg}`}>
+                      {item.badge}
+                    </span>
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+                      {item.examTag}
+                    </span>
+                  </div>
+
+                  {/* Center 3D Elevated Pedestal & Title */}
+                  <div className="my-auto py-4 text-center relative z-10">
+                    <div
+                      className={`mx-auto w-20 h-20 sm:w-24 sm:h-24 rounded-3xl flex items-center justify-center text-white
+                        bg-gradient-to-tr ${item.theme.pedestalBg}
+                        border-2 border-white/40 dark:border-white/10
+                        ${item.theme.pedestalBorderBottom}
+                        shadow-[inset_0_2px_4px_rgba(255,255,255,0.4),0_15px_30px_-8px_rgba(0,0,0,0.35)]
+                        group-hover:scale-105 transition-all duration-300`}
+                    >
+                      <PhysicsChapterIcon
+                        name={item.iconName}
+                        className={`w-10 h-10 sm:w-12 sm:h-12 text-white ${item.iconAnim}`}
+                      />
+                    </div>
+
+                    <h3 className="mt-5 text-xl sm:text-2xl font-black text-slate-900 dark:text-zinc-50 tracking-tight leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                      {item.title}
+                    </h3>
+
+                    <p className="mt-2 text-xs sm:text-sm font-semibold text-slate-600 dark:text-zinc-300">
+                      {item.subtitle}
+                    </p>
+
+                    {/* Bullet Highlights */}
+                    <div className="mt-4 pt-4 border-t border-slate-200/60 dark:border-zinc-800/80 text-left space-y-2">
+                      {item.bullets.map((b, i) => (
+                        <div key={i} className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-zinc-400">
+                          <span className={`w-1.5 h-1.5 rounded-full ${item.id === 'physics' ? 'bg-blue-500' : (item.id === 'chemistry' ? 'bg-emerald-500' : 'bg-violet-500')}`} />
+                          <span>{b}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Tactile Action Button */}
+                  <div className="pt-4 relative z-10">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onOpenSubject) onOpenSubject(item.id);
+                      }}
+                      className={`w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-2xl font-black text-xs sm:text-sm transition-all duration-200
+                        ${item.theme.btnBg}
+                        border border-white/20 hover:scale-[1.02] active:scale-95 shadow-md`}
+                    >
+                      <span>{item.ctaText}</span>
+                      <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    </button>
+                  </div>
+
+                </div>
+              ))}
+            </div>
+
+          </div>
+        </section>
+      );
+    }
+
+    // LEVEL 1: MAIN ENTRY 3D BOX (Homepage & Hub Standalone Feature - Backwards Compatible)
     function Level1PhysicsEntryCard({ onOpenPhysics, className = '' }) {
       return (
-        <div className={`w-full ${className}`}>
-          <div
-            onClick={onOpenPhysics}
-            className="group cursor-pointer relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-indigo-50/30 to-violet-50/40 dark:from-[#11121a] dark:via-[#141524] dark:to-[#0f101a]
-              border-2 border-indigo-200/80 dark:border-indigo-900/60
-              border-b-[6px] border-b-indigo-400 dark:border-b-indigo-600
-              hover:border-indigo-400 dark:hover:border-indigo-500
-              shadow-[0_20px_50px_-15px_rgba(99,102,241,0.18),0_10px_20px_-10px_rgba(0,0,0,0.06)]
-              hover:shadow-[0_30px_70px_-15px_rgba(99,102,241,0.3),0_15px_30px_-5px_rgba(0,0,0,0.1)]
-              hover:-translate-y-1 transition-all duration-300 ease-out p-6 sm:p-9 lg:p-11"
-          >
-            {/* Top Ambient Glow Orb */}
-            <div className="absolute top-0 right-1/4 w-96 h-60 bg-indigo-500/10 dark:bg-indigo-500/20 blur-[90px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-0 left-10 w-72 h-44 bg-violet-500/10 dark:bg-violet-500/20 blur-[80px] rounded-full pointer-events-none" />
-
-            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-              
-              {/* Left Side: Prominent 3D Icon & Text */}
-              <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 lg:gap-8 flex-1">
-                
-                {/* Elevated 3D Icon Pedestal */}
-                <div
-                  className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-3xl shrink-0 flex items-center justify-center
-                    bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white
-                    border-2 border-white/40 dark:border-white/10
-                    border-b-[5px] border-b-indigo-800 dark:border-b-indigo-950
-                    shadow-[inset_0_2px_4px_rgba(255,255,255,0.4),0_15px_30px_-8px_rgba(99,102,241,0.5)]
-                    group-hover:scale-105 group-hover:rotate-3 transition-all duration-300"
-                >
-                  <PhysicsChapterIcon name="Atom" className="w-11 h-11 sm:w-14 sm:h-14 lg:w-16 lg:h-16 animate-[spin_12s_linear_infinite]" />
-                </div>
-
-                {/* Title & Metadata */}
-                <div className="space-y-2.5 max-w-2xl">
-                  
-                  {/* Pill Badges */}
-                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shadow-sm">
-                      ✨ New 3D Module · 100% Free
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      JEE Mains + Advanced
-                    </span>
-                  </div>
-
-                  {/* Main Mandatory Title */}
-                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-zinc-50 tracking-tight leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                    PHYSICS Resources Chapterwise <span className="text-indigo-600 dark:text-indigo-400">(JEE MAINS + ADVANCED)</span>
-                  </h3>
-
-                  {/* Subtle Mandatory Subtitle */}
-                  <p className="text-base sm:text-lg font-medium text-slate-600 dark:text-zinc-300 leading-relaxed">
-                    28 Chapters • Theory & Chapterwise Tests
-                  </p>
-
-                  {/* Feature Chips */}
-                  <div className="pt-1 flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs font-semibold text-slate-500 dark:text-zinc-400">
-                    <span className="flex items-center gap-1.5">
-                      📖 Comprehensive Theory Notes
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      ⚡ Online CBT Exercises
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      🎓 Curated by Nelov Mallick (IIT Delhi)
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Side: Big Tactile 3D Action Button */}
-              <div className="shrink-0 w-full sm:w-auto">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpenPhysics();
-                  }}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-black text-sm sm:text-base text-white
-                    bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600
-                    border-2 border-indigo-400/40
-                    border-b-[4px] border-b-indigo-900
-                    shadow-[0_12px_24px_-4px_rgba(99,102,241,0.5)]
-                    hover:scale-105 active:scale-95 active:border-b-2
-                    transition-all duration-200"
-                >
-                  <span>Enter Physics Vault (C1–C28)</span>
-                  <span className="group-hover:translate-x-1.5 transition-transform duration-200">→</span>
-                </button>
-              </div>
-
-            </div>
-          </div>
-        </div>
+        <StudyResourcesVaultShowcase
+          className={className}
+          onOpenSubject={(sub) => {
+            if (typeof onOpenPhysics === 'function') {
+              onOpenPhysics(sub);
+            }
+          }}
+        />
+      );
+    }
       );
     }
 
@@ -2016,31 +2317,90 @@
       );
     }
 
-    // LEVEL 2: 28 CHAPTER 3D BOXES GRID VIEW
-    function Level2PhysicsChaptersView({ setView, setActivePhysicsChapterSlug }) {
+    // ==============================================================================
+    // LEVEL 2: SUBJECT CHAPTERS 3D GRID VIEW (Universal for Physics, Chemistry & Maths)
+    // ==============================================================================
+    function Level2SubjectChaptersView({ subject = 'physics', setView, setActiveChapterSlug }) {
       const [searchQuery, setSearchQuery] = useState('');
       const [selectedCategory, setSelectedCategory] = useState('All');
-      const allChapters = window.physicsChaptersData || [];
 
-      const categories = [
-        'All',
-        'General Physics',
-        'Mechanics',
-        'Thermal Physics',
-        'Waves & Oscillations',
-        'Electromagnetism',
-        'Optics',
-        'Modern Physics',
-      ];
+      const configs = {
+        physics: {
+          name: 'Physics',
+          title: 'Physics Resources Chapterwise',
+          examTag: 'JEE MAINS + ADVANCED',
+          totalCount: 28,
+          accentColor: 'text-blue-600 dark:text-blue-400',
+          badgeClass: 'bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+          activeTabClass: 'bg-blue-600 text-white shadow-md shadow-blue-500/25',
+          btnClass: 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20',
+          glow: 'rgba(37, 99, 235, 0.25)',
+          emoji: '⚛️',
+          data: window.physicsChaptersData || [],
+          categories: [
+            'All',
+            'General Physics',
+            'Mechanics',
+            'Thermal Physics',
+            'Waves & Oscillations',
+            'Electromagnetism',
+            'Optics',
+            'Modern Physics'
+          ]
+        },
+        chemistry: {
+          name: 'Chemistry',
+          title: 'Chemistry Resources Chapterwise',
+          examTag: 'JEE MAINS + ADVANCED',
+          totalCount: 29,
+          accentColor: 'text-emerald-600 dark:text-emerald-400',
+          badgeClass: 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+          activeTabClass: 'bg-emerald-600 text-white shadow-md shadow-emerald-500/25',
+          btnClass: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20',
+          glow: 'rgba(5, 150, 105, 0.25)',
+          emoji: '🧪',
+          data: window.chemistryChaptersData || [],
+          categories: [
+            'All',
+            'Organic Chemistry',
+            'Physical Chemistry',
+            'Inorganic Chemistry'
+          ]
+        },
+        mathematics: {
+          name: 'Mathematics',
+          title: 'Mathematics Resources Chapterwise',
+          examTag: 'JEE MAINS + ADVANCED',
+          totalCount: 26,
+          accentColor: 'text-violet-600 dark:text-violet-400',
+          badgeClass: 'bg-violet-100 dark:bg-violet-950/80 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800',
+          activeTabClass: 'bg-violet-600 text-white shadow-md shadow-violet-500/25',
+          btnClass: 'bg-violet-600 hover:bg-violet-700 text-white shadow-violet-500/20',
+          glow: 'rgba(124, 58, 237, 0.25)',
+          emoji: '📐',
+          data: window.mathsChaptersData || [],
+          categories: [
+            'All',
+            'Calculus',
+            'Algebra',
+            'Coordinate Geometry',
+            'Vectors & 3D',
+            'Trigonometry'
+          ]
+        }
+      };
+
+      const cfg = configs[subject] || configs.physics;
+      const allChapters = cfg.data;
 
       const filteredChapters = allChapters.filter(ch => {
         if (selectedCategory !== 'All' && ch.category !== selectedCategory) return false;
         if (searchQuery.trim()) {
           const q = searchQuery.toLowerCase().trim();
-          const mCode = ch.code.toLowerCase().includes(q);
-          const mName = ch.name.toLowerCase().includes(q);
-          const mCat = ch.category.toLowerCase().includes(q);
-          const mBadge = ch.badgeText.toLowerCase().includes(q);
+          const mCode = (ch.code || '').toLowerCase().includes(q);
+          const mName = (ch.name || '').toLowerCase().includes(q);
+          const mCat = (ch.category || '').toLowerCase().includes(q);
+          const mBadge = (ch.badgeText || '').toLowerCase().includes(q);
           if (!mCode && !mName && !mCat && !mBadge) return false;
         }
         return true;
@@ -2048,7 +2408,10 @@
 
       return (
         <div className="min-h-screen bg-slate-50/60 dark:bg-[#0a0a0c] py-8 sm:py-12 relative overflow-hidden">
-          <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-indigo-500/5 dark:bg-indigo-500/10 blur-[130px] rounded-full pointer-events-none" />
+          <div
+            className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[450px] blur-[130px] rounded-full pointer-events-none opacity-40 dark:opacity-20"
+            style={{ background: cfg.glow }}
+          />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-8">
             
@@ -2064,25 +2427,25 @@
                 </button>
                 <span className="text-slate-400">›</span>
                 <span className="font-bold text-slate-900 dark:text-zinc-100">
-                  Physics Resources (C1–C28)
+                  {cfg.name} Resources ({cfg.totalCount} Chapters)
                 </span>
               </nav>
 
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
-                28 Chapters Available
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${cfg.badgeClass}`}>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                {cfg.totalCount} Chapters Available
               </span>
             </div>
 
             {/* Header Hero */}
             <div className="text-center max-w-3xl mx-auto space-y-3 pt-2">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/10 border border-indigo-200/80 dark:border-indigo-800/80 text-indigo-700 dark:text-indigo-300 text-xs font-black tracking-wide uppercase shadow-sm">
-                <span>⚛️</span>
-                <span>Physics Resources Chapterwise · JEE Mains + Advanced</span>
+              <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-black tracking-wide uppercase shadow-sm ${cfg.badgeClass}`}>
+                <span>{cfg.emoji}</span>
+                <span>{cfg.title} · {cfg.examTag}</span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-zinc-50 tracking-tight">
-                Complete <span className="text-indigo-600 dark:text-indigo-400">28 Chapters</span> Vault
+                Complete <span className={cfg.accentColor}>{cfg.totalCount} Chapters</span> Vault
               </h1>
 
               <p className="text-sm sm:text-base text-slate-600 dark:text-zinc-400 leading-relaxed">
@@ -2097,7 +2460,7 @@
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search chapters by number (e.g. C8, C13) or name (e.g. Rotational, Electrostatics, Optics)..."
+                  placeholder={`Search ${cfg.name} chapters by number or topic name...`}
                   className="w-full pl-12 pr-10 py-3.5 sm:py-4 rounded-2xl bg-white dark:bg-[#12131a] border border-slate-200/90 dark:border-zinc-800 text-slate-900 dark:text-zinc-100 placeholder-slate-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all"
                 />
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">🔍</span>
@@ -2114,7 +2477,7 @@
 
               {/* Unit Tabs */}
               <div className="flex items-center justify-center flex-wrap gap-2 pt-1">
-                {categories.map((cat) => {
+                {cfg.categories.map((cat) => {
                   const isSelected = selectedCategory === cat;
                   return (
                     <button
@@ -2123,11 +2486,11 @@
                       onClick={() => setSelectedCategory(cat)}
                       className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                         isSelected
-                          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25 scale-105'
+                          ? cfg.activeTabClass + ' scale-105'
                           : 'bg-white dark:bg-[#12131a] text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-800'
                       }`}
                     >
-                      {cat} {cat === 'All' ? '(28)' : ''}
+                      {cat} {cat === 'All' ? `(${cfg.totalCount})` : ''}
                     </button>
                   );
                 })}
@@ -2136,7 +2499,7 @@
               {/* Showing Count */}
               <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-zinc-400 px-2">
                 <span>
-                  Showing <strong className="text-slate-800 dark:text-zinc-200">{filteredChapters.length}</strong> of 28 Chapters
+                  Showing <strong className="text-slate-800 dark:text-zinc-200">{filteredChapters.length}</strong> of {cfg.totalCount} Chapters
                 </span>
                 {searchQuery && (
                   <button
@@ -2150,7 +2513,7 @@
               </div>
             </div>
 
-            {/* 28 Chapter 3D Boxes Grid */}
+            {/* Chapter 3D Boxes Grid */}
             {filteredChapters.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-2">
                 {filteredChapters.map((chapter) => (
@@ -2160,15 +2523,15 @@
                     badge={chapter.code}
                     category={chapter.category}
                     title={chapter.name}
-                    subtitle={chapter.theory.summary}
+                    subtitle={chapter.theory ? chapter.theory.summary : ''}
                     metadata={chapter.badgeText}
-                    accentColor={chapter.colorTheme.accent}
-                    glowColor={chapter.colorTheme.glow}
+                    accentColor={cfg.accentColor}
+                    glowColor={cfg.glow}
                     actionText="Open Chapter"
                     onClick={() => {
-                      setActivePhysicsChapterSlug(chapter.id);
-                      setView('physics-chapter');
-                      window.location.hash = `#/resources/physics/${chapter.id}`;
+                      if (setActiveChapterSlug) setActiveChapterSlug(chapter.id);
+                      setView('subject-chapter');
+                      window.location.hash = `#/resources/${subject}/${chapter.id}`;
                     }}
                   />
                 ))}
@@ -2177,10 +2540,10 @@
               <div className="text-center py-16 bg-white dark:bg-[#12131a] rounded-3xl border border-slate-200 dark:border-zinc-800 p-8 space-y-4">
                 <span className="text-4xl">🔍</span>
                 <h3 className="font-bold text-lg text-slate-800 dark:text-zinc-200">
-                  No Physics Chapters Found
+                  No {cfg.name} Chapters Found
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-zinc-400 max-w-sm mx-auto">
-                  No chapter matched "{searchQuery}". Try searching by chapter code like "C1" or topic like "Rotational".
+                  No chapter matched "{searchQuery}". Try searching by chapter code like "{subject === 'chemistry' ? 'Ch 1' : 'C1'}" or topic keyword.
                 </p>
                 <button
                   type="button"
@@ -2197,33 +2560,109 @@
       );
     }
 
-    // LEVEL 3: CHAPTER DETAIL VIEW (Theory 3D Box + Exercises 3D Boxes)
-    function Level3PhysicsChapterDetailView({ chapterSlug, setView, currentUser }) {
-      const chapter = (window.getPhysicsChapterById ? window.getPhysicsChapterById(chapterSlug) : null) || (window.physicsChaptersData || [])[0];
+    function Level2PhysicsChaptersView({ setView, setActivePhysicsChapterSlug }) {
+      return (
+        <Level2SubjectChaptersView
+          subject="physics"
+          setView={setView}
+          setActiveChapterSlug={setActivePhysicsChapterSlug}
+        />
+      );
+    }
+
+    // ==============================================================================
+    // LEVEL 3: SUBJECT CHAPTER DETAIL VIEW (Theory 3D Box + CBT Exercises 3D Boxes)
+    // Supports 3 Sub-Topic Tabs for Maths C18 (Applications of Derivative)
+    // ==============================================================================
+    function Level3SubjectChapterDetailView({ subject = 'physics', chapterSlug, setView, currentUser }) {
       const [activeExerciseForTest, setActiveExerciseForTest] = useState(null);
       const [showTheoryModal, setShowTheoryModal] = useState(false);
+      const [activeSubTopicIndex, setActiveSubTopicIndex] = useState(0);
+
+      // Chapter Resolver
+      let chapter = null;
+      const cleanSlug = (chapterSlug || '').toLowerCase().trim();
+
+      if (subject === 'chemistry') {
+        chapter = (window.getChemistryChapterById ? window.getChemistryChapterById(cleanSlug) : null) ||
+                  (window.chemistryChaptersData || []).find(c => c.id === cleanSlug || (c.code || '').toLowerCase().replace(/\s+/g, '-') === cleanSlug || (c.code || '').toLowerCase() === cleanSlug) ||
+                  (window.chemistryChaptersData || [])[0];
+      } else if (subject === 'mathematics') {
+        chapter = (window.getMathsChapterById ? window.getMathsChapterById(cleanSlug) : null) ||
+                  (window.mathsChaptersData || []).find(c => c.id === cleanSlug || (c.code || '').toLowerCase().replace(/\s+/g, '-') === cleanSlug || (c.code || '').toLowerCase() === cleanSlug) ||
+                  (window.mathsChaptersData || [])[0];
+      } else {
+        chapter = (window.getPhysicsChapterById ? window.getPhysicsChapterById(cleanSlug) : null) ||
+                  (window.physicsChaptersData || []).find(c => c.id === cleanSlug || (c.code || '').toLowerCase().replace(/\s+/g, '-') === cleanSlug || (c.code || '').toLowerCase() === cleanSlug) ||
+                  (window.physicsChaptersData || [])[0];
+      }
 
       if (!chapter) {
         return (
           <div className="min-h-screen py-20 text-center">
             <p>Chapter not found.</p>
-            <button onClick={() => { setView('physics-resources'); window.location.hash = '#/resources/physics'; }} className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-xl">
-              Back to Physics Chapters
+            <button
+              onClick={() => { setView('subject-resources'); window.location.hash = `#/resources/${subject}`; }}
+              className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-xl font-bold text-xs"
+            >
+              Back to {subject.toUpperCase()} Chapters
             </button>
           </div>
         );
       }
 
+      // Check for Maths C18 Sub-Topics
+      const isMultiSubTopic = chapter.hasSubTopics && chapter.subTopics && chapter.subTopics.length > 0;
+      const currentSubTopic = isMultiSubTopic ? chapter.subTopics[activeSubTopicIndex] : null;
+      const currentTheory = isMultiSubTopic ? currentSubTopic.theory : chapter.theory;
+      const currentExercises = isMultiSubTopic ? currentSubTopic.exercises : chapter.exercises;
+
+      const themeConfig = {
+        physics: {
+          accentText: 'text-blue-600 dark:text-blue-400',
+          badgeClass: 'bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+          pedestalBg: 'from-blue-600 via-indigo-600 to-indigo-700',
+          glow: 'rgba(37, 99, 235, 0.25)',
+          tabActiveClass: 'bg-blue-600 text-white shadow-md shadow-blue-500/25',
+          btnClass: 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20'
+        },
+        chemistry: {
+          accentText: 'text-emerald-600 dark:text-emerald-400',
+          badgeClass: 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+          pedestalBg: 'from-emerald-600 via-teal-600 to-teal-700',
+          glow: 'rgba(5, 150, 105, 0.25)',
+          tabActiveClass: 'bg-emerald-600 text-white shadow-md shadow-emerald-500/25',
+          btnClass: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'
+        },
+        mathematics: {
+          accentText: 'text-violet-600 dark:text-violet-400',
+          badgeClass: 'bg-violet-100 dark:bg-violet-950/80 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800',
+          pedestalBg: 'from-violet-600 via-purple-600 to-fuchsia-600',
+          glow: 'rgba(124, 58, 237, 0.25)',
+          tabActiveClass: 'bg-violet-600 text-white shadow-md shadow-violet-500/25',
+          btnClass: 'bg-violet-600 hover:bg-violet-700 text-white shadow-violet-500/20'
+        }
+      }[subject] || {
+        accentText: 'text-indigo-600 dark:text-indigo-400',
+        badgeClass: 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+        pedestalBg: 'from-indigo-600 via-indigo-600 to-violet-600',
+        glow: 'rgba(99, 102, 241, 0.25)',
+        tabActiveClass: 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25',
+        btnClass: 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20'
+      };
+
+      const subjectDisplayName = subject.charAt(0).toUpperCase() + subject.slice(1);
+
       return (
         <div className="min-h-screen bg-slate-50/60 dark:bg-[#0a0a0c] py-8 sm:py-12 relative overflow-hidden">
           <div
             className="absolute top-20 right-1/4 w-[500px] h-[350px] blur-[120px] rounded-full pointer-events-none opacity-40 dark:opacity-30"
-            style={{ background: chapter.colorTheme.glow }}
+            style={{ background: themeConfig.glow }}
           />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-8">
             
-            {/* Breadcrumb */}
+            {/* Breadcrumb Navigation Trail */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-zinc-800">
               <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-500 dark:text-zinc-400">
                 <button
@@ -2236,23 +2675,23 @@
                 <span className="text-slate-400">›</span>
                 <button
                   type="button"
-                  onClick={() => { setView('physics-resources'); window.location.hash = '#/resources/physics'; }}
+                  onClick={() => { setView('subject-resources'); window.location.hash = `#/resources/${subject}`; }}
                   className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
-                  Physics Resources
+                  {subjectDisplayName} Resources
                 </button>
                 <span className="text-slate-400">›</span>
-                <span className="font-bold text-slate-900 dark:text-zinc-100">
-                  {chapter.fullName}
+                <span className={`font-bold text-slate-900 dark:text-zinc-100 ${themeConfig.accentText}`}>
+                  {chapter.code} - {chapter.name}
                 </span>
               </nav>
 
               <button
                 type="button"
-                onClick={() => { setView('physics-resources'); window.location.hash = '#/resources/physics'; }}
+                onClick={() => { setView('subject-resources'); window.location.hash = `#/resources/${subject}`; }}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-zinc-200 bg-white dark:bg-[#12131a] border border-slate-200 dark:border-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-800 shadow-sm transition-all"
               >
-                ← Back to 28 Chapters
+                ← Back to {subjectDisplayName} Chapters
               </button>
             </div>
 
@@ -2264,24 +2703,23 @@
             >
               <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-5">
                 <div
-                  className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center shrink-0
-                    bg-gradient-to-b from-slate-50 to-slate-100 dark:from-zinc-800 dark:to-zinc-900
-                    border border-slate-200 dark:border-zinc-700 border-b-[3px] border-b-slate-300 dark:border-b-zinc-700
-                    shadow-md"
+                  className={`w-18 h-18 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center shrink-0 text-white
+                    bg-gradient-to-tr ${themeConfig.pedestalBg}
+                    border border-white/20 shadow-md`}
                 >
-                  <PhysicsChapterIcon name={chapter.iconName} className={`w-9 h-9 ${chapter.colorTheme.accent}`} />
+                  <PhysicsChapterIcon name={chapter.iconName} className="w-9 h-9 text-white" />
                 </div>
 
                 <div className="space-y-1.5">
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                    <span className="px-2.5 py-0.5 rounded-lg text-xs font-black tracking-wide uppercase bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                    <span className={`px-2.5 py-0.5 rounded-lg text-xs font-black tracking-wide uppercase ${themeConfig.badgeClass}`}>
                       {chapter.code}
                     </span>
                     <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300">
                       {chapter.category}
                     </span>
                     <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                      {chapter.exercises.length} CBT {chapter.exercises.length === 1 ? 'Test' : 'Tests'} Ready
+                      {isMultiSubTopic ? `${chapter.subTopics.length} Sub-Topics · 15 CBT Tests` : `${currentExercises.length} CBT ${currentExercises.length === 1 ? 'Test' : 'Tests'} Ready`}
                     </span>
                   </div>
 
@@ -2289,7 +2727,7 @@
                     {chapter.name}
                   </h1>
                   <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 max-w-2xl">
-                    {chapter.theory.summary}
+                    {chapter.theory ? chapter.theory.summary : ''}
                   </p>
                 </div>
               </div>
@@ -2297,9 +2735,42 @@
               <div className="shrink-0 text-center sm:text-right">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-300">Academic Mentor</span>
                 <p className="font-extrabold text-sm text-slate-800 dark:text-zinc-200">Nelov Mallick (IIT Delhi)</p>
-                <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold">100% Free Education</p>
+                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">100% Free Education</p>
               </div>
             </div>
+
+            {/* MATHS C18 SPECIAL: 3 SUB-TOPIC TABS */}
+            {isMultiSubTopic && (
+              <div className="p-6 rounded-3xl bg-white dark:bg-[#12131a] border border-slate-200 dark:border-zinc-800 shadow-sm space-y-3">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-zinc-400">
+                  <span className="text-violet-500 font-bold">📑 Select Sub-Topic:</span>
+                  <span>(Applications of Derivative is organized into 3 dedicated sub-modules)</span>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {chapter.subTopics.map((sub, idx) => {
+                    const isActive = activeSubTopicIndex === idx;
+                    return (
+                      <button
+                        key={sub.id}
+                        type="button"
+                        onClick={() => setActiveSubTopicIndex(idx)}
+                        className={`py-3 px-4 rounded-2xl text-xs sm:text-sm font-black transition-all border flex items-center justify-between ${
+                          isActive
+                            ? themeConfig.tabActiveClass
+                            : 'bg-slate-50 dark:bg-zinc-800/80 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-700'
+                        }`}
+                      >
+                        <span>{sub.name}</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20">
+                          {sub.exercises.length} Exercises
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* SECTION 1: THEORY PORTION */}
             <section className="space-y-4">
@@ -2325,10 +2796,9 @@
                 <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                   <div className="flex items-start gap-5">
                     <div
-                      className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl flex items-center justify-center shrink-0
-                        bg-gradient-to-tr from-indigo-500/10 via-violet-500/10 to-indigo-500/20 text-indigo-600 dark:text-indigo-400
-                        border border-indigo-200 dark:border-indigo-800 border-b-[3px] border-b-indigo-300 dark:border-b-indigo-900
-                        shadow-inner group-hover:scale-105 transition-transform text-2xl font-bold"
+                      className={`w-16 h-16 sm:w-18 sm:h-18 rounded-2xl flex items-center justify-center shrink-0
+                        bg-gradient-to-tr ${themeConfig.pedestalBg} text-white
+                        border border-white/20 shadow-inner group-hover:scale-105 transition-transform text-2xl font-bold`}
                     >
                       📖
                     </div>
@@ -2336,20 +2806,20 @@
                     <div className="space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                          {chapter.theory.statusLabel}
+                          {currentTheory.statusLabel || 'Theory Notes — Upload Pending'}
                         </span>
                         <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400">
-                          {chapter.theory.topics ? chapter.theory.topics.length : 4} Core Topics Mapped
+                          {currentTheory.topics ? currentTheory.topics.length : 4} Core Topics Mapped
                         </span>
                       </div>
 
                       <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-zinc-50 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                        {chapter.theory.title}
+                        {currentTheory.title}
                       </h3>
 
-                      {chapter.theory.topics && (
+                      {currentTheory.topics && (
                         <div className="flex flex-wrap gap-1.5 pt-1">
-                          {chapter.theory.topics.map((topic, idx) => (
+                          {currentTheory.topics.map((topic, idx) => (
                             <span
                               key={idx}
                               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-zinc-800/80 text-slate-700 dark:text-zinc-300 border border-slate-200/60 dark:border-zinc-700/60"
@@ -2394,24 +2864,24 @@
                     Attempt chapterwise tests in official JEE CBT format with timer, palette, and instant score summary.
                   </p>
                 </div>
-                <span className="hidden sm:inline-flex px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                  {chapter.exercises.length} {chapter.exercises.length === 1 ? 'Exercise' : 'Exercises'} Total
+                <span className={`hidden sm:inline-flex px-3 py-1 rounded-full text-xs font-extrabold border shadow-sm ${themeConfig.badgeClass}`}>
+                  {currentExercises.length} {currentExercises.length === 1 ? 'Exercise' : 'Exercises'} Total
                 </span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {chapter.exercises.map((exercise) => (
+                {currentExercises.map((exercise) => (
                   <PhysicsCard3D
                     key={exercise.id}
                     iconName={chapter.iconName}
-                    badge={exercise.statusLabel}
+                    badge={exercise.statusLabel || 'Ready for Upload / Coming Soon'}
                     badgeColor="bg-amber-50 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border-amber-200 dark:border-amber-800"
-                    category={exercise.targetExam}
+                    category={exercise.targetExam || 'Both'}
                     title={exercise.title}
                     subtitle={exercise.description}
                     metadata={`${exercise.questionCount || 25} Questions • ${exercise.timeMinutes || 60} Min`}
-                    accentColor={chapter.colorTheme.accent}
-                    glowColor={chapter.colorTheme.glow}
+                    accentColor={themeConfig.accentText}
+                    glowColor={themeConfig.glow}
                     actionText="Launch CBT Shell"
                     onClick={() => setActiveExerciseForTest(exercise)}
                   />
@@ -2443,7 +2913,7 @@
                     </div>
                     <div>
                       <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-zinc-50">
-                        {chapter.fullName} · Theory
+                        {chapter.fullName || chapter.name} · Theory
                       </h3>
                       <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
                         Upload Pending (Word / PDF)
@@ -2474,7 +2944,7 @@
                       Included Subtopics:
                     </h4>
                     <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-zinc-400 pl-1">
-                      {chapter.theory.topics && chapter.theory.topics.map((t, idx) => (
+                      {(currentTheory.topics || []).map((t, idx) => (
                         <li key={idx}>{t}</li>
                       ))}
                     </ul>
@@ -2495,6 +2965,17 @@
           )}
 
         </div>
+      );
+    }
+
+    function Level3PhysicsChapterDetailView({ chapterSlug, setView, currentUser }) {
+      return (
+        <Level3SubjectChapterDetailView
+          subject="physics"
+          chapterSlug={chapterSlug}
+          setView={setView}
+          currentUser={currentUser}
+        />
       );
     }
 
@@ -4895,11 +5376,31 @@
               <button
                 type="button"
                 onClick={() => { setView('physics-resources'); window.location.hash = '#/resources/physics'; }}
-                className={`transition-colors flex items-center gap-1.5 ${view === 'physics-resources' || view === 'physics-chapter-detail' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'hover:text-indigo-600'}`}
+                className="transition-colors flex items-center gap-1.5 hover:text-blue-600 text-slate-700 dark:text-zinc-300 font-bold"
               >
-                <span>⚛️ Physics Vault</span>
-                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                  3D C1–C28
+                <span>⚛️ Physics</span>
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                  28
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setView('chemistry-resources'); window.location.hash = '#/resources/chemistry'; }}
+                className="transition-colors flex items-center gap-1.5 hover:text-emerald-600 text-slate-700 dark:text-zinc-300 font-bold"
+              >
+                <span>🧪 Chemistry</span>
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  29
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setView('mathematics-resources'); window.location.hash = '#/resources/mathematics'; }}
+                className="transition-colors flex items-center gap-1.5 hover:text-violet-600 text-slate-700 dark:text-zinc-300 font-bold"
+              >
+                <span>📐 Maths</span>
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-violet-100 dark:bg-violet-900/60 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800">
+                  26
                 </span>
               </button>
               <button
@@ -5047,8 +5548,24 @@
                   onClick={() => { setMobileMenuOpen(false); setView('physics-resources'); window.location.hash = '#/resources/physics'; }}
                   className="text-left py-2 px-3 rounded-lg text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 flex items-center justify-between"
                 >
-                  <span>⚛️ Physics Vault (3D C1–C28)</span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">3D Vault</span>
+                  <span>⚛️ Physics Vault (28 Chapters)</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">C1–C28</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setMobileMenuOpen(false); setView('chemistry-resources'); window.location.hash = '#/resources/chemistry'; }}
+                  className="text-left py-2 px-3 rounded-lg text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 flex items-center justify-between"
+                >
+                  <span>🧪 Chemistry Vault (29 Chapters)</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">Ch 1–Ch 29</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setMobileMenuOpen(false); setView('mathematics-resources'); window.location.hash = '#/resources/mathematics'; }}
+                  className="text-left py-2 px-3 rounded-lg text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 flex items-center justify-between"
+                >
+                  <span>📐 Maths Vault (26 Chapters)</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-100 dark:bg-violet-950 text-violet-600 dark:text-violet-400">C01–C28</span>
                 </button>
                 <button
                   type="button"
@@ -7164,14 +7681,49 @@
 
                 if (hash.startsWith('#/resources/physics/') || hash.startsWith('#resources/physics/')) {
           const rawSlug = hash.replace(/^#\/?resources\/physics\//, '').trim().toLowerCase();
+          setActiveSubject('physics');
           setActivePhysicsChapterSlug(rawSlug || 'c1');
-          setView('physics-chapter');
+          setActiveSubjectChapterSlug(rawSlug || 'c1');
+          setView('subject-chapter');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
 
         if (hash === '#/resources/physics' || hash === '#resources/physics') {
-          setView('physics-resources');
+          setActiveSubject('physics');
+          setView('subject-resources');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+
+        if (hash.startsWith('#/resources/chemistry/') || hash.startsWith('#resources/chemistry/')) {
+          const rawSlug = hash.replace(/^#\/?resources\/chemistry\//, '').trim().toLowerCase();
+          setActiveSubject('chemistry');
+          setActiveSubjectChapterSlug(rawSlug || 'ch-1');
+          setView('subject-chapter');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+
+        if (hash === '#/resources/chemistry' || hash === '#resources/chemistry') {
+          setActiveSubject('chemistry');
+          setView('subject-resources');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+
+        if (hash.startsWith('#/resources/mathematics/') || hash.startsWith('#resources/mathematics/') || hash.startsWith('#/resources/maths/') || hash.startsWith('#resources/maths/')) {
+          const rawSlug = hash.replace(/^#\/?resources\/(?:mathematics|maths)\//, '').trim().toLowerCase();
+          setActiveSubject('mathematics');
+          setActiveSubjectChapterSlug(rawSlug || 'c01');
+          setView('subject-chapter');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+
+        if (hash === '#/resources/mathematics' || hash === '#resources/mathematics' || hash === '#/resources/maths' || hash === '#resources/maths') {
+          setActiveSubject('mathematics');
+          setView('subject-resources');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
@@ -9048,7 +9600,8 @@
       // -------------------------------------------------------------
       // RENDER: REVISION NOTEBOOK VIEW
       // -------------------------------------------------------------
-            if (view === 'physics-resources') {
+            if (view === 'subject-resources' || view === 'physics-resources' || view === 'chemistry-resources' || view === 'mathematics-resources') {
+        const currentSub = view === 'chemistry-resources' ? 'chemistry' : (view === 'mathematics-resources' ? 'mathematics' : (view === 'physics-resources' ? 'physics' : activeSubject));
         return (
           <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
             <MainNavbar
@@ -9064,9 +9617,14 @@
               userDropdownOpen={userDropdownOpen}
               setUserDropdownOpen={setUserDropdownOpen}
             />
-            <Level2PhysicsChaptersView
+            <Level2SubjectChaptersView
+              subject={currentSub}
               setView={setView}
-              setActivePhysicsChapterSlug={setActivePhysicsChapterSlug}
+              setActiveChapterSlug={(slug) => {
+                setActiveSubject(currentSub);
+                setActiveSubjectChapterSlug(slug);
+                setActivePhysicsChapterSlug(slug);
+              }}
             />
             <AuthModalDialog
               isOpen={authModal.isOpen}
@@ -9080,7 +9638,7 @@
         );
       }
 
-      if (view === 'physics-chapter') {
+      if (view === 'subject-chapter' || view === 'physics-chapter') {
         return (
           <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
             <MainNavbar
@@ -9096,8 +9654,9 @@
               userDropdownOpen={userDropdownOpen}
               setUserDropdownOpen={setUserDropdownOpen}
             />
-            <Level3PhysicsChapterDetailView
-              chapterSlug={activePhysicsChapterSlug}
+            <Level3SubjectChapterDetailView
+              subject={activeSubject}
+              chapterSlug={activeSubjectChapterSlug || activePhysicsChapterSlug}
               setView={setView}
               currentUser={currentUser}
             />
@@ -9250,6 +9809,16 @@
 
           {/* MAIN HOMEPAGE CONTENT */}
           <main>
+            {/* 0. STUDY RESOURCES & FORMULA VAULT (Top-of-Homepage 3D Showcase) */}
+            <StudyResourcesVaultShowcase
+              onOpenSubject={(sub) => {
+                setActiveSubject(sub);
+                setView('subject-resources');
+                window.location.hash = '#/resources/' + sub;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            />
+
             {/* 1. HERO SECTION */}
             <section className="relative pt-16 pb-20 sm:pt-24 sm:pb-32 overflow-hidden">
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:28px_28px] pointer-events-none" />

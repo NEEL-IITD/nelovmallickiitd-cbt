@@ -28,7 +28,8 @@ import { ResourcesHub } from './components/ResourcesHub';
 import { LecturesHub } from './components/LecturesHub';
 import { LecturePlayer } from './components/LecturePlayer';
 import { LecturesSection } from './components/LecturesSection';
-import { PhysicsResourcesHub } from './components/physics/PhysicsResourcesHub';
+import { StudyResourcesVaultShowcase } from './components/vault/StudyResourcesVaultShowcase';
+import { SubjectResourcesHub } from './components/vault/SubjectResourcesHub';
 
 export const AppContent: React.FC = () => {
   const { user, isCloudConnected, openAuthModal } = useAuth();
@@ -111,7 +112,22 @@ export const AppContent: React.FC = () => {
           <RevisionNotebook />
         </ProtectedRoute>
       ) : currentHash.startsWith('#/resources/physics') ? (
-        <PhysicsResourcesHub
+        <SubjectResourcesHub
+          subject="physics"
+          currentHash={currentHash}
+          onNavigate={handleNavigate}
+          user={user}
+        />
+      ) : currentHash.startsWith('#/resources/chemistry') ? (
+        <SubjectResourcesHub
+          subject="chemistry"
+          currentHash={currentHash}
+          onNavigate={handleNavigate}
+          user={user}
+        />
+      ) : currentHash.startsWith('#/resources/mathematics') ? (
+        <SubjectResourcesHub
+          subject="mathematics"
           currentHash={currentHash}
           onNavigate={handleNavigate}
           user={user}
@@ -150,6 +166,11 @@ export const AppContent: React.FC = () => {
         />
       ) : (
         <main>
+          {/* 0. STUDY RESOURCES & FORMULA VAULT (Top-of-Homepage 3D Showcase) */}
+          <StudyResourcesVaultShowcase
+            onOpenSubject={(subject) => handleNavigate(`#/resources/${subject}`)}
+          />
+
           {/* 1. Hero Section with Live CBT Mock Test */}
           <Hero
             exam={exam}

@@ -6,14 +6,14 @@
 // ==============================================================================
 
 import React, { useState, useEffect } from 'react';
-import { PhysicsChapter, ChapterExercise } from '../../data/physicsChapters';
 import { Clock, CheckCircle2, X, ArrowLeft, ArrowRight, Bookmark, ShieldCheck, UploadCloud } from 'lucide-react';
 
 interface ExerciseTestShellModalProps {
   isOpen: boolean;
   onClose: () => void;
-  chapter: PhysicsChapter;
-  exercise: ChapterExercise;
+  chapter: any;
+  exercise: any;
+  subject?: 'physics' | 'chemistry' | 'mathematics';
   studentName?: string;
 }
 
