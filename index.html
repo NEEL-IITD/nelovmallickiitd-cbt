@@ -814,6 +814,16 @@
               </p>
             </div>
 
+            {/* Level 1: Standalone Main Entry 3D Box in Hub */}
+            <div className="max-w-5xl mx-auto">
+              <Level1PhysicsEntryCard
+                onOpenPhysics={() => {
+                  if (typeof setView === 'function') setView('physics-resources');
+                  window.location.hash = '#/resources/physics';
+                }}
+              />
+            </div>
+
             {/* Search & Filter Bar */}
             <div className="bg-white dark:bg-[#12131a] rounded-2xl border border-slate-200 dark:border-zinc-800 p-5 sm:p-6 shadow-sm space-y-5">
               {/* Search Field */}
@@ -4884,6 +4894,16 @@
               </button>
               <button
                 type="button"
+                onClick={() => { setView('physics-resources'); window.location.hash = '#/resources/physics'; }}
+                className={`transition-colors flex items-center gap-1.5 ${view === 'physics-resources' || view === 'physics-chapter-detail' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'hover:text-indigo-600'}`}
+              >
+                <span>⚛️ Physics Vault</span>
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                  3D C1–C28
+                </span>
+              </button>
+              <button
+                type="button"
                 onClick={() => { setView('resources'); window.location.hash = '#/resources'; }}
                 className={`transition-colors flex items-center gap-1.5 ${view === 'resources' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'hover:text-indigo-600'}`}
               >
@@ -5021,6 +5041,14 @@
                 >
                   <span>▶ Video Lectures & Masterclasses</span>
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-400">New</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setMobileMenuOpen(false); setView('physics-resources'); window.location.hash = '#/resources/physics'; }}
+                  className="text-left py-2 px-3 rounded-lg text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 flex items-center justify-between"
+                >
+                  <span>⚛️ Physics Vault (3D C1–C28)</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">3D Vault</span>
                 </button>
                 <button
                   type="button"
