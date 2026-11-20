@@ -1,6 +1,6 @@
 // ==============================================================================
 // NelovMallickIITD CBT Platform - Private Admin Dashboard (/admin)
-// Gated by AdminRoute (profile.role === 'admin')
+// Complete Visibility for Admin Gmail (Students, Contact Numbers, Attempts, Lectures, Bookmarks, Reports)
 // Mentored by Nelov Mallick (IIT Delhi) · 100% Free Forever
 // ==============================================================================
 
@@ -10,11 +10,36 @@ import { studentStorage } from '../utils/studentStorage';
 import { ErrorReportItem, ErrorReportStatus } from '../types';
 
 export const AdminDashboard: React.FC = () => {
-  const { isCloudConnected } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'tests' | 'reports' | 'students'>('overview');
+  const { isCloudConnected, user } = useAuth();
+  const [activeTab, setActiveTab] = useState<'overview' | 'students' | 'attempts' | 'tests' | 'reports'>('overview');
 
-  // Test configs state
+  // Core Data States
+  const [students, setStudents] = useState<any[]>([]);
+  const [allAttempts, setAllAttempts] = useState<any[]>([]);
+  const [allBookmarks, setAllBookmarks] = useState<any[]>([]);
+  const [allLectures, setAllLectures] = useState<any[]>([]);
+  const [reports, setReports] = useState<ErrorReportItem[]>([]);
   const [testConfigs, setTestConfigs] = useState<Record<string, 'live' | 'coming_soon'>>({});
+
+  // UI / Filter States
+  const [loading, setLoading] = useState(true);
+  const [studentSearch, setStudentSearch] = useState('');
+  const [studentAuthFilter, setStudentAuthFilter] = useState<'All' | 'google' | 'gmail' | 'phone' | 'email_with_phone'>('All');
+  const [studentExamFilter, setStudentExamFilter] = useState<'All' | 'JEE Mains' | 'JEE Advanced' | 'Both'>('All');
+  const [selectedStudent, setSelectedStudent] = useState<any | null>(null);
+  const [copiedPhone, setCopiedPhone] = useState<string | null>(null);
+
+  // Attempts Tab Filters
+  const [attemptSearch, setAttemptSearch] = useState('');
+  const [attemptExamFilter, setAttemptExamFilter] = useState<'All' | 'JEE Mains' | 'JEE Advanced'>('All');
+  const [attemptCodeFilter, setAttemptCodeFilter] = useState<string>('All');
+
+  // Error Reports Tab States
+  const [reportFilter, setReportFilter] = useState<'All' | ErrorReportStatus>('All');
+  const [adminNotes, setAdminNotes] = useState<Record<string, string>>({});
+  const [savedNoteSuccess, setSavedNoteSuccess] = useState<string | null>(null);
+
+  // Test Configs Toggle Modal
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
     testId: string;
@@ -24,22 +49,6 @@ export const AdminDashboard: React.FC = () => {
     questionCount: number;
   } | null>(null);
 
-  // Error reports state
-  const [reports, setReports] = useState<ErrorReportItem[]>([]);
-  const [reportFilter, setReportFilter] = useState<'All' | ErrorReportStatus>('All');
-  const [adminNotes, setAdminNotes] = useState<Record<string, string>>({});
-  const [savedNoteSuccess, setSavedNoteSuccess] = useState<string | null>(null);
-
-  // Students & attempts state
-  const [students, setStudents] = useState<any[]>([]);
-  const [allAttempts, setAllAttempts] = useState<any[]>([]);
-  const [studentSearch, setStudentSearch] = useState('');
-  const [viewAttemptLogs, setViewAttemptLogs] = useState(false);
-
-  // Loading indicator
-  const [loading, setLoading] = useState(true);
-
-  // Load admin data on mount
   useEffect(() => {
     loadAllAdminData();
   }, []);
@@ -47,20 +56,21 @@ export const AdminDashboard: React.FC = () => {
   const loadAllAdminData = async () => {
     setLoading(true);
     try {
-      // 1. Load test configs
-      const configs = await studentStorage.getTestConfigs();
-      setTestConfigs(configs);
+      const [profilesData, attemptsData, bookmarksData, lecturesData, reportsData, configsData] = await Promise.all([
+        studentStorage.getAllProfiles(),
+        studentStorage.getAllAttempts(),
+        studentStorage.getAllBookmarks(),
+        studentStorage.getAllLectureProgress(),
+        studentStorage.getAllErrorReports(),
+        studentStorage.getTestConfigs()
+      ]);
 
-      // 2. Load error reports
-      const allReports = await studentStorage.getAllErrorReports();
-      setReports(allReports);
-
-      // 3. Load students & attempts
-      const userList = (window as any).authService?.getAllUsers ? (window as any).authService.getAllUsers() : [];
-      setStudents(userList);
-
-      const attemptsList = (window as any).studentStorage?.getAllAttempts ? (window as any).studentStorage.getAllAttempts() : [];
-      setAllAttempts(attemptsList);
+      setStudents(profilesData || []);
+      setAllAttempts(attemptsData || []);
+      setAllBookmarks(bookmarksData || []);
+      setAllLectures(lecturesData || []);
+      setReports(reportsData || []);
+      setTestConfigs(configsData || {});
     } catch (e) {
       console.warn('Error loading admin portal data:', e);
     } finally {
@@ -68,23 +78,69 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Test catalog definition with local ready question counts
+  // Copy contact number with visual feedback
+  const handleCopyPhone = (phone: string) => {
+    if (!phone) return;
+    navigator.clipboard.writeText(phone);
+    setCopiedPhone(phone);
+    setTimeout(() => setCopiedPhone(null), 2000);
+  };
+
+  // Export Students CSV
+  const handleExportStudentsCSV = () => {
+    if (students.length === 0) return;
+
+    const headers = ['Full Name', 'Email', 'Contact Number', 'Auth Method', 'Target Exam', 'Role', 'Joined Date', 'Tests Attempted', 'Avg Score %', 'Lectures Completed', 'Bookmarks'];
+    const rows = students.map((s) => {
+      const studentAttempts = allAttempts.filter((a) => a.userId === s.id);
+      const studentLectures = allLectures.filter((l) => l.user_id === s.id && l.completed);
+      const studentBookmarks = allBookmarks.filter((b) => b.user_id === s.id);
+      const avgScore = studentAttempts.length > 0
+        ? Math.round(studentAttempts.reduce((acc, a) => acc + (a.percentage || 0), 0) / studentAttempts.length)
+        : 0;
+
+      return [
+        `"${(s.full_name || 'Student').replace(/"/g, '""')}"`,
+        `"${(s.email || '').replace(/"/g, '""')}"`,
+        `"${(s.contact_number || '').replace(/"/g, '""')}"`,
+        `"${s.auth_method || (s.contact_number ? 'phone' : 'gmail')}"`,
+        `"${s.target_exam || 'JEE Advanced'}"`,
+        `"${s.role || 'student'}"`,
+        `"${s.created_at ? new Date(s.created_at).toLocaleDateString() : ''}"`,
+        studentAttempts.length,
+        `${avgScore}%`,
+        studentLectures.length,
+        studentBookmarks.length
+      ].join(',');
+    });
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `nelovmallick_students_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Catalog definitions: PTM 01-10 for JEE Mains, PTA 01-10 for JEE Advanced
   const jeeMainsList = Array.from({ length: 10 }, (_, i) => {
     const num = String(i + 1).padStart(2, '0');
-    const testId = `jee-mains-pta-${num}`;
+    const testId = `jee-mains-ptm-${num}`;
     return {
       testId,
-      code: `PTA ${num}`,
+      code: `PTM ${num}`,
       examType: 'JEE Mains',
-      title: `JEE Mains – PTA ${num} Full Syllabus Mock Test`,
-      questionCount: 0 // placeholder
+      title: `JEE Mains – PTM ${num} Full Syllabus Mock Test`,
+      questionCount: 0
     };
   });
 
   const jeeAdvancedList = Array.from({ length: 10 }, (_, i) => {
     const num = String(i + 1).padStart(2, '0');
     const testId = `jee-advanced-pta-${num}`;
-    const readyCount = (num === '04' || num === '05') ? 54 : 0;
+    const readyCount = (num === '04' || num === '05' || num === '06') ? 54 : 0;
     return {
       testId,
       code: `PTA ${num}`,
@@ -99,7 +155,6 @@ export const AdminDashboard: React.FC = () => {
     const currentStatus = testConfigs[test.testId] || 'coming_soon';
     const newStatus = currentStatus === 'live' ? 'coming_soon' : 'live';
 
-    // Show warning if trying to activate a test with 0 questions loaded
     if (newStatus === 'live' && test.questionCount === 0) {
       setConfirmModal({
         isOpen: true,
@@ -121,7 +176,7 @@ export const AdminDashboard: React.FC = () => {
     setConfirmModal(null);
   };
 
-  // Handle report status change
+  // Error Report Actions
   const handleUpdateReportStatus = async (reportId: string, newStatus: ErrorReportStatus) => {
     await studentStorage.updateErrorReportStatus(reportId, newStatus, adminNotes[reportId]);
     setReports((prev) =>
@@ -139,20 +194,61 @@ export const AdminDashboard: React.FC = () => {
   };
 
   // Metrics
-  const totalRegistered = Math.max(students.length, 1);
+  const totalStudents = students.length;
+  const gmailStudentsCount = students.filter(
+    (s) => s.auth_method === 'google' || s.auth_method === 'gmail' || (s.email && s.email.includes('@gmail.com'))
+  ).length;
+  const phoneStudentsCount = students.filter(
+    (s) => s.auth_method === 'phone' || (!s.email && s.contact_number)
+  ).length;
+  const nonGmailPhoneCount = students.filter(
+    (s) => s.auth_method === 'email_with_phone'
+  ).length;
+
   const totalAttemptsCount = allAttempts.length;
+  const totalLecturesCompleted = allLectures.filter((l) => l.completed).length;
+  const totalBookmarksCount = allBookmarks.length;
   const liveTestsCount = Object.values(testConfigs).filter((s) => s === 'live').length;
   const openReportsCount = reports.filter((r) => r.status === 'open').length;
 
+  // Filtered Students
+  const filteredStudents = students.filter((s) => {
+    if (studentSearch) {
+      const term = studentSearch.toLowerCase();
+      const matchName = (s.full_name || '').toLowerCase().includes(term);
+      const matchEmail = (s.email || '').toLowerCase().includes(term);
+      const matchContact = (s.contact_number || '').replace(/\s+/g, '').includes(term.replace(/\s+/g, ''));
+      if (!matchName && !matchEmail && !matchContact) return false;
+    }
+    if (studentAuthFilter !== 'All') {
+      const m = s.auth_method || (s.contact_number && !s.email ? 'phone' : 'gmail');
+      if (m !== studentAuthFilter) return false;
+    }
+    if (studentExamFilter !== 'All') {
+      if (s.target_exam !== studentExamFilter) return false;
+    }
+    return true;
+  });
+
+  // Filtered Attempts
+  const filteredAttempts = allAttempts.filter((a) => {
+    if (attemptSearch) {
+      const term = attemptSearch.toLowerCase();
+      const matchName = (a.studentName || '').toLowerCase().includes(term);
+      const matchEmail = (a.studentEmail || '').toLowerCase().includes(term);
+      const matchContact = (a.studentContact || '').replace(/\s+/g, '').includes(term.replace(/\s+/g, ''));
+      const matchCode = (a.testCode || '').toLowerCase().includes(term);
+      if (!matchName && !matchEmail && !matchContact && !matchCode) return false;
+    }
+    if (attemptExamFilter !== 'All' && a.examType !== attemptExamFilter) return false;
+    if (attemptCodeFilter !== 'All' && a.testCode !== attemptCodeFilter) return false;
+    return true;
+  });
+
+  // Filtered Reports
   const filteredReports = reports.filter((r) => {
     if (reportFilter === 'All') return true;
     return r.status === reportFilter;
-  });
-
-  const filteredStudents = students.filter((s) => {
-    if (!studentSearch) return true;
-    const term = studentSearch.toLowerCase();
-    return s.name.toLowerCase().includes(term) || s.email.toLowerCase().includes(term);
   });
 
   return (
@@ -161,7 +257,7 @@ export const AdminDashboard: React.FC = () => {
       <div className="border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#101116] sticky top-16 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl font-bold">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl font-bold shadow-sm">
               🛡️
             </div>
             <div>
@@ -174,651 +270,897 @@ export const AdminDashboard: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-zinc-400">
-                Official JEE Test Series Engine · Mentored by <strong>Nelov Mallick (IIT Delhi)</strong>
+                Logged in as <strong>{user?.email || 'Admin'}</strong> · Single Attribution to <strong>Nelov Mallick (IIT Delhi)</strong>
               </p>
             </div>
           </div>
 
-          {/* Cloud Status Pill & Quick Home Link */}
-          <div className="flex items-center gap-3 text-xs">
+          {/* Quick Actions & Status */}
+          <div className="flex items-center gap-2.5 text-xs flex-wrap">
+            <button
+              onClick={loadAllAdminData}
+              disabled={loading}
+              className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-200 font-bold hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-1.5"
+            >
+              <span className={loading ? 'animate-spin' : ''}>🔄</span>
+              <span>Refresh</span>
+            </button>
+
             {isCloudConnected ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-bold">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Supabase Cloud Connected
+                Supabase Cloud
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 font-bold">
                 <span className="w-2 h-2 rounded-full bg-amber-500" />
-                Local Storage Mode
+                Local Mode
               </span>
             )}
+
             <a
               href="#/"
-              className="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300 font-bold hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+              className="px-3.5 py-1.5 rounded-xl bg-slate-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold hover:opacity-90 transition-opacity"
             >
-              Exit to Student View ↗
+              Exit to Portal ↗
             </a>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-1 sm:gap-2 overflow-x-auto pt-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-slate-100 dark:border-zinc-800/80 pt-1">
           {[
-            { id: 'overview', label: 'Overview & Analytics', icon: '📊' },
-            { id: 'tests', label: 'Manage Tests (PTA 01–10)', icon: '📝' },
-            { id: 'reports', label: `Error Reports (${openReportsCount})`, icon: '🚩', badge: openReportsCount },
-            { id: 'students', label: 'Students & Attempt Logs', icon: '👥' },
+            { id: 'overview', label: 'Overview', icon: '📊' },
+            { id: 'students', label: `All Students (${totalStudents})`, icon: '👥' },
+            { id: 'attempts', label: `Test Attempts (${totalAttemptsCount})`, icon: '📝' },
+            { id: 'tests', label: `Manage Tests (${liveTestsCount}/20 Live)`, icon: '⚙️' },
+            { id: 'reports', label: `Error Reports (${openReportsCount} Open)`, icon: '⚠️' }
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-bold border-b-2 transition-all whitespace-nowrap ${
+              className={`py-3 px-3.5 border-b-2 font-bold text-xs whitespace-nowrap transition-colors flex items-center gap-2 ${
                 activeTab === tab.id
-                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/20'
-                  : 'border-transparent text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 hover:bg-slate-100/50 dark:hover:bg-zinc-800/30'
+                  ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+                  : 'border-transparent text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200'
               }`}
             >
               <span>{tab.icon}</span>
               <span>{tab.label}</span>
-              {tab.badge !== undefined && tab.badge > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500 text-white font-black">
-                  {tab.badge}
-                </span>
-              )}
             </button>
           ))}
         </div>
       </div>
 
       {/* Main Tab Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         {loading && (
-          <div className="py-4 text-center text-xs font-bold text-slate-400 animate-pulse">Syncing admin data...</div>
+          <div className="py-8 text-center text-xs font-bold text-slate-400 animate-pulse">
+            Syncing real-time admin portal data from Supabase...
+          </div>
         )}
-        
+
+        {/* ==================================================================== */}
         {/* TAB 1: OVERVIEW */}
+        {/* ==================================================================== */}
         {activeTab === 'overview' && (
-          <div className="space-y-8 animate-in fade-in duration-200">
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-5 shadow-sm space-y-2">
-                <span className="text-2xl">👥</span>
-                <p className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
-                  Registered Students
-                </p>
-                <h3 className="text-3xl font-black text-slate-900 dark:text-zinc-50">
-                  {totalRegistered}
-                </h3>
-                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                  100% Free Zero-Paywall Access
-                </p>
+          <div className="space-y-6 animate-in fade-in">
+            {/* 6 Top KPI Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+              {/* Total Students */}
+              <div className="p-4 rounded-2xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-1">
+                <span className="text-xl">👥</span>
+                <p className="text-[11px] font-bold text-slate-500 dark:text-zinc-400">Total Students</p>
+                <p className="text-2xl font-black text-slate-900 dark:text-zinc-100">{totalStudents}</p>
+                <div className="text-[10px] text-slate-400 space-y-0.5 pt-1">
+                  <span className="block text-indigo-600 dark:text-indigo-400 font-bold">✉️ {gmailStudentsCount} Gmail/Google</span>
+                  <span className="block text-emerald-600 dark:text-emerald-400 font-bold">📱 {phoneStudentsCount} Contact Only</span>
+                  {nonGmailPhoneCount > 0 && <span className="block text-amber-600 dark:text-amber-400">📧 {nonGmailPhoneCount} Email+Phone</span>}
+                </div>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-5 shadow-sm space-y-2">
-                <span className="text-2xl">📝</span>
-                <p className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
-                  Test Submissions
-                </p>
-                <h3 className="text-3xl font-black text-slate-900 dark:text-zinc-50">
-                  {totalAttemptsCount}
-                </h3>
-                <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold">
-                  Real CBT Exam Submissions
-                </p>
+              {/* Total Test Attempts */}
+              <div className="p-4 rounded-2xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-1">
+                <span className="text-xl">📝</span>
+                <p className="text-[11px] font-bold text-slate-500 dark:text-zinc-400">Test Attempts</p>
+                <p className="text-2xl font-black text-slate-900 dark:text-zinc-100">{totalAttemptsCount}</p>
+                <p className="text-[10px] text-slate-400 pt-1">PTM & PTA test submissions</p>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-5 shadow-sm space-y-2">
-                <span className="text-2xl">🟢</span>
-                <p className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
-                  Live Active Tests
-                </p>
-                <h3 className="text-3xl font-black text-slate-900 dark:text-zinc-50">
-                  {liveTestsCount} <span className="text-sm font-normal text-slate-400">/ 20</span>
-                </h3>
-                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                  PTA 04 & PTA 05 Ready
-                </p>
+              {/* Total Lectures Completed */}
+              <div className="p-4 rounded-2xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-1">
+                <span className="text-xl">🎥</span>
+                <p className="text-[11px] font-bold text-slate-500 dark:text-zinc-400">Lectures Finished</p>
+                <p className="text-2xl font-black text-slate-900 dark:text-zinc-100">{totalLecturesCompleted}</p>
+                <p className="text-[10px] text-slate-400 pt-1">Across 20+ Masterclasses</p>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-5 shadow-sm space-y-2">
-                <span className="text-2xl">🚩</span>
-                <p className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
-                  Open Error Reports
-                </p>
-                <h3 className="text-3xl font-black text-amber-600 dark:text-amber-400">
+              {/* Total Bookmarks */}
+              <div className="p-4 rounded-2xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-1">
+                <span className="text-xl">⭐</span>
+                <p className="text-[11px] font-bold text-slate-500 dark:text-zinc-400">Total Bookmarks</p>
+                <p className="text-2xl font-black text-slate-900 dark:text-zinc-100">{totalBookmarksCount}</p>
+                <p className="text-[10px] text-slate-400 pt-1">In Revision Notebooks</p>
+              </div>
+
+              {/* Live Tests */}
+              <div className="p-4 rounded-2xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-1">
+                <span className="text-xl">🚀</span>
+                <p className="text-[11px] font-bold text-slate-500 dark:text-zinc-400">Live Mock Tests</p>
+                <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{liveTestsCount} / 20</p>
+                <p className="text-[10px] text-slate-400 pt-1">PTA 04, 05, 06 Active</p>
+              </div>
+
+              {/* Open Reports */}
+              <div className="p-4 rounded-2xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-1">
+                <span className="text-xl">⚠️</span>
+                <p className="text-[11px] font-bold text-slate-500 dark:text-zinc-400">Open Reports</p>
+                <p className={`text-2xl font-black ${openReportsCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-900 dark:text-zinc-100'}`}>
                   {openReportsCount}
-                </h3>
-                <p className="text-[11px] text-slate-500 dark:text-zinc-400 font-semibold">
-                  Requires Admin Review
                 </p>
+                <p className="text-[10px] text-slate-400 pt-1">Requiring mentor review</p>
               </div>
             </div>
 
-            {/* Test Attempts Bar Chart & Recent Feed */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Chart Card */}
-              <div className="lg:col-span-2 rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 shadow-sm space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+            {/* Visual Charts Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Chart 1: Attempts per Test */}
+              <div className="p-5 rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-4">
+                <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-base font-extrabold text-slate-900 dark:text-zinc-50 flex items-center gap-2">
-                      <span>📈</span> Test Submissions by PTA Code
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-zinc-400">
-                      Total candidate submissions per mock test
-                    </p>
+                    <h3 className="font-extrabold text-sm text-slate-900 dark:text-zinc-100">Attempts Distribution by Test</h3>
+                    <p className="text-[11px] text-slate-400">Student submissions across JEE Advanced & Mains</p>
                   </div>
-                  <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
-                    Live Data
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+                    Live Analytics
                   </span>
                 </div>
 
-                <div className="w-full overflow-x-auto py-2">
-                  <div className="min-w-[480px] h-48 flex items-end gap-6 pt-6 border-b border-slate-200 dark:border-zinc-800">
-                    {['PTA 01', 'PTA 02', 'PTA 03', 'PTA 04', 'PTA 05', 'PTA 06', 'PTA 07', 'PTA 08', 'PTA 09', 'PTA 10'].map((pta) => {
-                      const count = allAttempts.filter((a) => a.testCode === pta || a.testId?.includes(pta.toLowerCase().replace(' ', ''))).length;
-                      const maxAttempts = Math.max(...[1, count]);
-                      const heightPct = Math.max(8, (count / (maxAttempts || 1)) * 100);
+                <div className="space-y-2.5 pt-2">
+                  {['PTA 04', 'PTA 05', 'PTA 06', 'PTA 01', 'PTM 01'].map((code) => {
+                    const count = allAttempts.filter((a) => a.testCode === code || (a.test_code === code)).length;
+                    const max = Math.max(...['PTA 04', 'PTA 05', 'PTA 06', 'PTA 01', 'PTM 01'].map((c) => allAttempts.filter((a) => a.testCode === c).length), 1);
+                    const pct = Math.round((count / max) * 100);
 
-                      return (
-                        <div key={pta} className="flex-1 flex flex-col items-center gap-2">
-                          <span className="text-[11px] font-mono font-bold text-indigo-600 dark:text-indigo-400">
-                            {count}
-                          </span>
-                          <div
-                            style={{ height: `${heightPct}%` }}
-                            className="w-full max-w-[36px] rounded-t-xl bg-gradient-to-t from-indigo-600 to-violet-500 hover:from-indigo-500 hover:to-violet-400 transition-all shadow-sm"
-                          />
-                          <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-400">
-                            {pta}
-                          </span>
+                    return (
+                      <div key={code} className="space-y-1">
+                        <div className="flex justify-between text-xs font-bold text-slate-700 dark:text-zinc-300">
+                          <span>{code}</span>
+                          <span>{count} attempts</span>
                         </div>
-                      );
-                    })}
+                        <div className="h-2.5 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-indigo-500 to-violet-600 rounded-full transition-all duration-500"
+                            style={{ width: `${Math.max(pct, count > 0 ? 8 : 2)}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Chart 2: Auth Methods Breakdown */}
+              <div className="p-5 rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-slate-900 dark:text-zinc-100">Student Access Distribution</h3>
+                    <p className="text-[11px] text-slate-400">Breakdown of registration and login modes</p>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                    100% Free
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 pt-4 text-center">
+                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 space-y-1">
+                    <span className="text-xl">✉️</span>
+                    <p className="text-xl font-black text-indigo-600 dark:text-indigo-400">{gmailStudentsCount}</p>
+                    <p className="text-[11px] font-bold text-slate-600 dark:text-zinc-400">Gmail / Google</p>
+                    <p className="text-[9px] text-slate-400">Phone Optional</p>
+                  </div>
+
+                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 space-y-1">
+                    <span className="text-xl">📱</span>
+                    <p className="text-xl font-black text-emerald-600 dark:text-emerald-400">{phoneStudentsCount}</p>
+                    <p className="text-[11px] font-bold text-slate-600 dark:text-zinc-400">Contact Number</p>
+                    <p className="text-[9px] text-slate-400">No Email Required</p>
+                  </div>
+
+                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 space-y-1">
+                    <span className="text-xl">📧</span>
+                    <p className="text-xl font-black text-amber-600 dark:text-amber-400">{nonGmailPhoneCount}</p>
+                    <p className="text-[11px] font-bold text-slate-600 dark:text-zinc-400">Email + Phone</p>
+                    <p className="text-[9px] text-slate-400">Mandatory Phone</p>
                   </div>
                 </div>
-              </div>
 
-              {/* Recent Activity Feed */}
-              <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 shadow-sm space-y-4">
-                <h3 className="text-base font-extrabold text-slate-900 dark:text-zinc-50 flex items-center gap-2 border-b border-slate-100 dark:border-zinc-800 pb-3">
-                  <span>⚡</span> Live Activity Feed
-                </h3>
-                <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
-                  {allAttempts.length === 0 ? (
-                    <div className="text-center py-8 text-xs text-slate-400">
-                      No attempts recorded yet.
-                    </div>
-                  ) : (
-                    allAttempts.slice(0, 6).map((att, i) => (
-                      <div key={i} className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/60 dark:border-zinc-800/60 text-xs space-y-1">
-                        <div className="flex justify-between items-center font-bold">
-                          <span className="text-indigo-600 dark:text-indigo-400">{att.testCode} Completed</span>
-                          <span className="text-[10px] font-mono text-slate-400">
-                            {att.completedAt ? new Date(att.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent'}
-                          </span>
-                        </div>
-                        <p className="text-slate-700 dark:text-zinc-300">
-                          Marks: <strong>{att.totalMarksScored}</strong> / {att.totalMaxMarks} ({att.percentage}%)
-                        </p>
-                        <p className="text-[10px] text-slate-500 dark:text-zinc-400">
-                          Accuracy: {att.accuracy}% · {att.predictedAirDisplay || 'Qualified'}
-                        </p>
-                      </div>
-                    ))
-                  )}
+                <div className="p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/60 text-xs text-indigo-900 dark:text-indigo-200">
+                  💡 <strong>Mentor Insight:</strong> All student accounts (whether Gmail or Contact Number) have full access to PTA mock tests, partial marking evaluations, and lecture notes with zero paywalls.
                 </div>
               </div>
             </div>
-          </div>
-        )}
 
-        {/* TAB 2: MANAGE TESTS (PTA 01-10) */}
-        {activeTab === 'tests' && (
-          <div className="space-y-8 animate-in fade-in duration-200">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/50 p-5 rounded-3xl">
-              <div>
-                <h3 className="text-base font-black text-indigo-950 dark:text-indigo-200">
-                  Dynamic Test Configuration Engine
-                </h3>
-                <p className="text-xs text-indigo-700/80 dark:text-indigo-300/80">
-                  Toggle tests between <strong>Live Now</strong> and <strong>Coming Soon</strong>. All updates propagate instantly to student dashboards.
-                </p>
-              </div>
-              <span className="px-3 py-1 rounded-full bg-white dark:bg-zinc-900 text-indigo-600 dark:text-indigo-400 font-extrabold text-xs shadow-sm">
-                20 Total Mock Exams
-              </span>
-            </div>
-
-            {/* JEE Advanced Section */}
-            <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
-                <div>
-                  <h3 className="text-lg font-black text-slate-900 dark:text-zinc-50">
-                    JEE Advanced Series (PTA 01 – PTA 10)
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-zinc-400">
-                    Multi-Section Format · Negative & Partial Marking · Numerical Grid
-                  </p>
-                </div>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                  JEE Advanced
-                </span>
-              </div>
-
-              <div className="divide-y divide-slate-100 dark:divide-zinc-800/80">
-                {jeeAdvancedList.map((test) => {
-                  const isLive = testConfigs[test.testId] === 'live';
-                  return (
-                    <div key={test.testId} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="space-y-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="font-extrabold text-sm text-slate-900 dark:text-zinc-100">
-                            {test.code}
-                          </span>
-                          <span className="text-xs text-slate-600 dark:text-zinc-300">
-                            — {test.title}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-[11px]">
-                          {test.questionCount > 0 ? (
-                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                              ✓ {test.questionCount} Questions Ready & Derived
-                            </span>
-                          ) : (
-                            <span className="text-slate-400 font-medium">
-                              0 questions loaded (Upload Pending)
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                          isLive
-                            ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
-                            : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
-                        }`}>
-                          {isLive ? 'Live Now' : 'Coming Soon'}
-                        </span>
-
-                        {/* Interactive Toggle Switch */}
-                        <button
-                          type="button"
-                          onClick={() => handleToggleClick(test)}
-                          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                            isLive ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-zinc-700'
-                          }`}
-                        >
-                          <span
-                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                              isLive ? 'translate-x-5' : 'translate-x-0'
-                            }`}
-                          />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* JEE Mains Section */}
-            <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
-                <div>
-                  <h3 className="text-lg font-black text-slate-900 dark:text-zinc-50">
-                    JEE Mains Series (PTA 01 – PTA 10)
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-zinc-400">
-                    Standard 300 Marks Format · 75 Questions (Physics, Chemistry, Maths)
-                  </p>
-                </div>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                  JEE Mains
-                </span>
-              </div>
-
-              <div className="divide-y divide-slate-100 dark:divide-zinc-800/80">
-                {jeeMainsList.map((test) => {
-                  const isLive = testConfigs[test.testId] === 'live';
-                  return (
-                    <div key={test.testId} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="space-y-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="font-extrabold text-sm text-slate-900 dark:text-zinc-100">
-                            {test.code}
-                          </span>
-                          <span className="text-xs text-slate-600 dark:text-zinc-300">
-                            — {test.title}
-                          </span>
-                        </div>
-                        <div className="text-[11px] text-slate-400 font-medium">
-                          0 questions loaded (Upload Pending)
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                          isLive
-                            ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
-                            : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
-                        }`}>
-                          {isLive ? 'Live Now' : 'Coming Soon'}
-                        </span>
-
-                        <button
-                          type="button"
-                          onClick={() => handleToggleClick(test)}
-                          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                            isLive ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-zinc-700'
-                          }`}
-                        >
-                          <span
-                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                              isLive ? 'translate-x-5' : 'translate-x-0'
-                            }`}
-                          />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 3: ERROR REPORTS INBOX */}
-        {activeTab === 'reports' && (
-          <div className="space-y-6 animate-in fade-in duration-200">
-            {/* Filter Bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#121318] p-4 rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-sm">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-bold text-slate-500 dark:text-zinc-400">Filter Status:</span>
-                {(['All', 'open', 'in_review', 'resolved', 'dismissed'] as const).map((st) => (
-                  <button
-                    key={st}
-                    onClick={() => setReportFilter(st)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      reportFilter === st
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-200'
-                    }`}
-                  >
-                    {st === 'All' ? 'All Reports' : st.replace('_', ' ').toUpperCase()}
+            {/* Recent Activity Feed */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {/* Latest Signups */}
+              <div className="p-5 rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-2">
+                  <h4 className="font-extrabold text-xs text-slate-900 dark:text-zinc-100 flex items-center gap-1.5">
+                    <span>👥</span> Latest Student Signups
+                  </h4>
+                  <button onClick={() => setActiveTab('students')} className="text-[11px] font-bold text-indigo-600 hover:underline">
+                    View All →
                   </button>
-                ))}
+                </div>
+                <div className="space-y-2.5">
+                  {students.slice(0, 5).map((s, idx) => (
+                    <div key={s.id || idx} className="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-50 dark:bg-zinc-900">
+                      <div>
+                        <p className="font-bold text-slate-800 dark:text-zinc-200">{s.full_name || 'Student Aspirant'}</p>
+                        <p className="text-[10px] text-slate-400">{s.email || s.contact_number || 'Direct Access'}</p>
+                      </div>
+                      <span className="text-[10px] px-2 py-0.5 rounded-md font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
+                        {s.target_exam || 'JEE'}
+                      </span>
+                    </div>
+                  ))}
+                  {students.length === 0 && <p className="text-xs text-slate-400 text-center py-2">No students registered yet.</p>}
+                </div>
               </div>
-              <span className="text-xs font-bold text-slate-500 dark:text-zinc-400">
-                Showing {filteredReports.length} of {reports.length} reports
-              </span>
+
+              {/* Latest Test Attempts */}
+              <div className="p-5 rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-2">
+                  <h4 className="font-extrabold text-xs text-slate-900 dark:text-zinc-100 flex items-center gap-1.5">
+                    <span>📝</span> Recent Test Submissions
+                  </h4>
+                  <button onClick={() => setActiveTab('attempts')} className="text-[11px] font-bold text-indigo-600 hover:underline">
+                    View All →
+                  </button>
+                </div>
+                <div className="space-y-2.5">
+                  {allAttempts.slice(0, 5).map((a, idx) => (
+                    <div key={a.id || idx} className="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-50 dark:bg-zinc-900">
+                      <div>
+                        <p className="font-bold text-slate-800 dark:text-zinc-200">{a.studentName || 'Student'}</p>
+                        <p className="text-[10px] text-slate-400">{a.testCode || a.code} · {a.obtainedMarks || 0}/{a.totalMarks || 180}</p>
+                      </div>
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+                        {a.percentage || 0}%
+                      </span>
+                    </div>
+                  ))}
+                  {allAttempts.length === 0 && <p className="text-xs text-slate-400 text-center py-2">No attempts submitted yet.</p>}
+                </div>
+              </div>
+
+              {/* Latest Error Reports */}
+              <div className="p-5 rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-2">
+                  <h4 className="font-extrabold text-xs text-slate-900 dark:text-zinc-100 flex items-center gap-1.5">
+                    <span>⚠️</span> Academic Issue Reports
+                  </h4>
+                  <button onClick={() => setActiveTab('reports')} className="text-[11px] font-bold text-indigo-600 hover:underline">
+                    View All →
+                  </button>
+                </div>
+                <div className="space-y-2.5">
+                  {reports.slice(0, 5).map((r) => (
+                    <div key={r.id} className="p-2 rounded-xl bg-slate-50 dark:bg-zinc-900 text-xs space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-800 dark:text-zinc-200">{r.reporterName}</span>
+                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-extrabold ${r.status === 'open' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                          {r.status.toUpperCase()}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 truncate">{r.testCode} Q#{r.questionNumber}: {r.description}</p>
+                    </div>
+                  ))}
+                  {reports.length === 0 && <p className="text-xs text-slate-400 text-center py-2">No error reports filed.</p>}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================================================================== */}
+        {/* TAB 2: ALL STUDENTS DIRECTORY */}
+        {/* ==================================================================== */}
+        {activeTab === 'students' && (
+          <div className="space-y-5 animate-in fade-in">
+            {/* Search, Filter & Export Bar */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-3 p-4 rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm">
+              <div className="flex items-center gap-2 w-full md:w-auto flex-1">
+                <div className="relative w-full max-w-sm">
+                  <input
+                    type="text"
+                    value={studentSearch}
+                    onChange={(e) => setStudentSearch(e.target.value)}
+                    placeholder="Search by Name, Gmail, or Contact Number..."
+                    className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
+                </div>
+
+                {/* Filter by Auth Method */}
+                <select
+                  value={studentAuthFilter}
+                  onChange={(e) => setStudentAuthFilter(e.target.value as any)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs font-bold text-slate-700 dark:text-zinc-300 focus:outline-none"
+                >
+                  <option value="All">All Auth Methods</option>
+                  <option value="google">Google OAuth</option>
+                  <option value="gmail">Gmail Email</option>
+                  <option value="phone">Name + Contact Number</option>
+                  <option value="email_with_phone">Email + Phone</option>
+                </select>
+
+                {/* Filter by Exam */}
+                <select
+                  value={studentExamFilter}
+                  onChange={(e) => setStudentExamFilter(e.target.value as any)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs font-bold text-slate-700 dark:text-zinc-300 focus:outline-none"
+                >
+                  <option value="All">All Target Exams</option>
+                  <option value="JEE Advanced">JEE Advanced</option>
+                  <option value="JEE Mains">JEE Mains</option>
+                  <option value="Both">Both</option>
+                </select>
+              </div>
+
+              {/* Export CSV Button */}
+              <button
+                onClick={handleExportStudentsCSV}
+                className="w-full md:w-auto px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-sm transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+              >
+                <span>📥</span>
+                <span>Export Students CSV</span>
+              </button>
+            </div>
+
+            {/* Students Table */}
+            <div className="rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+                      <th className="py-3.5 px-4">Student</th>
+                      <th className="py-3.5 px-4">Gmail / Email</th>
+                      <th className="py-3.5 px-4">Contact Number</th>
+                      <th className="py-3.5 px-4">Auth Method</th>
+                      <th className="py-3.5 px-4">Target</th>
+                      <th className="py-3.5 px-4 text-center">Attempts</th>
+                      <th className="py-3.5 px-4 text-center">Avg %</th>
+                      <th className="py-3.5 px-4 text-center">Lectures</th>
+                      <th className="py-3.5 px-4 text-center">Bookmarks</th>
+                      <th className="py-3.5 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60">
+                    {filteredStudents.map((s) => {
+                      const sAttempts = allAttempts.filter((a) => a.userId === s.id);
+                      const sLectures = allLectures.filter((l) => l.user_id === s.id && l.completed);
+                      const sBookmarks = allBookmarks.filter((b) => b.user_id === s.id);
+                      const avgPct = sAttempts.length > 0
+                        ? Math.round(sAttempts.reduce((acc, a) => acc + (a.percentage || 0), 0) / sAttempts.length)
+                        : 0;
+
+                      const authMethodBadge = s.auth_method === 'phone' || (!s.email && s.contact_number)
+                        ? { label: '📱 Contact', color: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300' }
+                        : s.auth_method === 'google'
+                        ? { label: '🔵 Google', color: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300' }
+                        : s.auth_method === 'email_with_phone'
+                        ? { label: '📧 Email+Phone', color: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300' }
+                        : { label: '✉️ Gmail', color: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300' };
+
+                      return (
+                        <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors">
+                          {/* Student Name */}
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white font-extrabold text-[11px] flex items-center justify-center flex-shrink-0">
+                                {(s.full_name || 'S').substring(0, 1).toUpperCase()}
+                              </div>
+                              <div>
+                                <p className="font-extrabold text-slate-900 dark:text-zinc-100">{s.full_name || 'Student Aspirant'}</p>
+                                <p className="text-[10px] text-slate-400">
+                                  Joined {s.created_at ? new Date(s.created_at).toLocaleDateString() : 'Active'}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Email */}
+                          <td className="py-3.5 px-4 font-medium text-slate-600 dark:text-zinc-300">
+                            {s.email ? s.email : <span className="text-slate-400 italic">None (Contact Only)</span>}
+                          </td>
+
+                          {/* Contact Number with One-Click Copy */}
+                          <td className="py-3.5 px-4">
+                            {s.contact_number ? (
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono font-bold text-slate-800 dark:text-zinc-200">{s.contact_number}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyPhone(s.contact_number)}
+                                  className="p-1 rounded-md text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors text-[11px]"
+                                  title="Copy contact number"
+                                >
+                                  {copiedPhone === s.contact_number ? '✓' : '📋'}
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-slate-400 italic">Optional (Not set)</span>
+                            )}
+                          </td>
+
+                          {/* Auth Method */}
+                          <td className="py-3.5 px-4">
+                            <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold border ${authMethodBadge.color}`}>
+                              {authMethodBadge.label}
+                            </span>
+                          </td>
+
+                          {/* Target Exam */}
+                          <td className="py-3.5 px-4">
+                            <span className="font-bold text-slate-700 dark:text-zinc-300">{s.target_exam || 'JEE Advanced'}</span>
+                          </td>
+
+                          {/* Attempts */}
+                          <td className="py-3.5 px-4 text-center font-bold text-slate-800 dark:text-zinc-200">
+                            {sAttempts.length}
+                          </td>
+
+                          {/* Avg Score */}
+                          <td className="py-3.5 px-4 text-center">
+                            <span className={`font-extrabold ${avgPct >= 60 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-700 dark:text-zinc-300'}`}>
+                              {sAttempts.length > 0 ? `${avgPct}%` : '—'}
+                            </span>
+                          </td>
+
+                          {/* Lectures */}
+                          <td className="py-3.5 px-4 text-center font-bold text-slate-800 dark:text-zinc-200">
+                            {sLectures.length}
+                          </td>
+
+                          {/* Bookmarks */}
+                          <td className="py-3.5 px-4 text-center font-bold text-slate-800 dark:text-zinc-200">
+                            {sBookmarks.length}
+                          </td>
+
+                          {/* Action Button */}
+                          <td className="py-3.5 px-4 text-right">
+                            <button
+                              onClick={() => setSelectedStudent(s)}
+                              className="px-3 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 font-bold text-xs transition-colors"
+                            >
+                              Inspect Details →
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {filteredStudents.length === 0 && (
+                <div className="py-12 text-center text-slate-400 text-xs">
+                  No matching student records found.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ==================================================================== */}
+        {/* TAB 3: ALL TEST ATTEMPTS */}
+        {/* ==================================================================== */}
+        {activeTab === 'attempts' && (
+          <div className="space-y-5 animate-in fade-in">
+            {/* Filter Bar */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 p-4 rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm">
+              <div className="relative flex-1 w-full">
+                <input
+                  type="text"
+                  value={attemptSearch}
+                  onChange={(e) => setAttemptSearch(e.target.value)}
+                  placeholder="Search by student name, contact, or email..."
+                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs text-slate-900 dark:text-zinc-100 focus:outline-none"
+                />
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
+              </div>
+
+              <select
+                value={attemptExamFilter}
+                onChange={(e) => setAttemptExamFilter(e.target.value as any)}
+                className="px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs font-bold text-slate-700 dark:text-zinc-300"
+              >
+                <option value="All">All Exam Types</option>
+                <option value="JEE Advanced">JEE Advanced</option>
+                <option value="JEE Mains">JEE Mains</option>
+              </select>
+
+              <select
+                value={attemptCodeFilter}
+                onChange={(e) => setAttemptCodeFilter(e.target.value)}
+                className="px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs font-bold text-slate-700 dark:text-zinc-300"
+              >
+                <option value="All">All Test Codes</option>
+                <option value="PTA 04">PTA 04</option>
+                <option value="PTA 05">PTA 05</option>
+                <option value="PTA 06">PTA 06</option>
+                <option value="PTM 01">PTM 01</option>
+                <option value="PTM 02">PTM 02</option>
+              </select>
+            </div>
+
+            {/* Attempts Table */}
+            <div className="rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+                      <th className="py-3.5 px-4">Student</th>
+                      <th className="py-3.5 px-4">Contact / Gmail</th>
+                      <th className="py-3.5 px-4">Test Code</th>
+                      <th className="py-3.5 px-4 text-center">Score</th>
+                      <th className="py-3.5 px-4 text-center">Percentage</th>
+                      <th className="py-3.5 px-4 text-center">Accuracy</th>
+                      <th className="py-3.5 px-4 text-center">Predicted AIR</th>
+                      <th className="py-3.5 px-4 text-right">Submitted At</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60">
+                    {filteredAttempts.map((a, idx) => (
+                      <tr key={a.id || idx} className="hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors">
+                        <td className="py-3 px-4 font-bold text-slate-900 dark:text-zinc-100">
+                          {a.studentName || 'Student Aspirant'}
+                        </td>
+                        <td className="py-3 px-4 text-slate-500 dark:text-zinc-400">
+                          {a.studentContact || a.studentEmail || 'Direct'}
+                        </td>
+                        <td className="py-3 px-4 font-bold text-indigo-600 dark:text-indigo-400">
+                          {a.testCode || a.code}
+                        </td>
+                        <td className="py-3 px-4 text-center font-mono font-bold text-slate-800 dark:text-zinc-200">
+                          {a.obtainedMarks || 0} / {a.totalMarks || 180}
+                        </td>
+                        <td className="py-3 px-4 text-center font-extrabold text-emerald-600 dark:text-emerald-400">
+                          {a.percentage || 0}%
+                        </td>
+                        <td className="py-3 px-4 text-center font-bold text-slate-700 dark:text-zinc-300">
+                          {a.accuracy || 0}%
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                            {a.estimatedRankLabel || 'AIR Qualified'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-right text-slate-400 text-[11px]">
+                          {a.submittedAt ? new Date(a.submittedAt).toLocaleString() : 'Recent'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {filteredAttempts.length === 0 && (
+                <div className="py-12 text-center text-slate-400 text-xs">
+                  No matching test attempt records found.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ==================================================================== */}
+        {/* TAB 4: MANAGE TESTS (PTM 01-10 & PTA 01-10) */}
+        {/* ==================================================================== */}
+        {activeTab === 'tests' && (
+          <div className="space-y-6 animate-in fade-in">
+            <div className="p-4 rounded-3xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/60 text-xs text-indigo-900 dark:text-indigo-200">
+              ⚡ <strong>Instant Test Status Control:</strong> Toggle any mock test between <code>Live</code> and <code>Coming Soon</code>. Status changes reflect immediately for all students across the country in real-time.
+            </div>
+
+            {/* JEE Advanced Grid */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-black tracking-tight text-slate-900 dark:text-zinc-100 flex items-center gap-2">
+                <span>🎯</span> JEE Advanced Mock Tests (PTA 01 – PTA 10)
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                {jeeAdvancedList.map((test) => {
+                  const status = testConfigs[test.testId] || (test.questionCount > 0 ? 'live' : 'coming_soon');
+                  const isLive = status === 'live';
+
+                  return (
+                    <div key={test.testId} className="p-4 rounded-2xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-3 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono font-black text-sm text-slate-900 dark:text-zinc-100">{test.code}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${isLive ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-slate-100 text-slate-500 dark:bg-zinc-800 dark:text-zinc-400'}`}>
+                            {isLive ? 'LIVE' : 'COMING SOON'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] font-bold text-slate-600 dark:text-zinc-300 mt-1">{test.title}</p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">{test.questionCount > 0 ? `${test.questionCount} Questions Verified` : 'Draft / Template'}</p>
+                      </div>
+
+                      <button
+                        onClick={() => handleToggleClick(test)}
+                        className={`w-full py-2 rounded-xl text-xs font-bold transition-all ${
+                          isLive
+                            ? 'bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200'
+                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
+                        }`}
+                      >
+                        {isLive ? 'Deactivate (Coming Soon)' : 'Make Live 🚀'}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* JEE Mains Grid */}
+            <div className="space-y-3 pt-4">
+              <h3 className="text-sm font-black tracking-tight text-slate-900 dark:text-zinc-100 flex items-center gap-2">
+                <span>🎯</span> JEE Mains Mock Tests (PTM 01 – PTM 10)
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                {jeeMainsList.map((test) => {
+                  const status = testConfigs[test.testId] || 'coming_soon';
+                  const isLive = status === 'live';
+
+                  return (
+                    <div key={test.testId} className="p-4 rounded-2xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-3 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono font-black text-sm text-slate-900 dark:text-zinc-100">{test.code}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${isLive ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-slate-100 text-slate-500 dark:bg-zinc-800 dark:text-zinc-400'}`}>
+                            {isLive ? 'LIVE' : 'COMING SOON'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] font-bold text-slate-600 dark:text-zinc-300 mt-1">{test.title}</p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">JEE Mains Format</p>
+                      </div>
+
+                      <button
+                        onClick={() => handleToggleClick(test)}
+                        className={`w-full py-2 rounded-xl text-xs font-bold transition-all ${
+                          isLive
+                            ? 'bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200'
+                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
+                        }`}
+                      >
+                        {isLive ? 'Deactivate (Coming Soon)' : 'Make Live 🚀'}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================================================================== */}
+        {/* TAB 5: ERROR REPORTS INBOX */}
+        {/* ==================================================================== */}
+        {activeTab === 'reports' && (
+          <div className="space-y-5 animate-in fade-in">
+            {/* Filter Pills */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              {(['All', 'open', 'in_review', 'resolved', 'dismissed'] as ('All' | ErrorReportStatus)[]).map((st) => (
+                <button
+                  key={st}
+                  onClick={() => setReportFilter(st)}
+                  className={`px-3 py-1.5 rounded-xl font-bold text-xs capitalize transition-colors ${
+                    reportFilter === st
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400'
+                  }`}
+                >
+                  {st === 'All' ? `All (${reports.length})` : `${st.replace('_', ' ')} (${reports.filter((r) => r.status === st).length})`}
+                </button>
+              ))}
             </div>
 
             {/* Reports List */}
-            {filteredReports.length === 0 ? (
-              <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-12 text-center space-y-3">
-                <span className="text-3xl">🎉</span>
-                <h4 className="text-lg font-bold text-slate-900 dark:text-zinc-50">
-                  No Error Reports in this view
-                </h4>
-                <p className="text-xs text-slate-500 dark:text-zinc-400">
-                  Great job! Questions and answer keys have zero unresolved flags here.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {filteredReports.map((report) => (
-                  <div
-                    key={report.id}
-                    className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-5 sm:p-6 shadow-sm space-y-4"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-slate-100 dark:border-zinc-800/80 pb-3">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
-                            {report.examType}
-                          </span>
-                          <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200">
-                            {report.testCode}
-                          </span>
-                          <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
-                            Question #{report.questionNumber}
-                          </span>
-                          <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400">
-                            {report.issueType.replace('_', ' ')}
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-500 dark:text-zinc-400">
-                          Reported by <strong className="text-slate-800 dark:text-zinc-200">{report.reporterName}</strong> ({report.reporterEmail || 'No email'}) · {new Date(report.createdAt).toLocaleString()}
-                        </p>
-                      </div>
+            <div className="space-y-3">
+              {filteredReports.map((report) => (
+                <div key={report.id} className="p-5 rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-zinc-800 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-sm text-slate-900 dark:text-zinc-100">
+                        {report.testCode} · Question #{report.questionNumber}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+                        {report.issueType.replace('_', ' ')}
+                      </span>
+                    </div>
 
-                      {/* Status Badge */}
-                      <span className={`px-3 py-1 rounded-full text-xs font-extrabold uppercase ${
-                        report.status === 'open' ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300' :
-                        report.status === 'in_review' ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300' :
-                        report.status === 'resolved' ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' :
-                        'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400'
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-slate-400">{new Date(report.createdAt).toLocaleString()}</span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                        report.status === 'open' ? 'bg-amber-100 text-amber-700' :
+                        report.status === 'in_review' ? 'bg-blue-100 text-blue-700' :
+                        report.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
                       }`}>
                         {report.status.replace('_', ' ')}
                       </span>
                     </div>
+                  </div>
 
-                    {/* Student Description */}
-                    <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/60 dark:border-zinc-800/60 text-xs text-slate-800 dark:text-zinc-200 leading-relaxed">
-                      <strong className="block text-[11px] font-bold text-slate-500 dark:text-zinc-400 mb-1">
-                        Student's Feedback / Counter-Derivation:
-                      </strong>
-                      {report.description}
+                  {/* Reporter details with Contact Number */}
+                  <div className="flex items-center gap-3 text-xs bg-slate-50 dark:bg-zinc-900 p-2.5 rounded-xl flex-wrap">
+                    <span className="font-bold text-slate-700 dark:text-zinc-300">Reporter: {report.reporterName}</span>
+                    {report.reporterEmail && <span className="text-slate-400">✉️ {report.reporterEmail}</span>}
+                    {report.reporterContactNumber && (
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                        <span>📱 {report.reporterContactNumber}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyPhone(report.reporterContactNumber!)}
+                          className="hover:text-emerald-800"
+                          title="Copy contact"
+                        >
+                          📋
+                        </button>
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-slate-700 dark:text-zinc-300 leading-relaxed bg-amber-50/50 dark:bg-amber-950/20 p-3 rounded-xl border border-amber-100 dark:border-amber-900/40">
+                    "{report.description}"
+                  </p>
+
+                  {/* Admin Note and Status Controls */}
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                    <div className="flex items-center gap-2 w-full sm:w-auto flex-1 max-w-md">
+                      <input
+                        type="text"
+                        value={adminNotes[report.id] !== undefined ? adminNotes[report.id] : (report.adminNote || '')}
+                        onChange={(e) => setAdminNotes({ ...adminNotes, [report.id]: e.target.value })}
+                        placeholder="Add mentor note / explanation..."
+                        className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs focus:outline-none"
+                      />
+                      <button
+                        onClick={() => handleSaveAdminNote(report.id)}
+                        className="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-zinc-800 hover:bg-slate-300 text-xs font-bold whitespace-nowrap"
+                      >
+                        {savedNoteSuccess === report.id ? 'Saved ✓' : 'Save Note'}
+                      </button>
                     </div>
 
-                    {/* Admin Note & Action Buttons */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={adminNotes[report.id] !== undefined ? adminNotes[report.id] : (report.adminNote || '')}
-                          onChange={(e) => setAdminNotes({ ...adminNotes, [report.id]: e.target.value })}
-                          placeholder="Add internal resolution note..."
-                          className="flex-1 px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleSaveAdminNote(report.id)}
-                          className="px-3 py-2 rounded-xl bg-slate-800 dark:bg-zinc-700 text-white font-bold text-xs"
-                        >
-                          {savedNoteSuccess === report.id ? 'Saved! ✓' : 'Save Note'}
-                        </button>
-                      </div>
-
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateReportStatus(report.id, 'in_review')}
-                          className="px-3 py-2 rounded-xl border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 font-bold text-xs hover:bg-blue-50 dark:hover:bg-blue-950/40"
-                        >
-                          Mark In Review
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateReportStatus(report.id, 'resolved')}
-                          className="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm"
-                        >
-                          Mark Resolved ✓
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateReportStatus(report.id, 'dismissed')}
-                          className="px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold text-xs hover:bg-slate-100"
-                        >
-                          Dismiss
-                        </button>
-                      </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => handleUpdateReportStatus(report.id, 'in_review')}
+                        className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                      >
+                        In Review
+                      </button>
+                      <button
+                        onClick={() => handleUpdateReportStatus(report.id, 'resolved')}
+                        className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+                      >
+                        Resolved ✓
+                      </button>
+                      <button
+                        onClick={() => handleUpdateReportStatus(report.id, 'dismissed')}
+                        className="px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-slate-600"
+                      >
+                        Dismiss
+                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                </div>
+              ))}
 
-        {/* TAB 4: STUDENTS & ATTEMPT LOGS */}
-        {activeTab === 'students' && (
-          <div className="space-y-6 animate-in fade-in duration-200">
-            {/* Search & Toggle Bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#121318] p-4 rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-sm">
-              <input
-                type="text"
-                value={studentSearch}
-                onChange={(e) => setStudentSearch(e.target.value)}
-                placeholder="Search registered students by name or email..."
-                className="w-full sm:w-80 px-4 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs"
-              />
-              <button
-                type="button"
-                onClick={() => setViewAttemptLogs(!viewAttemptLogs)}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm transition-all"
-              >
-                {viewAttemptLogs ? 'View Student Directory' : 'View Full Exam Attempt Logs'}
-              </button>
+              {filteredReports.length === 0 && (
+                <div className="py-12 text-center text-slate-400 text-xs">
+                  No error reports under this status.
+                </div>
+              )}
             </div>
-
-            {!viewAttemptLogs ? (
-              /* Students Table */
-              <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] overflow-hidden shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 dark:bg-zinc-900/60 border-b border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 uppercase font-bold text-[10px] tracking-wider">
-                      <tr>
-                        <th className="p-4">Student Candidate</th>
-                        <th className="p-4">Email</th>
-                        <th className="p-4">Target Exam</th>
-                        <th className="p-4">Role</th>
-                        <th className="p-4">Signup Date</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60">
-                      {filteredStudents.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="p-8 text-center text-slate-400">
-                            No students match your query.
-                          </td>
-                        </tr>
-                      ) : (
-                        filteredStudents.map((s, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors">
-                            <td className="p-4 font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-[11px]">
-                                {s.name.slice(0, 2).toUpperCase()}
-                              </div>
-                              <span>{s.name}</span>
-                            </td>
-                            <td className="p-4 text-slate-600 dark:text-zinc-300 font-mono">{s.email}</td>
-                            <td className="p-4">
-                              <span className="px-2.5 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold text-[11px]">
-                                {s.targetExam || 'JEE Advanced'}
-                              </span>
-                            </td>
-                            <td className="p-4">
-                              <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase ${
-                                s.role === 'admin'
-                                  ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
-                                  : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400'
-                              }`}>
-                                {s.role || 'student'}
-                              </span>
-                            </td>
-                            <td className="p-4 text-slate-400 font-mono">
-                              {s.createdAt ? new Date(s.createdAt).toLocaleDateString() : 'Active'}
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ) : (
-              /* Attempt Logs View */
-              <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] overflow-hidden shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 dark:bg-zinc-900/60 border-b border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 uppercase font-bold text-[10px] tracking-wider">
-                      <tr>
-                        <th className="p-4">Test Code</th>
-                        <th className="p-4">Score</th>
-                        <th className="p-4">Percentage</th>
-                        <th className="p-4">Accuracy</th>
-                        <th className="p-4">Predicted AIR</th>
-                        <th className="p-4">Submitted At</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60">
-                      {allAttempts.length === 0 ? (
-                        <tr>
-                          <td colSpan={6} className="p-8 text-center text-slate-400">
-                            No attempt logs recorded.
-                          </td>
-                        </tr>
-                      ) : (
-                        allAttempts.map((att, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors">
-                            <td className="p-4 font-bold text-indigo-600 dark:text-indigo-400">
-                              {att.testCode || att.testId}
-                            </td>
-                            <td className="p-4 font-mono font-bold text-slate-900 dark:text-zinc-100">
-                              {att.totalMarksScored} / {att.totalMaxMarks}
-                            </td>
-                            <td className="p-4 font-mono">{att.percentage}%</td>
-                            <td className="p-4 font-mono">{att.accuracy}%</td>
-                            <td className="p-4 font-bold text-slate-700 dark:text-zinc-300">
-                              {att.predictedAirDisplay || 'Qualified'}
-                            </td>
-                            <td className="p-4 text-slate-400 font-mono">
-                              {att.completedAt ? new Date(att.completedAt).toLocaleString() : 'Recent'}
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
           </div>
         )}
       </div>
 
-      {/* Confirmation Warning Modal (Toggling 0-question test to Live) */}
+      {/* ==================================================================== */}
+      {/* STUDENT DETAIL MODAL / DRAWER */}
+      {/* ==================================================================== */}
+      {selectedStudent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-2xl rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 sm:p-8 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setSelectedStudent(null)}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800"
+            >
+              ✕
+            </button>
+
+            {/* Student Header */}
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white font-black text-lg flex items-center justify-center shadow-md">
+                {(selectedStudent.full_name || 'S').substring(0, 1).toUpperCase()}
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-slate-900 dark:text-zinc-100">{selectedStudent.full_name || 'Student Aspirant'}</h3>
+                <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5 flex-wrap">
+                  {selectedStudent.email && <span>✉️ {selectedStudent.email}</span>}
+                  {selectedStudent.contact_number && (
+                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                      <span>📱 {selectedStudent.contact_number}</span>
+                      <button onClick={() => handleCopyPhone(selectedStudent.contact_number)} className="hover:text-emerald-800">📋</button>
+                    </span>
+                  )}
+                  <span className="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-600 font-bold text-[10px]">
+                    {selectedStudent.target_exam || 'JEE Advanced'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Student Individual Attempts */}
+            <div className="space-y-3 pt-2">
+              <h4 className="font-bold text-xs uppercase tracking-wider text-slate-400">Individual Test Attempts</h4>
+              {allAttempts.filter((a) => a.userId === selectedStudent.id).map((attempt, idx) => (
+                <div key={attempt.id || idx} className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 space-y-1 text-xs">
+                  <div className="flex justify-between items-center font-bold">
+                    <span className="text-indigo-600 dark:text-indigo-400">{attempt.testCode || attempt.code}</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-black">{attempt.percentage || 0}% ({attempt.obtainedMarks || 0}/{attempt.totalMarks || 180})</span>
+                  </div>
+                  <div className="flex justify-between text-[11px] text-slate-500">
+                    <span>Accuracy: {attempt.accuracy || 0}% · {attempt.estimatedRankLabel || 'AIR Qualified'}</span>
+                    <span>{attempt.submittedAt ? new Date(attempt.submittedAt).toLocaleDateString() : 'Attempted'}</span>
+                  </div>
+                </div>
+              ))}
+              {allAttempts.filter((a) => a.userId === selectedStudent.id).length === 0 && (
+                <p className="text-xs text-slate-400 italic">No mock tests completed by this student yet.</p>
+              )}
+            </div>
+
+            {/* Student Watched Lectures */}
+            <div className="space-y-3 pt-2">
+              <h4 className="font-bold text-xs uppercase tracking-wider text-slate-400">Completed Video Lectures</h4>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                {allLectures.filter((l) => l.user_id === selectedStudent.id && l.completed).map((lec, idx) => (
+                  <div key={idx} className="p-2.5 rounded-xl bg-slate-50 dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 flex items-center gap-2">
+                    <span className="text-emerald-500">✓</span>
+                    <span className="truncate">{lec.chapter_slug || lec.chapterSlug || 'Masterclass Video'}</span>
+                  </div>
+                ))}
+              </div>
+              {allLectures.filter((l) => l.user_id === selectedStudent.id && l.completed).length === 0 && (
+                <p className="text-xs text-slate-400 italic">No lectures completed yet.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal for Test Status Toggle */}
       {confirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-md rounded-3xl border border-amber-300 dark:border-amber-800/60 bg-white dark:bg-[#121318] p-6 shadow-2xl space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl">
-              ⚠️
-            </div>
-            <h4 className="text-lg font-black text-slate-900 dark:text-zinc-50">
-              Activate {confirmModal.testCode} with 0 Questions?
-            </h4>
-            <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
-              <strong>{confirmModal.testCode}</strong> currently has <strong>0 questions</strong> loaded in the active question registry. Activating this test will make it visible to students on the live dashboard with no exam content ready.
+          <div className="relative w-full max-w-md rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 shadow-2xl space-y-4">
+            <h3 className="text-base font-extrabold text-slate-900 dark:text-zinc-100">
+              Confirm Test Activation
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-zinc-400">
+              You are about to make <strong>{confirmModal.testCode}</strong> live. Ready questions: {confirmModal.questionCount}.
             </p>
-            <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">
-              Are you sure you want to toggle it to Live Now?
-            </p>
-            <div className="flex gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setConfirmModal(null)}
-                className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 font-bold text-xs hover:bg-slate-50"
-              >
+            <div className="flex gap-2 justify-end pt-2">
+              <button onClick={() => setConfirmModal(null)} className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600">
                 Cancel
               </button>
               <button
-                type="button"
-                onClick={() => applyStatusChange(confirmModal.testId, 'live')}
-                className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs shadow-md"
+                onClick={() => applyStatusChange(confirmModal.testId, confirmModal.newStatus)}
+                className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold"
               >
-                Activate Anyway
+                Proceed & Make Live
               </button>
             </div>
           </div>

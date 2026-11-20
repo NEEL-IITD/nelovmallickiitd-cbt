@@ -12,7 +12,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   toggleTheme,
   onNavigate,
 }) => {
-  const { user, isAuthenticated, logOut, openAuthModal } = useAuth();
+  const { user, isAuthenticated, isAdmin, logOut, openAuthModal } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -139,10 +139,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-2 shadow-2xl z-50 text-xs space-y-1">
                     <div className="p-2.5 border-b border-slate-100 dark:border-zinc-800/80">
                       <p className="font-extrabold text-slate-900 dark:text-zinc-100 truncate">{user.name}</p>
-                      <p className="text-[11px] text-slate-500 dark:text-zinc-400 truncate">{user.email}</p>
-                      <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold">
-                        {user.targetExam || 'JEE Advanced'}
-                      </span>
+                      <p className="text-[11px] text-slate-500 dark:text-zinc-400 truncate">
+                        {user.email || (user.contactNumber ? `📞 ${user.contactNumber}` : 'Student Aspirant')}
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                        <span className="inline-block px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold">
+                          {user.targetExam || 'JEE Advanced'}
+                        </span>
+                        {user.authMethod === 'phone' && (
+                          <span className="inline-block px-1.5 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold">
+                            📱 Phone
+                          </span>
+                        )}
+                        {(user.role === 'admin' || isAdmin) && (
+                          <span className="inline-block px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 text-[9px] font-bold">
+                            🛡️ Admin
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <button
@@ -161,7 +175,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <span>⭐</span> Revision Notebook
                     </button>
 
-                    {user.role === 'admin' && (
+                    {(user.role === 'admin' || isAdmin) && (
                       <button
                         type="button"
                         onClick={() => { setUserDropdownOpen(false); onNavigate?.('#/admin') || (window.location.hash = '#/admin'); }}

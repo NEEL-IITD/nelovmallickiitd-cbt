@@ -2,14 +2,18 @@ export type ExamType = 'jee' | 'neet' | 'JEE Mains' | 'JEE Advanced';
 
 export type TargetExam = 'JEE Mains' | 'JEE Advanced' | 'Both';
 export type UserRole = 'student' | 'admin';
+export type AuthMethod = 'google' | 'gmail' | 'phone' | 'email_with_phone';
 
 export interface User {
   id: string;
   name: string;
-  email: string;
+  email?: string | null;
+  contactNumber?: string | null;
+  authMethod?: AuthMethod;
   targetExam: TargetExam;
   role: UserRole;
   createdAt: string;
+  lastLoginAt?: string;
 }
 
 export interface TestConfigItem {
@@ -76,6 +80,7 @@ export interface ErrorReportItem {
   userId?: string;
   reporterName: string;
   reporterEmail: string;
+  reporterContactNumber?: string;
   testId: string;
   examType: string;
   testCode: string;

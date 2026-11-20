@@ -15,18 +15,27 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name TEXT NOT NULL,
-  email TEXT NOT NULL,
+  email TEXT,
+  contact_number TEXT,
+  auth_method TEXT DEFAULT 'gmail' CHECK (auth_method IN ('google', 'gmail', 'phone', 'email_with_phone')),
   target_exam TEXT CHECK (target_exam IN ('JEE Mains', 'JEE Advanced', 'Both')) DEFAULT 'JEE Advanced',
   role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('student', 'admin')),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  last_login_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT check_email_or_contact CHECK (
+    (email ILIKE '%@gmail.com') OR 
+    (contact_number IS NOT NULL AND length(trim(contact_number)) >= 10) OR 
+    (role = 'admin')
+  )
 );
 
--- Index for fast lookup
+-- Indexes for fast lookup
 CREATE INDEX IF NOT EXISTS idx_profiles_email ON public.profiles(email);
 CREATE INDEX IF NOT EXISTS idx_profiles_role ON public.profiles(role);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_profiles_contact_number ON public.profiles(contact_number) WHERE contact_number IS NOT NULL;
 
 -- ==============================================================================
--- 3. Trigger: Automatically Create Profile on User Signup (Email & Google OAuth)
+-- 3. Trigger: Automatically Create Profile on User Signup (Email, Google & Phone)
 -- ==============================================================================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
@@ -37,12 +46,25 @@ AS $$
 DECLARE
   v_full_name TEXT;
   v_target_exam TEXT;
+  v_contact_number TEXT;
+  v_auth_method TEXT;
+  v_email TEXT;
+  v_role TEXT := 'student';
+  v_is_phone_user BOOLEAN := FALSE;
 BEGIN
-  -- Extract name from user metadata or Google OAuth raw metadata
+  -- Determine if phone-based synthetic user
+  IF NEW.email LIKE '%@phone.nelovportal.local' THEN
+    v_is_phone_user := TRUE;
+    v_email := NULL;
+  ELSE
+    v_email := NEW.email;
+  END IF;
+
+  -- Extract full name from user metadata or fallback
   v_full_name := COALESCE(
     NEW.raw_user_meta_data->>'full_name',
     NEW.raw_user_meta_data->>'name',
-    SPLIT_PART(NEW.email, '@', 1),
+    CASE WHEN v_is_phone_user THEN 'Student Aspirant' ELSE SPLIT_PART(NEW.email, '@', 1) END,
     'Student Aspirant'
   );
 
@@ -50,24 +72,63 @@ BEGIN
     NEW.raw_user_meta_data->>'target_exam',
     'JEE Advanced'
   );
-
   IF v_target_exam NOT IN ('JEE Mains', 'JEE Advanced', 'Both') THEN
     v_target_exam := 'JEE Advanced';
   END IF;
 
-  INSERT INTO public.profiles (id, full_name, email, target_exam, role, created_at)
+  v_contact_number := NEW.raw_user_meta_data->>'contact_number';
+  IF v_contact_number IS NOT NULL AND TRIM(v_contact_number) = '' THEN
+    v_contact_number := NULL;
+  END IF;
+
+  v_auth_method := COALESCE(
+    NEW.raw_user_meta_data->>'auth_method',
+    CASE 
+      WHEN v_is_phone_user THEN 'phone'
+      WHEN NEW.raw_app_meta_data->>'provider' = 'google' THEN 'google'
+      WHEN v_email ILIKE '%@gmail.com' THEN 'gmail'
+      ELSE 'email_with_phone'
+    END
+  );
+
+  -- Auto Admin Recognition:
+  IF LOWER(COALESCE(NEW.email, '')) = LOWER('YOUR_ADMIN_EMAIL@gmail.com')
+     OR LOWER(COALESCE(NEW.email, '')) IN ('nelovmallick@gmail.com', 'mallicknelov@gmail.com', 'nelovmallick@iitd.ac.in')
+     OR LOWER(COALESCE(v_email, '')) = LOWER('YOUR_ADMIN_EMAIL@gmail.com')
+     OR LOWER(COALESCE(v_email, '')) IN ('nelovmallick@gmail.com', 'mallicknelov@gmail.com', 'nelovmallick@iitd.ac.in') THEN
+    v_role := 'admin';
+  END IF;
+
+  INSERT INTO public.profiles (
+    id,
+    full_name,
+    email,
+    contact_number,
+    auth_method,
+    target_exam,
+    role,
+    created_at,
+    last_login_at
+  )
   VALUES (
     NEW.id,
     v_full_name,
-    NEW.email,
+    v_email,
+    v_contact_number,
+    v_auth_method,
     v_target_exam,
-    'student',
+    v_role,
+    NOW(),
     NOW()
   )
   ON CONFLICT (id) DO UPDATE
   SET
     full_name = EXCLUDED.full_name,
-    email = EXCLUDED.email;
+    email = COALESCE(EXCLUDED.email, profiles.email),
+    contact_number = COALESCE(EXCLUDED.contact_number, profiles.contact_number),
+    auth_method = COALESCE(EXCLUDED.auth_method, profiles.auth_method),
+    role = CASE WHEN v_role = 'admin' THEN 'admin' ELSE profiles.role END,
+    last_login_at = NOW();
 
   RETURN NEW;
 END;
@@ -108,17 +169,17 @@ VALUES
   ('jee-advanced-pta-09', 'JEE Advanced', 'PTA 09', 'JEE Advanced – PTA 09 Full Syllabus Mock Test', 'coming_soon', NOW()),
   ('jee-advanced-pta-10', 'JEE Advanced', 'PTA 10', 'JEE Advanced – PTA 10 Full Syllabus Mock Test', 'coming_soon', NOW()),
 
-  -- JEE Mains (All PTA 01 through PTA 10 initially Coming Soon)
-  ('jee-mains-pta-01', 'JEE Mains', 'PTA 01', 'JEE Mains – PTA 01 Full Syllabus Mock Test', 'coming_soon', NOW()),
-  ('jee-mains-pta-02', 'JEE Mains', 'PTA 02', 'JEE Mains – PTA 02 Full Syllabus Mock Test', 'coming_soon', NOW()),
-  ('jee-mains-pta-03', 'JEE Mains', 'PTA 03', 'JEE Mains – PTA 03 Full Syllabus Mock Test', 'coming_soon', NOW()),
-  ('jee-mains-pta-04', 'JEE Mains', 'PTA 04', 'JEE Mains – PTA 04 Full Syllabus Mock Test', 'coming_soon', NOW()),
-  ('jee-mains-pta-05', 'JEE Mains', 'PTA 05', 'JEE Mains – PTA 05 Full Syllabus Mock Test', 'coming_soon', NOW()),
-  ('jee-mains-pta-06', 'JEE Mains', 'PTA 06', 'JEE Mains – PTA 06 Full Syllabus Mock Test', 'coming_soon', NOW()),
-  ('jee-mains-pta-07', 'JEE Mains', 'PTA 07', 'JEE Mains – PTA 07 Full Syllabus Mock Test', 'coming_soon', NOW()),
-  ('jee-mains-pta-08', 'JEE Mains', 'PTA 08', 'JEE Mains – PTA 08 Full Syllabus Mock Test', 'coming_soon', NOW()),
-  ('jee-mains-pta-09', 'JEE Mains', 'PTA 09', 'JEE Mains – PTA 09 Full Syllabus Mock Test', 'coming_soon', NOW()),
-  ('jee-mains-pta-10', 'JEE Mains', 'PTA 10', 'JEE Mains – PTA 10 Full Syllabus Mock Test', 'coming_soon', NOW())
+  -- JEE Mains (PTM 01 through PTM 10 initially Coming Soon)
+  ('jee-mains-ptm-01', 'JEE Mains', 'PTM 01', 'JEE Mains – PTM 01 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-02', 'JEE Mains', 'PTM 02', 'JEE Mains – PTM 02 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-03', 'JEE Mains', 'PTM 03', 'JEE Mains – PTM 03 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-04', 'JEE Mains', 'PTM 04', 'JEE Mains – PTM 04 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-05', 'JEE Mains', 'PTM 05', 'JEE Mains – PTM 05 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-06', 'JEE Mains', 'PTM 06', 'JEE Mains – PTM 06 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-07', 'JEE Mains', 'PTM 07', 'JEE Mains – PTM 07 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-08', 'JEE Mains', 'PTM 08', 'JEE Mains – PTM 08 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-09', 'JEE Mains', 'PTM 09', 'JEE Mains – PTM 09 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-10', 'JEE Mains', 'PTM 10', 'JEE Mains – PTM 10 Full Syllabus Mock Test', 'coming_soon', NOW())
 ON CONFLICT (test_id) DO UPDATE
 SET
   exam_type = EXCLUDED.exam_type,
@@ -182,6 +243,7 @@ CREATE TABLE IF NOT EXISTS public.error_reports (
   user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   reporter_name TEXT NOT NULL,
   reporter_email TEXT NOT NULL,
+  reporter_contact_number TEXT,
   test_id TEXT NOT NULL,
   exam_type TEXT NOT NULL,
   test_code TEXT NOT NULL,
@@ -302,11 +364,14 @@ CREATE POLICY "test_attempts_update_policy"
 -- ------------------------------------------------------------------------------
 -- RLS Policies: Bookmarks (Revision Notebook)
 -- ------------------------------------------------------------------------------
--- Students have full CRUD access strictly to their own bookmarks
+-- Students have full CRUD access strictly to their own bookmarks; Admins can view all bookmarks
 CREATE POLICY "bookmarks_select_policy"
   ON public.bookmarks
   FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (
+    auth.uid() = user_id
+    OR public.is_admin()
+  );
 
 CREATE POLICY "bookmarks_insert_policy"
   ON public.bookmarks
@@ -372,7 +437,10 @@ ALTER TABLE public.lecture_progress ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "lecture_progress_select_policy"
   ON public.lecture_progress
   FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (
+    auth.uid() = user_id
+    OR public.is_admin()
+  );
 
 CREATE POLICY "lecture_progress_insert_policy"
   ON public.lecture_progress

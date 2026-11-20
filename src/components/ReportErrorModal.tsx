@@ -60,6 +60,7 @@ export const ReportErrorModal: React.FC<ReportErrorModalProps> = ({
         userId: user?.id,
         reporterName: user?.name || 'Aspirant Student',
         reporterEmail: user?.email || '',
+        reporterContactNumber: user?.contactNumber || undefined,
         testId: questionInfo.testId,
         examType: questionInfo.examType,
         testCode: questionInfo.testCode,

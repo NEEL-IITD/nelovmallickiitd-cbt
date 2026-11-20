@@ -6,6 +6,7 @@
 
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { ErrorReportItem, ErrorReportStatus, ErrorIssueType, MistakeTagType } from '../types';
+import { authService } from '../services/authService';
 
 export interface TestAttemptRecord {
   id: string;
@@ -329,6 +330,7 @@ export const studentStorage = {
     userId?: string;
     reporterName: string;
     reporterEmail: string;
+    reporterContactNumber?: string;
     testId: string;
     examType: string;
     testCode: string;
@@ -353,6 +355,7 @@ export const studentStorage = {
           user_id: report.userId || null,
           reporter_name: report.reporterName,
           reporter_email: report.reporterEmail,
+          reporter_contact_number: report.reporterContactNumber || null,
           test_id: report.testId,
           exam_type: report.examType,
           test_code: report.testCode,
@@ -403,6 +406,7 @@ export const studentStorage = {
             userId: d.user_id,
             reporterName: d.reporter_name,
             reporterEmail: d.reporter_email,
+            reporterContactNumber: d.reporter_contact_number || d.reporterContactNumber || null,
             testId: d.test_id,
             examType: d.exam_type,
             testCode: d.test_code,
@@ -623,5 +627,157 @@ export const studentStorage = {
         localStorage.setItem(`nelov_${userId}_lecture_progress`, JSON.stringify(local));
       }
     } catch (e) {}
+  },
+
+  // ----------------------------------------------------------------------------
+  // ATTEMPT LIMIT ENFORCEMENT (3 Attempts per Test Limit)
+  // ----------------------------------------------------------------------------
+  getTestAttemptsCount(userId: string, testId: string): number {
+    const attempts = this.getAttempts(userId);
+    return attempts.filter((a) => a.testId === testId).length;
+  },
+
+  canAttemptTest(userId: string, testId: string): boolean {
+    return this.getTestAttemptsCount(userId, testId) < 3;
+  },
+
+  // ----------------------------------------------------------------------------
+  // ADMIN AGGREGATIONS & CLOUD DIRECTORY
+  // ----------------------------------------------------------------------------
+  async getAllProfiles(): Promise<any[]> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!error && data) {
+          return data;
+        }
+      } catch (e) {
+        console.warn('Error fetching all profiles from Supabase:', e);
+      }
+    }
+    // Local storage fallback
+    const users = (authService as any).getAllUsers ? (authService as any).getAllUsers() : [];
+    return users.map((u: any) => ({
+      id: u.id,
+      full_name: u.name,
+      email: u.email,
+      contact_number: u.contactNumber,
+      auth_method: u.authMethod || (u.contactNumber ? 'phone' : 'gmail'),
+      target_exam: u.targetExam,
+      role: u.role,
+      created_at: u.createdAt
+    }));
+  },
+
+  async getAllAttempts(): Promise<any[]> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('test_attempts')
+          .select(`
+            *,
+            profiles:user_id (
+              full_name,
+              email,
+              contact_number,
+              auth_method
+            )
+          `)
+          .order('submitted_at', { ascending: false });
+        if (!error && data) {
+          return data.map((d: any) => ({
+            id: d.id,
+            userId: d.user_id,
+            studentName: d.profiles?.full_name || 'Student Aspirant',
+            studentEmail: d.profiles?.email || null,
+            studentContact: d.profiles?.contact_number || null,
+            authMethod: d.profiles?.auth_method || 'gmail',
+            testId: d.test_id,
+            examType: d.exam_type,
+            testCode: d.code,
+            obtainedMarks: Number(d.obtained_marks),
+            totalMarks: Number(d.total_marks),
+            percentage: Number(d.percentage),
+            accuracy: Number(d.accuracy),
+            estimatedRankLabel: d.estimated_rank_label,
+            subjectBreakdown: d.subject_breakdown,
+            responses: d.responses,
+            mistakeTags: d.mistake_tags,
+            submittedAt: d.submitted_at
+          }));
+        }
+      } catch (e) {
+        console.warn('Error fetching all test attempts from Supabase:', e);
+      }
+    }
+
+    // Local fallback: scan localStorage keys for all user attempts
+    const allLocal: any[] = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('nelov_') && key.endsWith('_attempts')) {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const list = JSON.parse(raw);
+            if (Array.isArray(list)) {
+              allLocal.push(...list);
+            }
+          }
+        }
+      }
+    } catch (e) {}
+    return allLocal;
+  },
+
+  async getAllBookmarks(): Promise<any[]> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.from('bookmarks').select('*');
+        if (!error && data) return data;
+      } catch (e) {}
+    }
+    const allLocal: any[] = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('nelov_') && key.endsWith('_bookmarks')) {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const list = JSON.parse(raw);
+            if (Array.isArray(list)) allLocal.push(...list);
+          }
+        }
+      }
+    } catch (e) {}
+    return allLocal;
+  },
+
+  async getAllLectureProgress(): Promise<any[]> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.from('lecture_progress').select('*');
+        if (!error && data) return data;
+      } catch (e) {}
+    }
+    const allLocal: any[] = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('nelov_') && key.endsWith('_lecture_progress')) {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const obj = JSON.parse(raw);
+            if (obj && typeof obj === 'object') {
+              Object.values(obj).forEach((v) => allLocal.push(v));
+            }
+          }
+        }
+      }
+    } catch (e) {}
+    return allLocal;
   }
 };

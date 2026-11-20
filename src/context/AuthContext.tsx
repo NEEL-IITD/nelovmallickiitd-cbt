@@ -5,7 +5,7 @@
 // ==============================================================================
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, authService, LogInParams, SignUpParams } from '../services/authService';
+import { User, authService, LogInParams, SignUpParams, isAdminEmail } from '../services/authService';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 export interface AuthModalState {
@@ -50,30 +50,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           const { data: { session } } = await supabase.auth.getSession();
           if (session?.user && mounted) {
+            const isPhone = Boolean(session.user.email?.endsWith('@phone.nelovportal.local'));
             let role: 'student' | 'admin' = 'student';
-            let fullName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Student';
+            let fullName = session.user.user_metadata?.full_name || (isPhone ? 'Student Aspirant' : session.user.email?.split('@')[0]) || 'Student';
             let targetExam = session.user.user_metadata?.target_exam || 'JEE Advanced';
+            let contactNumber = session.user.user_metadata?.contact_number || null;
+            let authMethod = isPhone ? 'phone' : (session.user.app_metadata?.provider === 'google' ? 'google' : 'gmail');
+            let displayEmail = isPhone ? null : (session.user.email || null);
 
             try {
               const { data: profile } = await supabase
                 .from('profiles')
-                .select('full_name, target_exam, role')
+                .select('full_name, email, contact_number, auth_method, target_exam, role')
                 .eq('id', session.user.id)
                 .single();
 
               if (profile) {
                 if (profile.role === 'admin') role = 'admin';
                 if (profile.full_name) fullName = profile.full_name;
+                if (profile.contact_number) contactNumber = profile.contact_number;
+                if (profile.auth_method) authMethod = profile.auth_method;
                 if (profile.target_exam) targetExam = profile.target_exam;
+                if (profile.email && !profile.email.endsWith('@phone.nelovportal.local')) {
+                  displayEmail = profile.email;
+                }
               }
             } catch (err) {
               console.warn('Profile fetch error:', err);
             }
 
+            // Auto Admin Recognition
+            if (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) {
+              role = 'admin';
+            }
+
             const currentUser: User = {
               id: session.user.id,
               name: fullName,
-              email: session.user.email || '',
+              email: displayEmail,
+              contactNumber,
+              authMethod: authMethod as any,
               targetExam,
               role,
               createdAt: session.user.created_at || new Date().toISOString()
@@ -114,30 +130,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (!mounted) return;
         if (event === 'SIGNED_IN' && session?.user) {
+          const isPhone = Boolean(session.user.email?.endsWith('@phone.nelovportal.local'));
           let role: 'student' | 'admin' = 'student';
-          let fullName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Student';
+          let fullName = session.user.user_metadata?.full_name || (isPhone ? 'Student Aspirant' : session.user.email?.split('@')[0]) || 'Student';
           let targetExam = session.user.user_metadata?.target_exam || 'JEE Advanced';
+          let contactNumber = session.user.user_metadata?.contact_number || null;
+          let authMethod = isPhone ? 'phone' : (session.user.app_metadata?.provider === 'google' ? 'google' : 'gmail');
+          let displayEmail = isPhone ? null : (session.user.email || null);
 
           try {
             if (supabase) {
               const { data: profile } = await supabase
                 .from('profiles')
-                .select('full_name, target_exam, role')
+                .select('full_name, email, contact_number, auth_method, target_exam, role')
                 .eq('id', session.user.id)
                 .single();
 
               if (profile) {
                 if (profile.role === 'admin') role = 'admin';
                 if (profile.full_name) fullName = profile.full_name;
+                if (profile.contact_number) contactNumber = profile.contact_number;
+                if (profile.auth_method) authMethod = profile.auth_method;
                 if (profile.target_exam) targetExam = profile.target_exam;
+                if (profile.email && !profile.email.endsWith('@phone.nelovportal.local')) {
+                  displayEmail = profile.email;
+                }
               }
             }
           } catch (err) {}
 
+          // Auto Admin Recognition
+          if (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) {
+            role = 'admin';
+          }
+
           const loggedInUser: User = {
             id: session.user.id,
             name: fullName,
-            email: session.user.email || '',
+            email: displayEmail,
+            contactNumber,
+            authMethod: authMethod as any,
             targetExam,
             role,
             createdAt: session.user.created_at || new Date().toISOString()
@@ -211,7 +243,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         user,
         isAuthenticated: !!user,
-        isAdmin: user?.role === 'admin',
+        isAdmin: user?.role === 'admin' || isAdminEmail(user?.email),
         isLoading,
         isCloudConnected: authService.isCloudConnected(),
         logIn,

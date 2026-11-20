@@ -1,24 +1,33 @@
 // ==============================================================================
 // NelovMallickIITD CBT Platform - AuthModal Component
-// Supports Supabase Email + Google OAuth & Local Fallback
+// Supports:
+// 1. One-Click Google OAuth Login
+// 2. Email Login & Signup (Mandatory Contact Number for non-@gmail.com addresses)
+// 3. Name & Contact Number Login & Signup (100% Free, Zero Paid SMS required)
 // Mentored by Nelov Mallick (IIT Delhi) · 100% Free Forever
 // ==============================================================================
 
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { TargetExam } from '../services/authService';
+import { TargetExam, isGmail, isValidIndianPhone } from '../services/authService';
 
 export const AuthModal: React.FC = () => {
   const { authModalState, closeAuthModal, logIn, signUp, signInWithGoogle } = useAuth();
   const { isOpen, mode: initialMode, redirectUrl, message } = authModalState;
 
   const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>(initialMode || 'login');
+  const [authTab, setAuthTab] = useState<'email' | 'phone'>('email');
+
+  // Form Fields
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [targetExam, setTargetExam] = useState<TargetExam>('JEE Advanced');
   const [showPassword, setShowPassword] = useState(false);
+
+  // Status
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
@@ -31,6 +40,9 @@ export const AuthModal: React.FC = () => {
   }, [initialMode, isOpen]);
 
   if (!isOpen) return null;
+
+  const isGmailEntered = isGmail(email);
+  const isNonGmailEntered = Boolean(email.trim() && !isGmailEntered);
 
   const handleClose = () => {
     setError('');
@@ -55,8 +67,23 @@ export const AuthModal: React.FC = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
     try {
-      await logIn({ email, password });
+      if (authTab === 'email') {
+        if (!email.trim()) {
+          throw new Error('Please enter your email address.');
+        }
+        await logIn({ email: email.trim(), password });
+      } else {
+        if (!contactNumber.trim()) {
+          throw new Error('Please enter your 10-digit contact number.');
+        }
+        if (!isValidIndianPhone(contactNumber)) {
+          throw new Error('Please enter a valid 10-digit mobile number.');
+        }
+        await logIn({ contactNumber: contactNumber.trim(), password });
+      }
+
       closeAuthModal();
       if (redirectUrl) {
         window.location.hash = redirectUrl.startsWith('#') ? redirectUrl : `#${redirectUrl}`;
@@ -77,9 +104,49 @@ export const AuthModal: React.FC = () => {
       return;
     }
 
+    if (password.length < 6) {
+      setError('Password / PIN must be at least 6 characters long.');
+      return;
+    }
+
     setLoading(true);
     try {
-      await signUp({ name, email, password, targetExam });
+      if (authTab === 'email') {
+        if (!name.trim()) throw new Error('Please enter your full name.');
+        if (!email.trim()) throw new Error('Please enter your email address.');
+
+        // Enforce Mandatory Contact Number for non-Gmail addresses
+        if (isNonGmailEntered && !contactNumber.trim()) {
+          throw new Error('Contact number is strictly required when not using a @gmail.com address.');
+        }
+
+        if (contactNumber.trim() && !isValidIndianPhone(contactNumber)) {
+          throw new Error('Please enter a valid 10-digit mobile number (e.g. 98765 43210).');
+        }
+
+        await signUp({
+          name: name.trim(),
+          email: email.trim(),
+          contactNumber: contactNumber.trim() || undefined,
+          password,
+          targetExam
+        });
+      } else {
+        // Name + Contact Number Sign Up (Zero Email Needed)
+        if (!name.trim()) throw new Error('Please enter your full name.');
+        if (!contactNumber.trim()) throw new Error('Please enter your contact number.');
+        if (!isValidIndianPhone(contactNumber)) {
+          throw new Error('Please enter a valid 10-digit mobile number (e.g. 98765 43210).');
+        }
+
+        await signUp({
+          name: name.trim(),
+          contactNumber: contactNumber.trim(),
+          password,
+          targetExam
+        });
+      }
+
       closeAuthModal();
       if (redirectUrl) {
         window.location.hash = redirectUrl.startsWith('#') ? redirectUrl : `#${redirectUrl}`;
@@ -113,7 +180,7 @@ export const AuthModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-      <div className="relative w-full max-w-md rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 sm:p-8 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-md rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 sm:p-8 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={handleClose}
@@ -124,26 +191,56 @@ export const AuthModal: React.FC = () => {
         </button>
 
         {/* Brand & Header */}
-        <div className="text-center space-y-2">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-black text-sm flex items-center justify-center mx-auto shadow-md shadow-indigo-600/30">
+        <div className="text-center space-y-1.5">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-black text-sm flex items-center justify-center mx-auto shadow-md shadow-indigo-600/30">
             NM
           </div>
-          <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-zinc-50 tracking-tight">
+          <h3 className="text-xl font-black text-slate-900 dark:text-zinc-50 tracking-tight">
             {mode === 'login' && 'Welcome Back Aspirant'}
             {mode === 'signup' && 'Create Free Account'}
             {mode === 'forgot' && 'Reset Password'}
           </h3>
           <p className="text-xs text-slate-500 dark:text-zinc-400">
             {message || (mode === 'login'
-              ? 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.'
-              : '100% Free Access · No credit card, subscription, or payment required')}
+              ? 'Sign in to attempt PTA/PTM tests, track your rank, and access lecture notes.'
+              : '100% Free Access · Mentored by Nelov Mallick (IIT Delhi)')}
           </p>
           <div className="pt-0.5">
-            <span className="inline-flex px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-              ✓ 100% Free Forever · Mentored by Nelov Mallick (IIT Delhi)
+            <span className="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+              ✓ 100% Free Forever · Zero SMS Fees · No Paywalls
             </span>
           </div>
         </div>
+
+        {/* Method Switcher Tabs (Gmail/Email vs Name & Contact Number) */}
+        {(mode === 'login' || mode === 'signup') && (
+          <div className="grid grid-cols-2 gap-1.5 p-1 rounded-2xl bg-slate-100 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 text-xs font-bold">
+            <button
+              type="button"
+              onClick={() => { setAuthTab('email'); setError(''); }}
+              className={`py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+                authTab === 'email'
+                  ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200'
+              }`}
+            >
+              <span>✉️</span>
+              <span>Gmail / Email</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setAuthTab('phone'); setError(''); }}
+              className={`py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+                authTab === 'phone'
+                  ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200'
+              }`}
+            >
+              <span>📱</span>
+              <span>Name + Contact</span>
+            </button>
+          </div>
+        )}
 
         {/* Error / Success Alerts */}
         {error && (
@@ -159,14 +256,17 @@ export const AuthModal: React.FC = () => {
           </div>
         )}
 
-        {/* ONE-CLICK GOOGLE LOGIN BUTTON (Visible on login & signup) */}
-        {(mode === 'login' || mode === 'signup') && (
+        {/* ==================================================================== */}
+        {/* OPTION A: GMAIL / EMAIL TAB */}
+        {/* ==================================================================== */}
+        {authTab === 'email' && (mode === 'login' || mode === 'signup') && (
           <div className="space-y-3">
+            {/* 1-Click Continue with Google */}
             <button
               type="button"
               disabled={loading}
               onClick={handleGoogleLogin}
-              className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-800 dark:text-zinc-100 font-bold text-xs shadow-sm transition-all hover:border-slate-400 dark:hover:border-zinc-600"
+              className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-800 dark:text-zinc-100 font-bold text-xs shadow-sm transition-all hover:border-slate-400"
             >
               <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
@@ -180,17 +280,17 @@ export const AuthModal: React.FC = () => {
             <div className="relative flex items-center justify-center">
               <div className="border-t border-slate-200 dark:border-zinc-800 w-full" />
               <span className="bg-white dark:bg-[#121318] px-3 text-[10px] font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider whitespace-nowrap">
-                or continue with email
+                or sign in with email
               </span>
               <div className="border-t border-slate-200 dark:border-zinc-800 w-full" />
             </div>
           </div>
         )}
 
-        {/* LOG IN FORM */}
-        {mode === 'login' && (
-          <form onSubmit={handleLoginSubmit} className="space-y-4 text-xs">
-            <div className="space-y-1.5">
+        {/* EMAIL LOG IN FORM */}
+        {authTab === 'email' && mode === 'login' && (
+          <form onSubmit={handleLoginSubmit} className="space-y-3.5 text-xs">
+            <div className="space-y-1">
               <label className="font-bold text-slate-700 dark:text-zinc-300">
                 Email Address
               </label>
@@ -199,12 +299,12 @@ export const AuthModal: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="student@example.com"
+                placeholder="student@gmail.com"
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <div className="flex justify-between items-center">
                 <label className="font-bold text-slate-700 dark:text-zinc-300">
                   Password
@@ -241,7 +341,7 @@ export const AuthModal: React.FC = () => {
               disabled={loading}
               className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all disabled:opacity-50"
             >
-              {loading ? 'Authenticating...' : 'Sign In Free →'}
+              {loading ? 'Authenticating...' : 'Sign In with Email →'}
             </button>
 
             <div className="pt-2 text-center text-slate-500 dark:text-zinc-400">
@@ -257,12 +357,12 @@ export const AuthModal: React.FC = () => {
           </form>
         )}
 
-        {/* SIGN UP FORM */}
-        {mode === 'signup' && (
-          <form onSubmit={handleSignUpSubmit} className="space-y-3.5 text-xs">
+        {/* EMAIL SIGN UP FORM */}
+        {authTab === 'email' && mode === 'signup' && (
+          <form onSubmit={handleSignUpSubmit} className="space-y-3 text-xs">
             <div className="space-y-1">
               <label className="font-bold text-slate-700 dark:text-zinc-300">
-                Full Name
+                Full Name <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -275,19 +375,69 @@ export const AuthModal: React.FC = () => {
             </div>
 
             <div className="space-y-1">
-              <label className="font-bold text-slate-700 dark:text-zinc-300">
-                Email Address
-              </label>
+              <div className="flex justify-between items-center">
+                <label className="font-bold text-slate-700 dark:text-zinc-300">
+                  Email Address <span className="text-rose-500">*</span>
+                </label>
+                {isGmailEntered && (
+                  <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                    ✓ Gmail detected (Phone optional)
+                  </span>
+                )}
+                {isNonGmailEntered && (
+                  <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
+                    ⚠️ Non-Gmail (Phone strictly required)
+                  </span>
+                )}
+              </div>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="aarav@example.com"
+                placeholder="aarav@gmail.com (or yahoo, outlook)"
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
+            {/* DYNAMIC CONTACT NUMBER FIELD */}
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <label className="font-bold text-slate-700 dark:text-zinc-300 flex items-center gap-1.5">
+                  <span>Contact Number</span>
+                  {isNonGmailEntered ? (
+                    <span className="text-rose-500 font-extrabold">* (Required)</span>
+                  ) : (
+                    <span className="text-slate-400 font-normal">(Optional for Gmail)</span>
+                  )}
+                </label>
+                {isNonGmailEntered && (
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
+                    Required when not using Gmail
+                  </span>
+                )}
+              </div>
+              <div className="relative flex rounded-xl border border-slate-200 dark:border-zinc-700 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500">
+                <span className="inline-flex items-center px-3 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 font-bold text-xs border-r border-slate-200 dark:border-zinc-700">
+                  🇮🇳 +91
+                </span>
+                <input
+                  type="tel"
+                  required={isNonGmailEntered}
+                  value={contactNumber}
+                  onChange={(e) => setContactNumber(e.target.value)}
+                  placeholder="98765 43210"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none text-xs"
+                />
+              </div>
+              <p className="text-[10px] text-slate-400">
+                {isNonGmailEntered
+                  ? 'Since you are not using Gmail, a valid 10-digit mobile number is mandatory for account security.'
+                  : 'Allows mentor Nelov Mallick to share revision notes and test alerts directly.'}
+              </p>
+            </div>
+
+            {/* Target Exam */}
             <div className="space-y-1">
               <label className="font-bold text-slate-700 dark:text-zinc-300">
                 Target Examination
@@ -310,26 +460,25 @@ export const AuthModal: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Passwords */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div className="space-y-1">
                 <label className="font-bold text-slate-700 dark:text-zinc-300">
-                  Password
+                  Password <span className="text-rose-500">*</span>
                 </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Min 6 chars"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs"
-                  />
-                </div>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Min 6 chars"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs"
+                />
               </div>
 
               <div className="space-y-1">
                 <label className="font-bold text-slate-700 dark:text-zinc-300">
-                  Confirm Password
+                  Confirm Password <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -363,6 +512,195 @@ export const AuthModal: React.FC = () => {
           </form>
         )}
 
+        {/* ==================================================================== */}
+        {/* OPTION B: NAME + CONTACT NUMBER TAB (100% Free, Zero SMS Cost) */}
+        {/* ==================================================================== */}
+        {authTab === 'phone' && mode === 'login' && (
+          <form onSubmit={handleLoginSubmit} className="space-y-3.5 text-xs">
+            <div className="p-2.5 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/60 text-[11px] text-indigo-900 dark:text-indigo-200">
+              📱 <strong>Quick Contact Number Login:</strong> Enter your registered 10-digit mobile number and password/PIN to continue.
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-bold text-slate-700 dark:text-zinc-300">
+                Registered Contact Number <span className="text-rose-500">*</span>
+              </label>
+              <div className="relative flex rounded-xl border border-slate-200 dark:border-zinc-700 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500">
+                <span className="inline-flex items-center px-3 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 font-bold text-xs border-r border-slate-200 dark:border-zinc-700">
+                  🇮🇳 +91
+                </span>
+                <input
+                  type="tel"
+                  required
+                  value={contactNumber}
+                  onChange={(e) => setContactNumber(e.target.value)}
+                  placeholder="98765 43210"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-bold text-slate-700 dark:text-zinc-300">
+                Password / 6-Digit PIN <span className="text-rose-500">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password / PIN"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-semibold"
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all disabled:opacity-50"
+            >
+              {loading ? 'Authenticating...' : 'Sign In with Contact Number →'}
+            </button>
+
+            <div className="pt-2 text-center text-slate-500 dark:text-zinc-400">
+              Need to register with contact number?{' '}
+              <button
+                type="button"
+                onClick={() => { setMode('signup'); setError(''); }}
+                className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+              >
+                Sign Up Here
+              </button>
+            </div>
+          </form>
+        )}
+
+        {authTab === 'phone' && mode === 'signup' && (
+          <form onSubmit={handleSignUpSubmit} className="space-y-3 text-xs">
+            <div className="p-2.5 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/60 text-[11px] text-indigo-900 dark:text-indigo-200">
+              🚀 <strong>No Email Required!</strong> Create an account with just your Name & Contact Number. 100% Free Forever.
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-bold text-slate-700 dark:text-zinc-300">
+                Full Name <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Aarav Sharma"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-bold text-slate-700 dark:text-zinc-300">
+                Contact Number <span className="text-rose-500">*</span>
+              </label>
+              <div className="relative flex rounded-xl border border-slate-200 dark:border-zinc-700 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500">
+                <span className="inline-flex items-center px-3 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 font-bold text-xs border-r border-slate-200 dark:border-zinc-700">
+                  🇮🇳 +91
+                </span>
+                <input
+                  type="tel"
+                  required
+                  value={contactNumber}
+                  onChange={(e) => setContactNumber(e.target.value)}
+                  placeholder="98765 43210"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none text-xs"
+                />
+              </div>
+              <p className="text-[10px] text-slate-400">
+                Enter your 10-digit mobile number. You will use this to log in anytime.
+              </p>
+            </div>
+
+            {/* Target Exam */}
+            <div className="space-y-1">
+              <label className="font-bold text-slate-700 dark:text-zinc-300">
+                Target Examination
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {(['JEE Advanced', 'JEE Mains', 'Both'] as TargetExam[]).map((exam) => (
+                  <button
+                    key={exam}
+                    type="button"
+                    onClick={() => setTargetExam(exam)}
+                    className={`py-2 px-2 rounded-xl text-center font-bold text-[11px] border transition-all ${
+                      targetExam === exam
+                        ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400'
+                        : 'border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:border-slate-300'
+                    }`}
+                  >
+                    {exam}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Passwords */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700 dark:text-zinc-300">
+                  Password / PIN <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Min 6 chars"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700 dark:text-zinc-300">
+                  Confirm Password / PIN <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repeat password"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 mt-1 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all disabled:opacity-50"
+            >
+              {loading ? 'Creating Account...' : 'Complete Free Registration →'}
+            </button>
+
+            <div className="pt-2 text-center text-slate-500 dark:text-zinc-400">
+              Already have an account?{' '}
+              <button
+                type="button"
+                onClick={() => { setMode('login'); setError(''); }}
+                className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+              >
+                Sign In with Contact Number
+              </button>
+            </div>
+          </form>
+        )}
+
         {/* FORGOT PASSWORD FORM */}
         {mode === 'forgot' && (
           <form onSubmit={handleForgotSubmit} className="space-y-4 text-xs">
@@ -379,7 +717,7 @@ export const AuthModal: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="student@example.com"
+                placeholder="student@gmail.com"
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>

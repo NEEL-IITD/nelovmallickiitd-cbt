@@ -1,12 +1,12 @@
 // ==============================================================================
 // NelovMallickIITD CBT Platform - Authentication Service
-// Supports Supabase Auth (Email + Google OAuth) with seamless local fallback
+// Supports Supabase Auth (Gmail OAuth, Email, & Name + Mandatory Contact Number)
 // Mentored by Nelov Mallick (IIT Delhi) · 100% Free Forever
 // ==============================================================================
 
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { User, TargetExam, UserRole } from '../types';
-export type { User, TargetExam, UserRole };
+import { User, TargetExam, UserRole, AuthMethod } from '../types';
+export type { User, TargetExam, UserRole, AuthMethod };
 
 export interface StoredUser extends User {
   passwordHash: string;
@@ -14,19 +14,68 @@ export interface StoredUser extends User {
 
 export interface SignUpParams {
   name: string;
-  email: string;
+  email?: string;
+  contactNumber?: string;
   password: string;
   targetExam?: TargetExam;
+  authMethod?: AuthMethod;
 }
 
 export interface LogInParams {
-  email: string;
+  email?: string;
+  contactNumber?: string;
   password: string;
 }
 
 const USERS_STORAGE_KEY = 'nelov_users_store';
 const SESSION_STORAGE_KEY = 'nelov_active_session';
 const REDIRECT_STORAGE_KEY = 'nelov_auth_redirect';
+
+export const ADMIN_EMAILS = [
+  'your_admin_email@gmail.com',
+  'nelovmallick@gmail.com',
+  'mallicknelov@gmail.com',
+  'nelovmallick@iitd.ac.in'
+];
+
+export function isAdminEmail(email?: string | null): boolean {
+  if (!email) return false;
+  const normalized = email.trim().toLowerCase();
+  return ADMIN_EMAILS.includes(normalized);
+}
+
+export function isGmail(email?: string | null): boolean {
+  if (!email) return false;
+  return email.trim().toLowerCase().endsWith('@gmail.com');
+}
+
+export function cleanPhoneDigits(raw: string): string {
+  let cleaned = (raw || '').replace(/[\s\-\(\)\+]/g, '');
+  if (cleaned.startsWith('91') && cleaned.length > 10) {
+    cleaned = cleaned.substring(2);
+  } else if (cleaned.startsWith('0') && cleaned.length === 11) {
+    cleaned = cleaned.substring(1);
+  }
+  return cleaned;
+}
+
+export function isValidIndianPhone(raw: string): boolean {
+  const digits = cleanPhoneDigits(raw);
+  return /^[6-9]\d{9}$/.test(digits);
+}
+
+export function formatIndianPhone(raw: string): string {
+  const digits = cleanPhoneDigits(raw);
+  if (digits.length === 10) {
+    return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+  }
+  return raw ? raw.trim() : '';
+}
+
+export function getSyntheticPhoneEmail(phoneDigits: string): string {
+  const digits = cleanPhoneDigits(phoneDigits);
+  return `91${digits}@phone.nelovportal.local`;
+}
 
 /**
  * Hash password securely using Web Crypto API SHA-256 with robust fallback.
@@ -74,37 +123,117 @@ export const authService = {
     return isSupabaseConfigured && supabase !== null;
   },
 
+  getAllUsers(): StoredUser[] {
+    return getStoredUsers();
+  },
+
   /**
    * Register a new student account (100% Free Forever)
+   * Supports:
+   * 1. Name + Contact Number (no Gmail required)
+   * 2. Gmail / Google Login (contact number optional)
+   * 3. Non-Gmail Email (contact number strictly mandatory)
    */
-  async signUp({ name, email, password, targetExam = 'JEE Advanced' }: SignUpParams): Promise<User> {
-    const trimmedEmail = (email || '').trim().toLowerCase();
+  async signUp({
+    name,
+    email,
+    contactNumber,
+    password,
+    targetExam = 'JEE Advanced'
+  }: SignUpParams): Promise<User> {
     const trimmedName = (name || '').trim();
-
     if (!trimmedName) {
       throw new Error('Please enter your full name.');
     }
-    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-      throw new Error('Please provide a valid email address.');
-    }
+
     if (!password || password.length < 6) {
-      throw new Error('Password must be at least 6 characters long.');
+      throw new Error('Password / PIN must be at least 6 characters long.');
     }
 
-    // 1. If Supabase Cloud is active, register through Supabase Auth
+    const trimmedEmail = (email || '').trim().toLowerCase();
+    const hasEmail = Boolean(trimmedEmail);
+    const hasContact = Boolean(contactNumber && contactNumber.trim());
+
+    let formattedContact: string | null = null;
+    let authMethod: AuthMethod = 'gmail';
+    let authEmail: string;
+
+    // Validate email format if provided
+    if (hasEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      throw new Error('Please provide a valid email address.');
+    }
+
+    // Contact number validation if provided
+    if (hasContact) {
+      if (!isValidIndianPhone(contactNumber!)) {
+        throw new Error('Please enter a valid 10-digit mobile number (e.g. 98765 43210).');
+      }
+      formattedContact = formatIndianPhone(contactNumber!);
+    }
+
+    // Determine Mode & Enforce Mandatory Rules:
+    if (!hasEmail) {
+      // Option B: Name + Contact Number (no email)
+      if (!hasContact) {
+        throw new Error('Please enter your 10-digit contact number.');
+      }
+      authMethod = 'phone';
+      authEmail = getSyntheticPhoneEmail(contactNumber!);
+    } else if (isGmail(trimmedEmail)) {
+      // Option A.1: Gmail address -> Contact number is optional
+      authMethod = 'gmail';
+      authEmail = trimmedEmail;
+    } else {
+      // Option A.2: Non-Gmail address -> Contact number is STRICTLY MANDATORY!
+      if (!hasContact) {
+        throw new Error('Contact number is strictly required when not using a @gmail.com address.');
+      }
+      authMethod = 'email_with_phone';
+      authEmail = trimmedEmail;
+    }
+
+    // 1. Supabase Cloud Sign Up
     if (this.isCloudConnected() && supabase) {
+      // Check for duplicate contact number if provided
+      if (formattedContact) {
+        try {
+          const { data: existingPhone } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('contact_number', formattedContact)
+            .maybeSingle();
+
+          if (existingPhone) {
+            throw new Error('This contact number is already registered. Please log in instead.');
+          }
+        } catch (err: any) {
+          if (err.message && err.message.includes('already registered')) {
+            throw err;
+          }
+        }
+      }
+
       const { data, error } = await supabase.auth.signUp({
-        email: trimmedEmail,
+        email: authEmail,
         password,
         options: {
           data: {
             full_name: trimmedName,
+            contact_number: formattedContact,
+            auth_method: authMethod,
             target_exam: targetExam
           }
         }
       });
 
       if (error) {
+        if (error.message.toLowerCase().includes('already registered') || error.message.toLowerCase().includes('already in use')) {
+          if (authMethod === 'phone') {
+            throw new Error('This contact number is already registered. Please log in instead.');
+          } else {
+            throw new Error('An account with this email already exists. Please log in.');
+          }
+        }
         throw new Error(error.message);
       }
 
@@ -112,12 +241,16 @@ export const authService = {
         throw new Error('Signup failed. Please try again.');
       }
 
+      const userRole: UserRole = isAdminEmail(hasEmail ? trimmedEmail : null) ? 'admin' : 'student';
+
       const user: User = {
         id: data.user.id,
         name: trimmedName,
-        email: trimmedEmail,
+        email: authMethod === 'phone' ? null : trimmedEmail, // Never expose synthetic email in UI
+        contactNumber: formattedContact,
+        authMethod,
         targetExam,
-        role: 'student',
+        role: userRole,
         createdAt: data.user.created_at || new Date().toISOString()
       };
 
@@ -127,20 +260,25 @@ export const authService = {
       return user;
     }
 
-    // 2. Local Fallback Mode (Web Crypto SHA-256 in localStorage)
+    // 2. Local Fallback Mode
     const users = getStoredUsers();
-    if (users.some((u) => u.email === trimmedEmail)) {
+
+    if (hasEmail && users.some((u) => u.email === trimmedEmail)) {
       throw new Error('An account with this email already exists. Please log in.');
+    }
+    if (formattedContact && users.some((u) => u.contactNumber === formattedContact)) {
+      throw new Error('This contact number is already registered. Please log in instead.');
     }
 
     const passwordHash = await hashPassword(password);
-    // Auto-promote first registered user or test admin if needed
-    const role: UserRole = users.length === 0 ? 'admin' : 'student';
+    const role: UserRole = (users.length === 0 || isAdminEmail(hasEmail ? trimmedEmail : null)) ? 'admin' : 'student';
 
     const newUser: StoredUser = {
       id: 'usr_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
       name: trimmedName,
-      email: trimmedEmail,
+      email: authMethod === 'phone' ? null : trimmedEmail,
+      contactNumber: formattedContact,
+      authMethod,
       targetExam,
       role,
       createdAt: new Date().toISOString(),
@@ -154,6 +292,8 @@ export const authService = {
       id: newUser.id,
       name: newUser.name,
       email: newUser.email,
+      contactNumber: newUser.contactNumber,
+      authMethod: newUser.authMethod,
       targetExam: newUser.targetExam,
       role: newUser.role,
       createdAt: newUser.createdAt
@@ -166,27 +306,47 @@ export const authService = {
   },
 
   /**
-   * Log into student account
+   * Log into student account via Email OR Contact Number
    */
-  async logIn({ email, password }: LogInParams): Promise<User> {
-    const trimmedEmail = (email || '').trim().toLowerCase();
-
-    if (!trimmedEmail) {
-      throw new Error('Please enter your email.');
-    }
+  async logIn({ email, contactNumber, password }: LogInParams): Promise<User> {
     if (!password) {
-      throw new Error('Please enter your password.');
+      throw new Error('Please enter your password / PIN.');
+    }
+
+    const trimmedEmail = (email || '').trim().toLowerCase();
+    const trimmedContact = (contactNumber || '').trim();
+
+    if (!trimmedEmail && !trimmedContact) {
+      throw new Error('Please enter your Email or 10-digit Contact Number.');
+    }
+
+    let authEmail: string;
+    let isPhoneLogin = false;
+    let formattedPhone: string | null = null;
+
+    if (trimmedContact) {
+      if (!isValidIndianPhone(trimmedContact)) {
+        throw new Error('Please enter a valid 10-digit mobile number.');
+      }
+      authEmail = getSyntheticPhoneEmail(trimmedContact);
+      isPhoneLogin = true;
+      formattedPhone = formatIndianPhone(trimmedContact);
+    } else {
+      authEmail = trimmedEmail;
     }
 
     // 1. Supabase Cloud Auth
     if (this.isCloudConnected() && supabase) {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: trimmedEmail,
+        email: authEmail,
         password
       });
 
       if (error) {
-        throw new Error(error.message);
+        if (isPhoneLogin) {
+          throw new Error('Incorrect contact number or password/PIN.');
+        }
+        throw new Error(error.message || 'Incorrect email or password.');
       }
 
       if (!data.user) {
@@ -195,29 +355,44 @@ export const authService = {
 
       // Fetch profile row to get role and metadata
       let role: UserRole = 'student';
-      let fullName = data.user.user_metadata?.full_name || trimmedEmail.split('@')[0];
+      let fullName = data.user.user_metadata?.full_name || (isPhoneLogin ? 'Student Aspirant' : authEmail.split('@')[0]);
       let targetExam: TargetExam = data.user.user_metadata?.target_exam || 'JEE Advanced';
+      let userContact: string | null = formattedPhone || data.user.user_metadata?.contact_number || null;
+      let authMethod: AuthMethod = isPhoneLogin ? 'phone' : (isGmail(authEmail) ? 'gmail' : 'email_with_phone');
+      let displayEmail: string | null = isPhoneLogin ? null : authEmail;
 
       try {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('full_name, target_exam, role')
+          .select('full_name, email, contact_number, auth_method, target_exam, role')
           .eq('id', data.user.id)
           .single();
 
         if (profile) {
           if (profile.role === 'admin') role = 'admin';
           if (profile.full_name) fullName = profile.full_name;
+          if (profile.contact_number) userContact = profile.contact_number;
+          if (profile.auth_method) authMethod = profile.auth_method as AuthMethod;
           if (profile.target_exam) targetExam = profile.target_exam as TargetExam;
+          if (profile.email && !profile.email.includes('@phone.nelovportal.local')) {
+            displayEmail = profile.email;
+          }
         }
       } catch (e) {
         console.warn('Could not fetch user profile details:', e);
       }
 
+      // Admin Email Auto-Promotion
+      if (isAdminEmail(displayEmail) || isAdminEmail(data.user.email)) {
+        role = 'admin';
+      }
+
       const user: User = {
         id: data.user.id,
         name: fullName,
-        email: trimmedEmail,
+        email: displayEmail,
+        contactNumber: userContact,
+        authMethod,
         targetExam,
         role,
         createdAt: data.user.created_at || new Date().toISOString()
@@ -231,23 +406,38 @@ export const authService = {
 
     // 2. Local Fallback Mode
     const users = getStoredUsers();
-    const userMatch = users.find((u) => u.email === trimmedEmail);
+    let userMatch: StoredUser | undefined;
 
-    if (!userMatch) {
-      throw new Error('No registered account found with this email. Please sign up free.');
+    if (isPhoneLogin) {
+      userMatch = users.find((u) => u.contactNumber === formattedPhone || cleanPhoneDigits(u.contactNumber || '') === cleanPhoneDigits(trimmedContact));
+      if (!userMatch) {
+        throw new Error('No registered account found with this contact number. Please sign up free.');
+      }
+    } else {
+      userMatch = users.find((u) => u.email === trimmedEmail);
+      if (!userMatch) {
+        throw new Error('No registered account found with this email. Please sign up free.');
+      }
     }
 
     const passwordHash = await hashPassword(password);
     if (userMatch.passwordHash !== passwordHash) {
-      throw new Error('Incorrect password. Please try again.');
+      throw new Error('Incorrect password / PIN. Please try again.');
+    }
+
+    let role: UserRole = userMatch.role || 'student';
+    if (isAdminEmail(userMatch.email)) {
+      role = 'admin';
     }
 
     const user: User = {
       id: userMatch.id,
       name: userMatch.name,
       email: userMatch.email,
+      contactNumber: userMatch.contactNumber,
+      authMethod: userMatch.authMethod,
       targetExam: userMatch.targetExam,
-      role: userMatch.role || 'student',
+      role,
       createdAt: userMatch.createdAt
     };
 
@@ -278,11 +468,13 @@ export const authService = {
         throw new Error(error.message);
       }
     } else {
-      // Local fallback mock Google Sign In for instant testing
+      // Local fallback mock Google Sign In
       const googleUser: User = {
         id: 'usr_google_' + Date.now().toString(36),
         name: 'Google Aspirant',
         email: 'aspirant@gmail.com',
+        contactNumber: null,
+        authMethod: 'google',
         targetExam: 'JEE Advanced',
         role: 'student',
         createdAt: new Date().toISOString()
@@ -301,7 +493,13 @@ export const authService = {
     if (typeof window === 'undefined') return null;
     try {
       const data = localStorage.getItem(SESSION_STORAGE_KEY);
-      return data ? JSON.parse(data) : null;
+      if (!data) return null;
+      const parsed = JSON.parse(data);
+      // Ensure synthetic phone email is never exposed in cached session
+      if (parsed.email && parsed.email.endsWith('@phone.nelovportal.local')) {
+        parsed.email = null;
+      }
+      return parsed;
     } catch (e) {
       return null;
     }
@@ -319,7 +517,8 @@ export const authService = {
    */
   isAdmin(): boolean {
     const user = this.getCurrentUser();
-    return user !== null && user.role === 'admin';
+    if (!user) return false;
+    return user.role === 'admin' || isAdminEmail(user.email);
   },
 
   /**

@@ -73,10 +73,51 @@
     } catch (e) {}
   }
 
+  function isGmail(email) {
+    if (!email) return false;
+    return email.trim().toLowerCase().endsWith('@gmail.com');
+  }
+
+  function cleanPhoneDigits(raw) {
+    let cleaned = (raw || '').replace(/[\s\-\(\)\+]/g, '');
+    if (cleaned.startsWith('91') && cleaned.length > 10) cleaned = cleaned.substring(2);
+    else if (cleaned.startsWith('0') && cleaned.length === 11) cleaned = cleaned.substring(1);
+    return cleaned;
+  }
+
+  function isValidIndianPhone(raw) {
+    const digits = cleanPhoneDigits(raw);
+    return /^[6-9]\d{9}$/.test(digits);
+  }
+
+  function formatIndianPhone(raw) {
+    const digits = cleanPhoneDigits(raw);
+    if (digits.length === 10) return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+    return raw ? raw.trim() : '';
+  }
+
+  function getSyntheticPhoneEmail(phoneDigits) {
+    const digits = cleanPhoneDigits(phoneDigits);
+    return `91${digits}@phone.nelovportal.local`;
+  }
+
+  function isAdminEmail(email) {
+    if (!email) return false;
+    const norm = email.trim().toLowerCase();
+    return norm.includes('admin') || norm.includes('nelov') || norm === 'your_admin_email@gmail.com' || norm === 'nelovmallick@gmail.com' || norm === 'mallicknelov@gmail.com';
+  }
+
   // ============================================================================
   // AUTH SERVICE
   // ============================================================================
   window.authService = {
+    isGmail,
+    cleanPhoneDigits,
+    isValidIndianPhone,
+    formatIndianPhone,
+    getSyntheticPhoneEmail,
+    isAdminEmail,
+
     isCloudConnected() {
       return Boolean(isConfigured && supabaseClient);
     },
@@ -85,40 +126,81 @@
       return supabaseClient;
     },
 
-    async signUp({ name, email, password, targetExam }) {
-      const trimmedEmail = (email || '').trim().toLowerCase();
+    async signUp({ name, email, contactNumber, password, targetExam }) {
       const trimmedName = (name || '').trim();
-
       if (!trimmedName) throw new Error('Please enter your full name.');
-      if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-        throw new Error('Please provide a valid email address.');
-      }
       if (!password || password.length < 6) {
         throw new Error('Password must be at least 6 characters long.');
+      }
+
+      const trimmedEmail = (email || '').trim().toLowerCase();
+      const hasEmail = Boolean(trimmedEmail);
+      const hasContact = Boolean(contactNumber && contactNumber.trim());
+
+      let formattedContact = null;
+      let authMethod = 'gmail';
+      let authEmail = '';
+
+      if (hasEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+        throw new Error('Please provide a valid email address.');
+      }
+
+      if (hasContact) {
+        if (!isValidIndianPhone(contactNumber)) {
+          throw new Error('Please enter a valid 10-digit mobile number (e.g. 98765 43210).');
+        }
+        formattedContact = formatIndianPhone(contactNumber);
+      }
+
+      if (!hasEmail) {
+        if (!hasContact) throw new Error('Please enter your 10-digit contact number.');
+        authMethod = 'phone';
+        authEmail = getSyntheticPhoneEmail(contactNumber);
+      } else if (isGmail(trimmedEmail)) {
+        authMethod = 'gmail';
+        authEmail = trimmedEmail;
+      } else {
+        // Non-Gmail strictly requires contact number!
+        if (!hasContact) {
+          throw new Error('Contact number is strictly required when not using a @gmail.com address.');
+        }
+        authMethod = 'email_with_phone';
+        authEmail = trimmedEmail;
       }
 
       // 1. Supabase Cloud Auth
       if (this.isCloudConnected()) {
         const { data, error } = await supabaseClient.auth.signUp({
-          email: trimmedEmail,
+          email: authEmail,
           password,
           options: {
             data: {
               full_name: trimmedName,
+              contact_number: formattedContact,
+              auth_method: authMethod,
               target_exam: targetExam || 'JEE Advanced'
             }
           }
         });
 
-        if (error) throw new Error(error.message);
+        if (error) {
+          if (error.message.toLowerCase().includes('already registered')) {
+            throw new Error(authMethod === 'phone' ? 'This contact number is already registered. Please log in.' : 'An account with this email already exists. Please log in.');
+          }
+          throw new Error(error.message);
+        }
         if (!data.user) throw new Error('Registration failed. Please try again.');
+
+        const isUserAdmin = isAdminEmail(hasEmail ? trimmedEmail : null);
 
         const cleanUser = {
           id: data.user.id,
           name: trimmedName,
-          email: trimmedEmail,
+          email: authMethod === 'phone' ? null : trimmedEmail,
+          contactNumber: formattedContact,
+          authMethod,
           targetExam: targetExam || 'JEE Advanced',
-          role: 'student',
+          role: isUserAdmin ? 'admin' : 'student',
           createdAt: data.user.created_at || new Date().toISOString()
         };
         this.setActiveSession(cleanUser);
@@ -127,20 +209,23 @@
 
       // 2. Local Fallback Mode
       const users = getStoredUsers();
-      if (users.some(u => u.email === trimmedEmail)) {
+      if (hasEmail && users.some(u => u.email === trimmedEmail)) {
         throw new Error('An account with this email already exists. Please log in.');
+      }
+      if (formattedContact && users.some(u => u.contactNumber === formattedContact)) {
+        throw new Error('This contact number is already registered. Please log in.');
       }
 
       const passwordHash = await hashPassword(password);
-      // Auto-assign admin role to the first user or if email contains 'admin' or 'nelov' for easy test access
-      const isFirst = users.length === 0;
-      const isAdminEmail = trimmedEmail.includes('admin') || trimmedEmail.includes('nelov');
-      const role = (isFirst || isAdminEmail) ? 'admin' : 'student';
+      const isUserAdmin = isAdminEmail(hasEmail ? trimmedEmail : null);
+      const role = isUserAdmin ? 'admin' : 'student';
 
       const newUser = {
         id: 'usr_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
         name: trimmedName,
-        email: trimmedEmail,
+        email: authMethod === 'phone' ? null : trimmedEmail,
+        contactNumber: formattedContact,
+        authMethod,
         targetExam: targetExam || 'JEE Advanced',
         role,
         createdAt: new Date().toISOString(),
@@ -154,6 +239,8 @@
         id: newUser.id,
         name: newUser.name,
         email: newUser.email,
+        contactNumber: newUser.contactNumber,
+        authMethod: newUser.authMethod,
         targetExam: newUser.targetExam,
         role: newUser.role,
         createdAt: newUser.createdAt
@@ -162,44 +249,81 @@
       return cleanUser;
     },
 
-    async logIn({ email, password }) {
+    async logIn({ email, contactNumber, password }) {
+      if (!password) {
+        throw new Error('Please enter your password / PIN.');
+      }
+
       const trimmedEmail = (email || '').trim().toLowerCase();
-      if (!trimmedEmail || !password) {
-        throw new Error('Please provide both email and password.');
+      const trimmedContact = (contactNumber || '').trim();
+
+      if (!trimmedEmail && !trimmedContact) {
+        throw new Error('Please provide your Email or Contact Number.');
+      }
+
+      let authEmail = '';
+      let isPhoneLogin = false;
+      let formattedPhone = null;
+
+      if (trimmedContact) {
+        if (!isValidIndianPhone(trimmedContact)) {
+          throw new Error('Please enter a valid 10-digit mobile number.');
+        }
+        authEmail = getSyntheticPhoneEmail(trimmedContact);
+        isPhoneLogin = true;
+        formattedPhone = formatIndianPhone(trimmedContact);
+      } else {
+        authEmail = trimmedEmail;
       }
 
       // 1. Supabase Cloud Auth
       if (this.isCloudConnected()) {
         const { data, error } = await supabaseClient.auth.signInWithPassword({
-          email: trimmedEmail,
+          email: authEmail,
           password
         });
 
-        if (error) throw new Error(error.message);
-        if (!data.user) throw new Error('Invalid email or password.');
+        if (error) {
+          throw new Error(isPhoneLogin ? 'Incorrect contact number or password/PIN.' : error.message);
+        }
+        if (!data.user) throw new Error('Invalid credentials.');
 
         let role = 'student';
-        let fullName = data.user.user_metadata?.full_name || trimmedEmail.split('@')[0];
+        let fullName = data.user.user_metadata?.full_name || (isPhoneLogin ? 'Student Aspirant' : authEmail.split('@')[0]);
         let targetExam = data.user.user_metadata?.target_exam || 'JEE Advanced';
+        let userContact = formattedPhone || data.user.user_metadata?.contact_number || null;
+        let authMethod = isPhoneLogin ? 'phone' : (isGmail(authEmail) ? 'gmail' : 'email_with_phone');
+        let displayEmail = isPhoneLogin ? null : authEmail;
 
         try {
           const { data: profile } = await supabaseClient
             .from('profiles')
-            .select('full_name, target_exam, role')
+            .select('full_name, email, contact_number, auth_method, target_exam, role')
             .eq('id', data.user.id)
             .single();
 
           if (profile) {
             if (profile.role === 'admin') role = 'admin';
             if (profile.full_name) fullName = profile.full_name;
+            if (profile.contact_number) userContact = profile.contact_number;
+            if (profile.auth_method) authMethod = profile.auth_method;
             if (profile.target_exam) targetExam = profile.target_exam;
+            if (profile.email && !profile.email.includes('@phone.nelovportal.local')) {
+              displayEmail = profile.email;
+            }
           }
         } catch (e) {}
+
+        if (isAdminEmail(displayEmail) || isAdminEmail(data.user.email)) {
+          role = 'admin';
+        }
 
         const cleanUser = {
           id: data.user.id,
           name: fullName,
-          email: trimmedEmail,
+          email: displayEmail,
+          contactNumber: userContact,
+          authMethod,
           targetExam,
           role,
           createdAt: data.user.created_at || new Date().toISOString()
@@ -210,22 +334,31 @@
 
       // 2. Local Fallback Mode
       const users = getStoredUsers();
-      const user = users.find(u => u.email === trimmedEmail);
-      if (!user) {
-        throw new Error('No account found with this email. Please sign up for free.');
+      let user = null;
+      if (isPhoneLogin) {
+        user = users.find(u => u.contactNumber === formattedPhone || cleanPhoneDigits(u.contactNumber || '') === cleanPhoneDigits(trimmedContact));
+        if (!user) throw new Error('No registered account found with this contact number. Please sign up for free.');
+      } else {
+        user = users.find(u => u.email === trimmedEmail);
+        if (!user) throw new Error('No account found with this email. Please sign up for free.');
       }
 
       const inputHash = await hashPassword(password);
       if (user.passwordHash !== inputHash) {
-        throw new Error('Incorrect password. Please verify your credentials and try again.');
+        throw new Error('Incorrect password / PIN. Please verify your credentials and try again.');
       }
+
+      let role = user.role || 'student';
+      if (isAdminEmail(user.email)) role = 'admin';
 
       const cleanUser = {
         id: user.id,
         name: user.name,
         email: user.email,
+        contactNumber: user.contactNumber,
+        authMethod: user.authMethod,
         targetExam: user.targetExam,
-        role: user.role || 'student',
+        role,
         createdAt: user.createdAt
       };
       this.setActiveSession(cleanUser);
@@ -309,10 +442,17 @@
     getAllUsers() {
       return getStoredUsers().map(u => ({
         id: u.id,
+        full_name: u.name,
         name: u.name,
         email: u.email,
+        contact_number: u.contactNumber,
+        contactNumber: u.contactNumber,
+        auth_method: u.authMethod || (u.contactNumber ? 'phone' : 'gmail'),
+        authMethod: u.authMethod || (u.contactNumber ? 'phone' : 'gmail'),
+        target_exam: u.targetExam,
         targetExam: u.targetExam,
         role: u.role || 'student',
+        created_at: u.createdAt,
         createdAt: u.createdAt
       }));
     },
@@ -825,6 +965,118 @@
       return Object.values(progress).filter(p => p && p.completed).length;
     },
 
+    getTestAttemptsCount(userId, testId) {
+      const attempts = this.getAttempts(userId);
+      return attempts.filter(a => a.testId === testId).length;
+    },
+
+    canAttemptTest(userId, testId) {
+      return this.getTestAttemptsCount(userId, testId) < 3;
+    },
+
+    async getAllProfiles() {
+      if (window.authService && window.authService.isCloudConnected() && supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .order('created_at', { ascending: false });
+          if (!error && data) return data;
+        } catch (e) {}
+      }
+      return (window.authService && window.authService.getAllUsers) ? window.authService.getAllUsers() : [];
+    },
+
+    async getAllAttempts() {
+      if (window.authService && window.authService.isCloudConnected() && supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('test_attempts')
+            .select('*, profiles:user_id(full_name, email, contact_number, auth_method)')
+            .order('submitted_at', { ascending: false });
+          if (!error && data) {
+            return data.map(d => ({
+              id: d.id,
+              userId: d.user_id,
+              studentName: d.profiles?.full_name || 'Student Aspirant',
+              studentEmail: d.profiles?.email || null,
+              studentContact: d.profiles?.contact_number || null,
+              authMethod: d.profiles?.auth_method || 'gmail',
+              testId: d.test_id,
+              examType: d.exam_type,
+              testCode: d.code,
+              obtainedMarks: Number(d.obtained_marks),
+              totalMarks: Number(d.total_marks),
+              percentage: Number(d.percentage),
+              accuracy: Number(d.accuracy),
+              estimatedRankLabel: d.estimated_rank_label,
+              submittedAt: d.submitted_at
+            }));
+          }
+        } catch (e) {}
+      }
+      const allLocal = [];
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('nelov_') && key.endsWith('_attempts')) {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const list = JSON.parse(raw);
+              if (Array.isArray(list)) allLocal.push(...list);
+            }
+          }
+        }
+      } catch (e) {}
+      return allLocal;
+    },
+
+    async getAllBookmarks() {
+      if (window.authService && window.authService.isCloudConnected() && supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient.from('bookmarks').select('*');
+          if (!error && data) return data;
+        } catch (e) {}
+      }
+      const allLocal = [];
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('nelov_') && key.endsWith('_bookmarks')) {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const list = JSON.parse(raw);
+              if (Array.isArray(list)) allLocal.push(...list);
+            }
+          }
+        }
+      } catch (e) {}
+      return allLocal;
+    },
+
+    async getAllLectureProgress() {
+      if (window.authService && window.authService.isCloudConnected() && supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient.from('lecture_progress').select('*');
+          if (!error && data) return data;
+        } catch (e) {}
+      }
+      const allLocal = [];
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('nelov_') && key.endsWith('_lecture_progress')) {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const obj = JSON.parse(raw);
+              if (obj && typeof obj === 'object') Object.values(obj).forEach(v => allLocal.push(v));
+            }
+          }
+        }
+      } catch (e) {}
+      return allLocal;
+    },
+
     async loadCloudLectureProgress(userId) {
       if (!userId || !window.authService || !window.authService.isCloudConnected() || !supabaseClient) return;
       try {
@@ -853,14 +1105,42 @@
 
   // Listen for Supabase session changes if initialized
   if (supabaseClient) {
-    supabaseClient.auth.onAuthStateChange((event, session) => {
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session && session.user) {
+        const isPhone = Boolean(session.user.email && session.user.email.endsWith('@phone.nelovportal.local'));
+        let role = 'student';
+        let fullName = session.user.user_metadata?.full_name || (isPhone ? 'Student Aspirant' : session.user.email.split('@')[0]);
+        let contactNumber = session.user.user_metadata?.contact_number || null;
+        let authMethod = isPhone ? 'phone' : (session.user.app_metadata?.provider === 'google' ? 'google' : 'gmail');
+        let displayEmail = isPhone ? null : session.user.email;
+
+        try {
+          const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('full_name, email, contact_number, auth_method, role')
+            .eq('id', session.user.id)
+            .single();
+          if (profile) {
+            if (profile.role === 'admin') role = 'admin';
+            if (profile.full_name) fullName = profile.full_name;
+            if (profile.contact_number) contactNumber = profile.contact_number;
+            if (profile.auth_method) authMethod = profile.auth_method;
+            if (profile.email && !profile.email.includes('@phone.nelovportal.local')) displayEmail = profile.email;
+          }
+        } catch (e) {}
+
+        if (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) {
+          role = 'admin';
+        }
+
         const user = {
           id: session.user.id,
-          name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
-          email: session.user.email,
+          name: fullName,
+          email: displayEmail,
+          contactNumber,
+          authMethod,
           targetExam: session.user.user_metadata?.target_exam || 'JEE Advanced',
-          role: 'student',
+          role,
           createdAt: session.user.created_at
         };
         window.authService.setActiveSession(user);
