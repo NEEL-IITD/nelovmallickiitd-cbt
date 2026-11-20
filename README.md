@@ -129,9 +129,14 @@ The repository is pre-configured with industry-standard autonomous engineering s
 | **Impeccable** | Pixel-perfect polish and frontend execution standards. | `@skills/impeccable` |
 | **Web Design Guidelines** | Vercel Labs web design benchmarks and high-performance Web standards. | `@skills/web-design-guidelines` |
 
+### 6. Continuous Deployment & Auto-Sync Pipeline
+- **Real-Time Workspace Watcher (`npm run sync:watch`)**: Detects any changes across the workspace, auto-stages files, creates structured git commits, and auto-pushes to GitHub `origin/main`.
+- **Instant Production Sync (`npm run sync`)**: Runs TypeScript verification, creates the production build, and deploys directly to Vercel global CDN with zero manual interventions.
+
 ---
 
 ## 🛡️ License & Direction
 
 Academic direction, test curation, and lecture series by **Nelov Mallick (IIT Delhi)**.  
 Released as a 100% free platform for JEE Mains & Advanced aspirants across India.
+<!-- Antigravity Auto-Sync Enabled -->

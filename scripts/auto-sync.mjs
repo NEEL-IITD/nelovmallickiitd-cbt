@@ -7,23 +7,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
-const IGNORE_PATTERNS = [
-  /[\\/]\.git([\\/]|$)/,
-  /[\\/]node_modules([\\/]|$)/,
-  /[\\/]dist([\\/]|$)/,
-  /[\\/]\.vercel([\\/]|$)/,
-  /[\\/]\.system_generated([\\/]|$)/,
-  /[\\/]browser_evidence([\\/]|$)/,
-  /[\\/]scratch([\\/]|$)/,
-  /\.log$/,
-  /\.lock$/,
-  /\.tmp$/,
-  /~$/,
-  /package-lock\.json$/
-];
-
-function shouldIgnore(filePath) {
-  return IGNORE_PATTERNS.some(regex => regex.test(filePath));
+function shouldIgnore(relPath) {
+  const norm = relPath.replace(/\\/g, '/').toLowerCase();
+  if (norm.startsWith('.git') || norm.includes('/.git/')) return true;
+  if (norm.startsWith('node_modules') || norm.includes('/node_modules/')) return true;
+  if (norm.startsWith('dist') || norm.includes('/dist/')) return true;
+  if (norm.startsWith('.vercel') || norm.includes('/.vercel/')) return true;
+  if (norm.startsWith('.system_generated') || norm.includes('/.system_generated/')) return true;
+  if (norm.startsWith('browser_evidence') || norm.includes('/browser_evidence/')) return true;
+  if (norm.endsWith('.log') || norm.endsWith('.lock') || norm.endsWith('.tmp') || norm.endsWith('package-lock.json')) return true;
+  return false;
 }
 
 let debounceTimer = null;
@@ -62,7 +55,7 @@ function scheduleSync() {
   if (debounceTimer) clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => {
     triggerSync();
-  }, 5000); // 5 second debounce
+  }, 4000); // 4 second debounce
 }
 
 console.log('====================================================');
@@ -74,12 +67,11 @@ console.log('====================================================');
 try {
   fs.watch(rootDir, { recursive: true }, (eventType, filename) => {
     if (!filename) return;
-    const fullPath = path.join(rootDir, filename);
 
-    if (shouldIgnore(fullPath)) return;
+    if (shouldIgnore(filename)) return;
 
     console.log(`🔔 [${new Date().toLocaleTimeString()}] Workspace change detected: ${filename} (${eventType})`);
-    pendingChanges.add(fullPath);
+    pendingChanges.add(filename);
     scheduleSync();
   });
 } catch (err) {
