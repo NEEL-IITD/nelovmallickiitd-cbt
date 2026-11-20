@@ -5281,7 +5281,7 @@
       handleLogOut,
       setView,
       view = 'home',
-      activeSubject = 'physics',
+      activeVaultSubject = 'physics',
       userDropdownOpen,
       setUserDropdownOpen
     }) {
@@ -7453,8 +7453,8 @@
       const [activeLectureChapterSlug, setActiveLectureChapterSlug] = useState('isomerism-and-stereochemistry');
       const [activeLectureIndex, setActiveLectureIndex] = useState(1);
       const [activePhysicsChapterSlug, setActivePhysicsChapterSlug] = useState('c1');
-      const [activeSubject, setActiveSubject] = useState('physics');
-      const [activeSubjectChapterSlug, setActiveSubjectChapterSlug] = useState('c1');
+      const [activeVaultSubject, setActiveVaultSubject] = useState('physics');
+      const [activeVaultChapterSlug, setActiveVaultChapterSlug] = useState('c1');
       const [testConfigs, setTestConfigs] = useState({
         'jee-advanced-pta-04': 'live',
         'jee-advanced-pta-05': 'live',
@@ -7682,16 +7682,16 @@
 
                 if (hash.startsWith('#/resources/physics/') || hash.startsWith('#resources/physics/')) {
           const rawSlug = hash.replace(/^#\/?resources\/physics\//, '').trim().toLowerCase();
-          setActiveSubject('physics');
+          setActiveVaultSubject('physics');
           setActivePhysicsChapterSlug(rawSlug || 'c1');
-          setActiveSubjectChapterSlug(rawSlug || 'c1');
+          setActiveVaultChapterSlug(rawSlug || 'c1');
           setView('subject-chapter');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
 
         if (hash === '#/resources/physics' || hash === '#resources/physics') {
-          setActiveSubject('physics');
+          setActiveVaultSubject('physics');
           setView('subject-resources');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
@@ -7699,15 +7699,15 @@
 
         if (hash.startsWith('#/resources/chemistry/') || hash.startsWith('#resources/chemistry/')) {
           const rawSlug = hash.replace(/^#\/?resources\/chemistry\//, '').trim().toLowerCase();
-          setActiveSubject('chemistry');
-          setActiveSubjectChapterSlug(rawSlug || 'ch-1');
+          setActiveVaultSubject('chemistry');
+          setActiveVaultChapterSlug(rawSlug || 'ch-1');
           setView('subject-chapter');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
 
         if (hash === '#/resources/chemistry' || hash === '#resources/chemistry') {
-          setActiveSubject('chemistry');
+          setActiveVaultSubject('chemistry');
           setView('subject-resources');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
@@ -7715,15 +7715,15 @@
 
         if (hash.startsWith('#/resources/mathematics/') || hash.startsWith('#resources/mathematics/') || hash.startsWith('#/resources/maths/') || hash.startsWith('#resources/maths/')) {
           const rawSlug = hash.replace(/^#\/?resources\/(?:mathematics|maths)\//, '').trim().toLowerCase();
-          setActiveSubject('mathematics');
-          setActiveSubjectChapterSlug(rawSlug || 'c01');
+          setActiveVaultSubject('mathematics');
+          setActiveVaultChapterSlug(rawSlug || 'c01');
           setView('subject-chapter');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
 
         if (hash === '#/resources/mathematics' || hash === '#resources/mathematics' || hash === '#/resources/maths' || hash === '#resources/maths') {
-          setActiveSubject('mathematics');
+          setActiveVaultSubject('mathematics');
           setView('subject-resources');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
@@ -9536,7 +9536,6 @@
               handleLogOut={handleLogOut}
               setView={setView}
               view={view}
-              activeSubject={activeSubject}
               userDropdownOpen={userDropdownOpen}
               setUserDropdownOpen={setUserDropdownOpen}
             />
@@ -9575,7 +9574,6 @@
               handleLogOut={handleLogOut}
               setView={setView}
               view={view}
-              activeSubject={activeSubject}
               userDropdownOpen={userDropdownOpen}
               setUserDropdownOpen={setUserDropdownOpen}
             />
@@ -9604,7 +9602,7 @@
       // RENDER: REVISION NOTEBOOK VIEW
       // -------------------------------------------------------------
             if (view === 'subject-resources' || view === 'physics-resources' || view === 'chemistry-resources' || view === 'mathematics-resources') {
-        const currentSub = view === 'chemistry-resources' ? 'chemistry' : (view === 'mathematics-resources' ? 'mathematics' : (view === 'physics-resources' ? 'physics' : activeSubject));
+        const currentSub = view === 'chemistry-resources' ? 'chemistry' : (view === 'mathematics-resources' ? 'mathematics' : (view === 'physics-resources' ? 'physics' : activeVaultSubject));
         return (
           <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
             <MainNavbar
@@ -9617,7 +9615,6 @@
               handleLogOut={handleLogOut}
               setView={setView}
               view={view}
-              activeSubject={activeSubject}
               userDropdownOpen={userDropdownOpen}
               setUserDropdownOpen={setUserDropdownOpen}
             />
@@ -9625,8 +9622,8 @@
               subject={currentSub}
               setView={setView}
               setActiveChapterSlug={(slug) => {
-                setActiveSubject(currentSub);
-                setActiveSubjectChapterSlug(slug);
+                setActiveVaultSubject(currentSub);
+                setActiveVaultChapterSlug(slug);
                 setActivePhysicsChapterSlug(slug);
               }}
             />
@@ -9655,13 +9652,12 @@
               handleLogOut={handleLogOut}
               setView={setView}
               view={view}
-              activeSubject={activeSubject}
               userDropdownOpen={userDropdownOpen}
               setUserDropdownOpen={setUserDropdownOpen}
             />
             <Level3SubjectChapterDetailView
-              subject={activeSubject}
-              chapterSlug={activeSubjectChapterSlug || activePhysicsChapterSlug}
+              subject={activeVaultSubject}
+              chapterSlug={activeVaultChapterSlug || activePhysicsChapterSlug}
               setView={setView}
               currentUser={currentUser}
             />
@@ -9690,7 +9686,6 @@
               handleLogOut={handleLogOut}
               setView={setView}
               view={view}
-              activeSubject={activeSubject}
               userDropdownOpen={userDropdownOpen}
               setUserDropdownOpen={setUserDropdownOpen}
             />
@@ -9775,7 +9770,6 @@
             handleLogOut={handleLogOut}
             setView={setView}
             view={view}
-              activeSubject={activeSubject}
             userDropdownOpen={userDropdownOpen}
             setUserDropdownOpen={setUserDropdownOpen}
           />
@@ -9819,7 +9813,7 @@
             {/* 0. STUDY RESOURCES & FORMULA VAULT (Top-of-Homepage 3D Showcase) */}
             <StudyResourcesVaultShowcase
               onOpenSubject={(sub) => {
-                setActiveSubject(sub);
+                setActiveVaultSubject(sub);
                 setView('subject-resources');
                 window.location.hash = '#/resources/' + sub;
                 window.scrollTo({ top: 0, behavior: 'smooth' });
