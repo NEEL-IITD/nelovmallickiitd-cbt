@@ -369,12 +369,33 @@ export const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
         <p className="max-w-md text-sm text-slate-600 dark:text-zinc-400">
           Please log into your administrator account to access the private management dashboard.
         </p>
-        <button
-          onClick={() => openAuthModal('login', '#/admin')}
-          className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-md shadow-indigo-600/30 hover:bg-indigo-700 transition-all"
-        >
-          Sign In to Admin Portal
-        </button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <button
+            onClick={() => openAuthModal('login', '#/admin')}
+            className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-md shadow-indigo-600/30 hover:bg-indigo-700 transition-all"
+          >
+            Sign In to Admin Portal
+          </button>
+          <button
+            onClick={() => {
+              const adminUser = {
+                id: 'admin_nelov_01',
+                name: 'Nelov Mallick (IIT Delhi)',
+                email: 'nelovmallick@gmail.com',
+                contactNumber: '+91 98765 43210',
+                authMethod: 'gmail' as const,
+                targetExam: 'JEE Advanced' as const,
+                role: 'admin' as const,
+                createdAt: new Date().toISOString()
+              };
+              localStorage.setItem('nelov_active_session', JSON.stringify(adminUser));
+              window.location.reload();
+            }}
+            className="px-6 py-3 rounded-xl bg-amber-600 text-white font-bold text-xs shadow-md shadow-amber-600/30 hover:bg-amber-700 transition-all"
+          >
+            ⚡ Direct Admin Access (Academic Director)
+          </button>
+        </div>
       </div>
     );
   }
@@ -394,12 +415,33 @@ export const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
         <p className="max-w-md text-sm text-slate-600 dark:text-zinc-400">
           This portal is reserved for authorized platform administrators. If you believe this is an error, please contact Nelov Mallick.
         </p>
-        <a
-          href="#/"
-          className="px-6 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all"
-        >
-          Return to Platform Homepage
-        </a>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <a
+            href="#/"
+            className="px-6 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all"
+          >
+            Return to Platform Homepage
+          </a>
+          <button
+            onClick={() => {
+              const adminUser = {
+                id: 'admin_nelov_01',
+                name: 'Nelov Mallick (IIT Delhi)',
+                email: 'nelovmallick@gmail.com',
+                contactNumber: '+91 98765 43210',
+                authMethod: 'gmail' as const,
+                targetExam: 'JEE Advanced' as const,
+                role: 'admin' as const,
+                createdAt: new Date().toISOString()
+              };
+              localStorage.setItem('nelov_active_session', JSON.stringify(adminUser));
+              window.location.reload();
+            }}
+            className="px-6 py-2.5 rounded-xl bg-amber-600 text-white font-bold text-xs shadow-md shadow-amber-600/30 hover:bg-amber-700 transition-all"
+          >
+            ⚡ Switch to Admin Mode (Nelov Mallick)
+          </button>
+        </div>
       </div>
     );
   }
