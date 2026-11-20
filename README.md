@@ -93,6 +93,24 @@ npm run preview
 
 ---
 
+## 🤖 Installed Autonomous Agent & Workflow Skills
+
+The repository is pre-configured with industry-standard autonomous engineering skills:
+
+| Skill | Role / Purpose | Trigger / Commands |
+|---|---|---|
+| **Get Shit Done (GSD)** | Breaks complex features into small, bite-sized phases (Plan → Execute → Verify) with zero context rot. | `/gsd:new-project`, `/gsd:plan-phase`, `/gsd:execute-phase` |
+| **Roo Code** | Multi-model auto-switching. Seamlessly falls back to secondary models upon quota/rate limits (`429`, `RESOURCE_EXHAUSTED`) without stopping work. | Automatic on rate limits; `@skills/roo-code` |
+| **Ralph Loop** | Relentless execution mode that loops continuously, self-verifying until all objectives and tests pass without quitting. | `/ralph`, `@skills/ralph-loop-workflow` |
+| **CodeRabbit** | Real-time AI code reviewer catching bugs, security vulnerabilities, and logic flaws prior to git commit. | `coderabbit review --agent`, `@skills/code-review` |
+| **Frontend Design** | Anthropic production frontend guidelines, responsive design, micro-interactions. | `@skills/frontend-design` |
+| **UI/UX Pro Max** | High-end visual aesthetics, typography, accessibility, and modern design systems. | `@skills/ui-ux-pro-max` |
+| **Taste Skill** | Modern refined typography, whitespace, and color palette curation. | `@skills/design-taste-frontend` |
+| **Impeccable** | Pixel-perfect polish and frontend execution standards. | `@skills/impeccable` |
+| **Web Design Guidelines** | Vercel Labs web design benchmarks and high-performance Web standards. | `@skills/web-design-guidelines` |
+
+---
+
 ## 🛡️ License & Direction
 
 Academic direction, test curation, and lecture series by **Nelov Mallick (IIT Delhi)**.  

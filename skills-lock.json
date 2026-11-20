@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "code-review": {
+      "source": "coderabbitai/skills",
+      "sourceType": "github",
+      "skillPath": "skills/code-review/SKILL.md",
+      "computedHash": "ccbcf4ed2afd9e92b11060521e1512d7a56b6886152252683fce567c33ae22bd"
+    },
     "design-taste-frontend": {
       "source": "Leonxlnx/taste-skill",
       "sourceType": "github",
@@ -13,11 +19,29 @@
       "skillPath": "skills/frontend-design/SKILL.md",
       "computedHash": "106acf230014cbb43ca34e6410371321b56ca742f9ee0442e8ec05bf02eb0384"
     },
+    "gsd": {
+      "source": "ctsstc/get-shit-done-skills",
+      "sourceType": "github",
+      "skillPath": ".kilocode/skills/gsd/SKILL.md",
+      "computedHash": "680208c668bd9ce5135c2b6b21c200406ef04a45450b3246adb3a573f11ab40c"
+    },
     "impeccable": {
       "source": "pbakaus/impeccable",
       "sourceType": "github",
       "skillPath": ".agents/skills/impeccable/SKILL.md",
       "computedHash": "2b8264b52e65ed93f48962cf4daa657f055f5f6533d600071edd13b78432ef3e"
+    },
+    "ralph-loop-workflow": {
+      "source": "andrelandgraf/fullstackrecipes",
+      "sourceType": "github",
+      "skillPath": "skills/ralph-loop-workflow/SKILL.md",
+      "computedHash": "3657b1d85fb15dab69fea1d1153995ca0cd1438c764550a021f1836f9cae4d35"
+    },
+    "roo-code": {
+      "source": "antigravity/multi-model-router",
+      "sourceType": "local",
+      "skillPath": ".agents/skills/roo-code/SKILL.md",
+      "computedHash": "roo-code-v1-multi-model-failover-autofallback"
     },
     "ui-ux-pro-max": {
       "source": "nextlevelbuilder/ui-ux-pro-max-skill",
