@@ -149,3 +149,77 @@ export interface FAQItem {
   question: string;
   answer: string;
 }
+
+// ==============================================================================
+// Vault Exercises & Theory Notes Types (JEE CBT JSON Schema)
+// ==============================================================================
+
+export type VaultSubjectType = 'physics' | 'chemistry' | 'mathematics';
+export type VaultQuestionType = 'single_correct' | 'multi_correct' | 'numerical';
+
+export interface VaultQuestion {
+  id: string;
+  number: number;
+  type: VaultQuestionType;
+  question: string;
+  image?: string | null;
+  options?: string[];
+  correctAnswer: number | number[];
+  tolerance?: number;
+  solution: string;
+  solutionImage?: string | null;
+  marking?: {
+    correct: number;
+    incorrect: number;
+    unattempted: number;
+  };
+}
+
+export interface VaultExercise {
+  subject: VaultSubjectType;
+  chapterId: string;
+  chapterName?: string;
+  exerciseId: string;
+  title: string;
+  durationMinutes: number;
+  defaultMarking: {
+    correct: number;
+    incorrect: number;
+    unattempted: number;
+  };
+  questions: VaultQuestion[];
+  totalQuestions?: number;
+  totalMarks?: number;
+  updatedAt?: string;
+}
+
+export interface VaultTheoryNote {
+  id: string;
+  subject: VaultSubjectType;
+  chapterId: string;
+  chapterName?: string;
+  title: string;
+  pdfUrl: string;
+  fileName: string;
+  fileSizeBytes: number;
+  updatedAt?: string;
+}
+
+export interface VaultValidationResult {
+  isValid: boolean;
+  errors: string[];
+  summary: {
+    totalQuestions: number;
+    singleCorrectCount: number;
+    multiCorrectCount: number;
+    numericalCount: number;
+    totalMarks: number;
+    durationMinutes: number;
+    subject: string;
+    chapterId: string;
+    exerciseId: string;
+    title: string;
+  } | null;
+  data: VaultExercise | null;
+}
+
