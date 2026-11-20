@@ -5,12 +5,14 @@
 // and 3 Sub-Topic Tabs for Maths C18 (Applications of Derivative)
 // ==============================================================================
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { SubjectIcon } from './SubjectIcon';
 import { Tilt3DCard } from '../ui/Tilt3DCard';
+import { TheoryPdfViewerModal } from './TheoryPdfViewerModal';
+import { vaultService } from '../../services/vaultService';
 import {
   ArrowLeft, BookOpen, Clock, FileText, CheckCircle2,
-  Layers, Play
+  Layers, Play, Sparkles
 } from 'lucide-react';
 
 interface SubjectChapterDetailProps {
@@ -71,6 +73,22 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
   const currentTheory = isMultiSubTopic ? currentSubTopic.theory : chapter.theory;
   const currentExercises = isMultiSubTopic ? currentSubTopic.exercises : chapter.exercises;
 
+  // Dynamic Theory Data from Vault
+  const vaultTheory = useMemo(() => {
+    return vaultService.getTheoryNotes(subject, chapter.code || chapter.id);
+  }, [subject, chapter]);
+
+  const hasVaultPdf = Boolean(vaultTheory && vaultTheory.pdfUrl);
+
+  const handleExerciseClick = (exercise: any) => {
+    const vaultEx = vaultService.getExercise(subject, chapter.code || chapter.id, exercise.id);
+    if (vaultEx) {
+      onLaunchExercise(vaultEx);
+    } else {
+      onLaunchExercise(exercise);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0e] text-slate-900 dark:text-zinc-50 pt-6 pb-28 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -99,14 +117,22 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
             </span>
           </nav>
 
-          <button
-            type="button"
-            onClick={onBackToSubject}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 hover:border-slate-400 shadow-sm transition-all"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to {subjectDisplayName} Chapters</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <a
+              href="#/admin"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition-colors"
+            >
+              <span>⚡ Admin Upload</span>
+            </a>
+            <button
+              type="button"
+              onClick={onBackToSubject}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 hover:border-slate-400 shadow-sm transition-all"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to {subjectDisplayName} Chapters</span>
+            </button>
+          </div>
         </div>
 
         {/* Chapter Header Card (3D Elevated) */}
@@ -231,16 +257,23 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
                 <div className="flex items-center gap-4">
                   <div
                     className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0
-                      bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300
+                      ${hasVaultPdf ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600' : 'bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300'}
                       border border-slate-200 dark:border-zinc-700 shadow-sm`}
                   >
                     <FileText className="w-6 h-6" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
-                        Theory Notes — Upload Pending
-                      </span>
+                      {hasVaultPdf ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          <span>PDF Ready ({((vaultTheory?.fileSizeBytes || 0) / (1024 * 1024)).toFixed(1)} MB)</span>
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                          Theory Notes — Upload Pending
+                        </span>
+                      )}
                       {currentTheory.topics && (
                         <span className="text-[11px] font-bold text-slate-400">
                           {currentTheory.topics.length} Core Topics Mapped
@@ -248,7 +281,7 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
                       )}
                     </div>
                     <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-zinc-50 mt-1">
-                      {isMultiSubTopic ? `${currentSubTopic.name} — Theory` : currentTheory.title}
+                      {vaultTheory?.title || (isMultiSubTopic ? `${currentSubTopic.name} — Theory` : currentTheory.title)}
                     </h3>
                   </div>
                 </div>
@@ -256,9 +289,14 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
                 <button
                   type="button"
                   onClick={() => setPreviewTheoryModal(true)}
-                  className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 text-xs font-bold border border-slate-200 dark:border-zinc-700 transition-colors shrink-0"
+                  className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-colors shrink-0 flex items-center gap-2 ${
+                    hasVaultPdf
+                      ? 'bg-emerald-600 text-white border-emerald-500 hover:bg-emerald-700 shadow-md shadow-emerald-500/20'
+                      : 'bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 border-slate-200 dark:border-zinc-700'
+                  }`}
                 >
-                  📄 Preview Theory Notes
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>{hasVaultPdf ? '📄 View Official Theory PDF' : '📄 Preview Theory Notes'}</span>
                 </button>
               </div>
 
@@ -281,7 +319,9 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
 
               <div className="flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400 pt-2 border-t border-slate-100 dark:border-zinc-800">
                 <span>Format: PDF / Word (.docx) Interactive Viewer</span>
-                <span className="font-bold">Awaiting Docx/PDF Upload</span>
+                <span className="font-bold">
+                  {hasVaultPdf ? `PDF Uploaded (${vaultTheory?.fileName})` : 'Awaiting Docx/PDF Upload'}
+                </span>
               </div>
             </div>
           </Tilt3DCard>
@@ -306,6 +346,11 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
           {/* Exercise 3D Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {currentExercises.map((exercise: any) => {
+              const vaultEx = vaultService.getExercise(subject, chapter.code || chapter.id, exercise.id);
+              const isTestReady = Boolean(vaultEx && vaultEx.questions && vaultEx.questions.length > 0);
+              const qCount = isTestReady ? vaultEx!.questions.length : (exercise.questionCount || 25);
+              const durationMin = isTestReady ? (vaultEx!.durationMinutes || exercise.timeMinutes || 60) : (exercise.timeMinutes || 60);
+
               return (
                 <div key={exercise.id} className="w-full flex">
                   <Tilt3DCard
@@ -313,7 +358,7 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
                     scale={1.02}
                     perspective={1200}
                     className="group cursor-pointer w-full flex flex-col justify-between"
-                    onClick={() => onLaunchExercise(exercise)}
+                    onClick={() => handleExerciseClick(exercise)}
                   >
                     <div
                       className={`relative flex flex-col justify-between h-full overflow-hidden rounded-2xl bg-white dark:bg-[#121318]
@@ -325,9 +370,16 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
                       <div className="space-y-4" style={{ transform: 'translateZ(20px)' }}>
                         {/* Status Badge */}
                         <div className="flex items-center justify-between">
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
-                            Ready for Upload
-                          </span>
+                          {isTestReady ? (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                              <span>⚡ Test Ready ({qCount} Qs)</span>
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                              Ready for Upload
+                            </span>
+                          )}
                           <span className="text-[11px] font-bold text-slate-500 dark:text-zinc-400">
                             {exercise.targetExam}
                           </span>
@@ -336,7 +388,7 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
                         {/* Title */}
                         <div className="space-y-1">
                           <h3 className="text-lg font-black text-slate-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                            {exercise.title}
+                            {vaultEx?.title || exercise.title}
                           </h3>
                           <p className="text-xs text-slate-600 dark:text-zinc-400 line-clamp-2">
                             {exercise.description}
@@ -347,22 +399,26 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
                         <div className="flex items-center gap-3 text-xs font-semibold text-slate-500 dark:text-zinc-400 pt-1">
                           <span className="flex items-center gap-1">
                             <Clock className="w-3.5 h-3.5 text-indigo-500" />
-                            {exercise.timeMinutes} Min
+                            {durationMin} Min
                           </span>
                           <span>•</span>
-                          <span>{exercise.questionCount} Questions</span>
+                          <span>{qCount} Questions</span>
                           <span>•</span>
-                          <span>{exercise.marks} Marks</span>
+                          <span>{isTestReady ? (qCount * 4) : exercise.marks} Marks</span>
                         </div>
                       </div>
 
                       {/* Action Button */}
                       <div className="pt-5 mt-4 border-t border-slate-100 dark:border-zinc-800" style={{ transform: 'translateZ(25px)' }}>
                         <div
-                          className={`w-full py-2.5 px-4 rounded-xl text-xs font-black flex items-center justify-center gap-2 shadow-sm transition-all ${theme.btnClass} group-hover:scale-[1.02]`}
+                          className={`w-full py-2.5 px-4 rounded-xl text-xs font-black flex items-center justify-center gap-2 shadow-sm transition-all ${
+                            isTestReady
+                              ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'
+                              : theme.btnClass
+                          } group-hover:scale-[1.02]`}
                         >
                           <Play className="w-3.5 h-3.5 fill-current" />
-                          <span>Launch CBT Test Shell</span>
+                          <span>{isTestReady ? `⚡ Launch Live Test (${qCount} Qs)` : 'Launch CBT Test Shell'}</span>
                         </div>
                       </div>
 
@@ -374,48 +430,17 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
           </div>
         </section>
 
-        {/* Theory Preview Modal */}
-        {previewTheoryModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-            <div className="w-full max-w-lg rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 sm:p-8 shadow-2xl space-y-5 text-left">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-2xl flex items-center justify-center mx-auto shadow-sm">
-                📄
-              </div>
-              <div className="text-center space-y-2">
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
-                  Upload Ready State
-                </span>
-                <h3 className="text-lg font-black text-slate-900 dark:text-zinc-50">
-                  {currentTheory.title}
-                </h3>
-                <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
-                  {currentTheory.summary}
-                </p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs space-y-2">
-                <div className="font-bold text-slate-900 dark:text-zinc-100">
-                  📋 Mapped Core Concepts:
-                </div>
-                <ul className="list-disc pl-5 space-y-1 text-slate-600 dark:text-zinc-400">
-                  {currentTheory.topics?.map((t: string, idx: number) => (
-                    <li key={idx}>{t}</li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={() => setPreviewTheoryModal(false)}
-                  className="w-full py-3 rounded-xl bg-slate-900 dark:bg-zinc-100 text-white dark:text-slate-900 font-extrabold text-xs shadow-md transition-all"
-                >
-                  Close Preview
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Theory Modal (Embedded PDF Viewer or Upload Preview) */}
+        <TheoryPdfViewerModal
+          isOpen={previewTheoryModal}
+          onClose={() => setPreviewTheoryModal(false)}
+          chapter={chapter}
+          subject={subject}
+          onOpenAdminUpload={() => {
+            setPreviewTheoryModal(false);
+            window.location.hash = '#/admin';
+          }}
+        />
 
       </div>
     </div>

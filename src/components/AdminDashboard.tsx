@@ -8,10 +8,13 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { studentStorage } from '../utils/studentStorage';
 import { ErrorReportItem, ErrorReportStatus } from '../types';
+import { VaultContentManager } from './vault/VaultContentManager';
+import { ExerciseTestShellModal } from './physics/ExerciseTestShellModal';
 
 export const AdminDashboard: React.FC = () => {
   const { isCloudConnected, user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'students' | 'attempts' | 'tests' | 'reports'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'students' | 'attempts' | 'tests' | 'reports' | 'vault'>('overview');
+  const [testToLaunch, setTestToLaunch] = useState<any | null>(null);
 
   // Core Data States
   const [students, setStudents] = useState<any[]>([]);
@@ -311,6 +314,7 @@ export const AdminDashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-slate-100 dark:border-zinc-800/80 pt-1">
           {[
             { id: 'overview', label: 'Overview', icon: '📊' },
+            { id: 'vault', label: 'Vault Exercises & Theory', icon: '⚡' },
             { id: 'students', label: `All Students (${totalStudents})`, icon: '👥' },
             { id: 'attempts', label: `Test Attempts (${totalAttemptsCount})`, icon: '📝' },
             { id: 'tests', label: `Manage Tests (${liveTestsCount}/20 Live)`, icon: '⚙️' },
@@ -1066,6 +1070,38 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* ==================================================================== */}
+        {/* TAB 6: VAULT EXERCISES & THEORY UPLOADER */}
+        {/* ==================================================================== */}
+        {activeTab === 'vault' && (
+          <div className="space-y-6 animate-in fade-in">
+            <div className="p-5 rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="font-black text-lg text-slate-900 dark:text-zinc-100 flex items-center gap-2">
+                  <span>⚡ Vault Content Manager &amp; JEE Exercise Uploader</span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                    Schema Locked
+                  </span>
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
+                  Upload chapterwise exercises as standardized JSON files and theory notes as PDF files. Automatically deployed to live student vault.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                <span>Director:</span>
+                <span className="text-slate-900 dark:text-zinc-100 font-extrabold">Nelov Mallick (IIT Delhi)</span>
+              </div>
+            </div>
+
+            <VaultContentManager
+              onLaunchTest={(exercise) => {
+                setTestToLaunch(exercise);
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {/* ==================================================================== */}
@@ -1165,6 +1201,18 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Live Test Launch Shell from Vault */}
+      {testToLaunch && (
+        <ExerciseTestShellModal
+          isOpen={Boolean(testToLaunch)}
+          onClose={() => setTestToLaunch(null)}
+          chapter={{ code: testToLaunch.chapterId, name: testToLaunch.title }}
+          exercise={testToLaunch}
+          subject={testToLaunch.subject || 'physics'}
+          studentName={user?.name || 'Administrator'}
+        />
       )}
     </div>
   );

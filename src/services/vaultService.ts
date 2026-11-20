@@ -14,7 +14,7 @@ import {
 
 const STORAGE_KEY_EXERCISES = 'nelov_vault_exercises';
 const STORAGE_KEY_THEORY = 'nelov_vault_theory';
-const STORAGE_KEY_ATTEMPTS = 'nelov_vault_exercise_attempts';
+export const STORAGE_KEY_ATTEMPTS = 'nelov_vault_exercise_attempts';
 
 // Seed data from Nelov Mallick: Physics C08 Rotational Motion - Exercise 1
 export const SEED_ROTATIONAL_MOTION_EX1: VaultExercise = {
@@ -273,7 +273,7 @@ class VaultService {
     }
 
     // Cloud sync to Supabase
-    if (isSupabaseConfigured() && supabase) {
+    if (isSupabaseConfigured && supabase) {
       try {
         await supabase.from('vault_exercises').upsert(
           {
@@ -384,13 +384,13 @@ class VaultService {
 
       localStorage.setItem(STORAGE_KEY_EXERCISES, JSON.stringify(map));
 
-      if (isSupabaseConfigured() && supabase) {
-        supabase
-          .from('vault_exercises')
-          .delete()
-          .eq('id', directKey)
-          .then(() => {})
-          .catch(() => {});
+      if (isSupabaseConfigured && supabase) {
+        try {
+          supabase
+            .from('vault_exercises')
+            .delete()
+            .eq('id', directKey);
+        } catch (e) {}
       }
       return true;
     } catch (e) {
@@ -430,7 +430,7 @@ class VaultService {
       console.warn('[VaultService] Failed to save theory notes locally:', e);
     }
 
-    if (isSupabaseConfigured() && supabase) {
+    if (isSupabaseConfigured && supabase) {
       try {
         await supabase.from('vault_theory_notes').upsert(
           {
@@ -503,13 +503,13 @@ class VaultService {
       delete map[key];
       localStorage.setItem(STORAGE_KEY_THEORY, JSON.stringify(map));
 
-      if (isSupabaseConfigured() && supabase) {
-        supabase
-          .from('vault_theory_notes')
-          .delete()
-          .eq('id', key)
-          .then(() => {})
-          .catch(() => {});
+      if (isSupabaseConfigured && supabase) {
+        try {
+          supabase
+            .from('vault_theory_notes')
+            .delete()
+            .eq('id', key);
+        } catch (e) {}
       }
       return true;
     } catch (e) {

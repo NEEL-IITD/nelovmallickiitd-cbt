@@ -7,19 +7,20 @@
 // 3. Reusable test shell modal integration
 // ==============================================================================
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { PhysicsChapter, ChapterExercise } from '../../data/physicsChapters';
 import { PhysicsCard3D } from './PhysicsCard3D';
 import { PhysicsIcon } from './PhysicsIcon';
 import { Tilt3DCard } from '../ui/Tilt3DCard';
 import { ExerciseTestShellModal } from './ExerciseTestShellModal';
+import { TheoryPdfViewerModal } from '../vault/TheoryPdfViewerModal';
+import { vaultService } from '../../services/vaultService';
 import {
   ArrowLeft,
   BookOpen,
   Layers,
   UploadCloud,
-  FileText,
-  ChevronRight
+  FileText
 } from 'lucide-react';
 
 interface Level3ChapterDetailProps {
@@ -35,8 +36,24 @@ export const Level3ChapterDetail: React.FC<Level3ChapterDetailProps> = ({
   onNavigateHome,
   user
 }) => {
-  const [activeExerciseForTest, setActiveExerciseForTest] = useState<ChapterExercise | null>(null);
+  const [activeExerciseForTest, setActiveExerciseForTest] = useState<any | null>(null);
   const [showTheoryModal, setShowTheoryModal] = useState<boolean>(false);
+
+  // Dynamic Theory from Vault
+  const vaultTheory = useMemo(() => {
+    return vaultService.getTheoryNotes('physics', chapter.code || chapter.id);
+  }, [chapter]);
+
+  const hasVaultPdf = Boolean(vaultTheory && vaultTheory.pdfUrl);
+
+  const handleLaunchExercise = (exercise: ChapterExercise) => {
+    const vaultEx = vaultService.getExercise('physics', chapter.code || chapter.id, exercise.id);
+    if (vaultEx) {
+      setActiveExerciseForTest(vaultEx);
+    } else {
+      setActiveExerciseForTest(exercise);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50/60 dark:bg-[#0a0a0c] py-8 sm:py-12 relative overflow-hidden">
@@ -49,74 +66,63 @@ export const Level3ChapterDetail: React.FC<Level3ChapterDetailProps> = ({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-8">
         
-        {/* Navigation & Breadcrumbs Bar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-zinc-800">
-          
-          {/* Breadcrumbs */}
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-500 dark:text-zinc-400">
+        {/* Navigation Breadcrumb Trail */}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200/80 dark:border-zinc-800/80 pb-4">
+          <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-zinc-400">
             <button
-              type="button"
               onClick={onNavigateHome}
               className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
             >
               Home
             </button>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+            <span>›</span>
             <button
-              type="button"
               onClick={onBackToGrid}
               className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
             >
               Physics Resources
             </button>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-            <span className="font-bold text-slate-900 dark:text-zinc-100">
-              {chapter.fullName}
+            <span>›</span>
+            <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">
+              {chapter.code} - {chapter.name}
             </span>
           </nav>
 
-          {/* Back Button */}
-          <button
-            type="button"
-            onClick={onBackToGrid}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-zinc-200 bg-white dark:bg-[#12131a] border border-slate-200 dark:border-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-800 shadow-sm transition-all"
-          >
-            <ArrowLeft className="w-4 h-4 text-indigo-500" />
-            Back to 28 Chapters
-          </button>
+          <div className="flex items-center gap-2">
+            <a
+              href="#/admin"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition-colors"
+            >
+              <span>⚡ Admin Upload</span>
+            </a>
+            <button
+              onClick={onBackToGrid}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 hover:border-slate-400 shadow-sm transition-all"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to 28 Chapters</span>
+            </button>
+          </div>
         </div>
 
-        {/* Chapter Header Card (3D Elevated) */}
-        <div
-          className="rounded-3xl bg-white dark:bg-[#12131a] border border-slate-200/90 dark:border-zinc-800/90 
-            border-b-4 border-b-slate-300 dark:border-b-zinc-700
-            shadow-[0_15px_35px_-10px_rgba(0,0,0,0.06)] p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6"
-        >
-          <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-5">
-            
-            {/* 3D Icon Box */}
+        {/* Chapter Header Banner */}
+        <div className="rounded-3xl bg-white dark:bg-[#12131a] border border-slate-200/90 dark:border-zinc-800/90 p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-sm">
+          <div className="flex items-center gap-5">
             <div
-              className={`w-18 h-18 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center shrink-0
-                bg-gradient-to-b from-slate-50 to-slate-100 dark:from-zinc-800 dark:to-zinc-900
-                border border-slate-200 dark:border-zinc-700 border-b-[3px] border-b-slate-300 dark:border-b-zinc-700
-                shadow-md`}
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center shrink-0 border border-white/20 shadow-md text-white"
+              style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #2563eb 100%)' }}
             >
-              <PhysicsIcon name={chapter.iconName} className={`w-9 h-9 ${chapter.colorTheme.accent}`} />
+              <PhysicsIcon name={chapter.iconName} className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
             </div>
-
-            <div className="space-y-1.5">
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                <span className="px-2.5 py-0.5 rounded-lg text-xs font-black tracking-wide uppercase bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
                   {chapter.code}
                 </span>
-                <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300">
+                <span className="text-xs font-bold text-slate-500 dark:text-zinc-400">
                   {chapter.category}
                 </span>
-                <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                  {chapter.exercises.length} CBT {chapter.exercises.length === 1 ? 'Test' : 'Tests'} Ready
-                </span>
               </div>
-
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-zinc-50 tracking-tight">
                 {chapter.name}
               </h1>
@@ -141,7 +147,7 @@ export const Level3ChapterDetail: React.FC<Level3ChapterDetailProps> = ({
               1. Theory Portion
             </h2>
             <span className="text-xs font-bold text-slate-500 dark:text-zinc-400">
-              Curated Concept Notes & Derivations
+              Curated Concept Notes &amp; Derivations
             </span>
           </div>
 
@@ -177,17 +183,24 @@ export const Level3ChapterDetail: React.FC<Level3ChapterDetailProps> = ({
 
                   <div className="space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-1.5">
-                        <UploadCloud className="w-3.5 h-3.5 text-amber-500" />
-                        {chapter.theory.statusLabel}
-                      </span>
+                      {hasVaultPdf ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          <span>PDF Ready ({((vaultTheory?.fileSizeBytes || 0) / (1024 * 1024)).toFixed(1)} MB)</span>
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-1.5">
+                          <UploadCloud className="w-3.5 h-3.5 text-amber-500" />
+                          {chapter.theory.statusLabel}
+                        </span>
+                      )}
                       <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400">
                         {chapter.theory.topics?.length || 4} Core Topics Mapped
                       </span>
                     </div>
 
                     <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-zinc-50 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                      {chapter.theory.title}
+                      {vaultTheory?.title || chapter.theory.title}
                     </h3>
 
                     {/* Topics Pill List */}
@@ -215,13 +228,17 @@ export const Level3ChapterDetail: React.FC<Level3ChapterDetailProps> = ({
                       e.stopPropagation();
                       setShowTheoryModal(true);
                     }}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-xs sm:text-sm text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors shadow-sm"
+                    className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-xs sm:text-sm border transition-colors shadow-sm ${
+                      hasVaultPdf
+                        ? 'bg-emerald-600 text-white border-emerald-500 hover:bg-emerald-700 shadow-emerald-500/20'
+                        : 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100'
+                    }`}
                   >
                     <FileText className="w-4 h-4" />
-                    Preview Theory Notes
+                    <span>{hasVaultPdf ? 'View Official Theory PDF' : 'Preview Theory Notes'}</span>
                   </button>
                   <span className="text-[11px] font-semibold text-slate-600 dark:text-zinc-300">
-                    Awaiting Docx/PDF Upload
+                    {hasVaultPdf ? `PDF Uploaded (${vaultTheory?.fileName})` : 'Awaiting Docx/PDF Upload'}
                   </span>
                 </div>
 
@@ -249,22 +266,33 @@ export const Level3ChapterDetail: React.FC<Level3ChapterDetailProps> = ({
 
           {/* Exercises 3D Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {chapter.exercises.map((exercise) => (
-              <PhysicsCard3D
-                key={exercise.id}
-                iconName={chapter.iconName}
-                badge={exercise.statusLabel}
-                badgeColor="bg-amber-50 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border-amber-200 dark:border-amber-800"
-                category={exercise.targetExam}
-                title={exercise.title}
-                subtitle={exercise.description}
-                metadata={`${exercise.questionCount || 25} Questions • ${exercise.timeMinutes || 60} Min`}
-                accentColor={chapter.colorTheme.accent}
-                glowColor={chapter.colorTheme.glow}
-                actionText="Launch CBT Shell"
-                onClick={() => setActiveExerciseForTest(exercise)}
-              />
-            ))}
+            {chapter.exercises.map((exercise) => {
+              const vaultEx = vaultService.getExercise('physics', chapter.code || chapter.id, exercise.id);
+              const isTestReady = Boolean(vaultEx && vaultEx.questions && vaultEx.questions.length > 0);
+              const qCount = isTestReady ? vaultEx!.questions.length : (exercise.questionCount || 25);
+              const durationMin = isTestReady ? (vaultEx!.durationMinutes || exercise.timeMinutes || 60) : (exercise.timeMinutes || 60);
+
+              return (
+                <PhysicsCard3D
+                  key={exercise.id}
+                  iconName={chapter.iconName}
+                  badge={isTestReady ? `⚡ Test Ready (${qCount} Qs)` : exercise.statusLabel}
+                  badgeColor={
+                    isTestReady
+                      ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                      : 'bg-amber-50 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                  }
+                  category={exercise.targetExam}
+                  title={vaultEx?.title || exercise.title}
+                  subtitle={exercise.description}
+                  metadata={`${qCount} Questions • ${durationMin} Min`}
+                  accentColor={chapter.colorTheme.accent}
+                  glowColor={chapter.colorTheme.glow}
+                  actionText={isTestReady ? `⚡ Launch Live Test (${qCount} Qs)` : 'Launch CBT Shell'}
+                  onClick={() => handleLaunchExercise(exercise)}
+                />
+              );
+            })}
           </div>
         </section>
 
@@ -277,75 +305,22 @@ export const Level3ChapterDetail: React.FC<Level3ChapterDetailProps> = ({
           onClose={() => setActiveExerciseForTest(null)}
           chapter={chapter}
           exercise={activeExerciseForTest}
+          subject="physics"
           studentName={user?.name || 'Guest Aspirant'}
         />
       )}
 
-      {/* Theory Notes Placeholder Modal */}
-      {showTheoryModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#12131a] rounded-3xl border border-slate-200 dark:border-zinc-800 max-w-xl w-full p-6 sm:p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in-95 duration-200">
-            
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
-                  <BookOpen className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-zinc-50">
-                    {chapter.fullName} · Theory
-                  </h3>
-                  <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
-                    Upload Pending (Word / PDF)
-                  </span>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowTheoryModal(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-3.5 text-xs sm:text-sm text-slate-600 dark:text-zinc-300">
-              <div className="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200/60 dark:border-indigo-800/60 space-y-2">
-                <p className="font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-1.5">
-                  <UploadCloud className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                  Theory Notes Pipeline Ready
-                </p>
-                <p>
-                  Nelov Mallick will upload complete handwritten derivations, formula vaults, and NCERT-aligned problem notes for <strong>{chapter.name}</strong>.
-                </p>
-              </div>
-
-              <div className="space-y-1.5">
-                <h4 className="font-bold text-slate-800 dark:text-zinc-200">
-                  Included Subtopics:
-                </h4>
-                <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-zinc-400 pl-1">
-                  {chapter.theory.topics?.map((t, idx) => (
-                    <li key={idx}>{t}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-zinc-800">
-              <button
-                type="button"
-                onClick={() => setShowTheoryModal(false)}
-                className="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-700 dark:text-zinc-300 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 transition-colors"
-              >
-                Got It
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
-
+      {/* Theory Notes PDF Viewer / Placeholder Modal */}
+      <TheoryPdfViewerModal
+        isOpen={showTheoryModal}
+        onClose={() => setShowTheoryModal(false)}
+        chapter={chapter}
+        subject="physics"
+        onOpenAdminUpload={() => {
+          setShowTheoryModal(false);
+          window.location.hash = '#/admin';
+        }}
+      />
     </div>
   );
 };
