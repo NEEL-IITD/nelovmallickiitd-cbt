@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { allStudyResources, StudyResource, SubjectType, ExamTargetType, ResourceCategory } from '../data/resourcesIndex';
 import { Tilt3DCard } from './ui/Tilt3DCard';
+import { Level1PhysicsEntryCard } from './physics/Level1PhysicsEntryCard';
 
 interface ResourcesHubProps {
   onBackToHome: () => void;
@@ -147,6 +148,15 @@ export const ResourcesHub: React.FC<ResourcesHubProps> = ({ onBackToHome, onOpen
           <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400">
             Comprehensive formula sheets, reaction mechanisms, and NCERT trends. Derived with full KaTeX equations by <strong className="font-semibold text-slate-900 dark:text-zinc-100">Nelov Mallick (IIT Delhi)</strong>.
           </p>
+        </div>
+
+        {/* Level 1: Flagship Physics 3D Resources Module */}
+        <div className="mb-12">
+          <Level1PhysicsEntryCard
+            onOpenPhysics={() => {
+              window.location.hash = '#/resources/physics';
+            }}
+          />
         </div>
 
         {/* Search & Filter Bar */}

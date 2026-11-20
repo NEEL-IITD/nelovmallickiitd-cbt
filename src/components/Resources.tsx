@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ExamType } from '../types';
 import { allStudyResources, StudyResource, SubjectType } from '../data/resourcesIndex';
 import { Tilt3DCard } from './ui/Tilt3DCard';
+import { Level1PhysicsEntryCard } from './physics/Level1PhysicsEntryCard';
 
 interface ResourcesProps {
   exam: ExamType;
@@ -87,6 +88,15 @@ export const Resources: React.FC<ResourcesProps> = ({ exam, onOpenAuth, onOpenRe
           <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400">
             High-yield formula sheets, key reaction mechanisms, and NCERT trend summaries. 100% free forever — sign in and they are yours, zero paywalls.
           </p>
+        </div>
+
+        {/* Level 1: Standalone Main Entry 3D Box (Physics Resources C1-C28) */}
+        <div className="mb-14 max-w-6xl mx-auto">
+          <Level1PhysicsEntryCard
+            onOpenPhysics={() => {
+              window.location.hash = '#/resources/physics';
+            }}
+          />
         </div>
 
         {/* Subject Filter Tabs */}

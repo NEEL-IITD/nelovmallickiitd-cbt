@@ -28,6 +28,7 @@ import { ResourcesHub } from './components/ResourcesHub';
 import { LecturesHub } from './components/LecturesHub';
 import { LecturePlayer } from './components/LecturePlayer';
 import { LecturesSection } from './components/LecturesSection';
+import { PhysicsResourcesHub } from './components/physics/PhysicsResourcesHub';
 
 export const AppContent: React.FC = () => {
   const { user, isCloudConnected, openAuthModal } = useAuth();
@@ -109,6 +110,12 @@ export const AppContent: React.FC = () => {
         <ProtectedRoute redirectUrl="#/notebook" fallbackMessage="Sign in or create a free account to view your bookmarked questions and derivations.">
           <RevisionNotebook />
         </ProtectedRoute>
+      ) : currentHash.startsWith('#/resources/physics') ? (
+        <PhysicsResourcesHub
+          currentHash={currentHash}
+          onNavigate={handleNavigate}
+          user={user}
+        />
       ) : currentHash === '#/resources' ? (
         <ResourcesHub
           onBackToHome={() => handleNavigate('#/')}

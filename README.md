@@ -44,9 +44,29 @@ Accessible when logging in with Admin Gmail (`nelovmallick@gmail.com` / `YOUR_AD
 - Chapter revision notes, formula sheets, and personal Revision Notebook.
 - Interactive 3D tilt effect cards on desktop.
 
+### 5. Physics Resources Chapterwise Module (TestonGo 3D Aesthetic)
+- **Level 1 (Main Entry 3D Box)**: Standalone 3D card titled **`PHYSICS Resources Chapterwise (JEE MAINS + ADVANCED)`** with subtitle `28 Chapters • Theory & Chapterwise Tests`, atomic 3D icon, and smooth transition into the Physics Vault.
+- **Level 2 (28 Chapter 3D Boxes Grid)**: Complete 28 chapters (C1 to C28) displayed in tactile 3D boxes with chapter code badges, distinct physics symbols, metadata tags, unit category filters (`Mechanics`, `General Physics`, `Thermal Physics`, `Electromagnetism`, etc.), and a real-time search bar.
+- **Level 3 (Inside Chapter: Theory + CBT Exercises)**:
+  - **Theory Portion**: Dedicated 3D box titled `Theory` (e.g. `Theory (NLM, Friction, Constraint)`) with `Theory Notes — Upload Pending` status and topic preview.
+  - **Exercises (Online Test Format)**: Individual 3D boxes for every exercise belonging to that chapter with `Coming Soon / Ready for Upload` status.
+  - **CBT Test Interface Shell**: Reusable full-fidelity CBT testing environment with live countdown timer, 25-question palette, answer selection, Mark for Review, and submission score summary—fully primed for Word (`.docx`) question uploads.
+
 ---
 
 ## 📸 Screenshots & Proof of Verification
+
+| Level 1: Standalone Physics 3D Entry Card | Level 2: 28 Chapter 3D Boxes Grid |
+|---|---|
+| ![Level 1 Physics Entry](/docs/images/physics_level1_entry_card.png) | ![Level 2 Chapter Grid](/docs/images/physics_level2_chapters_grid.png) |
+
+| Level 2: Real-Time Chapter Search Filter | Level 3: Chapter Detail & Theory/Exercises (C8) |
+|---|---|
+| ![Level 2 Search Filter](/docs/images/physics_level2_search_filter.png) | ![Level 3 Chapter C8](/docs/images/physics_level3_chapter_c8.png) |
+
+| CBT Test Interface Shell (Live Timer & Palette) | Test Submission & Instant Summary Modal |
+|---|---|
+| ![CBT Test Shell](/docs/images/physics_cbt_test_shell_modal.png) | ![CBT Submit Summary](/docs/images/physics_cbt_submit_summary.png) |
 
 | Dynamic Mandatory Contact Number | Student Profile Dropdown (Clean Phone Display) |
 |---|---|

@@ -34,6 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { name: 'JEE Mains (PTA 01–10)', href: '#/tests/jee-mains' },
     { name: 'Live Tests', href: '#/test/jee-advanced/pta-04' },
     { name: 'Lectures', href: '#/lectures', badge: 'New' },
+    { name: 'Physics Vault', href: '#/resources/physics', badge: '3D C1–C28' },
     { name: 'Study Resources', href: '#/resources', badge: 'Free' },
     { name: 'My Progress', href: '#/progress', protected: true },
     { name: 'Revision Notebook', href: '#/notebook', protected: true },
