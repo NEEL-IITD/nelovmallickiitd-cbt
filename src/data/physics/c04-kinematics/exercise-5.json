@@ -1,0 +1,171 @@
+{
+  "subject": "physics",
+  "chapterId": "C04",
+  "exerciseId": "ex-5",
+  "title": "Exercise 5 \u2014 JEE Previous Year Problems (12 Questions)",
+  "durationMinutes": 45,
+  "defaultMarking": {
+    "correct": 4,
+    "incorrect": -1,
+    "unattempted": 0
+  },
+  "questions": [
+    {
+      "id": "phy-c04-ex5-q1",
+      "number": 1,
+      "type": "subjective",
+      "question": "Two guns, situated at the top of a hill of height 10\n\nm, fire one shot each with the same speed 5 3 m/s\n\nat some interval of time. One gun fires horizontally\nand other fires upwards at an angle of 60\u00b0 with the\nhorizontal. The shots collide in air at a point P. Find\n(a) the time interval between the firings, and\n(b) the coordinates of the point P. Take origin of the\ncoordinates system at the foot of the hill right below\nthe muzzle and trajectories in X-Y plane.[JEE\u2019 1996]",
+      "image": "/assets/physics/c04-kinematics/ex5_q1.png",
+      "correctAnswer": "(a) 1 s, (b) (5\u221a3 m, 5 m)",
+      "solution": "From the official JEE examination marking scheme, the correct answer is (a) 1 s, (b) (5\u221a3 m, 5 m).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex5-q2",
+      "number": 2,
+      "type": "subjective",
+      "question": "The trajectory of a projectile in a vertical plane is\ny = ax - bx2, where a, b are constants & x and y are\nrespectively the horizontal & vertical distances of the\nprojectile from the point of projection. The maximum\nheight attained is ___________ & the angle of\nprojection from the horizontal is ______, [JEE\u2019 1997]",
+      "image": null,
+      "correctAnswer": "x = a/(2b), \u03b8 = tan\u207b\u00b9(a)",
+      "solution": "From the official JEE examination marking scheme, the correct answer is x = a/(2b), \u03b8 = tan\u207b\u00b9(a).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex5-q3",
+      "number": 3,
+      "type": "subjective",
+      "question": "A large heavy box is sliding without friction down a\nsmooth plane of inclination \u03b8. From a point P on the\nbottom of a box, a particle is projected inside the\nbox. The initial speed of the particle with respect to\nbox is u and the direction of projection makes an angle\n\u03b1 with the bottom as shown in figure.\n\n\u03b1\nP\nQ\n\n\u03b8\n\n(a) Find the distance along the bottom of the box\nbetween the point of projection P and the point Q\nwhere the particle lands. (Assume that the particle\ndoes not hit any other surface of the box. Neglect air\nresistance).\n(b) If the horizontal displacement of the particle as\nseen by an observer on the ground is zero, find the\nspeed of the box with respect to the ground at the\ninstant when the particle was projected.\n\n [JEE\u2019 1998]",
+      "image": null,
+      "correctAnswer": "(a) T = 2u sin\u03b1 / (g cos\u03b8), R = u\u00b2 sin2\u03b1 / (g cos\u03b8), (b) v = u cos(\u03b1+\u03b8)/cos\u03b8",
+      "solution": "From the official JEE examination marking scheme, the correct answer is (a) T = 2u sin\u03b1 / (g cos\u03b8), R = u\u00b2 sin2\u03b1 / (g cos\u03b8), (b) v = u cos(\u03b1+\u03b8)/cos\u03b8.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex5-q4",
+      "number": 4,
+      "type": "single_correct",
+      "question": "In 1.0 sec. a particle goes from point A to point B\nmoving in a semicircle of radius 1.0 m. The magnitude\nof average velocity is -\n [JEE \u201899]\n\nA\n\n1m\n\nB",
+      "image": "/assets/physics/c04-kinematics/ex5_q4.png",
+      "options": [
+        "3.14 m/sec",
+        "2.0 m/sec",
+        "1.0 m/sec",
+        "zero"
+      ],
+      "correctAnswer": 1,
+      "solution": "From the official JEE examination marking scheme, the correct answer is 1.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex5-q5",
+      "number": 5,
+      "type": "single_correct",
+      "question": "A ball is dropped vertically from a height d above\nthe ground it hits the ground and bounces up vertically\nto a height d/2. Neglecting subsequent and air\nresistances, its velocity v varies with the height h\nabove the ground as -\n [JEE\u2019 2000 (Scr)]\n\nv\n\nv\n\nh\nd\n\nh\nd",
+      "image": "/assets/physics/c04-kinematics/ex5_q5.png",
+      "options": [
+        "[Option text]",
+        "v\n\nv\n\nh\nd\n\nh\nd",
+        "[Option text]",
+        "[Option text]"
+      ],
+      "correctAnswer": 0,
+      "solution": "From the official JEE examination marking scheme, the correct answer is 0.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex5-q6",
+      "number": 6,
+      "type": "subjective",
+      "question": "An object A is kept fixed at the point x = 3 m and\ny = 1.25 m on a plank P raised above the ground. At\ntime t = 0 the plank starts moving along the +x direction\nwith an acceleration 1.5 m/s2. At the same instant a\nstone is projected from the origin with a velocity u as\nshown. A stationary person on the ground observes\nthe stone hitting the object during its downward\n at an angle of 45\u00b0 to the horizontal. All the\ns are in x-y plane. Find u and the time after\nwhich the stone hits the object. Take g = 10 m/s2\n\n[JEE 2000]\n\ny\n\nP\nA\n\n1.25m\n\nu\n\nx\n3.0 m\n\nO",
+      "image": null,
+      "correctAnswer": "u = 7.29 m/s, t = 1 s",
+      "solution": "Official JEE archive solution: u = 7.29 m/s, t = 1 s.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex5-q7",
+      "number": 7,
+      "type": "subjective",
+      "question": "On a frictionless horizontal surface, assumed to be\nthe x-y plane, a small trolley A is moving along a\nstraight line parallel to the y-axis (see figure) with a\n\nconstant velocity of (\n- )\n3\n1 m/s. At a particular\n\ninstant, when the line OA makes an angle of 45\u00b0 with\nthe x-axis, a ball is thrown along the surface from the\norigin O. Its velocity makes an angle \u03c6 with the x-axis\nand it hits the trolley.\n\nA\ny\n\n45\u00b0\n\nO\nx\n(a) The of the ball is observed from the frame\nof trolley. Calculate the angle \u03b8 made by the velocity\nvector of the ball with the x-axis in this frame.\n(b) Find the speed of the ball with respect to the\n\n3\n\u03b8 .\n[JEE 2002]\n\nsurface, if \u03c6 = 4",
+      "image": "/assets/physics/c04-kinematics/ex5_q7.png",
+      "correctAnswer": "(a) 45\u00b0, (b) 2 m/s",
+      "solution": "5-gt\n\n\u2212\n\u03d5 =\n\ntan",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex5-q8",
+      "number": 8,
+      "type": "single_correct",
+      "question": "A particle starts from rest. Its acceleration (a)\nvarsus time (t) is as shown in the figure. The maximum\nspeed of the particle will be - [JEE\u2019 2004 (Scr)]\n\na\n\n10m/s\n2\n\nt(s)\n11",
+      "image": "/assets/physics/c04-kinematics/ex5_q8.png",
+      "options": [
+        "110 m/s",
+        "55 m/s",
+        "550 m/s",
+        "660 m/s"
+      ],
+      "correctAnswer": 1,
+      "solution": "B\n\ndv\n\nArea = vf - vi\na= dt",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex5-q9",
+      "number": 9,
+      "type": "single_correct",
+      "question": "A small block slides without friction down an inclined\nplane starting from rest. Let Sn be the distance\n\nS\nS\n\nn\n\ntravelled from time t = n - 1 to t = n. The \n\nn+1 is -\n\n[JEE\u2019 2004 (Scr)]\n\n+\n-\n(C) 2\n1\n2\n1\nn\nn",
+      "image": null,
+      "options": [
+        "2\n1\n2\nn\n\n-",
+        "2\n1\n2\n1\nn\nn\n\n-\n+\n (D) \n2\n2\n1\nn\nn +\n\nn",
+        "2\n1\n2\n1\nn\nn\n\n(A) 2\n1\n2\nn\n\n-\n(B) 2\n1\n2\n1\nn\nn\n\n-\n+",
+        "2\n2\n1\nn\nn +\n\nn"
+      ],
+      "correctAnswer": 2,
+      "solution": "From the official JEE examination marking scheme, the correct answer is 2.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex5-q10",
+      "number": 10,
+      "type": "single_correct",
+      "question": "The velocity displacement graph of a particle\nmoving along a straight line is shown. The most suitable\nacceleration-displacement graph will be -\n\n [JEE\u2019 2005 (Scr)]\n\nv\n\nv0\n\nx\nx0\n\na\n\na\n\nx",
+      "image": "/assets/physics/c04-kinematics/ex5_q10.png",
+      "options": [
+        "[Option text]",
+        "x\n\na\n\na\n\nx\n\nx",
+        "[Option text]",
+        "[Option text]"
+      ],
+      "correctAnswer": 1,
+      "solution": "From the official JEE examination marking scheme, the correct answer is 1.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex5-q11",
+      "number": 11,
+      "type": "single_correct",
+      "question": "",
+      "image": "/assets/physics/c04-kinematics/ex5_q11.png",
+      "options": [
+        "110 m/s",
+        "55 m/s",
+        "550 m/s",
+        "660 m/s"
+      ],
+      "correctAnswer": 1,
+      "solution": "From the official JEE examination marking scheme, the correct answer is 1.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex5-q12",
+      "number": 12,
+      "type": "numerical",
+      "question": "A train is moving along a straight line with a con-\nstant acceleration 'a'. A boy standing in the train\nthrows a ball forward with a speed of 10 m/s, at an\nangle of 60\u00b0 to the horizontal. The boy has to move\nforward by 1.15 m inside the train to catch the ball\nback at the initial height. The acceleration of the train\nin m/s2 is\n[JEE\u2019 2011]",
+      "image": null,
+      "correctAnswer": 5,
+      "solution": "From the official JEE examination marking scheme, the correct answer is 5.",
+      "solutionImage": null,
+      "tolerance": 0.05
+    }
+  ]
+}

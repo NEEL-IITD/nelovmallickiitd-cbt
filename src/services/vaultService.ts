@@ -174,8 +174,8 @@ class VaultService {
         if (!q.id) {
           errors.push(`Question #${qNum}: missing "id"`);
         }
-        if (!q.type || !['single_correct', 'multi_correct', 'numerical'].includes(q.type)) {
-          errors.push(`Question #${qNum}: "type" must be 'single_correct', 'multi_correct', or 'numerical'`);
+        if (!q.type || !['single_correct', 'multi_correct', 'numerical', 'subjective', 'conceptual_flashcard'].includes(q.type)) {
+          errors.push(`Question #${qNum}: "type" must be 'single_correct', 'multi_correct', 'numerical', 'subjective', or 'conceptual_flashcard'`);
         }
         if (!q.question || typeof q.question !== 'string') {
           errors.push(`Question #${qNum}: missing or empty "question" text`);
@@ -199,10 +199,14 @@ class VaultService {
           if (q.correctAnswer === undefined || isNaN(Number(q.correctAnswer))) {
             errors.push(`Question #${qNum}: "correctAnswer" must be a numeric value`);
           }
+        } else if (q.type === 'subjective') {
+          if (q.correctAnswer === undefined || q.correctAnswer === null) {
+            errors.push(`Question #${qNum}: "correctAnswer" must be provided for subjective problem`);
+          }
         }
 
-        if (!q.solution || typeof q.solution !== 'string') {
-          errors.push(`Question #${qNum}: "solution" text is required`);
+        if ((!q.solution || typeof q.solution !== 'string') && (!q.answer || typeof q.answer !== 'string')) {
+          errors.push(`Question #${qNum}: "solution" or "answer" text is required`);
         }
       });
     }

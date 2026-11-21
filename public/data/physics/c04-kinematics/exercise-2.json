@@ -1,0 +1,405 @@
+{
+  "subject": "physics",
+  "chapterId": "C04",
+  "exerciseId": "ex-2",
+  "title": "Exercise 2 \u2014 Multi-Correct (20 Questions)",
+  "durationMinutes": 60,
+  "defaultMarking": {
+    "correct": 4,
+    "incorrect": -2,
+    "unattempted": 0
+  },
+  "questions": [
+    {
+      "id": "phy-c04-ex2-q1",
+      "number": 1,
+      "type": "multi_correct",
+      "question": "The displacement x of a particle depend on time t\nas x = \u03b1t2 - \u03b2t3",
+      "image": null,
+      "options": [
+        "particle will return to its starting point after time \u03b1/\u03b2.",
+        "Option B",
+        "Option C",
+        "Option D"
+      ],
+      "correctAnswer": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "solution": "A,B,C,D\nX=\u03b1T2-\u03b2t3\n\n(A)\n0= \u03b1 t2-\u03b2t3\n\n\u03b2\n\u03b1\n=\n\u21d2t\n\n2t",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q2",
+      "number": 2,
+      "type": "multi_correct",
+      "question": "3\n\u03b1\n\n(B) the particle will come to rest after time \n\n\u03b2\n(C) the initial velocity of the particle was zero but its\ninitial acceleration was not zero.\n\n\u03b1\n\n(D) no net force act on the particle at time \n\n\u03b2",
+      "image": null,
+      "options": [
+        "Option A",
+        "the particle will come to rest after time \n\n\u03b2",
+        "the initial velocity of the particle was zero but its\ninitial acceleration was not zero.\n\n\u03b1",
+        "no net force act on the particle at time \n\n\u03b2"
+      ],
+      "correctAnswer": [
+        0,
+        2
+      ],
+      "solution": "dt\ndx\n\u03b2\n\u2212\n\u03b1\n=\n\n(B)\nv=",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q3",
+      "number": 3,
+      "type": "multi_correct",
+      "question": "\u03b1\n\n(B) the particle will come to rest after time \n\n\u03b2\n(C) the initial velocity of the particle was zero but its\ninitial acceleration was not zero.\n\n\u03b1\n\n(D) no net force act on the particle at time \n\n\u03b2\n3\nSol.\n\n2. A particle has intial velocity 10 m/s. It moves due\nto constant retarding force along the line of velocity\nwhich produces a retardation of 5 m/s2. Then -",
+      "image": null,
+      "options": [
+        "the maximum displacement in the direction of initial\nvelocity is 10 m",
+        "the particle will come to rest after time \n\n\u03b2",
+        "the initial velocity of the particle was zero but its\ninitial acceleration was not zero.\n\n\u03b1",
+        "no net force act on the particle at time \n\n\u03b2\n3"
+      ],
+      "correctAnswer": [
+        1,
+        2,
+        3
+      ],
+      "solution": "Evaluating the kinematic statements reveals options (B, C, D) are correct.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q4",
+      "number": 4,
+      "type": "multi_correct",
+      "question": "A particle initially at rest is subjected to two forces.\nOne is constant, the other is a retarding force\nproportion at to the particle velocity. In the subsequent\n of the particle.",
+      "image": null,
+      "options": [
+        "the acceleration will increase from zero to a\nconstant value",
+        "the acceleration will decrease from its initial value\nto zero",
+        "the velocity will increase from zero to maximum &\nthen decrease",
+        "the velocity will increase from zero to a constant\nvalue."
+      ],
+      "correctAnswer": [
+        1,
+        3
+      ],
+      "solution": "B,D\nFnet =f - kv\n\nMULTIPLE CHOICE QUESTIONS\n\nf\nkv\na\nm\nm\n\u21d2\n=\n\u2212\n\nAs \n\u2193\n\u2191a\n,\nv\nand when a=0, velocity remains constant",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q5",
+      "number": 5,
+      "type": "multi_correct",
+      "question": "Let \n\u0001v and \n\n\u0001a denote the velocity and acceleration\nrespectively of a body in one-dimensional",
+      "image": null,
+      "options": [
+        "| |\u0001v must decrease when \u0001a < 0\n\n\u0001a > 0",
+        "Speed must increase when",
+        "Speed will increase when both \u0001v and \u0001a are < 0",
+        "Speed will decrease when \u0001v < 0 and \u0001a > 0"
+      ],
+      "correctAnswer": [
+        2,
+        3
+      ],
+      "solution": "2\n\u2212\n\nput t=2 \u21d220-10=10m\nDistance traveled in first 3 seconds\n\n\uf8eb\n\u00d7\n\u00d7\n+",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q6",
+      "number": 6,
+      "type": "multi_correct",
+      "question": "Which of the following statements are true for a\nmoving body?",
+      "image": null,
+      "options": [
+        "If its speed changes, its velocity must change\nand it must have some acceleration",
+        "If its velocity changes, its speed must change\nand it must have some acceleration",
+        "If its velocity changes, its speed may or may not\nchange, and it must have some acceleration",
+        "If its speed changes but direction of does\nnot changes, its velocity may remain constant"
+      ],
+      "correctAnswer": [
+        0,
+        2
+      ],
+      "solution": "Evaluating the kinematic statements reveals options (A, C) are correct.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q7",
+      "number": 7,
+      "type": "multi_correct",
+      "question": "Let v and a denote the velocity and acceleration\nrespectively of a body",
+      "image": "/assets/physics/c04-kinematics/ex2_q7.png",
+      "options": [
+        "a can be non zero when v = 0",
+        "a must be zero when v = 0",
+        "a may be zero when v \u2260 0",
+        "The direction of a must have some correlation\nwith the direction of v"
+      ],
+      "correctAnswer": [
+        0,
+        2
+      ],
+      "solution": "A,C\n(A) At the top of the v = 0 but a = -g.\n\nv=0\na=-g\n\n(A, B)\ndt\ndv\na =\n\nO\n\n(C)\nIf particle is moving with costant velocity\n(D)\nNo",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q8",
+      "number": 8,
+      "type": "multi_correct",
+      "question": "A bead is free to slide down a\nsmooth wire tightly stretched\nbetween points A and B on a vertical\ncircle. If the bead starts from rest\nat A, the highest point on the circle \n\nA\n\nR\n\u03b8\nB",
+      "image": null,
+      "options": [
+        "its velocity v on arriving at B is proportional to\ncos\u03b8",
+        "its velocity v on arriving B is proportional to tan\u03b8",
+        "time to arrive at B is proportional to cos\u03b8",
+        "time to arrive at B is independent of \u03b8"
+      ],
+      "correctAnswer": [
+        0,
+        3
+      ],
+      "solution": "A,D\n\nA\n\nR\n\u03b8\n\u03b8\n\nAB=l=2Rcos\u03b8\nR\nB\n\na=g cos \u03b8\nv2=2\u00d7g cos \u03b8 \u00d72Rcos\u03b8",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q9",
+      "number": 9,
+      "type": "multi_correct",
+      "question": "Velocity-time graph for a car is semicircle as shown\nhere. Which of the following is correct :\nv\n\n1m/s\n\n2 sec",
+      "image": "/assets/physics/c04-kinematics/ex2_q9.png",
+      "options": [
+        "Car must move in circular path",
+        "Acceleration of car is never zero",
+        "Mean speed of the particle is \u03c0/4 m/s.",
+        "The car makes a turn once during its"
+      ],
+      "correctAnswer": [
+        2
+      ],
+      "solution": "C\n\nv\n\n1m/s\n\n2sec t",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q10",
+      "number": 10,
+      "type": "multi_correct",
+      "question": "The figure shows the velocity (v) of a particle\nplotted against time (t)\n\n+v0\nv\n\nT\n\nO\n\n2T\n\nt\n\n-v0",
+      "image": "/assets/physics/c04-kinematics/ex2_q10.png",
+      "options": [
+        "The particle changes its direction of at\nsome point",
+        "The acceleration of the particle remains constant",
+        "The displacement of the particle is zero",
+        "The initial and final speeds of the particle are the\nsame"
+      ],
+      "correctAnswer": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "solution": "A,B,C,D\n(a)\nAt T (velocity changes its direction)\n(b)\nslope constant\n(c)\nUpper wala area = Niche wala area\n(d)\nInitial speed = final speed.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q11",
+      "number": 11,
+      "type": "multi_correct",
+      "question": "A block is thrown with a velocity of 2 m/s (relative\nto ground) on a belt, which is moving with velocity 4\n m/s in opposite direction of the initial velocity of block.\nIf the block stops slipping on the belt after 4 sec of\nthe throwing then choose the correct statements(s)",
+      "image": null,
+      "options": [
+        "Displacement with respect to ground is zero after\n2.66 sec and magnitude of displacement with respect\nto ground is 12 m after 4 sec.",
+        "Magnitude of displacement with respect to ground\nin 4 sec is 4 m.",
+        "Magnitude of displacement with respect to belt in\n4 sec is 12 m.",
+        "Displacement with respect to ground is zero in 8/\n3 sec."
+      ],
+      "correctAnswer": [
+        1,
+        2,
+        3
+      ],
+      "solution": "Evaluating the kinematic statements reveals options (B, C, D) are correct.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q12",
+      "number": 12,
+      "type": "multi_correct",
+      "question": "A particle moves with constant speed v along a\nregular hexagon ABCDEF in the same order. Then the\nmagnitude of the average velocity for its from\nA to -",
+      "image": null,
+      "options": [
+        "F is v/5",
+        "D is v/3",
+        "C is v \u221a3/2",
+        "B is v"
+      ],
+      "correctAnswer": [
+        0,
+        2,
+        3
+      ],
+      "solution": "Evaluating the kinematic statements reveals options (A, C, D) are correct.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q13",
+      "number": 13,
+      "type": "multi_correct",
+      "question": "An observer moves with a constant speed along\nthe line joining two stationary objects. He will observe\nthat the two objects",
+      "image": null,
+      "options": [
+        "have the same speed",
+        "have the same velocity",
+        "move in the same direction",
+        "move in opposite directions"
+      ],
+      "correctAnswer": [
+        0,
+        1,
+        2
+      ],
+      "solution": "A,B,C\n\nObject1\nObject2",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q14",
+      "number": 14,
+      "type": "multi_correct",
+      "question": "A man on a rectilinearly moving cart, facing the\ndirection of , throws a ball straight up with\nrespect to himself",
+      "image": null,
+      "options": [
+        "The ball will always return to him",
+        "The ball will never return to him",
+        "The ball will return to him if the cart moves with\nconstant velocity",
+        "The ball will fall behind him if the cart moves with\nsome acceleration"
+      ],
+      "correctAnswer": [
+        2,
+        3
+      ],
+      "solution": "C,D\nFrom theory.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q15",
+      "number": 15,
+      "type": "multi_correct",
+      "question": "A projectile of mass 1 kg is projected with a velocity\n\nof \n20 m/s such that it strikes on the same level as\n\nthe point of projection at a distance of \n3 m. Which\n\nof the following options are incorrect.",
+      "image": null,
+      "options": [
+        "the maximum height reached by the projectile can\nbe 0.25 m",
+        "the minimum velocity during its can be\n\n15 m/s",
+        "the time taken for the flight can be \n3\n5 sec.",
+        "maximum potential energy during its can\nbe 6J."
+      ],
+      "correctAnswer": [
+        2,
+        3
+      ],
+      "solution": "Evaluating the kinematic statements reveals options (C, D) are correct.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q16",
+      "number": 16,
+      "type": "multi_correct",
+      "question": "Choose the correct alternative (s)",
+      "image": null,
+      "options": [
+        "If the greatest height to which a man can throw a\nstone is h, then the greatest horizontal distance upto\nwhich he can throw the stone is 2h.",
+        "The angle of projection for a projectile whose\nrange R is n times the maximum height is tan-1(4/n)",
+        "The time of flight T and the horizontal range R of\na projectile are connected by the equation gT2 =\n2Rtan\u03b8 where \u03b8 is the angle of projection.",
+        "A ball is thrown vertically up. Another ball is thrown\nat an angle \u03b8 with the vertical. Both of them remain in\nair for the same period of time. Then the ratio of\nheights attained by the two ball 1 : 1."
+      ],
+      "correctAnswer": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "solution": "Evaluating the kinematic statements reveals options (A, B, C, D) are correct.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q17",
+      "number": 17,
+      "type": "multi_correct",
+      "question": "If T is the total time of flight, h is the maximum\nheight & R is the range for horizontal , the x & y\nco-ordinates of projectile and time t are related\nas :\n\nt\nT\n=\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n\u2212\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n4\n1\n(B) y\nh X\n\nX\nR\n=\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n\u2212\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n4\n1",
+      "image": null,
+      "options": [
+        "y\nh t\n\nT\n\nR\n\nt\n=\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n\u2212\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n4\n1\n(D) y\nh R\n\nR\nX\n=\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n\u2212\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n4\n1\n\n(C) y\nh T\n\nT\n\nt\n\nX\n\nSol.",
+        "y\nh X\n\nX\nR\n=\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n\u2212\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n4\n1\n\n(A) y\nh t\n\nT\n\nR\n\nt\n=\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n\u2212\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n4\n1\n(D) y\nh R\n\nR\nX\n=\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n\u2212\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n4\n1",
+        "y\nh T\n\nT\n\nt\n\nX\n\nSol.",
+        "y\nh R\n\nR\nX\n=\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n\u2212\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n4\n1\n\n(C) y\nh T\n\nT\n\nt\n\nX"
+      ],
+      "correctAnswer": [
+        0,
+        1
+      ],
+      "solution": "A,B\nPut the value of T, R, H, in the given equation and\nsolve each option.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q18",
+      "number": 18,
+      "type": "multi_correct",
+      "question": "A particle moves in the xy plane with a constant\nacceleration \u2018g\u2019 in the negative y-direction. Its equation\nof is y = ax - bx2, where a and b constants.\nWhich of the following are correct?",
+      "image": null,
+      "options": [
+        "The x-component of its velocity is constant.",
+        "At the origin, the y-component of its velocity is\n\na\ng\n\nb\n2",
+        "At the origin, its velocity makes an angle tan-1(a)\nwith the x-axis",
+        "The particle moves exactly like a projectile."
+      ],
+      "correctAnswer": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "solution": "Evaluating the kinematic statements reveals options (A, B, C, D) are correct.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q19",
+      "number": 19,
+      "type": "multi_correct",
+      "question": "A ball is rolled off along the edge of a horizontal\ntable with velocity 4 m/s. It hits the ground after time\n0.4s. Which of the following are correct?",
+      "image": null,
+      "options": [
+        "The height of the table is 0.8 m",
+        "It hits the ground at an angle of 60\u00b0 with the\nvertical",
+        "It covers a horizontal distance 1.6 m from the\ntable",
+        "It hits the ground with vertical velocity 4 m/s"
+      ],
+      "correctAnswer": [
+        0,
+        2,
+        3
+      ],
+      "solution": "Evaluating the kinematic statements reveals options (A, C, D) are correct.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex2-q20",
+      "number": 20,
+      "type": "multi_correct",
+      "question": "m/s such that it strikes on the same level as\n\nthe point of projection at a distance of \n3 m. Which\n\nof the following options are incorrect.",
+      "image": null,
+      "options": [
+        "the maximum height reached by the projectile can\nbe 0.25 m",
+        "the minimum velocity during its can be\n\n15 m/s",
+        "the time taken for the flight can be \n3\n5 sec.",
+        "maximum potential energy during its can\nbe 6J."
+      ],
+      "correctAnswer": [
+        1
+      ],
+      "solution": "Evaluating the kinematic statements reveals options (B) are correct.",
+      "solutionImage": null
+    }
+  ]
+}

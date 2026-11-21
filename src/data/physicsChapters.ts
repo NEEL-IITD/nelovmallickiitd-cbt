@@ -17,6 +17,8 @@ export interface ChapterExercise {
   targetExam: 'JEE Mains' | 'JEE Advanced' | 'Both';
   markingScheme: string;
   description: string;
+  jsonUrl?: string;
+  mode?: 'cbt' | 'study_deck';
   uploadedQuestions?: any[]; // Prepared for Word (.docx) upload parsing
 }
 
@@ -216,7 +218,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
     }
   },
 
-  // C4 - Kinematics: Theory, Exercise (Combined)
+  // C4 - Kinematics: Theory (49 Pages) + 6 Exercises
   {
     id: 'c4',
     code: 'C4',
@@ -225,27 +227,110 @@ export const physicsChaptersData: PhysicsChapter[] = [
     fullName: 'C4 - Kinematics',
     category: 'Mechanics',
     iconName: 'Gauge',
-    badgeText: 'Theory + Combined Exercise',
+    badgeText: 'Theory + 6 Exercises',
     theory: {
       title: 'Theory',
-      topics: ['1D Motion with Constant & Variable Acceleration', 'Projectile Motion on Horizontal & Inclined Planes', 'Relative Velocity (River-Boat, Rain-Man, Wind-Airplane)'],
-      status: 'upload_pending',
-      statusLabel: 'Theory Notes — Upload Pending',
-      summary: 'Equations of motion, graphical analysis (v-t, a-t, x-t curves), trajectory geometry, and 2D relative motion frames.'
+      topics: [
+        '1D Motion with Constant & Variable Acceleration',
+        'Projectile Motion on Horizontal & Inclined Planes',
+        'Relative Velocity (River-Boat, Rain-Man, Wind-Airplane)',
+        'Graphical Analysis (v-t, a-t, x-t curves & calculus)'
+      ],
+      status: 'ready',
+      statusLabel: 'Live • 49 Pages',
+      pdfUrl: '/resources/physics/c04-kinematics/Kinematics_Theory_Clean.pdf',
+      summary: 'Complete 49-page authentic chapter theory notes: equations of motion, graphical calculus (v-t, a-t, x-t curves), horizontal and inclined plane projectile trajectories, and 2D relative motion frames.'
     },
     exercises: [
       {
-        id: 'c4-ex-comb',
-        title: 'Exercise (Combined)',
-        type: 'combined',
-        questionCount: 35,
-        timeMinutes: 75,
-        marks: 140,
-        status: 'ready_for_upload',
-        statusLabel: 'Coming Soon / Ready for Upload',
+        id: 'c4-ex1',
+        title: 'Exercise 1 — Single Correct',
+        type: 'numbered',
+        number: 1,
+        questionCount: 79,
+        timeMinutes: 90,
+        marks: 316,
+        status: 'live',
+        statusLabel: 'Live • 79 Questions',
         targetExam: 'Both',
         markingScheme: '+4 / -1',
-        description: 'Full-length kinematics test encompassing multi-stage 1D motion, inclined plane projectiles, and relative velocity encounter puzzles.'
+        jsonUrl: '/data/physics/c04-kinematics/exercise-1.json',
+        description: '79 authentic single-choice questions covering full kinematics 1D and 2D.'
+      },
+      {
+        id: 'c4-ex2',
+        title: 'Exercise 2 — Multi-Correct',
+        type: 'numbered',
+        number: 2,
+        questionCount: 20,
+        timeMinutes: 60,
+        marks: 80,
+        status: 'live',
+        statusLabel: 'Live • 20 Questions',
+        targetExam: 'JEE Advanced',
+        markingScheme: '+4 / -2 (Partial)',
+        jsonUrl: '/data/physics/c04-kinematics/exercise-2.json',
+        description: '20 challenging multiple-choice questions requiring multi-variable analysis.'
+      },
+      {
+        id: 'c4-ex3',
+        title: 'Exercise 3 — Subjective / Numerical',
+        type: 'numbered',
+        number: 3,
+        questionCount: 35,
+        timeMinutes: 90,
+        marks: 140,
+        status: 'live',
+        statusLabel: 'Live • 35 Questions',
+        targetExam: 'Both',
+        markingScheme: '+4 / 0',
+        jsonUrl: '/data/physics/c04-kinematics/exercise-3.json',
+        description: '35 comprehensive subjective problems and numerical value challenges.'
+      },
+      {
+        id: 'c4-ex4',
+        title: 'Exercise 4 — Advanced Subjective',
+        type: 'numbered',
+        number: 4,
+        questionCount: 10,
+        timeMinutes: 60,
+        marks: 40,
+        status: 'live',
+        statusLabel: 'Live • 10 Questions',
+        targetExam: 'JEE Advanced',
+        markingScheme: '+4 / 0',
+        jsonUrl: '/data/physics/c04-kinematics/exercise-4.json',
+        description: '10 Olympiad and JEE Advanced level tough subjective problems.'
+      },
+      {
+        id: 'c4-ex5',
+        title: 'Exercise 5 — JEE Previous Year Problems',
+        type: 'numbered',
+        number: 5,
+        questionCount: 12,
+        timeMinutes: 45,
+        marks: 48,
+        status: 'live',
+        statusLabel: 'Live • 12 Questions',
+        targetExam: 'Both',
+        markingScheme: '+4 / -1',
+        jsonUrl: '/data/physics/c04-kinematics/exercise-5.json',
+        description: '12 curated actual JEE Mains & Advanced previous year examination questions.'
+      },
+      {
+        id: 'c4-sa',
+        title: 'Short Answer Questions',
+        type: 'combined',
+        questionCount: 19,
+        timeMinutes: 30,
+        marks: 76,
+        status: 'live',
+        statusLabel: 'Live • 19 Conceptual Q&As',
+        targetExam: 'Both',
+        markingScheme: 'Study Mode / Flashcard',
+        jsonUrl: '/data/physics/c04-kinematics/short-answers.json',
+        mode: 'study_deck',
+        description: '19 conceptual flashcard Q&As designed for rapid core revision and interview prep.'
       }
     ],
     colorTheme: {

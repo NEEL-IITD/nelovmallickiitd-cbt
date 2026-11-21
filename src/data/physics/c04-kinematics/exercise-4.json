@@ -1,0 +1,119 @@
+{
+  "subject": "physics",
+  "chapterId": "C04",
+  "exerciseId": "ex-4",
+  "title": "Exercise 4 \u2014 Advanced Subjective (10 Questions)",
+  "durationMinutes": 60,
+  "defaultMarking": {
+    "correct": 4,
+    "incorrect": 0,
+    "unattempted": 0
+  },
+  "questions": [
+    {
+      "id": "phy-c04-ex4-q1",
+      "number": 1,
+      "type": "numerical",
+      "question": "A speeder in an automobile passes a stationary\npoliceman who is hiding behind a bill board with a\nmotorcycle. After a 2.0 sec delay (reaction time) the\npoliceman acceleraties to his maximum speed of 150\n km/h in 12 sec and catches the speeder 1.5 km beyond\nthe billboard. Find the speed of speeder in km/h.",
+      "image": null,
+      "correctAnswer": 122.7,
+      "solution": "Bill board\n t = 0\n\nt = 2sec\nt = 14 sec",
+      "solutionImage": null,
+      "tolerance": 0.05
+    },
+    {
+      "id": "phy-c04-ex4-q2",
+      "number": 2,
+      "type": "subjective",
+      "question": "A large number of bullets are fired in all direction\nwith the same speed v. What is the maximum area on\nground on which these bullets can spread?",
+      "image": null,
+      "correctAnswer": "\u03c0 v\u2074 / g\u00b2",
+      "solution": "Using relative frame analysis and equations of motion, the result is: \u03c0 v\u2074 / g\u00b2.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex4-q3",
+      "number": 3,
+      "type": "subjective",
+      "question": "The speed of a particle when it is at its greatest\n\nheight is 2 5\n/\n times of its speed when it is at its half\n\nthe maximum height. The angle of projection is\n_________ and the velocity vector angle at half the\nmaximum height is _________.",
+      "image": null,
+      "correctAnswer": "60\u00b0, tan\u207b\u00b9(3/2) or cos\u207b\u00b9(2/5)",
+      "solution": "Using relative frame analysis and equations of motion, the result is: 60\u00b0, tan\u207b\u00b9(3/2) or cos\u207b\u00b9(2/5).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex4-q4",
+      "number": 4,
+      "type": "numerical",
+      "question": "A projectile is to be thrown horizontally from the\ntop of a wall of height 1.7m. Calculate the initial\nvelocity of projection if it hits perpendicularly an incline\nof angle 37\u00b0 which starts from the ground at the bottom\nof the wall. The line of greatest slope of incline lies in\nthe plane of of projectile.",
+      "image": null,
+      "correctAnswer": 3,
+      "solution": "Using relative frame analysis and equations of motion, the result is: 3.",
+      "solutionImage": null,
+      "tolerance": 0.05
+    },
+    {
+      "id": "phy-c04-ex4-q5",
+      "number": 5,
+      "type": "subjective",
+      "question": "Two inclined planes OA and OB having inclination\n(with horizontal) 30\u00b0 and 60\u00b0 respectively, intersect\neach other at O as shown in figure. A particle is\n\nprojected from point P with velocity u\nms\n= 10 3\n-1 along\n\na direction perpendicular to plane OA. If the particle\nstrikes plane OB perpendicularly at Q, calculate\n\nA\n\nu\n\nB\n\nQ\n\nP\n\nh\n\n30\u00b0\n60\u00b0\n\nO \n(a) velocity with which particle strikes the plane OB,\n(b) time of flight,\n(c) vertical height h of P from O,\n(d) maximum height from O attained by the particle\nand\n(e) distance PQ",
+      "image": "/assets/physics/c04-kinematics/ex4_q5.png",
+      "correctAnswer": "(a) 10 m/s, (b) 2 s, (c) 5 m, (d) 16.25 m (sx = 10\u221a3 m), (e) 20 m",
+      "solution": "Using relative frame analysis and equations of motion, the result is: (a) 10 m/s, (b) 2 s, (c) 5 m, (d) 16.25 m (sx = 10\u221a3 m), (e) 20 m.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex4-q6",
+      "number": 6,
+      "type": "numerical",
+      "question": "A particle is thrown horizontally with relative velocity\n10 m/s from an inclined plane, which is also moving\nwith acceleration 10 m/s2 vertically upward. Find the\ntime after which it lands on the plane (g = 10 m/s2)\n\n10 m/s\n2\n\n30\u00b0",
+      "image": null,
+      "correctAnswer": 0.58,
+      "solution": "Using relative frame analysis and equations of motion, the result is: 0.58.",
+      "solutionImage": null,
+      "tolerance": 0.05
+    },
+    {
+      "id": "phy-c04-ex4-q7",
+      "number": 7,
+      "type": "numerical",
+      "question": "A, B & C are three objects each moving with constant\n\n\u2192\n\nvelocity. A\u2019s speed is 10 m/sec in a direction PQ\n\n. The\nvelocity of B relative to A is 6 m/sec at an angle of,\ncos-1(15/24) to PQ. The velocity of C relative to B is\n\n12 m/sec in a direction QP\n\u2192\n\n, then find the magnitude\nof the velocity of C.",
+      "image": "/assets/physics/c04-kinematics/ex4_q7.png",
+      "correctAnswer": 5,
+      "solution": "Using relative frame analysis and equations of motion, the result is: 5.",
+      "solutionImage": null,
+      "tolerance": 0.05
+    },
+    {
+      "id": "phy-c04-ex4-q8",
+      "number": 8,
+      "type": "numerical",
+      "question": "A particle is projected from point P with velocity\n\n5 2 m/s perpendicular to the surface of a hollow\n\nright angle cone whose axis is vertical. It collides at Q\nnormally. Find the time of the flight of the particle.\n\ny\n\nP\nQ\n45\u00b0\n\nx",
+      "image": "/assets/physics/c04-kinematics/ex4_q8.png",
+      "correctAnswer": 1,
+      "solution": "45\u00b0\n45\u00b0\n\n45\u00b0\n\n45\u00b0\n45\u00b0\n\n\u00ba",
+      "solutionImage": null,
+      "tolerance": 0.05
+    },
+    {
+      "id": "phy-c04-ex4-q9",
+      "number": 9,
+      "type": "subjective",
+      "question": "A glass wind screen whose inclination with the\nvertical can be changed, is mounted on a cart as\nshown in figure. The cart moves uniformly along the\nhorizontal path with a speed of 6 m/s. At what maximum\nangle \u03b1 to the vertical can the wind screen be placed\nso that the rain drops falling vertically downwards\nwith velocity 2 m/s, do not enter the cart?\n\n\u03b1\n\nv=6m/s",
+      "image": null,
+      "correctAnswer": "2 tan\u207b\u00b9(1/3)",
+      "solution": "Using relative frame analysis and equations of motion, the result is: 2 tan\u207b\u00b9(1/3).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex4-q10",
+      "number": 10,
+      "type": "subjective",
+      "question": "m/s from an inclined plane, which is also moving\nwith acceleration 10 m/s2 vertically upward. Find the\ntime after which it lands on the plane (g = 10 m/s2)\n\n10 m/s\n2\n\n30\u00b0",
+      "image": "/assets/physics/c04-kinematics/ex4_q10.png",
+      "correctAnswer": "\u03b8 = 37\u00b0, v = 6 m/s",
+      "solution": "Using relative frame analysis and equations of motion, the result is: \u03b8 = 37\u00b0, v = 6 m/s.",
+      "solutionImage": null
+    }
+  ]
+}

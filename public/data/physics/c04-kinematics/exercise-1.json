@@ -1,0 +1,1278 @@
+{
+  "subject": "physics",
+  "chapterId": "C04",
+  "exerciseId": "ex-1",
+  "title": "Exercise 1 \u2014 Single Correct (79 Questions)",
+  "durationMinutes": 90,
+  "defaultMarking": {
+    "correct": 4,
+    "incorrect": -1,
+    "unattempted": 0
+  },
+  "questions": [
+    {
+      "id": "phy-c04-ex1-q1",
+      "number": 1,
+      "type": "single_correct",
+      "question": "A hall has the dimensions 10m \u00d7 10m \u00d7 10 m. A fly\nstarting at one corner ends up at a diagonally opposite\ncorner. The magnitude of its displacement is nearly",
+      "image": null,
+      "options": [
+        "m\n3\n5",
+        "m\n3\n10",
+        "m\n3\n20",
+        "m\n3\n30"
+      ],
+      "correctAnswer": 1,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (B).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q2",
+      "number": 2,
+      "type": "single_correct",
+      "question": "A car travels from A to B at a speed of 20 km/hm\n\nand returns at a speed of 30 km/h. The average\nspeed of the car for the whole journey is",
+      "image": null,
+      "options": [
+        "5 km/h",
+        "24 km/h",
+        "25 km/h",
+        "50 km/h"
+      ],
+      "correctAnswer": 1,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (B).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q3",
+      "number": 3,
+      "type": "single_correct",
+      "question": "5\n (B) \nm\n3\n10\n(C) \nm\n3\n20\n (D) \nm\n3\n30\n\nSol.\n\n2. A car travels from A to B at a speed of 20 km/hm\n\nand returns at a speed of 30 km/h. The average\nspeed of the car for the whole journey is",
+      "image": null,
+      "options": [
+        "5 km/h",
+        "m\n3\n10",
+        "m\n3\n20",
+        "m\n3\n30"
+      ],
+      "correctAnswer": 0,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (A).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q4",
+      "number": 4,
+      "type": "single_correct",
+      "question": "Sol.\n\n4. A car runs at constant speed on a circular track of\nradius 100 m taking 62.8 s on each lap. What is the\naverage speed and average velocity on each complete\nlap ?",
+      "image": null,
+      "options": [
+        "velocity 10 m/s speed 10 m/s",
+        "velocity zero, speed 10 m/s",
+        "velocity zero, speed zero",
+        "velocity 10 m/s, speed zero"
+      ],
+      "correctAnswer": 1,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (B).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q5",
+      "number": 5,
+      "type": "single_correct",
+      "question": "(B) \nm\n3\n10\n(C) \nm\n3\n20\n (D) \nm\n3\n30\n\nSol.\n\n2. A car travels from A to B at a speed of 20 km/hm\n\nand returns at a speed of 30 km/h. The average\nspeed of the car for the whole journey is",
+      "image": null,
+      "options": [
+        "5 km/h",
+        "m\n3\n10",
+        "m\n3\n20",
+        "m\n3\n30"
+      ],
+      "correctAnswer": 0,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (A).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q6",
+      "number": 6,
+      "type": "single_correct",
+      "question": "A particle has a velocity u towards east at t = 0.\nIts acceleration is towards west and is constant, Let\nxA and xB be the magnitude of displacements in the\nfirst 10 seconds and the next 10 seconds.",
+      "image": null,
+      "options": [
+        "xA < xB",
+        "xA = xB",
+        "xA > xB",
+        "the information is insufficient to decide the relation\nof xA with xB."
+      ],
+      "correctAnswer": 3,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (D).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q7",
+      "number": 7,
+      "type": "single_correct",
+      "question": "A body starts from rest and is uniformly accelerated\nfor 30 s. The distance travelled in the first 10s is x1,\nnext 10 s is x2 and the last 10 s is x3. Then x1 : x2 : x3\nis the same as",
+      "image": null,
+      "options": [
+        "1 : 2 : 4",
+        "1 : 2 : 5",
+        "1 : 3 : 5",
+        "1 : 3 : 9"
+      ],
+      "correctAnswer": 2,
+      "solution": "C\nlet the accelration of the body is a and u",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q8",
+      "number": 8,
+      "type": "single_correct",
+      "question": "(D) \ns\n/\nm\n3\n4\n\nSol.\n\n4. A car runs at constant speed on a circular track of\nradius 100 m taking 62.8 s on each lap. What is the\naverage speed and average velocity on each complete\nlap ?",
+      "image": null,
+      "options": [
+        "velocity 10 m/s speed 10 m/s",
+        "velocity zero, speed 10 m/s",
+        "velocity zero, speed zero",
+        "s\n/\nm\n3\n4"
+      ],
+      "correctAnswer": 1,
+      "solution": "62\nt =\n\nin each lap car travel a distance = \nR\n2\u03c0\n=\n\nm",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q9",
+      "number": 9,
+      "type": "single_correct",
+      "question": "The co-ordinates of a moving particle at a time t,\nare given by, x = 5 sin 10 t, y = 5 cos 10 t. The speed\nof the particle is -",
+      "image": null,
+      "options": [
+        "25",
+        "50",
+        "10",
+        "None"
+      ],
+      "correctAnswer": 1,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (B).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q10",
+      "number": 10,
+      "type": "single_correct",
+      "question": "(C) \nm\n3\n20\n (D) \nm\n3\n30\n\nSol.\n\n2. A car travels from A to B at a speed of 20 km/hm\n\nand returns at a speed of 30 km/h. The average\nspeed of the car for the whole journey is",
+      "image": null,
+      "options": [
+        "5 km/h",
+        "24 km/h",
+        "m\n3\n20",
+        "m\n3\n30"
+      ],
+      "correctAnswer": 3,
+      "solution": "m\nB\n\nC\n\n10m\n\nA\n\n10m\n\nFly start from A and reaches at B.\n\u2234\n(AB)2 = (AC)2+(BC)2",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q11",
+      "number": 11,
+      "type": "single_correct",
+      "question": "(C) \ns\n/\nm\n3\n8\n (D) \ns\n/\nm\n3\n4\n\nSol.\n\n4. A car runs at constant speed on a circular track of\nradius 100 m taking 62.8 s on each lap. What is the\naverage speed and average velocity on each complete\nlap ?",
+      "image": null,
+      "options": [
+        "velocity 10 m/s speed 10 m/s",
+        "velocity zero, speed 10 m/s",
+        "s\n/\nm\n3\n8",
+        "s\n/\nm\n3\n4"
+      ],
+      "correctAnswer": 2,
+      "solution": "C\n\n\u02c6\n\u02c6\nF\n2sin 3 ti\n3cos3 tj\n=\n\u03c0\n+\n\u03c0\n\u0002\n\ndv\n\u02c6\n\u02c6\n2sin3 ti\n3cos3 tj\ndt =\n\u03c0\n+\n\u03c0\n\na = \n\nv\nt\nt\n\n\u02c6\n\u02c6\ndv",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q12",
+      "number": 12,
+      "type": "single_correct",
+      "question": "A force F = Be-Ct acts on a particle whose mass is\nm and whose velocity is 0 at t = 0. It\u2019s terminal velocity\n(velocity after a long time) is :\n\nm\n(D) - B",
+      "image": null,
+      "options": [
+        "C\n\nmB",
+        "B\n\nmC",
+        "BC\n\nmC\n\nSol.",
+        "- B\n\n(A) C\n\nmB\n (B) B\n\nmC\n(C) BC\n\nmC"
+      ],
+      "correctAnswer": 1,
+      "solution": "B\n\nct\nF\nBe\u2212\n=\n\nct\nB\na\ne\nm\n\n\u2212\n=\n\nv\nt\n\nB\ndv\ne\ndt\nm\n\n\u2212\n\u21d2\n=\n\u222b\n\u222b\n\nct",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q13",
+      "number": 13,
+      "type": "single_correct",
+      "question": "A particle starts moving rectilinearly at time t = 0\nsuch that its velocity \u2018v\u2019 changes with time \u2018t\u2019 according\nto the equation v = t2 - t where t is in seconds and v\nis in m/s. The time interval for which the particle retards\nis",
+      "image": null,
+      "options": [
+        "t < 1/2",
+        "1/2 < t < 1",
+        "t > 1",
+        "t < 1/2 and t > 1"
+      ],
+      "correctAnswer": 1,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (B).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q14",
+      "number": 14,
+      "type": "single_correct",
+      "question": "A ball is thrown vertically down with velocity of\n5m/s. With what velocity should another ball be thrown\ndown after 2 seconds so that it can hit the 1st ball in 2\nseconds",
+      "image": null,
+      "options": [
+        "40 m/s",
+        "55 m/s",
+        "15 m/s",
+        "25 m/s"
+      ],
+      "correctAnswer": 0,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (A).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q15",
+      "number": 15,
+      "type": "single_correct",
+      "question": "A particle is projected vertically upwards from a\npoint A on the ground. It takes t1 time to reach a\npoint B but it still continues to move up. If it takes\nfurther t2 time to reach the ground from point B then\nheight of point B from the ground is",
+      "image": null,
+      "options": [
+        "1\n\n2\n1\n2\n2\ng t\nt\n(\n)\n+",
+        "g t1 t2\n\n8\n1\n2\n2\ng t\nt\n(\n)\n+\n(D) \n2\n1t\nt\ng\n2\n1",
+        "1\n\nSol.",
+        "2\n1t\nt\ng\n2\n1\n\n(C) 1"
+      ],
+      "correctAnswer": 3,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (D).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q16",
+      "number": 16,
+      "type": "single_correct",
+      "question": "Balls are thrown vertically upward in such a way\nthat the next ball is thrown when the previous one is\nat the maximum height. If the maximum height is 5m,\nthe number of balls thrown per minute will be",
+      "image": null,
+      "options": [
+        "40",
+        "50",
+        "60",
+        "120"
+      ],
+      "correctAnswer": 2,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (C).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q17",
+      "number": 17,
+      "type": "single_correct",
+      "question": "A disc arranged in a vertical plane has two groves\nof same length directed along the vertical chord AB\nand CD as shown in the fig. The same particles slide\ndown along AB and CD. The ratio of the time tAB/tCD is\n\nC\n60\u00b0\n\nA\n\nD\n\nB",
+      "image": "/assets/physics/c04-kinematics/ex1_q17.png",
+      "options": [
+        "1 : 2",
+        "1\n2\n:",
+        "2 : 1",
+        "2 1\n:"
+      ],
+      "correctAnswer": 1,
+      "solution": "B\nLength of groove is L\n\ng\nL\ng\n\nL\nt\n\neff",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q18",
+      "number": 18,
+      "type": "single_correct",
+      "question": "The displacement-time graph of a moving particle\nis shown below. The instantaneous velocity of the\nparticle is negative at the point\n\nx\n\nD\n\nF\n\nE\n\nC\n\nt",
+      "image": "/assets/physics/c04-kinematics/ex1_q18.png",
+      "options": [
+        "C",
+        "D",
+        "E",
+        "F"
+      ],
+      "correctAnswer": 2,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (C).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q19",
+      "number": 19,
+      "type": "single_correct",
+      "question": "The variation of velocity of a particle moving along\nstraight line is shown in the figure. The distance\ntravelled by the particle in 4 s is\n\nv(m/s)",
+      "image": "/assets/physics/c04-kinematics/ex1_q19.png",
+      "options": [
+        "Option A",
+        "Option B",
+        "Option C",
+        "Option D"
+      ],
+      "correctAnswer": 2,
+      "solution": "C\nFrom graph it is clear that velocity is always positive\nduring its \nso displacement = distance\ndisplacement = Area under V-t curve",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q20",
+      "number": 20,
+      "type": "single_correct",
+      "question": "(D) \nm\n3\n30\n\nSol.\n\n2. A car travels from A to B at a speed of 20 km/hm\n\nand returns at a speed of 30 km/h. The average\nspeed of the car for the whole journey is",
+      "image": "/assets/physics/c04-kinematics/ex1_q20.png",
+      "options": [
+        "5 km/h",
+        "24 km/h",
+        "25 km/h",
+        "m\n3\n30"
+      ],
+      "correctAnswer": 3,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (D).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q21",
+      "number": 21,
+      "type": "single_correct",
+      "question": "If position time graph of a particle is sine curve as\nshown, what will be its velocity-time graph\n\nx\n\nt\n\nv\n\nv",
+      "image": "/assets/physics/c04-kinematics/ex1_q21.png",
+      "options": [
+        "[Option text]",
+        "t\n\nt\n\nv\n\nv",
+        "[Option text]",
+        "t\n\nt"
+      ],
+      "correctAnswer": 2,
+      "solution": "C\nEquation of given sin curre is\n\nx\nA sint\n= \u2212\n\nt\ncos\nA\ndt\ndx\nV\n\u2212\n=\n=\n\nv\n\nt",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q22",
+      "number": 22,
+      "type": "single_correct",
+      "question": "Acceleration versus velocity graph of a particle\nmoving in a straight line starting form rest is as shown\n\nin figure. The corresponding velocity-time graph would\nbe -\na\n\nv\n\nv\n\nv",
+      "image": "/assets/physics/c04-kinematics/ex1_q22.png",
+      "options": [
+        "[Option text]",
+        "t\n\nt\n\nv\n\nv",
+        "[Option text]",
+        "t\n\nt"
+      ],
+      "correctAnswer": 3,
+      "solution": "D\nFrom graph\n\na\nAV\nB\n= \u2212\n+\n\ndv\n\n\u222b\n\u222b\n=\n\u2212\ndt\nAV\nB\n\n\u222b\n\u222b\n=\n\u2212\n\u21d2\ndt\nk\ndk\nA",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q23",
+      "number": 23,
+      "type": "single_correct",
+      "question": "A man moves in x - y plane along the path shown.\nAt what point is his average velocity vector in the\nsame direction as his instantaneous velocity vector.\nThe man starts from point P.\n\ny\n\nC\n\nP\n\nD\n\nB\n\nA\n\nx",
+      "image": "/assets/physics/c04-kinematics/ex1_q23.png",
+      "options": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "correctAnswer": 2,
+      "solution": "B\nPoint C\n\ny\n\nC\n\nP\n\nD\n\nB\n\nA\n\nx",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q24",
+      "number": 24,
+      "type": "single_correct",
+      "question": "The acceleration of a particle which moves along\n\nthe positive x-axis varies with its position as shown.\nIf the velocity of the particle is 0.8 m/s at x = 0, the\n\nvelocity of the particle at x = 1.4 is (in m/s)\n\n2\n\na(in m/s )\n\n0.4\n\n0.2\n\nO\n0.4 0.8\n1.4\n\nx (in m)",
+      "image": "/assets/physics/c04-kinematics/ex1_q24.png",
+      "options": [
+        "1.6",
+        "1.2",
+        "1.4",
+        "none"
+      ],
+      "correctAnswer": 1,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (B).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q25",
+      "number": 25,
+      "type": "single_correct",
+      "question": "The v-t graph of the particle is correctly shown\nby\n\nv\n\nv\n\nT\n2T\nt\n\n0\n (B) \n\n0",
+      "image": null,
+      "options": [
+        "T\n2T\nt\n\nv\n\nv\n\n0\n (D) \nT\n2T\nt\n\n0\n\n(C) \nT\n2T\nt\n\nSol.",
+        "0\n\n(A) \nT\n2T\nt\n\nv\n\nv\n\n0\n (D) \nT\n2T\nt\n\n0",
+        "T\n2T\nt\n\nSol.",
+        "T\n2T\nt\n\n0\n\n(C) \nT\n2T\nt"
+      ],
+      "correctAnswer": 1,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (B).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q26",
+      "number": 26,
+      "type": "single_correct",
+      "question": "The a-t graph of the particle is correctly shown\nby\n\na\n\na\n\n2T\nt\n\n0\n (B) \nt\n\n0",
+      "image": null,
+      "options": [
+        "T\n\nv\n\na\n\n0\n (D) \nt\n0\n\n(C) \nt\n\nSol.",
+        "t\n\n0\n\n(A) \nT\n\nv\n\na\n\n0\n (D) \nt\n0",
+        "t\n\nSol.",
+        "t\n0\n\n(C) \nt"
+      ],
+      "correctAnswer": 3,
+      "solution": "Refer to official JEE Kinematics solution steps for Question 26. Correct option: D.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q27",
+      "number": 27,
+      "type": "single_correct",
+      "question": "The speed-time graph of the particle is correctly\nshown by\n\nspeed\n\nspeed",
+      "image": "/assets/physics/c04-kinematics/ex1_q27.png",
+      "options": [
+        "t\n0\n\nT\n2T",
+        "t\n0\n\nT\n2T\n\nspeed\n\nspeed",
+        "t\n0\n\nT\n2T",
+        "t\n0\n\nT\n2T"
+      ],
+      "correctAnswer": 2,
+      "solution": "D\n\nSpeed\n\nO\nT\n2T t",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q28",
+      "number": 28,
+      "type": "single_correct",
+      "question": "Choose the incorrect statement. The particle comes\nto rest at",
+      "image": null,
+      "options": [
+        "t = 0 s",
+        "t = 5 s",
+        "t = 8 s",
+        "none of these"
+      ],
+      "correctAnswer": 1,
+      "solution": "B\nParticle comes to rest when v=0\non observing graphs \u2192V=0 at t=0, 4.66 sec, 8 sec\nIncorrect t=5 sec",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q29",
+      "number": 29,
+      "type": "single_correct",
+      "question": "Identify the region in which the rate of change of\n\n\u0001v\n\n\u2206\n\nvelocity \n\nt of the particle is maximum\n\n\u2206",
+      "image": null,
+      "options": [
+        "0 to 2s",
+        "2 to 4s",
+        "4 to 6s",
+        "6 to 8 s"
+      ],
+      "correctAnswer": 2,
+      "solution": "C\nRate of change of velocity is maximum\nt = 4 to 6 sec\n\na =",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q30",
+      "number": 30,
+      "type": "single_correct",
+      "question": "Sol.\n\n2. A car travels from A to B at a speed of 20 km/hm\n\nand returns at a speed of 30 km/h. The average\nspeed of the car for the whole journey is",
+      "image": null,
+      "options": [
+        "5 km/h",
+        "24 km/h",
+        "25 km/h",
+        "50 km/h"
+      ],
+      "correctAnswer": 0,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (A).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q31",
+      "number": 31,
+      "type": "single_correct",
+      "question": "The maximum of displacement of the particle is",
+      "image": null,
+      "options": [
+        "33.3 m",
+        "23.3 m",
+        "18.3",
+        "zero"
+      ],
+      "correctAnswer": 0,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (A).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q32",
+      "number": 32,
+      "type": "single_correct",
+      "question": "The total distance travelled by the particle is",
+      "image": "/assets/physics/c04-kinematics/ex1_q32.png",
+      "options": [
+        "66.6 m",
+        "51.6 m",
+        "zero",
+        "36.6 m"
+      ],
+      "correctAnswer": 0,
+      "solution": "A\nTotal Distance = Upper walla area + Nichewala",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q33",
+      "number": 33,
+      "type": "single_correct",
+      "question": "The correct displacement-time graph of the particle\nis shown as\n\nx\n\nx\n\n(m)\n\n(m)",
+      "image": "/assets/physics/c04-kinematics/ex1_q33.png",
+      "options": [
+        "[Option text]",
+        "2\n4\n6\n8 t(s)\n0\n\n2\n4\n6\n8 t(s)\n0\n\nx\n\nx\n\n(m)\n\n(m)",
+        "[Option text]",
+        "2 4 6\n8\nt(s)\n0\n\n2\n4\n6\n8\nt(s)\n0"
+      ],
+      "correctAnswer": 2,
+      "solution": "C\nv - t Displacement is zero\n\nx\n\n(m)",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q34",
+      "number": 34,
+      "type": "single_correct",
+      "question": "The velocity-time graph of a body falling from\nrest under gravity and rebounding from a solid surface\nis represented by which of the following graphs ?\n\nV\n\nV",
+      "image": null,
+      "options": [
+        "t",
+        "t\n\nV\n\nV",
+        "t",
+        "t"
+      ],
+      "correctAnswer": 0,
+      "solution": "Refer to official JEE Kinematics solution steps for Question 34. Correct option: A.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q35",
+      "number": 35,
+      "type": "single_correct",
+      "question": "Shown in the figure are the displacement time\ngraph for two children going home from the school.\nWhich of the following statements about their relative\n is true after both of them started moving ?\nTheir relative velocity:\n\nC1\nX\n\nC2\n\nT\nO\nt",
+      "image": "/assets/physics/c04-kinematics/ex1_q35.png",
+      "options": [
+        "first increases and then decreases",
+        "first decreases and then increases",
+        "is zero",
+        "is non zero constant"
+      ],
+      "correctAnswer": 3,
+      "solution": "D\nThe slope of curve c1 and c2 is constant.\nso, their Relative velocity is Non-zero constant not a\nvariable quantity",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q36",
+      "number": 36,
+      "type": "single_correct",
+      "question": "Shown in the figure are the\nvelocity time graphs of the two\nparticles P1 and P2. Which of\nthe following statements about\ntheir relative is true ?\nTheire relative velocity\n \n\nP1\nv\n\nP2\n\nT\nO\nt",
+      "image": "/assets/physics/c04-kinematics/ex1_q36.png",
+      "options": [
+        "is zero",
+        "is non-zero but constant",
+        "continuously decreases",
+        "continuously increases"
+      ],
+      "correctAnswer": 3,
+      "solution": "D\n\u2234 Slope of v-t curve gives aceleration",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q37",
+      "number": 37,
+      "type": "single_correct",
+      "question": "A body A is thrown vertically upwards with such a\nvelocity that it reaches a maximum height of h.\nSimultaneously another body B is dropped from height\nh. It strikes the ground and does not rebound. The\nvelocity of A relative to B v/s time graph is best\nrepresented by : (upward direction is positive)\n\nVAB\n\nVAB\n\n(B)",
+      "image": "/assets/physics/c04-kinematics/ex1_q37.png",
+      "options": [
+        "t\n\nt\n\nVAB\n\nVAB\n\nt\n\n(C) \n\n(D) \n\nt\n\nSol.",
+        "(A) \n\nt\n\nt\n\nVAB\n\nVAB\n\nt",
+        "[Option text]",
+        "t"
+      ],
+      "correctAnswer": 2,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (C).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q38",
+      "number": 38,
+      "type": "single_correct",
+      "question": "An object A is moving with 10 m/s and B is moving\nwith 5 m/s in the same direction of positive x-axis. A\nis 100 m behind B as shown. Find time taken by A to\nMeet B\n\n10m/s\n5m/s\n\nA\nB\n\n100m",
+      "image": null,
+      "options": [
+        "18 sec.",
+        "16 sec.",
+        "20 sec.",
+        "17 sec."
+      ],
+      "correctAnswer": 2,
+      "solution": "C\n\nB\nu=0\n\nH\n\ngt\ngh",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q39",
+      "number": 39,
+      "type": "single_correct",
+      "question": "It takes one minute for a passenger standing on\nan escalator to reach the top. If the escalator does\nnot move it takes him 3 minute to walk up. How long\nwill it take for the passenger to arrive at the top if he\nwalks up the moving escalator?",
+      "image": null,
+      "options": [
+        "30 sec",
+        "45 sec",
+        "40 sec",
+        "35 sec"
+      ],
+      "correctAnswer": 1,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (B).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q40",
+      "number": 40,
+      "type": "single_correct",
+      "question": "A body is thrown up in a lift with a velocity u\nrelative to the lift and the time of flight is found to be\nt. The acceleration with which the lift is moving up is",
+      "image": null,
+      "options": [
+        "u\ngt\nt\n-",
+        "2u\ngt\nt\n-",
+        "u\ngt\nt\n+",
+        "2u\ngt\nt\n+"
+      ],
+      "correctAnswer": 1,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (B).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q41",
+      "number": 41,
+      "type": "single_correct",
+      "question": "A ball is thrown upwards. It returns to ground\ndescribing a parabolic path. Which of the following\nremains constant ?",
+      "image": null,
+      "options": [
+        "speed of the ball",
+        "kinetic energy of the ball",
+        "vertical component of velocity",
+        "horizontal component of velocity."
+      ],
+      "correctAnswer": 3,
+      "solution": "B\na = acceleration of lift\nu = velocity relative to lift\nAccording to problem\n- u = u - (g + a) \u00d7 t\n\n2u\nt\ng\na\n=\n+\n\na\n\nat\ngt\n2u\n\u21d2\n+\n=\n\n2u\ngt\nt\n\u2212\n\u2234=",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q42",
+      "number": 42,
+      "type": "single_correct",
+      "question": "A point mass is projected, making an acute angle\nwith the horizontal. If angle between velocity v\u0001 and\n\nacceleration g\u0001 is \u03b8, then \u03b8 is given by",
+      "image": null,
+      "options": [
+        "0\u00ba < \u03b8 < 90\u00b0",
+        "\u03b8 = 90\u00b0",
+        "\u03b8 = 90\u00b0",
+        "0\u00ba < \u03b8 < 180\u00ba"
+      ],
+      "correctAnswer": 3,
+      "solution": "D\nHorizontal Component of velocity\nBecause \u2192there is no acceleration in horizontal Di-\nrection",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q43",
+      "number": 43,
+      "type": "single_correct",
+      "question": "The velocity at the maximum height of a projectile\nis half of its initial velocity u. Its range on the horizontal\nplane is",
+      "image": null,
+      "options": [
+        "g\n3\nu\n2 2",
+        "g\n2\nu\n3\n2",
+        "g\n3\nu2",
+        "g\n2\nu2"
+      ],
+      "correctAnswer": 1,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (B).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q44",
+      "number": 44,
+      "type": "single_correct",
+      "question": "Choose the incorrect statement",
+      "image": null,
+      "options": [
+        "It travels vertically with a velocity of 40 m/s",
+        "It travels horizontally with a velocity of 30 m/s",
+        "The minimum velocity of the projectile is 30 m/s",
+        "None of these"
+      ],
+      "correctAnswer": 0,
+      "solution": "B\nAt maximumm height Vy = 0\n\nu\nV\nu\nucos",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q45",
+      "number": 45,
+      "type": "single_correct",
+      "question": "Determine the instants at which the projectile is\nat the same height",
+      "image": null,
+      "options": [
+        "t = 1s and t = 7s",
+        "t = 3s and t = 5s",
+        "t = 2s and t = 6s",
+        "all the above"
+      ],
+      "correctAnswer": 3,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (D).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q46",
+      "number": 46,
+      "type": "single_correct",
+      "question": "The equation of the trajectory is given by",
+      "image": null,
+      "options": [
+        "180y = 240 x - x2",
+        "180 y = x2 - 240x",
+        "180y = 135x - x2",
+        "180y = x2 - 135x"
+      ],
+      "correctAnswer": 0,
+      "solution": "Refer to official JEE Kinematics solution steps for Question 46. Correct option: A.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q47",
+      "number": 47,
+      "type": "single_correct",
+      "question": "A particle is projected from a horizontal plane (x-\nz plane) such that its velocity vector at time t is\n\ngiven by \n\u0135)\nct\n-\nb\n(\n\u00ee\na\nV\n+\n=\n\u0001\n\n. Its range on the horizontal\n\nplane is given by",
+      "image": null,
+      "options": [
+        "ba\n\nc",
+        "2ba\n\nc",
+        "3ba\n\nc",
+        "None"
+      ],
+      "correctAnswer": 1,
+      "solution": "A\nBy Equation of trajectory",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q48",
+      "number": 48,
+      "type": "single_correct",
+      "question": "A ball is thrown from a point on ground at some\nangle of projection. At the same time a bird starts\nfrom a point directly above this point of projection at\na height h horizontally with speed u. Given that in its\nflight ball just touches the bird at one point. Find the\ndistance on ground where ball strikes",
+      "image": null,
+      "options": [
+        "2u h\n\ng",
+        "u\nh\ng\n2",
+        "2\n2\nu\nh\ng",
+        "u h\n\ng"
+      ],
+      "correctAnswer": 2,
+      "solution": "B\n\n(\n)\n(\n)\nx\ny\n\u02c6\n\u02c6\n\u02c6\n\u02c6\nV\nai\nb\nct j\nu i\nu\ngt j\n=\n+\n\u2212\n=\n+\n\u2212\n\u0002\n\nx\ny\n2u u\nR\ng\n=\n \nc\nab",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q49",
+      "number": 49,
+      "type": "single_correct",
+      "question": "A ball is hit by a batsman at an angle of 37\u00b0 as\nshown in figure. The man standing at P should run at\nwhat minimum velocity so that he catches the ball\nbefore it strikes the ground. Assume that height of\nman is negligible in comparison to maximum height of\nprojectile.",
+      "image": "/assets/physics/c04-kinematics/ex1_q49.png",
+      "options": [
+        "3 m/s",
+        "5 m/s",
+        "9 m/s",
+        "12 m/s"
+      ],
+      "correctAnswer": 1,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (B).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q50",
+      "number": 50,
+      "type": "single_correct",
+      "question": "A projectile is fired with a speed u at an angle \u03b8\nwith the horizontal. Its speed when its direction of\n makes an angle \u2018\u03b1\u2019 with the horizontal is -",
+      "image": null,
+      "options": [
+        "u sec\u03b8 cos\u03b1",
+        "u sec\u03b8 sin\u03b1",
+        "u cos\u03b8 sec\u03b1",
+        "u sin\u03b8 sec\u03b1"
+      ],
+      "correctAnswer": 2,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (C).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q51",
+      "number": 51,
+      "type": "single_correct",
+      "question": "Two projectiles A and B are thrown with the same\nspeed such that A makes angle \u03b8 with the horizontal\nand B makes angle \u03b8 with the vertical, then -",
+      "image": null,
+      "options": [
+        "Both must have same time of flight",
+        "Both must achieve same maximum height",
+        "A must have more horizontal range than B",
+        "Both may have same time of flight"
+      ],
+      "correctAnswer": 3,
+      "solution": "C\n\n\u03b1\n\n\u03b1\ncos\nv\n\n\u03b8\n\n\u03b8\ncos\nu\n\nHorizontal Component\n\nucos\nvcos\n\u03b8 =\n\u03b1\n\nv\nucos sec\n\u2234\n=\n\u03b8\n\u03b1",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q52",
+      "number": 52,
+      "type": "single_correct",
+      "question": "Suppose a player hits several baseballs. Which\nbaseball will be in the air for the longest time?",
+      "image": null,
+      "options": [
+        "The one with the farthest range.",
+        "The one which reaches maximum height",
+        "The one with the greatest initial velocity",
+        "The one leaving the bat at 45\u00b0 with respect to\nthe ground."
+      ],
+      "correctAnswer": 1,
+      "solution": "D\n\nA\nB\n\nu\nu\n\nBoth may have same time of flight\n\n\u03b8\n\u2234\n=\n\n2usin\nT\ng",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q53",
+      "number": 53,
+      "type": "single_correct",
+      "question": "The horizontal separation between the points A\nand B is -",
+      "image": "/assets/physics/c04-kinematics/ex1_q53.png",
+      "options": [
+        "30 m",
+        "60 m",
+        "90 m",
+        "None"
+      ],
+      "correctAnswer": 1,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (B).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q54",
+      "number": 54,
+      "type": "single_correct",
+      "question": "The distance (in metres) of the particle from origin\nat t = 2 sec.",
+      "image": "/assets/physics/c04-kinematics/ex1_q54.png",
+      "options": [
+        "60 2",
+        "100",
+        "60",
+        "120"
+      ],
+      "correctAnswer": 0,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (A).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q55",
+      "number": 55,
+      "type": "single_correct",
+      "question": "Particle is dropped from the height of 20 m from\nhorizontal ground. There is wind blowing due to which\nhorizontal acceleration of the particle becomes 6 m/s\u00b2.\nFind the horizontal displacement of the particle till it\nreaches ground.",
+      "image": null,
+      "options": [
+        "6 m",
+        "10 m",
+        "12 m",
+        "24 m"
+      ],
+      "correctAnswer": 2,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (C).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q56",
+      "number": 56,
+      "type": "single_correct",
+      "question": "A ball is projected from top of a tower with a\nvelocity of 5 m/s at an angle of 53\u00b0 to horizontal. Its\nspeed when it is at a height of 0.45 m from the point\nof projection is",
+      "image": null,
+      "options": [
+        "2 m/s",
+        "3 m/s",
+        "4 m/s",
+        "data insufficient"
+      ],
+      "correctAnswer": 2,
+      "solution": "C\nH=20 m, u = 0",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q57",
+      "number": 57,
+      "type": "single_correct",
+      "question": "Find time of flight of projectile thrown horizontally\nwith speed 10 m/s from a long inclined plane which\nmakes an angle of \u03b8 = 45\u00b0 from horizontal.",
+      "image": null,
+      "options": [
+        "2 sec",
+        "2 2 sec",
+        "2 sec",
+        "none"
+      ],
+      "correctAnswer": 2,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (C).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q58",
+      "number": 58,
+      "type": "single_correct",
+      "question": "One stone is projected horizontally from a 20 m\nhigh cliff with an initial speed of 10 m/s. A second\nstone is simultaneously dropped from that cliff. Which\nof the following is true ?",
+      "image": null,
+      "options": [
+        "Both strike the ground with the same velocity",
+        "The ball with initial speed 10 m/s reaches the\nground first",
+        "Both the balls hit the ground at the same time",
+        "One cannot say without knowing the height of\nthe building"
+      ],
+      "correctAnswer": 2,
+      "solution": "C\n\ny\n\n45\u00b0\n10m/s\n\n45\u00b0\nx\n\nay = \ng",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q59",
+      "number": 59,
+      "type": "single_correct",
+      "question": "An aeroplane flying at a constant velocity releases\na bomb. As the bomb drops down from the aeroplane.",
+      "image": null,
+      "options": [
+        "it will always be vertically below the aeroplane",
+        "it will always be vertically below the aeroplane\nonly if the aeroplane is flying horizontally",
+        "it will always be vertically below the aeroplane\nonly if the aeroplane is flying at an angle of 45\u00b0 to the\nhorizontal.",
+        "it will gradually fall behind the aeroplane if the\naeroplane is flying horizontally"
+      ],
+      "correctAnswer": 0,
+      "solution": "C\nTime is depend only in vertical component Vy\nbut in both cases Vy=0\n\u2234 Both will reach the ground at the same time",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q60",
+      "number": 60,
+      "type": "single_correct",
+      "question": "A particle is projected at angle 37\u00b0 with the incline\nplane in upward direction with speed 10 m/s. The angle\nof incline plane is given 53\u00b0. Then the maximum height\nabove the incline plane attained by the particle will be",
+      "image": null,
+      "options": [
+        "3m",
+        "4m",
+        "5m",
+        "zero"
+      ],
+      "correctAnswer": 0,
+      "solution": "H\nVE =\n and \ns\n/\nm",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q61",
+      "number": 61,
+      "type": "single_correct",
+      "question": "On an inclined plane of inclination 30\u00b0, a ball is\nthrown at an angle of 60\u00b0 with the horizontal from the\n\nfoot of the incline with velocity of 10 3 m/s. If g =\n\n10 m/s\u00b2, then the time in which ball with hit the inclined\nplane is -",
+      "image": "/assets/physics/c04-kinematics/ex1_q61.png",
+      "options": [
+        "1.15 sec.",
+        "6 sec",
+        "2 sec",
+        "0.92 sec"
+      ],
+      "correctAnswer": 2,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (C).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q62",
+      "number": 62,
+      "type": "single_correct",
+      "question": "A projectile is fired with a velocity at right angle\nto the slope which is inclined at an angle \u03b8 with the\nhorizontal. The expression for the range R along the\nincline is -\n\n2\n2\nv\ng sec\u03b8\n(B) \n\n2\n2\nv\ng tan\u03b8",
+      "image": null,
+      "options": [
+        "2\n2\nv\ng tan sec\n\u03b8\n\u03b8\n(D) \n\n2\n2\ntan \u03b8\n\nv\n\n(C) \n\ng\n\nSol.",
+        "2\n2\nv\ng tan\u03b8\n\n(A) \n\n2\n2\nv\ng tan sec\n\u03b8\n\u03b8\n(D) \n\n2\n2\ntan \u03b8\n\nv",
+        "g\n\nSol.",
+        "2\n2\ntan \u03b8\n\nv\n\n(C) \n\ng"
+      ],
+      "correctAnswer": 2,
+      "solution": "628\nTime\nTotal\n\nce\ntan\nDis\nTotal\n=\n=\n\nTotal Displacement",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q63",
+      "number": 63,
+      "type": "single_correct",
+      "question": "If time taken by the projectile to reach Q is T,\nthan PQ =\n\nv\n\nP\n\n90\u00b0\n\n\u03b8\nQ",
+      "image": null,
+      "options": [
+        "Tvsin\u03b8",
+        "Tvcos\u03b8",
+        "Tv sec\u03b8",
+        "Tv tan\u03b8"
+      ],
+      "correctAnswer": 3,
+      "solution": "C\n\nr\n\n90\u00b0\n\nR\n\nx\n\u03b8\n\nay = -g cos \u03b8\nax = g sin \u03b8\nuy = v\nux = 0\n\nv.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q64",
+      "number": 64,
+      "type": "single_correct",
+      "question": "The trajectory of particle 1 with respect to particle\n2 will be",
+      "image": null,
+      "options": [
+        "a parabola",
+        "a straight line",
+        "a vertical straight line",
+        "a horizontal straight line"
+      ],
+      "correctAnswer": 1,
+      "solution": "D\n\nv\n\np\n90\u00b0\n\n\u03b8\nQ",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q65",
+      "number": 65,
+      "type": "single_correct",
+      "question": "If v1 cos\u03b81 = v2 cos\u03b82, then choose the incorrect\nstatement",
+      "image": null,
+      "options": [
+        "one particle will remain exactly below or above\nthe other particle",
+        "the trajectory of one with respect to other will be\na vertical straight line",
+        "both will have the same range",
+        "none of these"
+      ],
+      "correctAnswer": 2,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (C).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q66",
+      "number": 66,
+      "type": "single_correct",
+      "question": "If v1sin\u03b81 = v2sin\u03b82, then choose the incorrect\nstatement",
+      "image": null,
+      "options": [
+        "the time of flight of both the particles will be same",
+        "the maximum height attained by the particles will\nbe same",
+        "the trajectory of one with respect to another will\nbe a horizontal straight line",
+        "none of these"
+      ],
+      "correctAnswer": 3,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (D).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q67",
+      "number": 67,
+      "type": "single_correct",
+      "question": "If v1 = v2 and \u03b81 > \u03b82, then choose the incorrect\nstatement",
+      "image": null,
+      "options": [
+        "Particle 2 moves under the particle 1",
+        "The slope of the trajectory of particle 2 with\nrespect to 1 is always positive",
+        "Both the particle will have the same range if \u03b81 >\n45\u00b0 and \u03b82 < 45\u00b0 and \u03b81 + \u03b82 = 90\u00b0",
+        "none of these"
+      ],
+      "correctAnswer": 1,
+      "solution": "D\n\ny\n2u\nT\ng\n=\n\u2234 same",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q68",
+      "number": 68,
+      "type": "single_correct",
+      "question": "A helicopter is flying south with a speed of 50\nkmh-1. A train is moving with the same speed towards\neast. The relative velocity of the helicopter as seen\nby the passengers in the train will be towards.",
+      "image": null,
+      "options": [
+        "north east",
+        "south east",
+        "north west",
+        "south west"
+      ],
+      "correctAnswer": 3,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (D).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q69",
+      "number": 69,
+      "type": "single_correct",
+      "question": "Two particles are moving with velocities v1 and\nv2. Their relative velocity is the maximum, when the\nangle between their velocities is",
+      "image": null,
+      "options": [
+        "zero",
+        "\u03c0/4",
+        "\u03c0/2",
+        "\u03c0"
+      ],
+      "correctAnswer": 3,
+      "solution": "D\n\nN\n\nv =v -v\nHT\nH\nT\n\n-vT\nvT\nE\n\nW\n\nVHT\n\nvOA\nS\n\nSouth - West",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q70",
+      "number": 70,
+      "type": "single_correct",
+      "question": "A ship is travelling due east at 10 km/h. A ship\nheading 30\u00b0 east of north is always due north from\nthe first ship. The speed of the second ship in km/h is",
+      "image": null,
+      "options": [
+        "2\n20",
+        "2\n/\n3\n20",
+        "20",
+        "2\n/\n20"
+      ],
+      "correctAnswer": 2,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (C).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q71",
+      "number": 71,
+      "type": "single_correct",
+      "question": "A particle is kept at rest at origin. Another particle\n\nstarts from (5, 0) with a velocity of \n\u0135\n3\n\u00ee\n4\n-\n+\n. Find\n\ntheir closest distance of approach.",
+      "image": null,
+      "options": [
+        "3 m",
+        "4 m",
+        "5 m",
+        "2 m"
+      ],
+      "correctAnswer": 0,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (A).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q72",
+      "number": 72,
+      "type": "single_correct",
+      "question": "Four particles situated at the corners of a square\nof side \u2018a\u2019 move at a constant speed v. Each particle\nmaintains a direction towards the next particle in\nsuccession. Calculate the time particles will take to\nmeet each other.",
+      "image": "/assets/physics/c04-kinematics/ex1_q72.png",
+      "options": [
+        "a\n\nv",
+        "a\n\nv\n2",
+        "a\n\nv\n3",
+        "2\n\n3\na\nv"
+      ],
+      "correctAnswer": 0,
+      "solution": "A\n\ny\n\nB\n\nB\n\n5m/s\n\n\u0135",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q73",
+      "number": 73,
+      "type": "single_correct",
+      "question": "A swimmer\u2019s speed in the direction of flow of river\nis 16 km/h. Against the direction of flow of river, the\nswimmer\u2019s speed is 8 km/h. Calculate the swimmer\u2019s\nspeed in still water and the velocity of flow of the\nriver.",
+      "image": null,
+      "options": [
+        "12 km/h, 4 km/h",
+        "10 km/h, 3 km/h",
+        "10 km/h, 4 km/h",
+        "12 km/h, 2 km/h"
+      ],
+      "correctAnswer": 0,
+      "solution": "A\nEach porticle move\nperpendicular with the neighbour particle so no com-\nponent of v along the line of of neighbour\nvelocity so vel. of approach = v\n\nv\na\nt =\n\u21d2",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q74",
+      "number": 74,
+      "type": "single_correct",
+      "question": "A pipe which can rotate in a vertical plane is\nmounted on a cart. The cart moves uniformly along a\nhorizontal path with a speed v1 = 2 m/s. At what\nangle \u03b1 to the horizontal should the pipe be placed so\nthat drops of rain falling with a velocity v2 6 m/s move\nparallel to the walls of the pipe without touching them ?\nconsider the velocity of the drops as constant due to\nthe resistance of the air.\n\nv1\n\n3\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7",
+      "image": null,
+      "options": [
+        "tan\n( )\n-1 3",
+        "tan-1 1\n\n2\n\uf8eb\n\uf8ed\uf8ec\n\uf8f6\n\uf8f8\uf8f7\n(D) None of these",
+        "tan-1 1\n\nSol.",
+        "None of these\n\n(C) tan-1 1"
+      ],
+      "correctAnswer": 0,
+      "solution": "A\n\nGiven \nb\nbr\nr\nv\nv\nv\n=\n+",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q75",
+      "number": 75,
+      "type": "single_correct",
+      "question": "A swimmer swims in still water at a speed = 5 km/\nhr. He enters a 200 m wide river, having river flow speed\n= 4 km/h at point A and proceeds to swim at an angle\nof 127\u00b0 (sin37\u00b0 = 0.6) with the river flow direction.\nAnother point B is located directly across A on the\nother side. The swimmer lands on the other bank at a\npoint C, from which he walks the distance CB with a\nspeed = 3 km/h. The total time in which he reachrs\nfrom A to B is",
+      "image": null,
+      "options": [
+        "5 minutes",
+        "4 minutes",
+        "3 minutes",
+        "None"
+      ],
+      "correctAnswer": 1,
+      "solution": "By standard kinematic equations and physical analysis, the result yields option (B).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q76",
+      "number": 76,
+      "type": "single_correct",
+      "question": "A boat having a speed of 5 km/h. in still water,\ncrosses a river of width 1 km along the shortest possible\npath in 15 minutes. The speed of the river in Km/hr.",
+      "image": null,
+      "options": [
+        "1",
+        "3",
+        "4",
+        "41"
+      ],
+      "correctAnswer": 1,
+      "solution": "B\n\n4 km/h\nd=0.2km\n\n5 km/h\n\n37\u00b0\n\n4 km/h\n\n3 km/h\n\nC\nB\n\n4 km/h\n\nA\n\n1 km/h\n\nGiven : Vbr= 5 km/h\nvr=4 km/h\nd = 0.2 km",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q77",
+      "number": 77,
+      "type": "single_correct",
+      "question": "A flag is mounted on a car moving due North with\nvelocity of 20 km/h. Strong winds are blowing due\nEast with velocity of 20 km/h. The flag will point it\ndirection",
+      "image": null,
+      "options": [
+        "East",
+        "North-East",
+        "South-East",
+        "South-West"
+      ],
+      "correctAnswer": 2,
+      "solution": "B\n\nB 0.05 km\n\nvbr\n\nvbr",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q78",
+      "number": 78,
+      "type": "single_correct",
+      "question": "A man is crossing a river flowing with velocity of 5\nm/s. He reaches a point directly across at a distance\nof 60 m in 5 sec. His velocity in still water should be",
+      "image": null,
+      "options": [
+        "12 m/s",
+        "13 m/s",
+        "5 m/s",
+        "10 m/s"
+      ],
+      "correctAnswer": 1,
+      "solution": "C\n\nN\n\nv =20 km/h\nc\n\nv =v -v\nwc\nw\nc\n=v +(-v )\nw\nc\n\nE\n\nv =20 km/h\nw\n\nvw\n\n\u2234\nvwc\n\nvc",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-ex1-q79",
+      "number": 79,
+      "type": "single_correct",
+      "question": "Wind is blowing in the north direction at speed of\n2 m/s which causes the rain to fall at some angle with\nthe vertical. With what velocity should a cyclist drive\nso that the rain appears vertical to him",
+      "image": null,
+      "options": [
+        "2 m/s south",
+        "2 m/s north",
+        "4 m/s west",
+        "4 m/s south"
+      ],
+      "correctAnswer": 1,
+      "solution": "B\nvr=5m/s\n\nvm\n60m\n\nvmr=vm-vr\n\nvr\n\ns\n/\nm",
+      "solutionImage": null
+    }
+  ]
+}

@@ -1,0 +1,219 @@
+{
+  "subject": "physics",
+  "chapterId": "C04",
+  "exerciseId": "short-answers",
+  "title": "Short Answer Questions \u2014 Conceptual Flashcard Deck (19 Q&As)",
+  "itemCount": 19,
+  "mode": "study_deck",
+  "questions": [
+    {
+      "id": "phy-c04-sa-q1",
+      "number": 1,
+      "type": "conceptual_flashcard",
+      "question": "A vector \n\u0001a is turned without a change in its length\n\nthrough a small angle d\u03b8. What are | |\u0001a and \u2206a?",
+      "image": null,
+      "conceptKey": "Concept #1",
+      "answer": "Magnitude |a| remains unchanged. The change in vector is |\u0394a| = \u221a(a\u00b2 + a\u00b2 - 2a\u00b2cos(d\u03b8)) = 2a sin(d\u03b8/2).",
+      "solution": "Magnitude |a| remains unchanged. The change in vector is |\u0394a| = \u221a(a\u00b2 + a\u00b2 - 2a\u00b2cos(d\u03b8)) = 2a sin(d\u03b8/2).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q2",
+      "number": 2,
+      "type": "conceptual_flashcard",
+      "question": "Does the speedometer of a car measure speed or\nvelocity ? Explain",
+      "image": null,
+      "conceptKey": "Concept #2",
+      "answer": "The speedometer measures instantaneous speed only, as it indicates the magnitude of velocity without specifying the direction of motion.",
+      "solution": "The speedometer measures instantaneous speed only, as it indicates the magnitude of velocity without specifying the direction of motion.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q3",
+      "number": 3,
+      "type": "conceptual_flashcard",
+      "question": "When a particle moves with constant velocity, its\naverage velocity and its instantaneous velocity & speed\nare equal. Comment on this statement.",
+      "image": null,
+      "conceptKey": "Concept #3",
+      "answer": "True. When a particle moves with constant velocity, both its speed and direction remain unchanged. Therefore, its instantaneous velocity, average velocity, and instantaneous speed are all equal.",
+      "solution": "True. When a particle moves with constant velocity, both its speed and direction remain unchanged. Therefore, its instantaneous velocity, average velocity, and instantaneous speed are all equal.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q4",
+      "number": 4,
+      "type": "conceptual_flashcard",
+      "question": "In a given time interval, is the total displacement\nof a particle equal to the product of the average\nvelocity and the time interval, even when the velocity\nis not constant? Explain.",
+      "image": null,
+      "conceptKey": "Concept #4",
+      "answer": "Yes. By definition, average velocity is V_avg = \u0394r / \u0394t. Therefore, the total displacement \u0394r = V_avg \u00b7 \u0394t holds universally, even if the velocity varies during the interval.",
+      "solution": "Yes. By definition, average velocity is V_avg = \u0394r / \u0394t. Therefore, the total displacement \u0394r = V_avg \u00b7 \u0394t holds universally, even if the velocity varies during the interval.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q5",
+      "number": 5,
+      "type": "conceptual_flashcard",
+      "question": "Can you have zero displacement and a non zero\naverage velocity? Can you have a zero displacement\nand a non zero velocity? Illustrate your answer on a\nx-t graph.",
+      "image": null,
+      "conceptKey": "Concept #5",
+      "answer": "(a) No, zero displacement means V_avg = \u0394r / \u0394t = 0. A non-zero average velocity is impossible with zero displacement.\n(b) Yes, instantaneous velocity can be non-zero at intermediate instants even if net displacement is zero (e.g. a particle returning to its starting point).",
+      "solution": "(a) No, zero displacement means V_avg = \u0394r / \u0394t = 0. A non-zero average velocity is impossible with zero displacement.\n(b) Yes, instantaneous velocity can be non-zero at intermediate instants even if net displacement is zero (e.g. a particle returning to its starting point).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q6",
+      "number": 6,
+      "type": "conceptual_flashcard",
+      "question": "At which point on its path a projectile has the\nsmallest speed?",
+      "image": null,
+      "conceptKey": "Concept #6",
+      "answer": "At the highest point (peak) of its trajectory, where the vertical velocity component is zero (vy = 0) and the speed equals horizontal velocity u cos\u03b8.",
+      "solution": "At the highest point (peak) of its trajectory, where the vertical velocity component is zero (vy = 0) and the speed equals horizontal velocity u cos\u03b8.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q7",
+      "number": 7,
+      "type": "conceptual_flashcard",
+      "question": "A person standing on the edge of a cliff at some\nheight above the ground below throws one ball straight\nup with initial speed u and then throws another ball\nstraight down with the same initial speed. Which ball,\nif either, has the larger speed when it hits the ground?\nNeglect air resistance.",
+      "image": null,
+      "conceptKey": "Concept #7",
+      "answer": "Both balls hit the ground with the exact same speed. By conservation of mechanical energy: v\u00b2 = u\u00b2 + 2gh, which depends solely on initial speed u and height h, irrespective of initial projection angle.",
+      "solution": "Both balls hit the ground with the exact same speed. By conservation of mechanical energy: v\u00b2 = u\u00b2 + 2gh, which depends solely on initial speed u and height h, irrespective of initial projection angle.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q8",
+      "number": 8,
+      "type": "conceptual_flashcard",
+      "question": "An airplane on floor relief mission has to drop a\nsack of rice exactly in the center of a circle on the\nground while flying at a predetermined height and\nspeed. What is so difficult about that? Why doesn\u2019t it\njust drop the sack when it is directly above the circle.",
+      "image": null,
+      "conceptKey": "Concept #8",
+      "answer": "Due to inertia, the dropped sack retains the airplane's horizontal velocity and moves in a parabolic trajectory. If dropped directly above the target, it overshoots and lands ahead of the circle.",
+      "solution": "Due to inertia, the dropped sack retains the airplane's horizontal velocity and moves in a parabolic trajectory. If dropped directly above the target, it overshoots and lands ahead of the circle.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q9",
+      "number": 9,
+      "type": "conceptual_flashcard",
+      "question": "Which of the following graphs cannot possibily\nrepresent one dimensional of a particle?\n\nx\n\n| |\n\u0001v\n\nl\n\nt\n\nt\n\nt\n\n \n\n \n\nl - length of path\n\nx - displacement",
+      "image": "/assets/physics/c04-kinematics/short_q9.png",
+      "conceptKey": "Concept #9",
+      "answer": "None of the three graphs can represent real 1D motion:\n- Graph I: At a single time t, position x has multiple values (a particle cannot be in two locations simultaneously).\n- Graph II: Speed |v| is plotted as negative, which is physically impossible for a magnitude.\n- Graph III: Total path length l decreases with time, which violates the monotonic nature of distance.",
+      "solution": "None of the three graphs can represent real 1D motion:\n- Graph I: At a single time t, position x has multiple values (a particle cannot be in two locations simultaneously).\n- Graph II: Speed |v| is plotted as negative, which is physically impossible for a magnitude.\n- Graph III: Total path length l decreases with time, which violates the monotonic nature of distance.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q10",
+      "number": 10,
+      "type": "conceptual_flashcard",
+      "question": "Can you suggest a suitable situation from\nobservation around you for each of the following ?\n\nx\n\nx\n\nt\n\nt\n\nx - displacement\n\nx\n\nt",
+      "image": "/assets/physics/c04-kinematics/short_q10.png",
+      "conceptKey": "Concept #10",
+      "answer": "Physical observations:\n- Graph I: A ball moving forward collides with a wall, rebounds, and comes to rest after collision.\n- Graph II: A ball repeatedly making inelastic bounces on the floor with decreasing height.\n- Graph III: An impulsive collision where velocity changes abruptly over an infinitesimally small interval.",
+      "solution": "Physical observations:\n- Graph I: A ball moving forward collides with a wall, rebounds, and comes to rest after collision.\n- Graph II: A ball repeatedly making inelastic bounces on the floor with decreasing height.\n- Graph III: An impulsive collision where velocity changes abruptly over an infinitesimally small interval.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q11",
+      "number": 11,
+      "type": "conceptual_flashcard",
+      "question": "One of the following statements is incorrect.\n(a) The car traveled around the track at a constant\nvelocity\n(b) The car traveled around the track at a constant\nspeed. Which statement is incorrect and why ?",
+      "image": null,
+      "conceptKey": "Concept #11",
+      "answer": "Statement (a) is incorrect. A car traveling around a curved track cannot have constant velocity because its direction of motion is continuously changing (velocity is a vector). Statement (b) is correct since speed is a scalar and can remain uniform.",
+      "solution": "Statement (a) is incorrect. A car traveling around a curved track cannot have constant velocity because its direction of motion is continuously changing (velocity is a vector). Statement (b) is correct since speed is a scalar and can remain uniform.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q12",
+      "number": 12,
+      "type": "conceptual_flashcard",
+      "question": "Give an example from your own experience in which\nthe velocity of an object is zero for just an instant of\ntime, but its acceleration is not zero.",
+      "image": null,
+      "conceptKey": "Concept #12",
+      "answer": "A ball thrown vertically upward: at the apex of its trajectory, its instantaneous velocity is zero (v = 0), but its acceleration is non-zero (a = g = 9.8 m/s\u00b2 downward).",
+      "solution": "A ball thrown vertically upward: at the apex of its trajectory, its instantaneous velocity is zero (v = 0), but its acceleration is non-zero (a = g = 9.8 m/s\u00b2 downward).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q13",
+      "number": 13,
+      "type": "conceptual_flashcard",
+      "question": "A ball is dropped from rest from the top of a building\nand strikes the ground with a speed vf. From ground\nlevel, a second ball is thrown straight upward at the\nsame instant that the first ball is dropped. The initial\nspeed of the second ball is v0 = vf, the same speed\nwith which the first ball will eventually strike the ground.\nIgnoring air resistance, decide whether the balls cross\npaths at half the height of the building above the\nhalfway point, or below the halfway point. Give your\nreasoning.",
+      "image": null,
+      "conceptKey": "Concept #13",
+      "answer": "The balls cross paths ABOVE the halfway point (at height 3H/4). Since h1 + h2 = H = vf \u00b7 t, we find t = \u221a(H / 2g). The distance fallen by the first ball is h1 = (1/2)gt\u00b2 = H/4, meaning the encounter occurs at height H - H/4 = 3H/4 from the ground.",
+      "solution": "The balls cross paths ABOVE the halfway point (at height 3H/4). Since h1 + h2 = H = vf \u00b7 t, we find t = \u221a(H / 2g). The distance fallen by the first ball is h1 = (1/2)gt\u00b2 = H/4, meaning the encounter occurs at height H - H/4 = 3H/4 from the ground.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q14",
+      "number": 14,
+      "type": "conceptual_flashcard",
+      "question": "The muzzle velocity of a gun is the velocity of the\nbullet when it leaves the barrel. The muzzle velocity\nof one rifle with a short barrel is greater than the\nmuzzle velocity of another rifle that has a longer barrel.\nIn which rifle is the acceleration of the bullet larger?\nExplain your reasoning.",
+      "image": null,
+      "conceptKey": "Concept #14",
+      "answer": "The bullet in the short barrel rifle experiences larger acceleration. Using v\u00b2 = 2as \u21d2 a = v\u00b2 / (2s). With a higher muzzle velocity v and shorter barrel length s, the short barrel bullet has significantly greater acceleration.",
+      "solution": "The bullet in the short barrel rifle experiences larger acceleration. Using v\u00b2 = 2as \u21d2 a = v\u00b2 / (2s). With a higher muzzle velocity v and shorter barrel length s, the short barrel bullet has significantly greater acceleration.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q15",
+      "number": 15,
+      "type": "conceptual_flashcard",
+      "question": "On a riverboat cruise, a plastic bottle is accidentally\ndropped overboard. A passenger on the boat estimate\nthat the boat pulls ahead of the bottle by 5 meters\neach second. Is it possible to conclude that the boat\nis moving at 5 m/s with respect to the shore? Account\nfor your answer.",
+      "image": null,
+      "conceptKey": "Concept #15",
+      "answer": "No. The bottle moves with the river current. The 5 m/s observed is the velocity of the boat relative to the water (bottle), not relative to the shore.",
+      "solution": "No. The bottle moves with the river current. The 5 m/s observed is the velocity of the boat relative to the water (bottle), not relative to the shore.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q16",
+      "number": 16,
+      "type": "conceptual_flashcard",
+      "question": "A wrench is accidentally dropped from the top of\nthe mast on a sailboat. Will the wrench hit at the\nsame place on the deck whether the sailboat is at\nrest or moving with a constant velocity? Justify your\nanswer.",
+      "image": null,
+      "conceptKey": "Concept #16",
+      "answer": "Yes, the wrench hits at the exact same location on the deck. By inertia, the wrench shares the sailboat's horizontal velocity, and in the sailboat's inertial reference frame, its vertical fall is identical whether moving or stationary.",
+      "solution": "Yes, the wrench hits at the exact same location on the deck. By inertia, the wrench shares the sailboat's horizontal velocity, and in the sailboat's inertial reference frame, its vertical fall is identical whether moving or stationary.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q17",
+      "number": 17,
+      "type": "conceptual_flashcard",
+      "question": "Is the acceleration of a projectile equal to zero\nwhen it reaches the top of its trajectory? If not, why\nnot?",
+      "image": null,
+      "conceptKey": "Concept #17",
+      "answer": "No. Acceleration remains constant at g (9.8 m/s\u00b2 vertically downward) throughout the entire flight. Only the vertical component of velocity is zero at the peak.",
+      "solution": "No. Acceleration remains constant at g (9.8 m/s\u00b2 vertically downward) throughout the entire flight. Only the vertical component of velocity is zero at the peak.",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q18",
+      "number": 18,
+      "type": "conceptual_flashcard",
+      "question": "A child is playing on the floor of a recreational\nvehicle (RV) as it moves along the highway at a\nconstant velocity. He has a toy cannon, which shoots\na marble at a fixed angle and speed with respect to\nthe floor. The connon can be aimed toward the front\nor the rear of the RV. Is the range towards the front\nthe same as, less than, or greater than the range\ntowards the rear? Answer this question (a) from the\nchild\u2019s point of view and (b) from the point of view of\nan observer standing still on the ground. Justify your\nanswers.",
+      "image": null,
+      "conceptKey": "Concept #18",
+      "answer": "(a) In the child's frame of reference (an inertial frame moving with constant velocity), ranges are identical.\n(b) In the ground frame: forward range is greater because ground velocity is u cos\u03b8 + v_RV, whereas backward range is smaller (u cos\u03b8 - v_RV).",
+      "solution": "(a) In the child's frame of reference (an inertial frame moving with constant velocity), ranges are identical.\n(b) In the ground frame: forward range is greater because ground velocity is u cos\u03b8 + v_RV, whereas backward range is smaller (u cos\u03b8 - v_RV).",
+      "solutionImage": null
+    },
+    {
+      "id": "phy-c04-sa-q19",
+      "number": 19,
+      "type": "conceptual_flashcard",
+      "question": "Three swimmers can swim equally fast relative to\nthe water. They have a race to see who can swim\nacross a river in the least time. Swimmer A swims\nperpendicular to the current and lands on the far shore\ndownstream, because the current has swept him in\nthat direction. Swimmer B swims upstream at an angle\nto the current and lands on the far shore directly\nopposite the starting point. Swimmer C swims\ndownstream at an angle to the current in an attempt\nto take advantage of the current. Who crosses the\nriver in the least time? Account for your answer.",
+      "image": null,
+      "conceptKey": "Concept #19",
+      "answer": "Swimmer A crosses in the least time. Crossing time depends solely on the velocity component perpendicular to the river bank (t = d / vy). Swimmer A swims directly across, maximizing vy = v_swim (cos 0\u00b0 = 1), whereas B and C direct part of their velocity along the current, resulting in a smaller vy.",
+      "solution": "Swimmer A crosses in the least time. Crossing time depends solely on the velocity component perpendicular to the river bank (t = d / vy). Swimmer A swims directly across, maximizing vy = v_swim (cos 0\u00b0 = 1), whereas B and C direct part of their velocity along the current, resulting in a smaller vy.",
+      "solutionImage": null
+    }
+  ]
+}
