@@ -493,12 +493,14 @@ BEGIN
         'total_marks_scored', r.total_marks_scored,
         'total_max_marks', r.total_max_marks,
         'is_current_user', r.is_current_user
-      ) ORDER BY r.computed_rank ASC LIMIT 100
+      ) ORDER BY r.computed_rank ASC
     ),
     '[]'::jsonb
   )
   INTO v_result
-  FROM ranked r;
+  FROM (
+    SELECT * FROM ranked ORDER BY computed_rank ASC LIMIT 100
+  ) r;
 
   RETURN v_result;
 END;
