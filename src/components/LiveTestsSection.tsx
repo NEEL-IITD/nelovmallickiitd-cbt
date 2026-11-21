@@ -92,14 +92,40 @@ export const LiveTestsSection: React.FC<LiveTestsSectionProps> = ({ onSelectTest
                 </h3>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-zinc-400 pt-0.5">
-                PTA 01 to PTA 10 (300 Mks)
+                PTM 01 to PTM 20 (300 Mks)
               </p>
             </div>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 dark:bg-zinc-700 text-slate-600 dark:text-zinc-400">
-              10 Slots
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-400">
+              20 Tests
             </span>
           </button>
         </div>
+
+        {/* JEE Mains 2027 Schedule Banner */}
+        {activeCategory === 'jee-mains' && (
+          <div className="max-w-4xl mx-auto rounded-3xl p-5 sm:p-6 bg-gradient-to-r from-indigo-900/80 via-slate-900/90 to-purple-900/80 text-white border border-indigo-500/30 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="space-y-1 text-center sm:text-left">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-400/20 text-indigo-300 border border-indigo-400/30">
+                  Jan 2027 Calendar Released
+                </span>
+                <span className="text-xs text-slate-300 font-medium">Curated by Nelov Mallick (IIT Delhi)</span>
+              </div>
+              <h4 className="text-base sm:text-lg font-bold text-white">
+                Complete 20-Test Practice Test Mains (PTM 01–20) Schedule
+              </h4>
+              <p className="text-xs text-slate-300">
+                Phase 1 (Nov 22) to Phase 3 (Jan 17). Missed a slot? Every test remains 100% open anytime afterward!
+              </p>
+            </div>
+            <a
+              href="#/schedule"
+              className="shrink-0 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 whitespace-nowrap"
+            >
+              View 20-Test Schedule →
+            </a>
+          </div>
+        )}
 
         {/* 10 Test Cards Grid (PTA 01 to PTA 10) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">

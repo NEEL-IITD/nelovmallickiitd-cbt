@@ -69,6 +69,7 @@
   <!-- Loaded Test Registries and Test Papers -->
   <script src="/data/siteData.js"></script>
   <script src="/data/testsIndex.js"></script>
+  <script src="/data/scheduleData.js"></script>
   <script src="/data/pta04.js"></script>
   <script src="/data/pta05.js"></script>
   <script src="/data/jee-advanced/pta04.js"></script>
@@ -110,6 +111,29 @@
     }
     .katex {
       font-size: 1.05em;
+    }
+    @media print {
+      header, nav, aside, footer, .no-print, button {
+        display: none !important;
+      }
+      body, html {
+        background: white !important;
+        color: black !important;
+      }
+      .print-area {
+        display: block !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .print-card {
+        border: 1px solid #ccc !important;
+        break-inside: avoid;
+        margin-bottom: 8px !important;
+        box-shadow: none !important;
+        background: #fff !important;
+        color: #000 !important;
+      }
     }
   </style>
 </head>
@@ -7971,12 +7995,29 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           <div className="font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-1.5">
                             <span>JEE Mains</span>
                             <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
-                              10 Tests
+                              20 Tests
                             </span>
                           </div>
-                          <p className="text-[11px] text-slate-500 dark:text-zinc-400">PTM 01–10 chapterwise mocks</p>
+                          <p className="text-[11px] text-slate-500 dark:text-zinc-400">PTM 01–20 full mock series</p>
                         </div>
                         <span className="text-slate-400">→</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => { setActiveDropdown(null); navigateTo('schedule', '#/schedule'); }}
+                        className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-left transition-colors"
+                      >
+                        <div>
+                          <div className="font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-1.5">
+                            <span>🗓️ 2027 PTM Schedule</span>
+                            <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                              20 Tests
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 dark:text-zinc-400">3D Interactive Jan 2027 Calendar</p>
+                        </div>
+                        <span className="text-indigo-500">→</span>
                       </button>
 
                       <div className="my-1 border-t border-slate-100 dark:border-zinc-800/80" />
@@ -8480,8 +8521,19 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         onClick={() => { setActiveCategory('jee-mains'); navigateTo('home', '#/tests/jee-mains'); }}
                         className="w-full text-left py-2 px-3 rounded-lg text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 flex items-center justify-between"
                       >
-                        <span>JEE Mains (PTM 01–10)</span>
-                        <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">10 Tests</span>
+                        <span>JEE Mains (PTM 01–20)</span>
+                        <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">20 Tests</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setMobileMenuOpen(false); navigateTo('schedule', '#/schedule'); }}
+                        className="w-full text-left py-2 px-3 rounded-lg text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 flex items-center justify-between"
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <span>🗓️</span>
+                          <span>2027 PTM Schedule</span>
+                        </span>
+                        <span className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.2 rounded font-extrabold">20 Tests →</span>
                       </button>
                       <button
                         type="button"
@@ -9574,7 +9626,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         };
       });
 
-      const jeeMainsTestsList = Array.from({ length: 10 }, (_, i) => {
+      const jeeMainsTestsList = Array.from({ length: 20 }, (_, i) => {
         const num = String(i + 1).padStart(2, '0');
         const testId = `jee-mains-ptm-${num}`;
         return {
@@ -10540,7 +10592,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 shadow-sm space-y-4">
                   <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
                     <div>
-                      <h3 className="text-lg font-black text-slate-900 dark:text-zinc-50">JEE Mains Series (PTM 01 – PTM 10)</h3>
+                      <h3 className="text-lg font-black text-slate-900 dark:text-zinc-50">JEE Mains Series (PTM 01 – PTM 20)</h3>
                       <p className="text-xs text-slate-500">Standard 300 Marks Pattern</p>
                     </div>
                     <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
@@ -12589,7 +12641,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         };
       });
 
-      const ptmTests = Array.from({ length: 10 }, (_, i) => {
+      const ptmTests = Array.from({ length: 20 }, (_, i) => {
         const num = String(i + 1).padStart(2, '0');
         const tid = 'jee-mains-ptm-' + num;
         return {
@@ -12697,7 +12749,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 }`}
               >
                 <span>⚡</span>
-                <span>JEE Mains (PTM 01–10)</span>
+                <span>JEE Mains (PTM 01–20)</span>
               </button>
 
               <button
@@ -13235,6 +13287,514 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       );
     }
 
+    // ==============================================================================
+    // 3D INTERACTIVE JEE MAINS 2027 (JANUARY ATTEMPT) 20-TEST PTM SCHEDULE VIEW
+    // Curated by Nelov Mallick (IIT Delhi) · 100% Free Forever
+    // ==============================================================================
+    function ScheduleView({ currentUser, setView, openAuth, handleSelectTest, testConfigs = {} }) {
+      const [selectedPhase, setSelectedPhase] = useState('all');
+      const [viewMode, setViewMode] = useState('cards');
+      const [copiedToast, setCopiedToast] = useState(false);
+
+      const schedule = window.JEE_MAINS_2027_SCHEDULE || [];
+      const revisionCard = window.FINAL_REVISION_CARD || {
+        dateStr: "Jan 18 – Jan 20, 2027",
+        title: "Final Formula Vault & Mental Rehearsal",
+        description: "Formula sheets, inorganic tables, error logs & light revision before exam day.",
+        hashRoute: "#/resources"
+      };
+
+      // Filtered schedule items
+      const filteredSchedule = useMemo(() => {
+        if (selectedPhase === 'all') return schedule;
+        return schedule.filter(item => item.phase === selectedPhase);
+      }, [selectedPhase, schedule]);
+
+      // Check if current wall clock time is inside the scheduled window
+      const isInsideWindow = (startIso, endIso) => {
+        if (!startIso || !endIso) return false;
+        const now = Date.now();
+        const start = new Date(startIso).getTime();
+        const end = new Date(endIso).getTime();
+        return now >= start && now <= end;
+      };
+
+      // Student attempt history check
+      const getAttemptCount = (testId) => {
+        if (!currentUser || !window.studentStorage?.getAttempts) return 0;
+        const attempts = window.studentStorage.getAttempts(currentUser.id) || [];
+        return attempts.filter(a => a.testId === testId).length;
+      };
+
+      const handleCopyLink = () => {
+        const url = window.location.origin + window.location.pathname + '#/schedule';
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(url).then(() => {
+            setCopiedToast(true);
+            setTimeout(() => setCopiedToast(false), 2500);
+          });
+        }
+      };
+
+      const handlePrint = () => {
+        window.print();
+      };
+
+      const handleAction = (item) => {
+        const isLive = testConfigs[item.id] === 'live';
+        if (!currentUser) {
+          openAuth('login', item.hashRoute, `Sign in or create a free account to attempt ${item.code}.`);
+          return;
+        }
+        if (isLive) {
+          if (handleSelectTest) {
+            handleSelectTest(item.id);
+          } else {
+            window.location.hash = item.hashRoute;
+          }
+        } else {
+          alert(`${item.code} is scheduled for ${item.dateStr} (${item.windowStr}). Every test is released according to this calendar and remains 100% open anytime afterward!`);
+        }
+      };
+
+      return (
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-100 transition-colors duration-200">
+          
+          {/* Copy Toast Notification */}
+          {copiedToast && (
+            <div className="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-semibold animate-bounce">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+              </svg>
+              Schedule link copied to clipboard!
+            </div>
+          )}
+
+          {/* Ambient Top Glow */}
+          <div className="relative overflow-hidden pt-8 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto print-area">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[360px] bg-gradient-to-b from-indigo-500/15 via-purple-500/10 to-transparent blur-3xl -z-10 pointer-events-none" />
+
+            {/* Top Back & Action Strip */}
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-8 no-print">
+              <button
+                type="button"
+                onClick={() => { setView('home'); window.location.hash = '#/'; }}
+                className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-white dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 px-3.5 py-2 rounded-xl shadow-xs transition-colors"
+              >
+                ← Back to Home
+              </button>
+
+              <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 px-3.5 py-2 rounded-xl shadow-xs hover:border-indigo-300 dark:hover:border-indigo-700 transition-all"
+                >
+                  <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Copy Link
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-xl shadow-md hover:shadow-indigo-500/20 transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                  Save / Print Schedule (PDF)
+                </button>
+              </div>
+            </div>
+
+            {/* 3D Hero Banner */}
+            <div className="relative rounded-3xl p-6 sm:p-10 mb-10 overflow-hidden bg-gradient-to-br from-indigo-900/90 via-slate-900/95 to-purple-950/90 text-white border border-indigo-500/30 shadow-2xl backdrop-blur-xl">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Top Pill Tags */}
+              <div className="flex flex-wrap items-center gap-2.5 mb-4">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  JEE Mains 2027 Calendar
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                  100% Free Forever
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-slate-200 border border-white/15">
+                  Curated by Nelov Mallick (IIT Delhi)
+                </span>
+              </div>
+
+              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+                JEE Mains 2027 (January Attempt)<br className="hidden sm:inline" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-sky-300 to-emerald-300">
+                  20-Test Practice Test Mains (PTM) Schedule
+                </span>
+              </h1>
+
+              {/* Academic Director Quote */}
+              <div className="relative my-6 pl-4 border-l-4 border-indigo-400 text-slate-200 italic text-sm sm:text-base font-medium max-w-3xl leading-relaxed">
+                &ldquo;The 20-Test PTM Series is designed to calibrate your exam temperament, eliminate negative marking, and lock your timing before January 2027. Treat every mock with the sanctity of the actual examination.&rdquo;
+                <div className="not-italic text-xs font-semibold text-indigo-300 mt-2">
+                  — Nelov Mallick, Academic Director &amp; Mentor (IIT Delhi)
+                </div>
+              </div>
+
+              {/* Flexible Access Reassurance Callout Pill */}
+              <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/10 dark:bg-white/5 border border-white/20 text-xs sm:text-sm font-medium text-slate-100 shadow-inner backdrop-blur-md">
+                <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-500/30 text-emerald-300 text-sm font-bold">
+                  ✓
+                </span>
+                <span>
+                  <strong className="text-emerald-300 font-bold">Flexible Access Guarantee:</strong> Missed a live window? Every live PTM stays open anytime afterward. Never locked out.
+                </span>
+              </div>
+
+              {/* 3 Fast Fact Pills */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-6 pt-6 border-t border-white/10">
+                <div className="flex items-center gap-3">
+                  <span className="w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 font-bold text-sm">
+                    20
+                  </span>
+                  <div>
+                    <p className="text-xs font-bold text-white">Full-Length Mocks</p>
+                    <p className="text-[11px] text-slate-300">300 Marks · 3 Hours · Exact CBT Engine</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 font-bold text-sm">
+                    3
+                  </span>
+                  <div>
+                    <p className="text-xs font-bold text-white">Progressive Phases</p>
+                    <p className="text-[11px] text-slate-300">Calibration → Endurance → Shift Simulation</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 font-bold text-sm">
+                    0₹
+                  </span>
+                  <div>
+                    <p className="text-xs font-bold text-white">Zero Paywalls</p>
+                    <p className="text-[11px] text-slate-300">100% Free Access for Every JEE Aspirant</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Phase Filter Tabs & View Mode Switcher */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-8 no-print">
+              
+              {/* Phase Filter Buttons */}
+              <div className="flex flex-wrap items-center gap-2 bg-slate-200/70 dark:bg-zinc-900/90 p-1.5 rounded-2xl border border-slate-300/80 dark:border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => setSelectedPhase('all')}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                    selectedPhase === 'all'
+                      ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  All Tests (20)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedPhase(1)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                    selectedPhase === 1
+                      ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  Phase 1 · Build (01–07)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedPhase(2)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                    selectedPhase === 2
+                      ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  Phase 2 · Endurance (08–16)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedPhase(3)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                    selectedPhase === 3
+                      ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  Phase 3 · NTA Shifts (17–20)
+                </button>
+              </div>
+
+              {/* View Mode Toggle */}
+              <div className="flex items-center self-end sm:self-auto gap-1 bg-slate-200/70 dark:bg-zinc-900/90 p-1.5 rounded-2xl border border-slate-300/80 dark:border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('cards')}
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    viewMode === 'cards'
+                      ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                  3D Cards
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('table')}
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    viewMode === 'table'
+                      ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Compact Timetable
+                </button>
+              </div>
+            </div>
+
+            {/* 1. 3D Cards Grid View */}
+            {viewMode === 'cards' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                {filteredSchedule.map((item) => {
+                  const isLive = testConfigs[item.id] === 'live';
+                  const inWindow = isInsideWindow(item.startIso, item.endIso);
+                  const attempts = getAttemptCount(item.id);
+
+                  return (
+                    <Tilt3DCard
+                      key={item.id}
+                      maxTilt={8}
+                      perspective={1100}
+                      className="print-card rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md p-6 shadow-md hover:shadow-xl dark:shadow-zinc-950/50 transition-all flex flex-col justify-between"
+                    >
+                      <div>
+                        {/* Top Meta Strip: Phase Pill + Event Tag */}
+                        <div className="flex items-center justify-between gap-2 mb-4">
+                          <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
+                            {item.phase === 1 && 'Phase 1 · Build & Calibrate'}
+                            {item.phase === 2 && 'Phase 2 · Speed & Endurance'}
+                            {item.phase === 3 && 'Phase 3 · NTA Shift Sim'}
+                          </span>
+
+                          {item.tag && (
+                            <span className="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                              {item.tag}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Test Code & Headline */}
+                        <div className="flex items-baseline justify-between mb-3">
+                          <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                            {item.code}
+                          </h3>
+                          <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400">
+                            300 Marks · 3 Hrs
+                          </span>
+                        </div>
+
+                        {/* Date and Window Box */}
+                        <div className="space-y-2 mb-5 p-3.5 rounded-2xl bg-slate-100/70 dark:bg-zinc-800/50 border border-slate-200/70 dark:border-zinc-700/50 text-xs">
+                          <div className="flex items-center gap-2.5 text-slate-700 dark:text-zinc-300 font-medium">
+                            <svg className="w-4 h-4 text-indigo-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span><strong>Date:</strong> {item.dateStr}</span>
+                          </div>
+                          <div className="flex items-center gap-2.5 text-slate-700 dark:text-zinc-300 font-medium">
+                            <svg className="w-4 h-4 text-indigo-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span><strong>Window:</strong> {item.windowStr}</span>
+                          </div>
+                        </div>
+
+                        {/* Status Badge */}
+                        <div className="flex flex-wrap items-center gap-2 mb-5">
+                          {inWindow ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                              LIVE WINDOW NOW
+                            </span>
+                          ) : isLive ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/30">
+                              <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                              Open Anytime
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-300 dark:border-zinc-700">
+                              Scheduled · Coming Soon
+                            </span>
+                          )}
+
+                          {attempts > 0 && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                              ✓ Attempted ({attempts}/3)
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Card Bottom CTA */}
+                      <button
+                        type="button"
+                        onClick={() => handleAction(item)}
+                        className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all ${
+                          isLive
+                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/20'
+                            : 'bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-300 dark:hover:bg-zinc-700'
+                        }`}
+                      >
+                        {isLive ? `Attempt ${item.code} →` : `Scheduled · Preview Details`}
+                      </button>
+                    </Tilt3DCard>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* 2. Compact Timetable View */}
+            {viewMode === 'table' && (
+              <div className="overflow-x-auto rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md shadow-lg mb-12">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-zinc-800 bg-slate-100/70 dark:bg-zinc-800/60 text-slate-600 dark:text-zinc-400 font-extrabold uppercase tracking-wider text-[11px]">
+                      <th className="py-3.5 px-4">#</th>
+                      <th className="py-3.5 px-4">Test Code</th>
+                      <th className="py-3.5 px-4">Phase</th>
+                      <th className="py-3.5 px-4">Date</th>
+                      <th className="py-3.5 px-4">Live Window (IST)</th>
+                      <th className="py-3.5 px-4">Event Tag</th>
+                      <th className="py-3.5 px-4">Status &amp; Access</th>
+                      <th className="py-3.5 px-4 text-right no-print">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60 font-medium">
+                    {filteredSchedule.map((item) => {
+                      const isLive = testConfigs[item.id] === 'live';
+                      const inWindow = isInsideWindow(item.startIso, item.endIso);
+                      const attempts = getAttemptCount(item.id);
+
+                      return (
+                        <tr
+                          key={item.id}
+                          className="hover:bg-indigo-50/40 dark:hover:bg-zinc-800/40 transition-colors"
+                        >
+                          <td className="py-3 px-4 font-mono text-slate-400 dark:text-zinc-500 font-bold">
+                            {String(item.num).padStart(2, '0')}
+                          </td>
+                          <td className="py-3 px-4 font-black text-slate-900 dark:text-white">
+                            {item.code}
+                          </td>
+                          <td className="py-3 px-4 text-slate-600 dark:text-zinc-400">
+                            {item.phase === 1 && 'Phase 1 · Build'}
+                            {item.phase === 2 && 'Phase 2 · Endurance'}
+                            {item.phase === 3 && 'Phase 3 · NTA Shifts'}
+                          </td>
+                          <td className="py-3 px-4 font-semibold text-slate-800 dark:text-zinc-200 whitespace-nowrap">
+                            {item.dateStr}
+                          </td>
+                          <td className="py-3 px-4 font-mono text-slate-700 dark:text-zinc-300 whitespace-nowrap">
+                            {item.windowStr}
+                          </td>
+                          <td className="py-3 px-4">
+                            {item.tag ? (
+                              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 whitespace-nowrap">
+                                {item.tag}
+                              </span>
+                            ) : (
+                              <span className="text-slate-400 dark:text-zinc-600">—</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              {inWindow ? (
+                                <span className="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                                  ● Live Window
+                                </span>
+                              ) : isLive ? (
+                                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/30">
+                                  ● Open Anytime
+                                </span>
+                              ) : (
+                                <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-200 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400">
+                                  Scheduled
+                                </span>
+                              )}
+                              {attempts > 0 && (
+                                <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">
+                                  ({attempts}/3 done)
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 text-right no-print">
+                            <button
+                              type="button"
+                              onClick={() => handleAction(item)}
+                              className={`px-3 py-1.5 rounded-xl font-bold text-xs whitespace-nowrap transition-all ${
+                                isLive
+                                  ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs'
+                                  : 'bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-300 dark:hover:bg-zinc-700'
+                              }`}
+                            >
+                              {isLive ? `Attempt →` : `Preview`}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Final Revision Vault Card */}
+            <div className="relative rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-purple-900/30 via-indigo-900/20 to-slate-900/40 border border-purple-500/30 backdrop-blur-xl shadow-lg flex flex-col sm:flex-row items-center justify-between gap-6 print-card">
+              <div className="space-y-2 text-center sm:text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-purple-500/20 text-purple-300 border border-purple-400/30">
+                  {revisionCard.dateStr}
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                  {revisionCard.title}
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 max-w-xl">
+                  {revisionCard.description}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => { setView('resources'); window.location.hash = revisionCard.hashRoute; }}
+                className="no-print shrink-0 px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-purple-500/20 transition-all flex items-center gap-2"
+              >
+                Open Formula Vault &amp; Resources →
+              </button>
+            </div>
+
+          </div>
+        </div>
+      );
+    }
+
     // MAIN APP COMPONENT
     function NelovMallickApp() {
       const [view, setView] = useState('home'); // 'home' | 'instructions' | 'exam' | 'result' | 'progress' | 'notebook'
@@ -13364,6 +13924,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           } else if (redirect.includes('notebook')) {
             setView('notebook');
             window.location.hash = '#/notebook';
+          } else if (redirect.includes('schedule')) {
+            setView('schedule');
+            window.location.hash = '#/schedule';
           } else {
             window.location.hash = redirect.startsWith('#') ? redirect : `#${redirect}`;
           }
@@ -13617,6 +14180,12 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return;
         }
 
+        if (hash === '#/schedule' || hash === '#schedule' || path === '/schedule') {
+          setView('schedule');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+
         if (hash === '#/notebook' || hash === '#notebook') {
           if (!activeUser) {
             openAuth('login', '#/notebook', 'Sign in or create a free account to access your personal Revision Notebook.');
@@ -13684,6 +14253,22 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             return;
           }
           handleSelectTest('jee-advanced-pta-06', activeUser);
+          return;
+        }
+
+        const ptmMatch = hash.match(/ptm-?(\d+)/);
+        if (ptmMatch) {
+          const ptmNum = String(parseInt(ptmMatch[1], 10)).padStart(2, '0');
+          const ptmId = `jee-mains-ptm-${ptmNum}`;
+          if (!activeUser) {
+            openAuth('login', `#/test/jee-mains/ptm-${ptmNum}`, `Sign in or create a free account to attempt PTM ${ptmNum}.`);
+            setView('home');
+            return;
+          }
+          if (activeTestId === ptmId && (view === 'instructions' || view === 'exam' || view === 'result')) {
+            return;
+          }
+          handleSelectTest(ptmId, activeUser);
           return;
         }
 
@@ -13765,7 +14350,10 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const handleSelectTest = (testId, explicitUser = null) => {
         const user = explicitUser || currentUser || window.authService?.getCurrentUser();
         if (!user) {
-          openAuth('login', testId.includes('pta-04') ? '#/test/jee-advanced/pta-04' : '#/test/jee-advanced/pta-05', 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.');
+          const authReturnHash = testId.startsWith('jee-mains-')
+            ? `#/test/jee-mains/${testId.replace('jee-mains-', '')}`
+            : (testId.includes('pta-04') ? '#/test/jee-advanced/pta-04' : (testId.includes('pta-06') ? '#/test/jee-advanced/pta-06' : '#/test/jee-advanced/pta-05'));
+          openAuth('login', authReturnHash, 'Sign in or create a free account to attempt tests, view detailed solutions, and track your JEE rank.');
           return;
         }
 
@@ -13806,7 +14394,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         }
 
         setActiveTestId(canonicalId);
-        const targetHash = `#/test/jee-advanced/${canonicalId.replace('jee-advanced-', '')}`;
+        const targetHash = canonicalId.startsWith('jee-mains-')
+          ? `#/test/jee-mains/${canonicalId.replace('jee-mains-', '')}`
+          : `#/test/jee-advanced/${canonicalId.replace('jee-advanced-', '')}`;
         if (window.location.hash !== targetHash) {
           window.location.hash = targetHash;
         }
@@ -15853,6 +16443,43 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         );
       }
 
+      if (view === 'schedule') {
+        return (
+          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
+            <MainNavbar
+              currentUser={currentUser}
+              activeCategory={activeCategory}
+              setActiveCategory={setActiveCategory}
+              isDark={isDark}
+              setIsDark={setIsDark}
+              openAuth={openAuth}
+              handleLogOut={handleLogOut}
+              setView={setView}
+              view={view}
+              userDropdownOpen={userDropdownOpen}
+              setUserDropdownOpen={setUserDropdownOpen}
+            />
+            <ScheduleView
+              currentUser={currentUser}
+              setView={setView}
+              openAuth={openAuth}
+              handleSelectTest={handleSelectTest}
+              testConfigs={testConfigs}
+            />
+            <PlatformFooter onOpenAuth={openAuth} />
+            <AuthModalDialog
+              isOpen={authModal.isOpen}
+              mode={authModal.mode}
+              redirectUrl={authModal.redirectUrl}
+              message={authModal.message}
+              onClose={closeAuth}
+              onAuthSuccess={handleAuthSuccess}
+            />
+            <StorageNoticeBanner />
+          </div>
+        );
+      }
+
       // -------------------------------------------------------------
       // RENDER: HOMEPAGE (Default View)
       // -------------------------------------------------------------
@@ -16193,14 +16820,41 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         </h3>
                       </div>
                       <p className="text-[11px] text-slate-500 dark:text-zinc-400 pt-0.5">
-                        PTA 01 to PTA 10 (300 Mks)
+                        PTM 01 to PTM 20 (300 Mks)
                       </p>
                     </div>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 dark:bg-zinc-700 text-slate-600 dark:text-zinc-400">
-                      10 Slots
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-400">
+                      20 Tests
                     </span>
                   </button>
                 </div>
+
+                {/* JEE Mains 2027 Schedule Banner */}
+                {activeCategory === 'jee-mains' && (
+                  <div className="max-w-4xl mx-auto rounded-3xl p-5 sm:p-6 bg-gradient-to-r from-indigo-900/80 via-slate-900/90 to-purple-900/80 text-white border border-indigo-500/30 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="space-y-1 text-center sm:text-left">
+                      <div className="flex items-center justify-center sm:justify-start gap-2">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-400/20 text-indigo-300 border border-indigo-400/30">
+                          Jan 2027 Calendar Released
+                        </span>
+                        <span className="text-xs text-slate-300 font-medium">Curated by Nelov Mallick (IIT Delhi)</span>
+                      </div>
+                      <h4 className="text-base sm:text-lg font-bold text-white">
+                        Complete 20-Test Practice Test Mains (PTM 01–20) Schedule
+                      </h4>
+                      <p className="text-xs text-slate-300">
+                        Phase 1 (Nov 22) to Phase 3 (Jan 17). Missed a slot? Every test remains 100% open anytime afterward!
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setView('schedule'); window.location.hash = '#/schedule'; }}
+                      className="shrink-0 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 whitespace-nowrap"
+                    >
+                      View 20-Test Schedule →
+                    </button>
+                  </div>
+                )}
 
                 {/* Subtitle / Active Category Info */}
                 <div className="flex items-center justify-between max-w-6xl mx-auto border-b border-slate-200 dark:border-zinc-800 pb-4">

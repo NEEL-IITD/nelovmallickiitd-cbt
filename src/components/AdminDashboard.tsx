@@ -289,8 +289,8 @@ export const AdminDashboard: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  // Catalog definitions: PTM 01-10 for JEE Mains, PTA 01-10 for JEE Advanced
-  const jeeMainsList = Array.from({ length: 10 }, (_, i) => {
+  // Catalog definitions: PTM 01-20 for JEE Mains, PTA 01-10 for JEE Advanced
+  const jeeMainsList = Array.from({ length: 20 }, (_, i) => {
     const num = String(i + 1).padStart(2, '0');
     const testId = `jee-mains-ptm-${num}`;
     return {
@@ -487,7 +487,7 @@ export const AdminDashboard: React.FC = () => {
             { id: 'vault', label: 'Vault Exercises & Theory', icon: '⚡' },
             { id: 'students', label: `All Students (${totalStudents})`, icon: '👥' },
             { id: 'attempts', label: `Test Attempts (${totalAttemptsCount})`, icon: '📝' },
-            { id: 'tests', label: `Manage Tests (${liveTestsCount}/20 Live)`, icon: '⚙️' },
+            { id: 'tests', label: `Manage Tests (${liveTestsCount}/30 Live)`, icon: '⚙️' },
             { id: 'leaderboards', label: 'Live Leaderboards', icon: '🏆' },
             { id: 'reports', label: `Error Reports (${openReportsCount} Open)`, icon: '⚠️' }
           ].map((tab) => (

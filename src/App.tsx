@@ -30,6 +30,7 @@ import { LecturesHub } from './components/LecturesHub';
 import { LecturePlayer } from './components/LecturePlayer';
 import { LecturesSection } from './components/LecturesSection';
 import { LeaderboardHub } from './components/LeaderboardHub';
+import { ScheduleView } from './components/ScheduleView';
 import { StudyResourcesVaultShowcase } from './components/vault/StudyResourcesVaultShowcase';
 import { SubjectResourcesHub } from './components/vault/SubjectResourcesHub';
 import { PrivacyPolicy } from './components/legal/PrivacyPolicy';
@@ -195,6 +196,17 @@ export const AppContent: React.FC = () => {
         <LeaderboardHub
           initialTestId={currentHash.split('/')[2] || 'jee-advanced-pta-04'}
           onNavigateHome={() => handleNavigate('#/')}
+        />
+      ) : currentHash === '#/schedule' || currentHash === '#schedule' ? (
+        <ScheduleView
+          onNavigate={handleNavigate}
+          onSelectTest={(testId) => {
+            if (testId.startsWith('jee-mains-')) {
+              handleNavigate(`#/test/jee-mains/${testId.replace('jee-mains-', '')}`);
+            } else {
+              handleNavigate(`#/test/jee-advanced/${testId.replace('jee-advanced-', '')}`);
+            }
+          }}
         />
       ) : currentHash === '#/account' || currentHash === '#account' ? (
         <ProtectedRoute redirectUrl="#/account" fallbackMessage="Sign in or create a free account to manage your Account & Privacy settings.">

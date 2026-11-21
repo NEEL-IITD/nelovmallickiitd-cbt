@@ -254,7 +254,7 @@ VALUES
   ('jee-advanced-pta-09', 'JEE Advanced', 'PTA 09', 'JEE Advanced – PTA 09 Full Syllabus Mock Test', 'coming_soon', NOW()),
   ('jee-advanced-pta-10', 'JEE Advanced', 'PTA 10', 'JEE Advanced – PTA 10 Full Syllabus Mock Test', 'coming_soon', NOW()),
 
-  -- JEE Mains (PTM 01 through PTM 10 initially Coming Soon)
+  -- JEE Mains (PTM 01 through PTM 20 initially Coming Soon)
   ('jee-mains-ptm-01', 'JEE Mains', 'PTM 01', 'JEE Mains – PTM 01 Full Syllabus Mock Test', 'coming_soon', NOW()),
   ('jee-mains-ptm-02', 'JEE Mains', 'PTM 02', 'JEE Mains – PTM 02 Full Syllabus Mock Test', 'coming_soon', NOW()),
   ('jee-mains-ptm-03', 'JEE Mains', 'PTM 03', 'JEE Mains – PTM 03 Full Syllabus Mock Test', 'coming_soon', NOW()),
@@ -264,7 +264,17 @@ VALUES
   ('jee-mains-ptm-07', 'JEE Mains', 'PTM 07', 'JEE Mains – PTM 07 Full Syllabus Mock Test', 'coming_soon', NOW()),
   ('jee-mains-ptm-08', 'JEE Mains', 'PTM 08', 'JEE Mains – PTM 08 Full Syllabus Mock Test', 'coming_soon', NOW()),
   ('jee-mains-ptm-09', 'JEE Mains', 'PTM 09', 'JEE Mains – PTM 09 Full Syllabus Mock Test', 'coming_soon', NOW()),
-  ('jee-mains-ptm-10', 'JEE Mains', 'PTM 10', 'JEE Mains – PTM 10 Full Syllabus Mock Test', 'coming_soon', NOW())
+  ('jee-mains-ptm-10', 'JEE Mains', 'PTM 10', 'JEE Mains – PTM 10 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-11', 'JEE Mains', 'PTM 11', 'JEE Mains – PTM 11 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-12', 'JEE Mains', 'PTM 12', 'JEE Mains – PTM 12 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-13', 'JEE Mains', 'PTM 13', 'JEE Mains – PTM 13 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-14', 'JEE Mains', 'PTM 14', 'JEE Mains – PTM 14 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-15', 'JEE Mains', 'PTM 15', 'JEE Mains – PTM 15 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-16', 'JEE Mains', 'PTM 16', 'JEE Mains – PTM 16 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-17', 'JEE Mains', 'PTM 17', 'JEE Mains – PTM 17 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-18', 'JEE Mains', 'PTM 18', 'JEE Mains – PTM 18 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-19', 'JEE Mains', 'PTM 19', 'JEE Mains – PTM 19 Full Syllabus Mock Test', 'coming_soon', NOW()),
+  ('jee-mains-ptm-20', 'JEE Mains', 'PTM 20', 'JEE Mains – PTM 20 Full Syllabus Mock Test', 'coming_soon', NOW())
 ON CONFLICT (test_id) DO UPDATE
 SET
   exam_type = EXCLUDED.exam_type,

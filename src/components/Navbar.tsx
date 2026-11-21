@@ -183,12 +183,29 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <div className="font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-1.5">
                         <span>JEE Mains</span>
                         <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
-                          10 Tests
+                          20 Tests
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 dark:text-zinc-400">PTM 01–10 chapterwise mocks</p>
+                      <p className="text-[11px] text-slate-500 dark:text-zinc-400">PTM 01–20 full mock series</p>
                     </div>
                     <span className="text-slate-400">→</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => navigateTo('#/schedule')}
+                    className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-left transition-colors"
+                  >
+                    <div>
+                      <div className="font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-1.5">
+                        <span>🗓️ 2027 PTM Schedule</span>
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                          20 Tests
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-zinc-400">3D Interactive Jan 2027 Calendar</p>
+                    </div>
+                    <span className="text-indigo-500">→</span>
                   </button>
 
                   <div className="my-1 border-t border-slate-100 dark:border-zinc-800/80" />
@@ -687,8 +704,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onClick={() => navigateTo('#tests')}
                     className="w-full text-left py-2 px-3 rounded-lg text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 flex items-center justify-between"
                   >
-                    <span>JEE Mains (PTM 01–10)</span>
-                    <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">10 Tests</span>
+                    <span>JEE Mains (PTM 01–20)</span>
+                    <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">20 Tests</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigateTo('#/schedule')}
+                    className="w-full text-left py-2 px-3 rounded-lg text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 flex items-center justify-between"
+                  >
+                    <span>🗓️ 2027 PTM Schedule</span>
+                    <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">20 Tests →</span>
                   </button>
                   <button
                     type="button"

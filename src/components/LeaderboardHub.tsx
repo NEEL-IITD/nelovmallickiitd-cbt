@@ -94,7 +94,7 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
     };
   });
 
-  const ptmTests = Array.from({ length: 10 }, (_, i) => {
+  const ptmTests = Array.from({ length: 20 }, (_, i) => {
     const num = String(i + 1).padStart(2, '0');
     return {
       testId: `jee-mains-ptm-${num}`,
