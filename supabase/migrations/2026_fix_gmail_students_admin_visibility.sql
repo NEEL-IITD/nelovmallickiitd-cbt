@@ -4,17 +4,38 @@
 -- Platform: NelovMallickIITD CBT Platform (Mentored by Nelov Mallick, IIT Delhi)
 --
 -- PURPOSE:
--- 1. Relax/fix check constraint on public.profiles to accept Google OAuth signups.
--- 2. Upgrade public.is_admin() with safe search_path and direct JWT claim check
---    so admin access works even if profile role lookup experiences a sync delay.
--- 3. Overhaul public.handle_new_user() trigger with search_path = '' and robust
+-- 1. Ensure ALL required profile columns exist (auth_method, contact_number, etc.)
+-- 2. Drop & recreate check_email_or_contact to accept all Google OAuth and Gmail signups.
+-- 3. Upgrade public.is_admin() with safe search_path and direct JWT claim check.
+-- 4. Overhaul public.handle_new_user() trigger with search_path = '' and robust
 --    provider detection for Google OAuth and Gmail signups.
--- 4. Add missing profiles_insert_policy so frontend self-healing upserts succeed.
--- 5. Backfill all existing auth.users into public.profiles immediately.
--- 6. Guarantee Nelov Mallick's admin role across profiles.
+-- 5. Add missing profiles_insert_policy so frontend self-healing upserts succeed.
+-- 6. Backfill all existing auth.users into public.profiles immediately.
+-- 7. Guarantee Nelov Mallick's admin role across profiles.
 -- ==============================================================================
 
--- 1. Drop restrictive check constraint and add flexible constraint
+-- 1. Ensure all columns exist on public.profiles before applying any constraints
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS contact_number TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS auth_method TEXT DEFAULT 'gmail';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS target_exam TEXT DEFAULT 'JEE Advanced';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'student';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS accepted_terms_at TIMESTAMPTZ;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS accepted_terms_version TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS parental_consent_confirmed BOOLEAN DEFAULT FALSE;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ DEFAULT NOW();
+
+-- Allow email to be NULL for phone-only registered students
+ALTER TABLE public.profiles ALTER COLUMN email DROP NOT NULL;
+
+-- Safe indexes
+CREATE INDEX IF NOT EXISTS idx_profiles_email ON public.profiles(email);
+CREATE INDEX IF NOT EXISTS idx_profiles_role ON public.profiles(role);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_profiles_contact_number 
+  ON public.profiles(contact_number) 
+  WHERE contact_number IS NOT NULL;
+
+-- 2. Drop restrictive check constraint and add flexible constraint
 ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS check_email_or_contact;
 ALTER TABLE public.profiles ADD CONSTRAINT check_email_or_contact CHECK (
   (auth_method IN ('google', 'gmail') AND email IS NOT NULL) OR
@@ -23,7 +44,7 @@ ALTER TABLE public.profiles ADD CONSTRAINT check_email_or_contact CHECK (
   (role = 'admin')
 );
 
--- 2. Upgrade public.is_admin() function
+-- 3. Upgrade public.is_admin() function
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN
 LANGUAGE plpgsql
@@ -66,7 +87,7 @@ BEGIN
 END;
 $$;
 
--- 3. Overhaul public.handle_new_user() Trigger Function
+-- 4. Overhaul public.handle_new_user() Trigger Function
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -207,7 +228,7 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_new_user();
 
--- 4. Ensure RLS Policies on public.profiles allow Self-Healing Inserts & Admin Access
+-- 5. Ensure RLS Policies on public.profiles allow Self-Healing Inserts & Admin Access
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "profiles_select_policy" ON public.profiles;
@@ -248,7 +269,7 @@ CREATE POLICY "profiles_update_policy"
 GRANT SELECT, INSERT, UPDATE ON TABLE public.profiles TO authenticated;
 GRANT SELECT ON TABLE public.profiles TO anon;
 
--- 5. Backfill: Synchronize all existing auth.users into public.profiles immediately
+-- 6. Backfill: Synchronize all existing auth.users into public.profiles immediately
 -- This instantly restores visibility of the 2 students who logged in via Google OAuth
 INSERT INTO public.profiles (
   id,
@@ -313,7 +334,7 @@ ON CONFLICT (id) DO UPDATE SET
   END,
   last_login_at = COALESCE(EXCLUDED.last_login_at, public.profiles.last_login_at);
 
--- 6. Guarantee Admin status for Nelov Mallick
+-- 7. Guarantee Admin status for Nelov Mallick
 UPDATE public.profiles
 SET role = 'admin'
 WHERE LOWER(COALESCE(email, '')) IN (
