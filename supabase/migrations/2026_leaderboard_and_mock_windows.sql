@@ -41,7 +41,7 @@ RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
-AS $$
+AS $window_trigger$
 DECLARE
   v_cfg RECORD;
   v_is_admin BOOLEAN;
@@ -72,7 +72,7 @@ BEGIN
 
   RETURN NEW;
 END;
-$$;
+$window_trigger$;
 
 DROP TRIGGER IF EXISTS trg_check_test_attempt_window ON public.test_attempts;
 CREATE TRIGGER trg_check_test_attempt_window
@@ -82,14 +82,12 @@ CREATE TRIGGER trg_check_test_attempt_window
 
 
 -- 4. RPC 1 — public.get_test_leaderboard(p_test_id text)
--- Returns privacy-safe 1st-attempt rankings, marks, percentiles, topper and student's standing.
--- Enforces window locking if scheduled mock window is still open.
 CREATE OR REPLACE FUNCTION public.get_test_leaderboard(p_test_id TEXT)
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
-AS $$
+AS $leaderboard$
 DECLARE
   v_cfg RECORD;
   v_is_admin BOOLEAN;
@@ -147,7 +145,7 @@ BEGIN
     );
   END IF;
 
-  -- Unlocked or Admin: Compute official 1st-attempt rankings
+  -- Compute official 1st-attempt summary stats
   WITH first_attempts AS (
     SELECT DISTINCT ON (a.user_id)
       a.id,
@@ -249,7 +247,7 @@ BEGIN
     v_topper := v_entries->0;
   END IF;
 
-  -- Extract Logged-in user's standing if attempted
+  -- Extract Current User Standing
   IF v_current_uid IS NOT NULL THEN
     WITH first_attempts AS (
       SELECT DISTINCT ON (a.user_id)
@@ -312,17 +310,16 @@ BEGIN
     'entries', v_entries
   );
 END;
-$$;
+$leaderboard$;
 
 
 -- 5. RPC 2 — public.get_test_toppers_summary()
--- Lightweight summary for all unlocked tests to show "Who is on Top" preview badges.
 CREATE OR REPLACE FUNCTION public.get_test_toppers_summary()
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
-AS $$
+AS $toppers_summary$
 DECLARE
   v_is_admin BOOLEAN;
   v_result JSONB := '[]'::jsonb;
@@ -406,17 +403,16 @@ BEGIN
 
   RETURN v_result;
 END;
-$$;
+$toppers_summary$;
 
 
 -- 6. RPC 3 — public.get_overall_leaderboard()
--- Aggregates 1st attempts across all unlocked tests to rank portal-wide leaders.
 CREATE OR REPLACE FUNCTION public.get_overall_leaderboard()
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
-AS $$
+AS $overall_leaderboard$
 DECLARE
   v_current_uid UUID;
   v_is_admin BOOLEAN;
@@ -504,8 +500,7 @@ BEGIN
 
   RETURN v_result;
 END;
-$$;
-
+$overall_leaderboard$;
 
 -- 7. Grant Permissions to authenticated and anon
 GRANT SELECT ON public.test_configs TO anon, authenticated;

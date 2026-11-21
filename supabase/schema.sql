@@ -675,32 +675,73 @@ GRANT SELECT ON public.admin_physics_summary TO authenticated;
 -- 13. Scheduled All-India Mock Windows & 1st-Attempt-Only Live Leaderboards
 -- ==============================================================================
 
--- Server-Side Start-Time Protection Trigger
+-- ==============================================================================
+-- Migration: 2026_leaderboard_and_mock_windows.sql
+-- Description:
+--   1. Add Scheduled All-India Mock Window columns to public.test_configs
+--   2. Add time_taken_seconds & attempted_in_live_window to public.test_attempts
+--   3. Server-side start-time check trigger on public.test_attempts
+--   4. Privacy-safe, 1st-Attempt-Only Leaderboard RPCs:
+--      - public.get_test_leaderboard(p_test_id text)
+--      - public.get_test_toppers_summary()
+--      - public.get_overall_leaderboard()
+-- Non-destructive & Idempotent. Preserves all student records, PTM/PTA tests, and attempts.
+-- ==============================================================================
+
+-- 1. Schedule Columns on public.test_configs
+ALTER TABLE public.test_configs
+  ADD COLUMN IF NOT EXISTS is_scheduled_window BOOLEAN NOT NULL DEFAULT FALSE,
+  ADD COLUMN IF NOT EXISTS starts_at TIMESTAMPTZ NULL,
+  ADD COLUMN IF NOT EXISTS ends_at TIMESTAMPTZ NULL,
+  ADD COLUMN IF NOT EXISTS window_label TEXT NULL,
+  ADD COLUMN IF NOT EXISTS lock_leaderboard_until_end BOOLEAN NOT NULL DEFAULT TRUE,
+  ADD COLUMN IF NOT EXISTS allow_practice_after_end BOOLEAN NOT NULL DEFAULT TRUE;
+
+-- 2. Performance & Attempt Columns on public.test_attempts
+ALTER TABLE public.test_attempts
+  ADD COLUMN IF NOT EXISTS time_taken_seconds INTEGER DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS attempted_in_live_window BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- High-performance indexes
+CREATE INDEX IF NOT EXISTS idx_test_attempts_test_user_sub 
+  ON public.test_attempts(test_id, user_id, submitted_at ASC);
+
+CREATE INDEX IF NOT EXISTS idx_test_attempts_leaderboard_rank 
+  ON public.test_attempts(test_id, obtained_marks DESC, accuracy DESC);
+
+CREATE INDEX IF NOT EXISTS idx_test_configs_schedule_active 
+  ON public.test_configs(is_scheduled_window, starts_at, ends_at);
+
+-- 3. Server-Side Start-Time Protection Trigger
 CREATE OR REPLACE FUNCTION public.check_test_attempt_window_start()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
-AS $$
+AS $window_trigger$
 DECLARE
   v_cfg RECORD;
   v_is_admin BOOLEAN;
 BEGIN
+  -- Admin bypass for previews and verification
   v_is_admin := public.is_admin();
   IF v_is_admin THEN
     RETURN NEW;
   END IF;
 
+  -- Look up test schedule config
   SELECT is_scheduled_window, starts_at, ends_at
   INTO v_cfg
   FROM public.test_configs
   WHERE test_id = NEW.test_id;
 
   IF FOUND AND v_cfg.is_scheduled_window = TRUE AND v_cfg.starts_at IS NOT NULL THEN
+    -- Block attempts if window has not started yet
     IF NOW() < v_cfg.starts_at THEN
       RAISE EXCEPTION 'This scheduled test window has not started yet. Starts at %', v_cfg.starts_at;
     END IF;
 
+    -- Tag attempts completed inside the official live window
     IF v_cfg.ends_at IS NOT NULL AND NOW() <= v_cfg.ends_at THEN
       NEW.attempted_in_live_window := TRUE;
     END IF;
@@ -708,7 +749,7 @@ BEGIN
 
   RETURN NEW;
 END;
-$$;
+$window_trigger$;
 
 DROP TRIGGER IF EXISTS trg_check_test_attempt_window ON public.test_attempts;
 CREATE TRIGGER trg_check_test_attempt_window
@@ -716,13 +757,14 @@ CREATE TRIGGER trg_check_test_attempt_window
   FOR EACH ROW
   EXECUTE FUNCTION public.check_test_attempt_window_start();
 
--- RPC 1 — public.get_test_leaderboard(p_test_id text)
+
+-- 4. RPC 1 — public.get_test_leaderboard(p_test_id text)
 CREATE OR REPLACE FUNCTION public.get_test_leaderboard(p_test_id TEXT)
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
-AS $$
+AS $leaderboard$
 DECLARE
   v_cfg RECORD;
   v_is_admin BOOLEAN;
@@ -738,11 +780,13 @@ BEGIN
   v_current_uid := auth.uid();
   v_is_admin := public.is_admin();
 
+  -- Get test schedule configuration
   SELECT test_id, is_scheduled_window, starts_at, ends_at, lock_leaderboard_until_end
   INTO v_cfg
   FROM public.test_configs
   WHERE test_id = p_test_id;
 
+  -- Check if current user has submitted an attempt
   IF v_current_uid IS NOT NULL THEN
     SELECT EXISTS (
       SELECT 1 FROM public.test_attempts
@@ -750,6 +794,7 @@ BEGIN
     ) INTO v_my_attempt_submitted;
   END IF;
 
+  -- Check if leaderboard should be locked (scheduled window open & locked, non-admin)
   IF FOUND 
      AND v_cfg.is_scheduled_window = TRUE 
      AND v_cfg.lock_leaderboard_until_end = TRUE 
@@ -757,6 +802,7 @@ BEGIN
      AND NOW() < v_cfg.ends_at 
      AND NOT v_is_admin THEN
 
+    -- Count total unique participants who submitted their 1st attempt so far
     SELECT COUNT(DISTINCT a.user_id)
     INTO v_total_participants
     FROM public.test_attempts a
@@ -776,6 +822,7 @@ BEGIN
     );
   END IF;
 
+  -- Compute official 1st-attempt summary stats
   WITH first_attempts AS (
     SELECT DISTINCT ON (a.user_id)
       a.id,
@@ -815,6 +862,7 @@ BEGIN
   INTO v_total_participants, v_avg_marks, v_high_marks
   FROM ranked;
 
+  -- Build Top 100 Entries JSON
   WITH first_attempts AS (
     SELECT DISTINCT ON (a.user_id)
       a.id,
@@ -871,10 +919,12 @@ BEGIN
     SELECT * FROM ranked ORDER BY computed_rank ASC, time_taken_seconds ASC LIMIT 100
   ) r;
 
+  -- Extract Topper (Rank #1)
   IF jsonb_array_length(v_entries) > 0 THEN
     v_topper := v_entries->0;
   END IF;
 
+  -- Extract Current User Standing
   IF v_current_uid IS NOT NULL THEN
     WITH first_attempts AS (
       SELECT DISTINCT ON (a.user_id)
@@ -937,15 +987,16 @@ BEGIN
     'entries', v_entries
   );
 END;
-$$;
+$leaderboard$;
 
--- RPC 2 — public.get_test_toppers_summary()
+
+-- 5. RPC 2 — public.get_test_toppers_summary()
 CREATE OR REPLACE FUNCTION public.get_test_toppers_summary()
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
-AS $$
+AS $toppers_summary$
 DECLARE
   v_is_admin BOOLEAN;
   v_result JSONB := '[]'::jsonb;
@@ -1029,15 +1080,16 @@ BEGIN
 
   RETURN v_result;
 END;
-$$;
+$toppers_summary$;
 
--- RPC 3 — public.get_overall_leaderboard()
+
+-- 6. RPC 3 — public.get_overall_leaderboard()
 CREATE OR REPLACE FUNCTION public.get_overall_leaderboard()
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
-AS $$
+AS $overall_leaderboard$
 DECLARE
   v_current_uid UUID;
   v_is_admin BOOLEAN;
@@ -1125,12 +1177,14 @@ BEGIN
 
   RETURN v_result;
 END;
-$$;
+$overall_leaderboard$;
 
+-- 7. Grant Permissions to authenticated and anon
 GRANT SELECT ON public.test_configs TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.get_test_leaderboard(TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.get_test_toppers_summary() TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.get_overall_leaderboard() TO anon, authenticated;
+
 
 -- ==============================================================================
 -- 14. How to elevate your account to Admin
