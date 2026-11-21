@@ -19,6 +19,9 @@ export interface SignUpParams {
   password: string;
   targetExam?: TargetExam;
   authMethod?: AuthMethod;
+  acceptedTermsAt?: string;
+  acceptedTermsVersion?: string;
+  parentalConsentConfirmed?: boolean;
 }
 
 export interface LogInParams {
@@ -139,7 +142,10 @@ export const authService = {
     email,
     contactNumber,
     password,
-    targetExam = 'JEE Advanced'
+    targetExam = 'JEE Advanced',
+    acceptedTermsAt,
+    acceptedTermsVersion,
+    parentalConsentConfirmed
   }: SignUpParams): Promise<User> {
     const trimmedName = (name || '').trim();
     if (!trimmedName) {
@@ -213,6 +219,10 @@ export const authService = {
         }
       }
 
+      const termsTimestamp = acceptedTermsAt || new Date().toISOString();
+      const termsVer = acceptedTermsVersion || '2026-11';
+      const parentalBool = Boolean(parentalConsentConfirmed);
+
       const { data, error } = await supabase.auth.signUp({
         email: authEmail,
         password,
@@ -221,7 +231,10 @@ export const authService = {
             full_name: trimmedName,
             contact_number: formattedContact,
             auth_method: authMethod,
-            target_exam: targetExam
+            target_exam: targetExam,
+            accepted_terms_at: termsTimestamp,
+            accepted_terms_version: termsVer,
+            parental_consent_confirmed: parentalBool
           }
         }
       });
@@ -251,6 +264,9 @@ export const authService = {
         authMethod,
         targetExam,
         role: userRole,
+        acceptedTermsAt: termsTimestamp,
+        acceptedTermsVersion: termsVer,
+        parentalConsentConfirmed: parentalBool,
         createdAt: data.user.created_at || new Date().toISOString()
       };
 
@@ -360,11 +376,14 @@ export const authService = {
       let userContact: string | null = formattedPhone || data.user.user_metadata?.contact_number || null;
       let authMethod: AuthMethod = isPhoneLogin ? 'phone' : (isGmail(authEmail) ? 'gmail' : 'email_with_phone');
       let displayEmail: string | null = isPhoneLogin ? null : authEmail;
+      let acceptedTermsAt: string | null = data.user.user_metadata?.accepted_terms_at || null;
+      let acceptedTermsVersion: string | null = data.user.user_metadata?.accepted_terms_version || null;
+      let parentalConsentConfirmed: boolean = Boolean(data.user.user_metadata?.parental_consent_confirmed);
 
       try {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('full_name, email, contact_number, auth_method, target_exam, role')
+          .select('full_name, email, contact_number, auth_method, target_exam, role, accepted_terms_at, accepted_terms_version, parental_consent_confirmed')
           .eq('id', data.user.id)
           .single();
 
@@ -374,6 +393,9 @@ export const authService = {
           if (profile.contact_number) userContact = profile.contact_number;
           if (profile.auth_method) authMethod = profile.auth_method as AuthMethod;
           if (profile.target_exam) targetExam = profile.target_exam as TargetExam;
+          if (profile.accepted_terms_at) acceptedTermsAt = profile.accepted_terms_at;
+          if (profile.accepted_terms_version) acceptedTermsVersion = profile.accepted_terms_version;
+          if (profile.parental_consent_confirmed) parentalConsentConfirmed = Boolean(profile.parental_consent_confirmed);
           if (profile.email && !profile.email.includes('@phone.nelovportal.local')) {
             displayEmail = profile.email;
           }
@@ -395,6 +417,9 @@ export const authService = {
         authMethod,
         targetExam,
         role,
+        acceptedTermsAt,
+        acceptedTermsVersion,
+        parentalConsentConfirmed,
         createdAt: data.user.created_at || new Date().toISOString()
       };
 
@@ -579,5 +604,73 @@ export const authService = {
       users[idx].role = role;
       saveStoredUsers(users);
     }
+  },
+
+  /**
+   * Save legal terms consent timestamp (DPDP Act 2023)
+   */
+  async acceptTerms(version = '2026-11'): Promise<User | null> {
+    const current = this.getCurrentUser();
+    if (!current) return null;
+    const now = new Date().toISOString();
+    current.acceptedTermsAt = now;
+    current.acceptedTermsVersion = version;
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(current));
+    }
+
+    if (this.isCloudConnected() && supabase) {
+      try {
+        await supabase
+          .from('profiles')
+          .update({
+            accepted_terms_at: now,
+            accepted_terms_version: version
+          })
+          .eq('id', current.id);
+      } catch (e) {
+        console.warn('Failed to update accepted_terms_at in Supabase:', e);
+      }
+    }
+    return current;
+  },
+
+  /**
+   * Permanently delete user account and all personal test records (DPDP self-service erasure)
+   */
+  async deleteMyAccount(): Promise<{ success: boolean }> {
+    const current = this.getCurrentUser();
+    if (!current) throw new Error('Authentication required.');
+    if (current.role === 'admin') {
+      throw new Error('Admin accounts cannot be self-deleted to prevent accidental management lockouts.');
+    }
+
+    if (this.isCloudConnected() && supabase) {
+      const { error } = await supabase.rpc('delete_my_account');
+      if (error) {
+        throw new Error(error.message || 'Failed to delete account on server.');
+      }
+    }
+
+    // Wipe local client storage keys for this user
+    if (typeof window !== 'undefined') {
+      try {
+        const uId = current.id;
+        const keysToDelete: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && (k.includes(uId) || k.startsWith(`nelov_${uId}_`))) {
+            keysToDelete.push(k);
+          }
+        }
+        keysToDelete.forEach(k => localStorage.removeItem(k));
+        const localUsers = getStoredUsers().filter(u => u.id !== uId);
+        saveStoredUsers(localUsers);
+      } catch (e) {}
+    }
+
+    await this.logOut();
+    return { success: true };
   }
 };

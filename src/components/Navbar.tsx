@@ -178,6 +178,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <span>⭐</span> Revision Notebook
                     </button>
 
+                    <button
+                      type="button"
+                      onClick={() => { setUserDropdownOpen(false); onNavigate?.('#/account') || (window.location.hash = '#/account'); }}
+                      className="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/60 text-slate-700 dark:text-zinc-300 font-semibold text-left transition-colors"
+                    >
+                      <span>👤</span> Account & Privacy
+                    </button>
+
                     {(user.role === 'admin' || isAdmin) && (
                       <button
                         type="button"
@@ -252,8 +260,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <div className="space-y-2">
                   <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-xs">
                     <p className="font-bold text-slate-900 dark:text-zinc-100">{user.name}</p>
-                    <p className="text-[11px] text-slate-500">{user.email}</p>
+                    <p className="text-[11px] text-slate-500">{user.email || (user.contactNumber ? `📞 ${user.contactNumber}` : 'Student Aspirant')}</p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => { setMobileMenuOpen(false); onNavigate?.('#/account') || (window.location.hash = '#/account'); }}
+                    className="w-full py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-bold text-xs text-left flex items-center gap-2"
+                  >
+                    <span>👤</span> Account & Privacy
+                  </button>
                   {user.role === 'admin' && (
                     <button
                       type="button"

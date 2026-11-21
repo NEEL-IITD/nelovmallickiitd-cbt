@@ -14,6 +14,9 @@ export interface User {
   role: UserRole;
   createdAt: string;
   lastLoginAt?: string;
+  acceptedTermsAt?: string | null;
+  acceptedTermsVersion?: string | null;
+  parentalConsentConfirmed?: boolean;
 }
 
 export interface TestConfigItem {

@@ -25,6 +25,8 @@ interface AuthContextType {
   signUp: (params: SignUpParams) => Promise<User>;
   signInWithGoogle: (redirectTo?: string) => Promise<void>;
   logOut: () => Promise<void>;
+  acceptTerms: (version?: string) => Promise<User | null>;
+  deleteMyAccount: () => Promise<void>;
   openAuthModal: (mode?: 'login' | 'signup' | 'forgot', redirectUrl?: string, message?: string) => void;
   closeAuthModal: () => void;
   authModalState: AuthModalState;
@@ -58,10 +60,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             let authMethod = isPhone ? 'phone' : (session.user.app_metadata?.provider === 'google' ? 'google' : 'gmail');
             let displayEmail = isPhone ? null : (session.user.email || null);
 
+            let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || null;
+            let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || null;
+            let parentalConsentConfirmed = Boolean(session.user.user_metadata?.parental_consent_confirmed);
+
             try {
               const { data: profile } = await supabase
                 .from('profiles')
-                .select('full_name, email, contact_number, auth_method, target_exam, role')
+                .select('full_name, email, contact_number, auth_method, target_exam, role, accepted_terms_at, accepted_terms_version, parental_consent_confirmed')
                 .eq('id', session.user.id)
                 .single();
 
@@ -71,6 +77,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 if (profile.contact_number) contactNumber = profile.contact_number;
                 if (profile.auth_method) authMethod = profile.auth_method;
                 if (profile.target_exam) targetExam = profile.target_exam;
+                if (profile.accepted_terms_at) acceptedTermsAt = profile.accepted_terms_at;
+                if (profile.accepted_terms_version) acceptedTermsVersion = profile.accepted_terms_version;
+                if (profile.parental_consent_confirmed) parentalConsentConfirmed = Boolean(profile.parental_consent_confirmed);
                 if (profile.email && !profile.email.endsWith('@phone.nelovportal.local')) {
                   displayEmail = profile.email;
                 }
@@ -92,6 +101,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               authMethod: authMethod as any,
               targetExam,
               role,
+              acceptedTermsAt,
+              acceptedTermsVersion,
+              parentalConsentConfirmed,
               createdAt: session.user.created_at || new Date().toISOString()
             };
 
@@ -138,11 +150,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           let authMethod = isPhone ? 'phone' : (session.user.app_metadata?.provider === 'google' ? 'google' : 'gmail');
           let displayEmail = isPhone ? null : (session.user.email || null);
 
+          let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || null;
+          let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || null;
+          let parentalConsentConfirmed = Boolean(session.user.user_metadata?.parental_consent_confirmed);
+
           try {
             if (supabase) {
               const { data: profile } = await supabase
                 .from('profiles')
-                .select('full_name, email, contact_number, auth_method, target_exam, role')
+                .select('full_name, email, contact_number, auth_method, target_exam, role, accepted_terms_at, accepted_terms_version, parental_consent_confirmed')
                 .eq('id', session.user.id)
                 .single();
 
@@ -152,6 +168,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 if (profile.contact_number) contactNumber = profile.contact_number;
                 if (profile.auth_method) authMethod = profile.auth_method;
                 if (profile.target_exam) targetExam = profile.target_exam;
+                if (profile.accepted_terms_at) acceptedTermsAt = profile.accepted_terms_at;
+                if (profile.accepted_terms_version) acceptedTermsVersion = profile.accepted_terms_version;
+                if (profile.parental_consent_confirmed) parentalConsentConfirmed = Boolean(profile.parental_consent_confirmed);
                 if (profile.email && !profile.email.endsWith('@phone.nelovportal.local')) {
                   displayEmail = profile.email;
                 }
@@ -172,6 +191,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             authMethod: authMethod as any,
             targetExam,
             role,
+            acceptedTermsAt,
+            acceptedTermsVersion,
+            parentalConsentConfirmed,
             createdAt: session.user.created_at || new Date().toISOString()
           };
 
@@ -221,6 +243,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
+  const acceptTerms = async (version = '2026-11'): Promise<User | null> => {
+    const updated = await authService.acceptTerms(version);
+    if (updated) setUser(updated);
+    return updated;
+  };
+
+  const deleteMyAccount = async (): Promise<void> => {
+    await authService.deleteMyAccount();
+    setUser(null);
+  };
+
   const openAuthModal = (
     mode: 'login' | 'signup' | 'forgot' = 'login',
     redirectUrl?: string,
@@ -250,6 +283,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signUp,
         signInWithGoogle,
         logOut,
+        acceptTerms,
+        deleteMyAccount,
         openAuthModal,
         closeAuthModal,
         authModalState,

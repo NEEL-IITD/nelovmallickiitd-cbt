@@ -31,12 +31,16 @@ export const AuthModal: React.FC = () => {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [termsAgreed, setTermsAgreed] = useState(false);
+  const [parentalConsent, setParentalConsent] = useState(false);
 
   // Sync mode if initialMode changes
   React.useEffect(() => {
     if (initialMode) setMode(initialMode);
     setError('');
     setSuccessMsg('');
+    setTermsAgreed(false);
+    setParentalConsent(false);
   }, [initialMode, isOpen]);
 
   if (!isOpen) return null;
@@ -109,8 +113,14 @@ export const AuthModal: React.FC = () => {
       return;
     }
 
+    if (!termsAgreed) {
+      setError('You must agree to the Terms of Service and Privacy Policy to create an account.');
+      return;
+    }
+
     setLoading(true);
     try {
+      const consentTimestamp = new Date().toISOString();
       if (authTab === 'email') {
         if (!name.trim()) throw new Error('Please enter your full name.');
         if (!email.trim()) throw new Error('Please enter your email address.');
@@ -129,7 +139,10 @@ export const AuthModal: React.FC = () => {
           email: email.trim(),
           contactNumber: contactNumber.trim() || undefined,
           password,
-          targetExam
+          targetExam,
+          acceptedTermsAt: consentTimestamp,
+          acceptedTermsVersion: '2026-11',
+          parentalConsentConfirmed: parentalConsent
         });
       } else {
         // Name + Contact Number Sign Up (Zero Email Needed)
@@ -143,7 +156,10 @@ export const AuthModal: React.FC = () => {
           name: name.trim(),
           contactNumber: contactNumber.trim(),
           password,
-          targetExam
+          targetExam,
+          acceptedTermsAt: consentTimestamp,
+          acceptedTermsVersion: '2026-11',
+          parentalConsentConfirmed: parentalConsent
         });
       }
 
@@ -521,9 +537,55 @@ export const AuthModal: React.FC = () => {
               </div>
             </div>
 
+            {/* Mandatory DPDP Clickwrap Agreement */}
+            <div className="space-y-2 pt-1 pb-1">
+              <label className="flex items-start gap-2.5 cursor-pointer text-[11px] leading-relaxed text-slate-700 dark:text-zinc-300">
+                <input
+                  type="checkbox"
+                  checked={termsAgreed}
+                  onChange={(e) => setTermsAgreed(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                  required
+                />
+                <span>
+                  I agree to the{' '}
+                  <a
+                    href="#/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-600 dark:text-indigo-400 font-bold underline hover:text-indigo-700"
+                  >
+                    Terms of Service
+                  </a>{' '}
+                  and{' '}
+                  <a
+                    href="#/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-600 dark:text-indigo-400 font-bold underline hover:text-indigo-700"
+                  >
+                    Privacy Policy
+                  </a>
+                  , and confirm I have parent/guardian consent if I am under 18. <span className="text-rose-500">*</span>
+                </span>
+              </label>
+
+              <label className="flex items-start gap-2.5 cursor-pointer text-[11px] leading-relaxed text-slate-500 dark:text-zinc-400">
+                <input
+                  type="checkbox"
+                  checked={parentalConsent}
+                  onChange={(e) => setParentalConsent(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <span>
+                  I am under 18 and registering with my parent/guardian's permission
+                </span>
+              </label>
+            </div>
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !termsAgreed}
               className="w-full py-3 mt-1 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all disabled:opacity-50"
             >
               {loading ? 'Creating Account...' : 'Complete Free Registration →'}
@@ -710,9 +772,55 @@ export const AuthModal: React.FC = () => {
               </div>
             </div>
 
+            {/* Mandatory DPDP Clickwrap Agreement */}
+            <div className="space-y-2 pt-1 pb-1">
+              <label className="flex items-start gap-2.5 cursor-pointer text-[11px] leading-relaxed text-slate-700 dark:text-zinc-300">
+                <input
+                  type="checkbox"
+                  checked={termsAgreed}
+                  onChange={(e) => setTermsAgreed(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                  required
+                />
+                <span>
+                  I agree to the{' '}
+                  <a
+                    href="#/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-600 dark:text-indigo-400 font-bold underline hover:text-indigo-700"
+                  >
+                    Terms of Service
+                  </a>{' '}
+                  and{' '}
+                  <a
+                    href="#/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-600 dark:text-indigo-400 font-bold underline hover:text-indigo-700"
+                  >
+                    Privacy Policy
+                  </a>
+                  , and confirm I have parent/guardian consent if I am under 18. <span className="text-rose-500">*</span>
+                </span>
+              </label>
+
+              <label className="flex items-start gap-2.5 cursor-pointer text-[11px] leading-relaxed text-slate-500 dark:text-zinc-400">
+                <input
+                  type="checkbox"
+                  checked={parentalConsent}
+                  onChange={(e) => setParentalConsent(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <span>
+                  I am under 18 and registering with my parent/guardian's permission
+                </span>
+              </label>
+            </div>
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !termsAgreed}
               className="w-full py-3 mt-1 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all disabled:opacity-50"
             >
               {loading ? 'Creating Account...' : 'Complete Free Registration →'}

@@ -126,7 +126,7 @@
       return supabaseClient;
     },
 
-    async signUp({ name, email, contactNumber, password, targetExam }) {
+    async signUp({ name, email, contactNumber, password, targetExam, acceptedTermsAt, acceptedTermsVersion, parentalConsentConfirmed }) {
       const trimmedName = (name || '').trim();
       if (!trimmedName) throw new Error('Please enter your full name.');
       if (!password || password.length < 6) {
@@ -168,6 +168,10 @@
         authEmail = trimmedEmail;
       }
 
+      const termsTimestamp = acceptedTermsAt || new Date().toISOString();
+      const termsVer = acceptedTermsVersion || '2026-11';
+      const parentalBool = Boolean(parentalConsentConfirmed);
+
       // 1. Supabase Cloud Auth
       if (this.isCloudConnected()) {
         const { data, error } = await supabaseClient.auth.signUp({
@@ -178,7 +182,10 @@
               full_name: trimmedName,
               contact_number: formattedContact,
               auth_method: authMethod,
-              target_exam: targetExam || 'JEE Advanced'
+              target_exam: targetExam || 'JEE Advanced',
+              accepted_terms_at: termsTimestamp,
+              accepted_terms_version: termsVer,
+              parental_consent_confirmed: parentalBool
             }
           }
         });
@@ -201,6 +208,9 @@
           authMethod,
           targetExam: targetExam || 'JEE Advanced',
           role: isUserAdmin ? 'admin' : 'student',
+          acceptedTermsAt: termsTimestamp,
+          acceptedTermsVersion: termsVer,
+          parentalConsentConfirmed: parentalBool,
           createdAt: data.user.created_at || new Date().toISOString()
         };
         this.setActiveSession(cleanUser);
@@ -294,11 +304,14 @@
         let userContact = formattedPhone || data.user.user_metadata?.contact_number || null;
         let authMethod = isPhoneLogin ? 'phone' : (isGmail(authEmail) ? 'gmail' : 'email_with_phone');
         let displayEmail = isPhoneLogin ? null : authEmail;
+        let acceptedTermsAt = null;
+        let acceptedTermsVersion = null;
+        let parentalConsentConfirmed = false;
 
         try {
           const { data: profile } = await supabaseClient
             .from('profiles')
-            .select('full_name, email, contact_number, auth_method, target_exam, role')
+            .select('full_name, email, contact_number, auth_method, target_exam, role, accepted_terms_at, accepted_terms_version, parental_consent_confirmed')
             .eq('id', data.user.id)
             .single();
 
@@ -308,6 +321,9 @@
             if (profile.contact_number) userContact = profile.contact_number;
             if (profile.auth_method) authMethod = profile.auth_method;
             if (profile.target_exam) targetExam = profile.target_exam;
+            if (profile.accepted_terms_at) acceptedTermsAt = profile.accepted_terms_at;
+            if (profile.accepted_terms_version) acceptedTermsVersion = profile.accepted_terms_version;
+            if (profile.parental_consent_confirmed) parentalConsentConfirmed = Boolean(profile.parental_consent_confirmed);
             if (profile.email && !profile.email.includes('@phone.nelovportal.local')) {
               displayEmail = profile.email;
             }
@@ -326,6 +342,9 @@
           authMethod,
           targetExam,
           role,
+          acceptedTermsAt,
+          acceptedTermsVersion,
+          parentalConsentConfirmed,
           createdAt: data.user.created_at || new Date().toISOString()
         };
         this.setActiveSession(cleanUser);
@@ -1100,6 +1119,63 @@
           localStorage.setItem(`nelov_${userId}_lecture_progress`, JSON.stringify(local));
         }
       } catch (e) {}
+    },
+
+    async acceptTerms(version = '2026-11') {
+      const current = this.getCurrentUser();
+      if (!current) return null;
+      const now = new Date().toISOString();
+      current.acceptedTermsAt = now;
+      current.acceptedTermsVersion = version;
+      this.setActiveSession(current);
+
+      if (this.isCloudConnected() && supabaseClient) {
+        try {
+          await supabaseClient
+            .from('profiles')
+            .update({
+              accepted_terms_at: now,
+              accepted_terms_version: version
+            })
+            .eq('id', current.id);
+        } catch (e) {
+          console.warn('[authStore] Error saving terms consent to Supabase:', e);
+        }
+      }
+      return current;
+    },
+
+    async deleteMyAccount() {
+      const current = this.getCurrentUser();
+      if (!current) throw new Error('Authentication required.');
+      if (current.role === 'admin') {
+        throw new Error('Admin accounts cannot be self-deleted to prevent accidental management lockouts.');
+      }
+
+      if (this.isCloudConnected() && supabaseClient) {
+        const { error } = await supabaseClient.rpc('delete_my_account');
+        if (error) {
+          throw new Error(error.message || 'Failed to delete account on server.');
+        }
+      }
+
+      // Scrub local client storage keys for this user
+      try {
+        const uId = current.id;
+        const keysToDelete = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && (k.includes(uId) || k.startsWith(`nelov_${uId}_`))) {
+            keysToDelete.push(k);
+          }
+        }
+        keysToDelete.forEach(k => localStorage.removeItem(k));
+        const localUsers = getStoredUsers().filter(u => u.id !== uId);
+        setStoredUsers(localUsers);
+      } catch (e) {}
+
+      await this.logOut();
+      return { success: true };
     }
   };
 
@@ -1113,11 +1189,14 @@
         let contactNumber = session.user.user_metadata?.contact_number || null;
         let authMethod = isPhone ? 'phone' : (session.user.app_metadata?.provider === 'google' ? 'google' : 'gmail');
         let displayEmail = isPhone ? null : session.user.email;
+        let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || null;
+        let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || null;
+        let parentalConsentConfirmed = Boolean(session.user.user_metadata?.parental_consent_confirmed);
 
         try {
           const { data: profile } = await supabaseClient
             .from('profiles')
-            .select('full_name, email, contact_number, auth_method, role')
+            .select('full_name, email, contact_number, auth_method, role, accepted_terms_at, accepted_terms_version, parental_consent_confirmed')
             .eq('id', session.user.id)
             .single();
           if (profile) {
@@ -1126,6 +1205,9 @@
             if (profile.contact_number) contactNumber = profile.contact_number;
             if (profile.auth_method) authMethod = profile.auth_method;
             if (profile.email && !profile.email.includes('@phone.nelovportal.local')) displayEmail = profile.email;
+            if (profile.accepted_terms_at) acceptedTermsAt = profile.accepted_terms_at;
+            if (profile.accepted_terms_version) acceptedTermsVersion = profile.accepted_terms_version;
+            if (profile.parental_consent_confirmed) parentalConsentConfirmed = Boolean(profile.parental_consent_confirmed);
           }
         } catch (e) {}
 
@@ -1141,6 +1223,9 @@
           authMethod,
           targetExam: session.user.user_metadata?.target_exam || 'JEE Advanced',
           role,
+          acceptedTermsAt,
+          acceptedTermsVersion,
+          parentalConsentConfirmed,
           createdAt: session.user.created_at
         };
         window.authService.setActiveSession(user);

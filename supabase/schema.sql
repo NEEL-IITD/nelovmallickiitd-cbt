@@ -20,6 +20,9 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   auth_method TEXT DEFAULT 'gmail' CHECK (auth_method IN ('google', 'gmail', 'phone', 'email_with_phone')),
   target_exam TEXT CHECK (target_exam IN ('JEE Mains', 'JEE Advanced', 'Both')) DEFAULT 'JEE Advanced',
   role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('student', 'admin')),
+  accepted_terms_at TIMESTAMPTZ,
+  accepted_terms_version TEXT,
+  parental_consent_confirmed BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_login_at TIMESTAMPTZ DEFAULT NOW(),
   CONSTRAINT check_email_or_contact CHECK (
@@ -51,6 +54,9 @@ DECLARE
   v_email TEXT;
   v_role TEXT := 'student';
   v_is_phone_user BOOLEAN := FALSE;
+  v_accepted_terms_at TIMESTAMPTZ := NULL;
+  v_accepted_terms_version TEXT := NULL;
+  v_parental_consent BOOLEAN := FALSE;
 BEGIN
   -- Determine if phone-based synthetic user
   IF NEW.email LIKE '%@phone.nelovportal.local' THEN
@@ -91,6 +97,21 @@ BEGIN
     END
   );
 
+  -- Extract legal consent and parental approval metadata
+  IF NEW.raw_user_meta_data->>'accepted_terms_at' IS NOT NULL THEN
+    BEGIN
+      v_accepted_terms_at := (NEW.raw_user_meta_data->>'accepted_terms_at')::TIMESTAMPTZ;
+    EXCEPTION WHEN OTHERS THEN
+      v_accepted_terms_at := NOW();
+    END;
+  END IF;
+
+  v_accepted_terms_version := NEW.raw_user_meta_data->>'accepted_terms_version';
+
+  IF NEW.raw_user_meta_data->>'parental_consent_confirmed' IS NOT NULL THEN
+    v_parental_consent := COALESCE((NEW.raw_user_meta_data->>'parental_consent_confirmed')::BOOLEAN, FALSE);
+  END IF;
+
   -- Auto Admin Recognition:
   IF LOWER(COALESCE(NEW.email, '')) = LOWER('YOUR_ADMIN_EMAIL@gmail.com')
      OR LOWER(COALESCE(NEW.email, '')) IN ('nelovmallick@gmail.com', 'mallicknelov@gmail.com', 'nelovmallick@iitd.ac.in')
@@ -107,6 +128,9 @@ BEGIN
     auth_method,
     target_exam,
     role,
+    accepted_terms_at,
+    accepted_terms_version,
+    parental_consent_confirmed,
     created_at,
     last_login_at
   )
@@ -118,6 +142,9 @@ BEGIN
     v_auth_method,
     v_target_exam,
     v_role,
+    v_accepted_terms_at,
+    v_accepted_terms_version,
+    v_parental_consent,
     NOW(),
     NOW()
   )
@@ -128,6 +155,9 @@ BEGIN
     contact_number = COALESCE(EXCLUDED.contact_number, profiles.contact_number),
     auth_method = COALESCE(EXCLUDED.auth_method, profiles.auth_method),
     role = CASE WHEN v_role = 'admin' THEN 'admin' ELSE profiles.role END,
+    accepted_terms_at = COALESCE(profiles.accepted_terms_at, EXCLUDED.accepted_terms_at),
+    accepted_terms_version = COALESCE(profiles.accepted_terms_version, EXCLUDED.accepted_terms_version),
+    parental_consent_confirmed = COALESCE(profiles.parental_consent_confirmed, EXCLUDED.parental_consent_confirmed),
     last_login_at = NOW();
 
   RETURN NEW;
@@ -139,6 +169,47 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_new_user();
+
+-- Self-Service Account Deletion Function
+CREATE OR REPLACE FUNCTION public.delete_my_account()
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, auth
+AS $$
+DECLARE
+  v_user_id UUID;
+  v_role TEXT;
+BEGIN
+  v_user_id := auth.uid();
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'Authentication required to delete an account.';
+  END IF;
+
+  -- Safety Guard: Ensure admin cannot accidentally delete their account via self-service
+  SELECT role INTO v_role FROM public.profiles WHERE id = v_user_id;
+  IF v_role = 'admin' THEN
+    RAISE EXCEPTION 'Admin accounts cannot be self-deleted to prevent accidental management lockouts.';
+  END IF;
+
+  -- Scrub PII from past error reports submitted by this user
+  UPDATE public.error_reports
+  SET reporter_name = 'Deleted User',
+      reporter_email = NULL
+  WHERE user_id = v_user_id;
+
+  -- Delete from auth.users (cascades to all user records)
+  DELETE FROM auth.users WHERE id = v_user_id;
+
+  RETURN jsonb_build_object(
+    'success', TRUE,
+    'message', 'Your account and all associated test records, bookmarks, and data have been permanently erased.'
+  );
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.delete_my_account() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.delete_my_account() TO authenticated;
 
 -- ==============================================================================
 -- 4. Test Configurations Table

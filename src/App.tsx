@@ -30,9 +30,16 @@ import { LecturePlayer } from './components/LecturePlayer';
 import { LecturesSection } from './components/LecturesSection';
 import { StudyResourcesVaultShowcase } from './components/vault/StudyResourcesVaultShowcase';
 import { SubjectResourcesHub } from './components/vault/SubjectResourcesHub';
+import { PrivacyPolicy } from './components/legal/PrivacyPolicy';
+import { TermsOfService } from './components/legal/TermsOfService';
+import { Disclaimer } from './components/legal/Disclaimer';
+import { CopyrightPolicy } from './components/legal/CopyrightPolicy';
+import { AccountPrivacy } from './components/legal/AccountPrivacy';
+import { StorageNotice } from './components/legal/StorageNotice';
+import { TermsAcceptanceModal } from './components/legal/TermsAcceptanceModal';
 
 export const AppContent: React.FC = () => {
-  const { user, isCloudConnected, openAuthModal } = useAuth();
+  const { user, isCloudConnected, openAuthModal, acceptTerms } = useAuth();
 
   // Global State
   const [exam, setExam] = useState<ExamType>('jee');
@@ -164,6 +171,18 @@ export const AppContent: React.FC = () => {
           onBackToHome={() => handleNavigate('#/')}
           openAuth={(mode) => openAuthModal(mode, '#/lectures')}
         />
+      ) : currentHash === '#/privacy-policy' || currentHash === '#privacy-policy' ? (
+        <PrivacyPolicy />
+      ) : currentHash === '#/terms' || currentHash === '#terms' ? (
+        <TermsOfService />
+      ) : currentHash === '#/disclaimer' || currentHash === '#disclaimer' ? (
+        <Disclaimer />
+      ) : currentHash === '#/copyright' || currentHash === '#copyright' ? (
+        <CopyrightPolicy />
+      ) : currentHash === '#/account' || currentHash === '#account' ? (
+        <ProtectedRoute redirectUrl="#/account" fallbackMessage="Sign in or create a free account to manage your Account & Privacy settings.">
+          <AccountPrivacy onBackToHome={() => handleNavigate('#/')} />
+        </ProtectedRoute>
       ) : (
         <main>
           {/* 0. STUDY RESOURCES & FORMULA VAULT (Top-of-Homepage 3D Showcase) */}
@@ -229,6 +248,18 @@ export const AppContent: React.FC = () => {
         isOpen={questionPaperOpen}
         onClose={() => setQuestionPaperOpen(false)}
         exam={exam}
+      />
+
+      {/* Lightweight Essential Storage / Cookie Notice */}
+      <StorageNotice />
+
+      {/* First-Time Google Sign-In & DPDP Terms Consent Modal */}
+      <TermsAcceptanceModal
+        isOpen={Boolean(user && !user.acceptedTermsAt)}
+        userName={user?.name}
+        onAccept={async () => {
+          await acceptTerms();
+        }}
       />
 
     </div>
