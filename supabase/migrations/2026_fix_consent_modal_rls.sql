@@ -34,6 +34,7 @@ CREATE INDEX IF NOT EXISTS idx_profiles_role ON public.profiles(role);
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
 GRANT SELECT, INSERT, UPDATE ON TABLE public.profiles TO authenticated;
 GRANT SELECT ON TABLE public.profiles TO anon;
+GRANT SELECT ON TABLE public.test_configs TO anon, authenticated;
 
 -- 3. Re-create clean, non-recursive RLS policies on public.profiles
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
