@@ -171,7 +171,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (isSupabaseConfigured && supabase) {
       const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (!mounted) return;
-        if (event === 'SIGNED_IN' && session?.user) {
+        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') && session?.user) {
           const isPhone = Boolean(session.user.email?.endsWith('@phone.nelovportal.local'));
           let role: 'student' | 'admin' = 'student';
           let fullName = session.user.user_metadata?.full_name || (isPhone ? 'Student Aspirant' : session.user.email?.split('@')[0]) || 'Student';
@@ -242,6 +242,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Auto Admin Recognition
           if (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) {
             role = 'admin';
+            acceptedTermsAt = acceptedTermsAt || '2026-11-20T00:00:00.000Z';
+            acceptedTermsVersion = acceptedTermsVersion || '2026-11';
+            parentalConsentConfirmed = true;
           }
 
           const loggedInUser: User = {
