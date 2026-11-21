@@ -192,6 +192,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </button>
 
                   <div className="my-1 border-t border-slate-100 dark:border-zinc-800/80" />
+                  <button
+                    type="button"
+                    onClick={() => navigateTo('#/leaderboard')}
+                    className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-950/30 text-left transition-colors"
+                  >
+                    <div>
+                      <div className="font-bold text-slate-900 dark:text-zinc-100 flex items-center gap-1.5">
+                        <span>🏆 Live Leaderboard</span>
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
+                          Toppers
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-zinc-400">1st-attempt official ranks &amp; percentiles</p>
+                    </div>
+                    <span className="text-amber-500">→</span>
+                  </button>
+
+                  <div className="my-1 border-t border-slate-100 dark:border-zinc-800/80" />
                   <div className="px-3 py-1.5 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                     Quick Launch Live Tests
                   </div>
@@ -671,6 +689,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                   >
                     <span>JEE Mains (PTM 01–10)</span>
                     <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">10 Tests</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigateTo('#/leaderboard')}
+                    className="w-full text-left py-2 px-3 rounded-lg text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 flex items-center justify-between"
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <span>🏆</span>
+                      <span>Live Leaderboard</span>
+                    </span>
+                    <span className="text-[10px] bg-amber-500 text-white px-1.5 py-0.2 rounded font-extrabold">Toppers →</span>
                   </button>
                   <div className="pt-1 border-t border-slate-100 dark:border-zinc-800">
                     <button

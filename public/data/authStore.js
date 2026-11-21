@@ -608,6 +608,7 @@
       // 2. Cloud sync to Supabase
       if (window.authService.isCloudConnected()) {
         try {
+          const timeSec = attemptRecord.timeTakenSeconds || (attemptRecord.timeSpentTotal ? Math.round(attemptRecord.timeSpentTotal) : 0);
           await supabaseClient.from('test_attempts').insert({
             id: attemptRecord.id,
             user_id: userId,
@@ -618,6 +619,7 @@
             total_marks: attemptRecord.totalMaxMarks,
             percentage: attemptRecord.percentage,
             accuracy: attemptRecord.accuracy,
+            time_taken_seconds: timeSec,
             estimated_rank_label: attemptRecord.predictedAirDisplay || 'AIR Qualified',
             subject_breakdown: attemptRecord.subjectStats || {},
             responses: attemptRecord.responses || {},
@@ -969,6 +971,257 @@
         localStorage.setItem(TEST_CONFIGS_OVERRIDE_KEY, JSON.stringify(cur));
         window.dispatchEvent(new CustomEvent('nelov_test_configs_changed', { detail: { testId, status } }));
       } catch (e) {}
+    },
+
+    async getTestConfigsDetails() {
+      if (window.authService.isCloudConnected()) {
+        try {
+          const { data, error } = await supabaseClient.from('test_configs').select('*');
+          if (!error && data) {
+            return data.map(d => ({
+              testId: d.test_id,
+              examType: d.exam_type,
+              code: d.code,
+              title: d.title,
+              status: d.status,
+              isScheduledWindow: d.is_scheduled_window || false,
+              startsAt: d.starts_at || null,
+              endsAt: d.ends_at || null,
+              windowLabel: d.window_label || null,
+              lockLeaderboardUntilEnd: d.lock_leaderboard_until_end ?? true,
+              allowPracticeAfterEnd: d.allow_practice_after_end ?? true,
+              updatedAt: d.updated_at
+            }));
+          }
+        } catch (e) {}
+      }
+      return [];
+    },
+
+    async updateTestSchedule(testId, scheduleData) {
+      if (window.authService.isCloudConnected()) {
+        try {
+          const { error } = await supabaseClient
+            .from('test_configs')
+            .update({
+              ...scheduleData,
+              updated_at: new Date().toISOString()
+            })
+            .eq('test_id', testId);
+          if (error) console.error('[Supabase] updateTestSchedule error:', error);
+        } catch (e) {
+          console.error('[Supabase] updateTestSchedule error:', e);
+        }
+      }
+
+      try {
+        const local = localStorage.getItem('nelov_test_schedules') || '{}';
+        const parsed = JSON.parse(local);
+        parsed[testId] = scheduleData;
+        localStorage.setItem('nelov_test_schedules', JSON.stringify(parsed));
+        window.dispatchEvent(new CustomEvent('nelov_test_configs_changed', { detail: { testId, scheduleData } }));
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+
+    async getTestLeaderboard(testId) {
+      if (window.authService.isCloudConnected()) {
+        try {
+          const { data, error } = await supabaseClient.rpc('get_test_leaderboard', { p_test_id: testId });
+          if (!error && data) {
+            return {
+              locked: data.locked || false,
+              unlocksAt: data.unlocks_at || null,
+              totalParticipants: data.total_participants || 0,
+              averageMarks: data.average_marks || 0,
+              highestMarks: data.highest_marks || 0,
+              topper: data.topper ? {
+                rank: data.topper.rank,
+                displayName: data.topper.display_name,
+                marks: data.topper.marks,
+                maxMarks: data.topper.max_marks,
+                percentage: data.topper.percentage,
+                percentile: data.topper.percentile,
+                accuracy: data.topper.accuracy,
+                timeTakenSeconds: data.topper.time_taken_seconds,
+                submittedAt: data.topper.submitted_at,
+                attemptedInLiveWindow: data.topper.attempted_in_live_window,
+                isCurrentUser: data.topper.is_current_user
+              } : null,
+              myStanding: data.my_standing ? {
+                rank: data.my_standing.rank,
+                displayName: data.my_standing.display_name,
+                marks: data.my_standing.marks,
+                maxMarks: data.my_standing.max_marks,
+                percentage: data.my_standing.percentage,
+                percentile: data.my_standing.percentile,
+                accuracy: data.my_standing.accuracy,
+                timeTakenSeconds: data.my_standing.time_taken_seconds,
+                submittedAt: data.my_standing.submitted_at,
+                attemptedInLiveWindow: data.my_standing.attempted_in_live_window,
+                isCurrentUser: data.my_standing.is_current_user
+              } : null,
+              entries: (data.entries || []).map(e => ({
+                rank: e.rank,
+                displayName: e.display_name,
+                marks: e.marks,
+                maxMarks: e.max_marks,
+                percentage: e.percentage,
+                percentile: e.percentile,
+                accuracy: e.accuracy,
+                timeTakenSeconds: e.time_taken_seconds,
+                submittedAt: e.submitted_at,
+                attemptedInLiveWindow: e.attempted_in_live_window,
+                isCurrentUser: e.is_current_user
+              })),
+              myAttemptSubmitted: data.my_attempt_submitted
+            };
+          }
+        } catch (e) {
+          console.warn('[Supabase] get_test_leaderboard fallback:', e);
+        }
+      }
+
+      return this.calculateLocalTestLeaderboard(testId);
+    },
+
+    calculateLocalTestLeaderboard(testId) {
+      const all = this.getAllAttempts ? this.getAllAttempts() : [];
+      const currentUser = window.authService?.getCurrentUser ? window.authService.getCurrentUser() : null;
+      const currentUid = currentUser?.id;
+
+      const userAttemptsMap = {};
+      all
+        .filter(a => (a.testId === testId || a.testCode === testId || a.code === testId))
+        .sort((a, b) => new Date(a.completedAt || a.submitted_at).getTime() - new Date(b.completedAt || b.submitted_at).getTime())
+        .forEach(a => {
+          const uId = a.userId || a.user_id;
+          if (uId && !userAttemptsMap[uId]) {
+            userAttemptsMap[uId] = a;
+          }
+        });
+
+      const firstAttempts = Object.values(userAttemptsMap);
+      const totalParticipants = firstAttempts.length;
+
+      if (totalParticipants === 0) {
+        return {
+          locked: false,
+          unlocksAt: null,
+          totalParticipants: 0,
+          averageMarks: 0,
+          highestMarks: 0,
+          topper: null,
+          myStanding: null,
+          entries: [],
+          myAttemptSubmitted: false
+        };
+      }
+
+      firstAttempts.sort((a, b) => {
+        const scoreA = Number(a.totalMarksScored ?? a.obtained_marks ?? 0);
+        const scoreB = Number(b.totalMarksScored ?? b.obtained_marks ?? 0);
+        if (scoreB !== scoreA) return scoreB - scoreA;
+        const accA = Number(a.accuracy ?? 0);
+        const accB = Number(b.accuracy ?? 0);
+        if (accB !== accA) return accB - accA;
+        return (a.timeTakenSeconds || a.time_taken_seconds || 0) - (b.timeTakenSeconds || b.time_taken_seconds || 0);
+      });
+
+      const highestMarks = Number(firstAttempts[0]?.totalMarksScored ?? firstAttempts[0]?.obtained_marks ?? 0);
+      const avgMarks = Math.round((firstAttempts.reduce((sum, a) => sum + Number(a.totalMarksScored ?? a.obtained_marks ?? 0), 0) / totalParticipants) * 10) / 10;
+
+      const entries = firstAttempts.map((a, index) => {
+        const rank = index + 1;
+        const myScore = Number(a.totalMarksScored ?? a.obtained_marks ?? 0);
+        const countBelowOrEqual = firstAttempts.filter(other => Number(other.totalMarksScored ?? other.obtained_marks ?? 0) <= myScore).length;
+        const percentile = Math.round((countBelowOrEqual / totalParticipants) * 10000) / 100;
+        const uId = a.userId || a.user_id;
+
+        return {
+          rank,
+          displayName: a.candidateName || a.studentName || a.profiles?.full_name || 'JEE Aspirant',
+          marks: myScore,
+          maxMarks: Number(a.totalMaxMarks ?? a.total_marks ?? 180),
+          percentage: Number(a.percentage ?? 0),
+          percentile,
+          accuracy: Number(a.accuracy ?? 0),
+          timeTakenSeconds: a.timeTakenSeconds || a.time_taken_seconds || 0,
+          submittedAt: a.completedAt || a.submitted_at,
+          attemptedInLiveWindow: !!(a.attemptedInLiveWindow || a.attempted_in_live_window),
+          isCurrentUser: currentUid === uId
+        };
+      });
+
+      const topper = entries[0] || null;
+      const myStanding = entries.find(e => e.isCurrentUser) || null;
+      const myAttemptSubmitted = !!firstAttempts.find(a => (a.userId || a.user_id) === currentUid);
+
+      return {
+        locked: false,
+        unlocksAt: null,
+        totalParticipants,
+        averageMarks: avgMarks,
+        highestMarks,
+        topper,
+        myStanding,
+        entries: entries.slice(0, 100),
+        myAttemptSubmitted
+      };
+    },
+
+    async getTestToppersSummary() {
+      if (window.authService.isCloudConnected()) {
+        try {
+          const { data, error } = await supabaseClient.rpc('get_test_toppers_summary');
+          if (!error && Array.isArray(data)) {
+            return data.map(d => ({
+              testId: d.test_id,
+              code: d.code,
+              title: d.title,
+              examType: d.exam_type,
+              isScheduledWindow: d.is_scheduled_window || false,
+              startsAt: d.starts_at || null,
+              endsAt: d.ends_at || null,
+              windowLabel: d.window_label || null,
+              isLocked: d.is_locked || false,
+              totalParticipants: d.total_participants || 0,
+              topperName: d.topper_name || null,
+              topperMarks: d.topper_marks || null,
+              maxMarks: d.max_marks || null,
+              topperPercentile: d.topper_percentile || null
+            }));
+          }
+        } catch (e) {
+          console.warn('[Supabase] get_test_toppers_summary fallback:', e);
+        }
+      }
+      return [];
+    },
+
+    async getOverallLeaderboard() {
+      if (window.authService.isCloudConnected()) {
+        try {
+          const { data, error } = await supabaseClient.rpc('get_overall_leaderboard');
+          if (!error && Array.isArray(data)) {
+            return data.map(d => ({
+              rank: d.rank,
+              displayName: d.display_name,
+              testsAttempted: d.tests_attempted,
+              avgPercentile: d.avg_percentile,
+              avgMarksPercent: d.avg_marks_percent,
+              totalMarksScored: d.total_marks_scored,
+              totalMaxMarks: d.total_max_marks,
+              isCurrentUser: d.is_current_user
+            }));
+          }
+        } catch (e) {
+          console.warn('[Supabase] get_overall_leaderboard fallback:', e);
+        }
+      }
+      return [];
     },
 
     getUserStats(userId) {

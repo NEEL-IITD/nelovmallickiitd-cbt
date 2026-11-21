@@ -200,6 +200,160 @@
       return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
     }
 
+    // Helper: Live Countdown Hook
+    function useCountdown(targetIsoString) {
+      const calculate = () => {
+        if (!targetIsoString) {
+          return { totalSecondsRemaining: 0, days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true, formatted: '00:00:00' };
+        }
+        const target = new Date(targetIsoString).getTime();
+        const now = Date.now();
+        const diff = target - now;
+        if (isNaN(target) || diff <= 0) {
+          return { totalSecondsRemaining: 0, days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true, formatted: '00:00:00' };
+        }
+        const totalSecondsRemaining = Math.floor(diff / 1000);
+        const days = Math.floor(totalSecondsRemaining / 86400);
+        const hours = Math.floor((totalSecondsRemaining % 86400) / 3600);
+        const minutes = Math.floor((totalSecondsRemaining % 3600) / 60);
+        const seconds = totalSecondsRemaining % 60;
+        let formatted = '';
+        if (days > 0) {
+          formatted = `${days}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+        } else {
+          formatted = `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+        }
+        return { totalSecondsRemaining, days, hours, minutes, seconds, isExpired: false, formatted };
+      };
+
+      const [state, setState] = useState(calculate);
+
+      useEffect(() => {
+        setState(calculate());
+        if (!targetIsoString) return;
+        const interval = setInterval(() => {
+          setState(calculate());
+        }, 1000);
+        return () => clearInterval(interval);
+      }, [targetIsoString]);
+
+      return state;
+    }
+
+    // Helper: Format to Indian Standard Time (IST)
+    function formatIST(isoString, formatType = 'full') {
+      if (!isoString) return '';
+      try {
+        const date = new Date(isoString);
+        if (isNaN(date.getTime())) return '';
+        const options = { timeZone: 'Asia/Kolkata', hour12: true };
+        if (formatType === 'time') {
+          options.hour = 'numeric';
+          options.minute = '2-digit';
+          return new Intl.DateTimeFormat('en-IN', options).format(date) + ' IST';
+        }
+        if (formatType === 'short') {
+          options.month = 'short';
+          options.day = 'numeric';
+          options.hour = 'numeric';
+          options.minute = '2-digit';
+          return new Intl.DateTimeFormat('en-IN', options).format(date) + ' IST';
+        }
+        options.weekday = 'short';
+        options.day = 'numeric';
+        options.month = 'short';
+        options.hour = 'numeric';
+        options.minute = '2-digit';
+        return new Intl.DateTimeFormat('en-IN', options).format(date) + ' IST';
+      } catch (e) {
+        return isoString;
+      }
+    }
+
+    function formatISTWindow(startsAt, endsAt) {
+      if (!startsAt) return '';
+      const startStr = formatIST(startsAt, 'full');
+      if (!endsAt) return startStr;
+      const endTimeStr = formatIST(endsAt, 'time');
+      const startParts = startStr.replace(' IST', '');
+      return `${startParts} â€“ ${endTimeStr}`;
+    }
+
+    // Component: MockWindowBadge (Ticking Countdown & Status)
+    function MockWindowBadge({ isScheduled = false, startsAt, endsAt, windowLabel, isLive = false, allowPractice = true }) {
+      const now = Date.now();
+      const startTime = startsAt ? new Date(startsAt).getTime() : 0;
+      const endTime = endsAt ? new Date(endsAt).getTime() : 0;
+
+      const isUpcoming = isScheduled && startTime > 0 && now < startTime;
+      const isLiveWindow = isScheduled && startTime > 0 && endTime > 0 && now >= startTime && now <= endTime;
+      const isClosed = isScheduled && endTime > 0 && now > endTime;
+
+      const startCountdown = useCountdown(isUpcoming ? startsAt : null);
+      const endCountdown = useCountdown(isLiveWindow ? endsAt : null);
+
+      if (isUpcoming) {
+        return (
+          <div className="flex flex-col items-start gap-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              <span>{windowLabel || 'All-India Scheduled Mock'}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-amber-700 dark:text-amber-300">
+              <span>â ³ Starts in: {startCountdown.formatted}</span>
+            </div>
+            <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-medium">
+              {formatISTWindow(startsAt, endsAt)}
+            </span>
+          </div>
+        );
+      }
+
+      if (isLiveWindow) {
+        return (
+          <div className="flex flex-col items-start gap-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-rose-600 text-white shadow-lg shadow-rose-600/30 animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-white" />
+              <span>ðŸ”´ LIVE ALL-INDIA WINDOW</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs font-mono font-black text-rose-600 dark:text-rose-400">
+              <span>Closes in: {endCountdown.formatted}</span>
+            </div>
+          </div>
+        );
+      }
+
+      if (isClosed) {
+        return (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700">
+              Window Closed
+            </span>
+            {allowPractice && (
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                Practice Open
+              </span>
+            )}
+          </div>
+        );
+      }
+
+      if (isLive) {
+        return (
+          <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-500 text-white shadow-sm flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+            Live Now Â· Free
+          </span>
+        );
+      }
+
+      return (
+        <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700">
+          Coming Soon
+        </span>
+      );
+    }
+
     
     // ==============================================================================
     // REUSABLE 3D PERSPECTIVE TILT CARD (TestonGo 3D Depth Engine)
@@ -5904,6 +6058,153 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       );
     }
 
+    // COMPONENT: Live All-India CBT Leaderboard Card for Results Page
+    function LiveLeaderboardResultsCard({ currentPaper, candidateName, evaluationData, currentUser, setView }) {
+      const [leaderboardData, setLeaderboardData] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [attemptCount, setAttemptCount] = useState(1);
+
+      useEffect(() => {
+        if (!currentPaper) return;
+        const testId = currentPaper.id || currentPaper.testId;
+
+        // Check user's attempt count for this test
+        if (currentUser && window.studentStorage?.getAttempts) {
+          const userAtts = window.studentStorage.getAttempts(currentUser.id) || [];
+          const testAtts = userAtts.filter(a => a.testId === testId);
+          setAttemptCount(Math.max(1, testAtts.length));
+        }
+
+        // Fetch leaderboard data
+        if (window.studentStorage?.getTestLeaderboard) {
+          window.studentStorage.getTestLeaderboard(testId).then(res => {
+            setLeaderboardData(res);
+            setLoading(false);
+          }).catch(err => {
+            console.warn('Error loading results leaderboard:', err);
+            setLoading(false);
+          });
+        } else {
+          setLoading(false);
+        }
+      }, [currentPaper, currentUser]);
+
+      if (!currentPaper || !evaluationData) return null;
+
+      const isFirstAttempt = attemptCount <= 1;
+      const topper = leaderboardData?.topper;
+      const myStanding = leaderboardData?.myStanding;
+      const scoreDiff = topper && topper.marks !== undefined ? Math.max(0, topper.marks - evaluationData.totalMarksScored) : 0;
+
+      return (
+        <div className="rounded-3xl border-2 border-indigo-600 bg-white dark:bg-[#121318] p-6 sm:p-8 shadow-xl shadow-indigo-600/5 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-zinc-800 pb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white font-black text-2xl flex items-center justify-center shadow-lg shadow-amber-500/20">
+                ðŸ †
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-black text-slate-900 dark:text-zinc-50">
+                    Live All-India CBT Leaderboard Standing
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+                    Official Ranks
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-zinc-400">
+                  Benchmarked against {leaderboardData?.totalParticipants || 0} active JEE aspirants Â· NTA Percentile Normalized
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof setView === 'function') setView('leaderboard');
+                window.location.hash = `#/leaderboard/${currentPaper.id || currentPaper.testId}`;
+              }}
+              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5 self-start sm:self-auto hover:scale-105"
+            >
+              <span>View Full Leaderboard</span>
+              <span>â†’</span>
+            </button>
+          </div>
+
+          {/* 1st Attempt vs Practice Attempt Notice */}
+          {!isFirstAttempt && (
+            <div className="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex items-center gap-2.5 text-xs text-amber-800 dark:text-amber-200 font-medium">
+              <span className="text-base">âš–ï¸ </span>
+              <p>
+                <strong>Practice Attempt #{attemptCount}:</strong> To preserve strict examination integrity and mirror NTA ranking standards, official All-India ranks and percentiles are locked to your 1st Attempt. This attempt is recorded for your personal diagnosis.
+              </p>
+            </div>
+          )}
+
+          {/* 4 Standing Metrics Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800">
+              <p className="text-[11px] font-bold text-slate-400 uppercase">Your All-India Rank</p>
+              <p className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 pt-1">
+                {myStanding?.rank ? `#${myStanding.rank}` : (isFirstAttempt ? '#1' : 'Rank Locked')}
+              </p>
+              <p className="text-[10px] text-slate-400">of {leaderboardData?.totalParticipants || 1} candidates</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800">
+              <p className="text-[11px] font-bold text-slate-400 uppercase">Normalized Percentile</p>
+              <p className="text-2xl sm:text-3xl font-black font-mono text-emerald-600 dark:text-emerald-400 pt-1">
+                {myStanding?.percentile ? `${myStanding.percentile}%ile` : `${evaluationData.percentage}%ile`}
+              </p>
+              <p className="text-[10px] text-slate-400">Official NTA Formula</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800">
+              <p className="text-[11px] font-bold text-slate-400 uppercase">Current Topper</p>
+              <p className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-zinc-100 truncate pt-1">
+                {topper?.displayName || candidateName}
+              </p>
+              <p className="text-[10px] font-mono font-bold text-amber-600 dark:text-amber-400">
+                {topper?.marks !== undefined ? `${topper.marks} / ${topper.maxMarks} Mks` : `${evaluationData.totalMarksScored} / ${evaluationData.totalMaxMarks}`}
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800">
+              <p className="text-[11px] font-bold text-slate-400 uppercase">Gap to Rank #1</p>
+              <p className="text-2xl sm:text-3xl font-black font-mono text-slate-900 dark:text-zinc-100 pt-1">
+                {scoreDiff === 0 ? (
+                  <span className="text-emerald-600 dark:text-emerald-400 text-xl font-bold">ðŸ‘‘ You are #1</span>
+                ) : (
+                  <span>-${scoreDiff} <span className="text-xs text-slate-400 font-normal">Mks</span></span>
+                )}
+              </p>
+              <p className="text-[10px] text-slate-400">{scoreDiff === 0 ? 'Topper of Paper' : 'Behind Current Leader'}</p>
+            </div>
+          </div>
+
+          {/* Top 3 Performers Mini-Bar */}
+          {leaderboardData?.entries && leaderboardData.entries.length > 0 && (
+            <div className="space-y-2 pt-2">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Top 3 Candidates on this Paper:</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {leaderboardData.entries.slice(0, 3).map((entry, idx) => (
+                  <div key={idx} className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-bold">{idx === 0 ? 'ðŸ‘‘ #1' : (idx === 1 ? 'ðŸ¥ˆ #2' : 'ðŸ¥‰ #3')}</span>
+                      <span className="font-semibold text-slate-800 dark:text-zinc-200 truncate">{entry.displayName}</span>
+                    </div>
+                    <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 shrink-0">
+                      {entry.marks} Mks ({entry.percentile}%ile)
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     // COMPONENT: Subject-wise Score & Accuracy Chart (Grouped Bar Chart)
     function SubjectScoreAccuracyChart({ subjectStats }) {
       const [hovered, setHovered] = useState(null);
@@ -7679,6 +7980,25 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       </button>
 
                       <div className="my-1 border-t border-slate-100 dark:border-zinc-800/80" />
+                      <button
+                        type="button"
+                        onClick={() => { setActiveDropdown(null); navigateTo('leaderboard', '#/leaderboard'); }}
+                        className="w-full flex items-center justify-between p-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-left text-amber-700 dark:text-amber-300 font-bold transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">🏆</span>
+                          <div>
+                            <div className="font-bold flex items-center gap-1.5">
+                              <span>Live Leaderboard</span>
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-amber-500 text-white">Toppers</span>
+                            </div>
+                            <p className="text-[11px] text-amber-600/80 dark:text-amber-400/80 font-normal">Official 1st-attempt ranks & percentiles</p>
+                          </div>
+                        </div>
+                        <span className="text-amber-600 dark:text-amber-400">→</span>
+                      </button>
+
+                      <div className="my-1 border-t border-slate-100 dark:border-zinc-800/80" />
                       <div className="px-3 py-1.5 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                         Quick Launch Live Tests
                       </div>
@@ -8162,6 +8482,17 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       >
                         <span>JEE Mains (PTM 01–10)</span>
                         <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">10 Tests</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setMobileMenuOpen(false); navigateTo('leaderboard', '#/leaderboard'); }}
+                        className="w-full text-left py-2 px-3 rounded-lg text-xs font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 flex items-center justify-between"
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <span>🏆</span>
+                          <span>Live Leaderboard & Toppers</span>
+                        </span>
+                        <span className="text-[10px] bg-amber-500 text-white px-1.5 py-0.2 rounded font-extrabold">Live</span>
                       </button>
                       <div className="pt-1 border-t border-slate-100 dark:border-zinc-800">
                         <button
@@ -9039,7 +9370,15 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
     // VIEW: Private Admin Dashboard Component (/admin)
     // Full Visibility for Admin Gmail (Students, Contact Numbers, Attempts, Lectures, Bookmarks, Reports)
     // =========================================================================
-    function AdminDashboardView({ currentUser, setView, testConfigs, setTestConfigs }) {
+    function AdminDashboardView({ currentUser, setView, testConfigs, setTestConfigs, detailedConfigs: propDetailedConfigs, setDetailedConfigs: propSetDetailedConfigs }) {
+      const [adminLeaderboardTestId, setAdminLeaderboardTestId] = useState('jee-advanced-pta-04');
+      const [adminLeaderboardData, setAdminLeaderboardData] = useState(null);
+      const [adminLeaderboardLoading, setAdminLeaderboardLoading] = useState(false);
+      const [scheduleModal, setScheduleModal] = useState(null);
+      const [localDetailedConfigs, setLocalDetailedConfigs] = useState({});
+
+      const detailedConfigs = propDetailedConfigs || localDetailedConfigs;
+      const setDetailedConfigs = propSetDetailedConfigs || setLocalDetailedConfigs;
       const [adminTab, setAdminTab] = useState('overview');
       const [loading, setLoading] = useState(true);
 
@@ -9136,6 +9475,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             if (cfg && Object.keys(cfg).length > 0) {
               setTestConfigs(cfg);
             }
+          }
+
+          if (window.studentStorage?.getTestConfigsDetails) {
+            const d = await window.studentStorage.getTestConfigsDetails();
+            const map = {};
+            (d || []).forEach(item => { map[item.testId] = item; });
+            setDetailedConfigs(map);
           }
 
           const normalized = (pList || []).map((p) => {
@@ -9239,6 +9585,141 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           questionCount: 0
         };
       });
+
+      // Fetch Admin Leaderboard Data on Tab / Test Change
+      useEffect(() => {
+        if (adminTab === 'leaderboards' && window.studentStorage?.getTestLeaderboard) {
+          setAdminLeaderboardLoading(true);
+          window.studentStorage.getTestLeaderboard(adminLeaderboardTestId)
+            .then(res => {
+              setAdminLeaderboardData(res);
+              setAdminLeaderboardLoading(false);
+            })
+            .catch(() => setAdminLeaderboardLoading(false));
+        }
+      }, [adminTab, adminLeaderboardTestId]);
+
+      const handleOpenScheduleModal = (test) => {
+        const cur = detailedConfigs[test.testId] || {};
+        let startsAt = '';
+        let endsAt = '';
+        if (cur.startsAt) {
+          try { startsAt = new Date(cur.startsAt).toISOString().slice(0, 16); } catch (e) {}
+        }
+        if (cur.endsAt) {
+          try { endsAt = new Date(cur.endsAt).toISOString().slice(0, 16); } catch (e) {}
+        }
+        setScheduleModal({
+          isOpen: true,
+          testId: test.testId,
+          code: test.code,
+          title: test.title,
+          isScheduled: cur.isScheduledWindow || false,
+          startsAt,
+          endsAt,
+          windowLabel: cur.windowLabel || 'Sunday All-India Live Mock',
+          lockLeaderboard: cur.lockLeaderboardUntilEnd ?? true,
+          allowPractice: cur.allowPracticeAfterEnd ?? true
+        });
+      };
+
+      const handlePresetNextSunday = () => {
+        const now = new Date();
+        const nextSunday = new Date();
+        const daysUntilSunday = (7 - now.getDay()) % 7 || 7;
+        nextSunday.setDate(now.getDate() + daysUntilSunday);
+        const year = nextSunday.getFullYear();
+        const month = String(nextSunday.getMonth() + 1).padStart(2, '0');
+        const day = String(nextSunday.getDate()).padStart(2, '0');
+        setScheduleModal(prev => prev ? ({
+          ...prev,
+          isScheduled: true,
+          startsAt: `${year}-${month}-${day}T09:00`,
+          endsAt: `${year}-${month}-${day}T14:00`,
+          windowLabel: 'Sunday All-India Live Mock'
+        }) : null);
+      };
+
+      const handleSaveSchedule = async () => {
+        if (!scheduleModal) return;
+        const startsAtIso = scheduleModal.startsAt ? new Date(scheduleModal.startsAt).toISOString() : null;
+        const endsAtIso = scheduleModal.endsAt ? new Date(scheduleModal.endsAt).toISOString() : null;
+        const ok = await window.studentStorage.updateTestSchedule(scheduleModal.testId, {
+          is_scheduled_window: scheduleModal.isScheduled,
+          starts_at: startsAtIso,
+          ends_at: endsAtIso,
+          window_label: scheduleModal.windowLabel,
+          lock_leaderboard_until_end: scheduleModal.lockLeaderboard,
+          allow_practice_after_end: scheduleModal.allowPractice
+        });
+        if (ok) {
+          setDetailedConfigs(prev => ({
+            ...prev,
+            [scheduleModal.testId]: {
+              ...(prev[scheduleModal.testId] || {}),
+              testId: scheduleModal.testId,
+              code: scheduleModal.code,
+              title: scheduleModal.title,
+              isScheduledWindow: scheduleModal.isScheduled,
+              startsAt: startsAtIso,
+              endsAt: endsAtIso,
+              windowLabel: scheduleModal.windowLabel,
+              lockLeaderboardUntilEnd: scheduleModal.lockLeaderboard,
+              allowPracticeAfterEnd: scheduleModal.allowPractice
+            }
+          }));
+          setScheduleModal(null);
+        }
+      };
+
+      const handleClearSchedule = async (testId) => {
+        const ok = await window.studentStorage.updateTestSchedule(testId, {
+          is_scheduled_window: false,
+          starts_at: null,
+          ends_at: null,
+          window_label: null
+        });
+        if (ok) {
+          setDetailedConfigs(prev => ({
+            ...prev,
+            [testId]: {
+              ...(prev[testId] || {}),
+              isScheduledWindow: false,
+              startsAt: null,
+              endsAt: null,
+              windowLabel: null
+            }
+          }));
+          setScheduleModal(null);
+        }
+      };
+
+      const handleExportLeaderboardCSV = () => {
+        if (!adminLeaderboardData || !adminLeaderboardData.entries || adminLeaderboardData.entries.length === 0) {
+          alert('No leaderboard entries to export for this test.');
+          return;
+        }
+        const headers = ['Rank', 'Student Name', 'Marks Scored', 'Max Marks', 'Percentile', 'Accuracy (%)', 'Time Taken (Seconds)', 'Attempted in Live Window', 'Submitted At'];
+        const rows = adminLeaderboardData.entries.map(e => [
+          e.rank,
+          `"${(e.displayName || 'Student').replace(/"/g, '""')}"`,
+          e.marks,
+          e.maxMarks,
+          e.percentile,
+          e.accuracy,
+          e.timeTakenSeconds || 0,
+          e.attemptedInLiveWindow ? 'Yes' : 'No',
+          e.submittedAt
+        ]);
+        const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', `leaderboard_${adminLeaderboardTestId}_${Date.now()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
 
       const handleToggleStatus = (test) => {
         const currentStatus = testConfigs[test.testId] || 'coming_soon';
@@ -9398,6 +9879,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 { id: 'students', label: `All Students (${totalStudentsCount})`, icon: '👥', badge: totalStudentsCount },
                 { id: 'attempts', label: `All Attempts (${totalAttemptsCount})`, icon: '📝' },
                 { id: 'tests', label: 'Manage Tests (PTM & PTA)', icon: '⚙️' },
+                { id: 'leaderboards', label: 'Live Leaderboards', icon: '🏆' },
                 { id: 'reports', label: `Error Reports (${openReportsCount})`, icon: '🚩', badge: openReportsCount },
               ].map((tab) => (
                 <button
@@ -9800,6 +10282,117 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               </div>
             )}
 
+            {/* TAB: LIVE LEADERBOARDS INSPECTION & CSV EXPORT */}
+            {adminTab === 'leaderboards' && (
+              <div className="space-y-6 animate-in fade-in">
+                <div className="p-5 rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="font-black text-lg text-slate-900 dark:text-zinc-100 flex items-center gap-2">
+                      <span>🏆 Live CBT Leaderboards &amp; All-India Rankings</span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
+                        Admin Inspector
+                      </span>
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
+                      Real-time 1st-attempt official rankings, marks, percentiles, accuracy, and pacing for any paper. Accessible even while test windows are locked.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleExportLeaderboardCSV}
+                      className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5"
+                    >
+                      <span>📥</span> Export Leaderboard CSV
+                    </button>
+                  </div>
+                </div>
+
+                {/* Test Selector */}
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
+                  {[...jeeAdvancedTestsList, ...jeeMainsTestsList].map((t) => (
+                    <button
+                      key={t.testId}
+                      onClick={() => setAdminLeaderboardTestId(t.testId)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all border ${
+                        adminLeaderboardTestId === t.testId
+                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                          : 'bg-white dark:bg-[#121318] text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-800'
+                      }`}
+                    >
+                      {t.code}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Leaderboard Table */}
+                <div className="rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm overflow-hidden p-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-extrabold text-sm text-slate-900 dark:text-zinc-100">
+                        Leaderboard: {adminLeaderboardTestId} ({adminLeaderboardData?.totalParticipants || 0} Participants)
+                      </h4>
+                      <p className="text-xs text-slate-400">
+                        Highest Marks: {adminLeaderboardData?.highestMarks || 0} · Average: {adminLeaderboardData?.averageMarks || 0}
+                      </p>
+                    </div>
+                    {adminLeaderboardData?.locked && (
+                      <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">
+                        🔒 Window Locked for Students
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-50 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-500 uppercase font-bold text-[10px]">
+                        <tr>
+                          <th className="p-3">Rank</th>
+                          <th className="p-3">Student Name</th>
+                          <th className="p-3 text-center">Marks Scored</th>
+                          <th className="p-3 text-center">Percentile</th>
+                          <th className="p-3 text-center">Accuracy</th>
+                          <th className="p-3 text-right">Time Taken</th>
+                          <th className="p-3 text-right">Submitted At</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-zinc-800">
+                        {adminLeaderboardLoading ? (
+                          <tr>
+                            <td colSpan={7} className="p-8 text-center text-slate-400">Loading rankings...</td>
+                          </tr>
+                        ) : (adminLeaderboardData?.entries || []).length === 0 ? (
+                          <tr>
+                            <td colSpan={7} className="p-8 text-center text-slate-400 italic">No attempt entries recorded for this paper yet.</td>
+                          </tr>
+                        ) : (
+                          (adminLeaderboardData?.entries || []).map((row) => (
+                            <tr key={row.rank + row.displayName} className="hover:bg-slate-50 dark:hover:bg-zinc-900/40">
+                              <td className="p-3 font-mono font-bold">#{row.rank}</td>
+                              <td className="p-3 font-semibold text-slate-900 dark:text-zinc-100">
+                                {row.displayName}
+                                {row.attemptedInLiveWindow && (
+                                  <span className="ml-2 px-1.5 py-0.2 rounded text-[9px] bg-emerald-100 text-emerald-700 font-bold uppercase">
+                                    Live Window
+                                  </span>
+                                )}
+                              </td>
+                              <td className="p-3 text-center font-mono font-bold">{row.marks} / {row.maxMarks}</td>
+                              <td className="p-3 text-center font-mono font-bold text-emerald-600">{row.percentile}%ile</td>
+                              <td className="p-3 text-center font-mono">{row.accuracy}%</td>
+                              <td className="p-3 text-right font-mono text-slate-500">{row.timeTakenSeconds ? `${Math.round(row.timeTakenSeconds / 60)}m` : '—'}</td>
+                              <td className="p-3 text-right text-slate-400 text-[11px]">{new Date(row.submittedAt).toLocaleString()}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* 3. ALL TEST ATTEMPTS TAB */}
             {adminTab === 'attempts' && (
               <div className="space-y-6 animate-in fade-in">
@@ -9913,7 +10506,19 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                               )}
                             </div>
                           </div>
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2.5 flex-wrap justify-end">
+                            {detailedConfigs[test.testId]?.isScheduledWindow && (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                📅 Scheduled
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleOpenScheduleModal(test)}
+                              className="px-2.5 py-1 rounded-xl text-xs font-bold border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 transition-colors"
+                            >
+                              📅 Schedule
+                            </button>
                             <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${isLive ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'}`}>
                               {isLive ? 'Live Now' : 'Coming Soon'}
                             </span>
@@ -9954,7 +10559,19 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                             </div>
                             <div className="text-[11px] text-slate-400">0 questions loaded (Upload Pending)</div>
                           </div>
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2.5 flex-wrap justify-end">
+                            {detailedConfigs[test.testId]?.isScheduledWindow && (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                📅 Scheduled
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleOpenScheduleModal(test)}
+                              className="px-2.5 py-1 rounded-xl text-xs font-bold border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 transition-colors"
+                            >
+                              📅 Schedule
+                            </button>
                             <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${isLive ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'}`}>
                               {isLive ? 'Live Now' : 'Coming Soon'}
                             </span>
@@ -10099,6 +10716,147 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             )}
 
           </div>
+
+          {/* Scheduled Mock Window Modal */}
+          {scheduleModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+              <div className="relative w-full max-w-lg rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 sm:p-8 shadow-2xl space-y-5">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-xl flex items-center justify-center">
+                      📅
+                    </div>
+                    <div>
+                      <h4 className="font-black text-slate-900 dark:text-zinc-50 text-base">
+                        Schedule Mock Window: {scheduleModal.code}
+                      </h4>
+                      <p className="text-xs text-slate-500">{scheduleModal.title}</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setScheduleModal(null)}
+                    className="w-8 h-8 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-400 hover:text-slate-600 flex items-center justify-center"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* 1-Click Preset */}
+                <div className="p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/60 flex items-center justify-between gap-3">
+                  <div className="text-xs text-indigo-950 dark:text-indigo-200">
+                    <p className="font-bold">⚡ Fast Preset: Next Sunday (9 AM – 2 PM IST)</p>
+                    <p className="text-[11px] text-indigo-600 dark:text-indigo-400">All-India standard 5-hour mock window</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handlePresetNextSunday}
+                    className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm transition-all shrink-0"
+                  >
+                    Apply Next Sunday
+                  </button>
+                </div>
+
+                {/* Window Toggle */}
+                <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800">
+                  <div>
+                    <p className="font-bold text-xs text-slate-800 dark:text-zinc-200">Enable Scheduled Mock Window</p>
+                    <p className="text-[11px] text-slate-500">Locks attempt submissions until starts_at</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={scheduleModal.isScheduled}
+                    onChange={(e) => setScheduleModal({ ...scheduleModal, isScheduled: e.target.checked })}
+                    className="w-5 h-5 rounded text-indigo-600 cursor-pointer"
+                  />
+                </div>
+
+                {/* Date & Time Pickers */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div className="space-y-1">
+                    <label className="font-bold text-slate-700 dark:text-zinc-300">Starts At (Date &amp; Time)</label>
+                    <input
+                      type="datetime-local"
+                      value={scheduleModal.startsAt}
+                      onChange={(e) => setScheduleModal({ ...scheduleModal, startsAt: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs font-mono"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="font-bold text-slate-700 dark:text-zinc-300">Ends At (Date &amp; Time)</label>
+                    <input
+                      type="datetime-local"
+                      value={scheduleModal.endsAt}
+                      onChange={(e) => setScheduleModal({ ...scheduleModal, endsAt: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs font-mono"
+                    />
+                  </div>
+                </div>
+
+                {/* Window Label */}
+                <div className="space-y-1 text-xs">
+                  <label className="font-bold text-slate-700 dark:text-zinc-300">Window Label / Banner Text</label>
+                  <input
+                    type="text"
+                    value={scheduleModal.windowLabel}
+                    onChange={(e) => setScheduleModal({ ...scheduleModal, windowLabel: e.target.value })}
+                    placeholder="e.g. Sunday All-India Live Mock"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs"
+                  />
+                </div>
+
+                {/* Rules Toggles */}
+                <div className="space-y-2 text-xs pt-1">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={scheduleModal.lockLeaderboard}
+                      onChange={(e) => setScheduleModal({ ...scheduleModal, lockLeaderboard: e.target.checked })}
+                      className="w-4 h-4 rounded text-indigo-600"
+                    />
+                    <span>Lock Leaderboard Until Window Closes (prevents peeking at ranks)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={scheduleModal.allowPractice}
+                      onChange={(e) => setScheduleModal({ ...scheduleModal, allowPractice: e.target.checked })}
+                      className="w-4 h-4 rounded text-indigo-600"
+                    />
+                    <span>Allow Practice Attempts After Window Ends</span>
+                  </label>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center justify-between border-t border-slate-100 dark:border-zinc-800 pt-3">
+                  <button
+                    type="button"
+                    onClick={() => handleClearSchedule(scheduleModal.testId)}
+                    className="px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-bold transition-colors"
+                  >
+                    Clear Schedule
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setScheduleModal(null)}
+                      className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 text-xs font-semibold hover:bg-slate-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveSchedule}
+                      className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition-all"
+                    >
+                      Save Schedule
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Warning Confirmation Modal */}
           {confirmModal && (
@@ -11764,6 +12522,719 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       );
     }
 
+    // ==============================================================================
+    // COMPONENT: LeaderboardView (Supabase Live 1st-Attempt All-India Leaderboard)
+    // ==============================================================================
+    function LeaderboardView({ currentUser, setView, openAuth, initialTestId = 'jee-advanced-pta-04', handleSelectTest, testConfigs = {}, detailedConfigs = {} }) {
+      const [activeTab, setActiveTab] = useState('jee-advanced'); // 'jee-advanced' | 'jee-mains' | 'overall'
+      const [selectedTestId, setSelectedTestId] = useState(initialTestId);
+      const [searchQuery, setSearchQuery] = useState('');
+      const [loading, setLoading] = useState(true);
+      const [leaderboardData, setLeaderboardData] = useState(null);
+      const [toppersSummaries, setToppersSummaries] = useState([]);
+      const [overallLeaderboard, setOverallLeaderboard] = useState([]);
+
+      const unlockCountdown = useCountdown(leaderboardData?.locked ? leaderboardData.unlocksAt : null);
+
+      useEffect(() => {
+        if (window.studentStorage?.getTestToppersSummary) {
+          window.studentStorage.getTestToppersSummary().then(s => setToppersSummaries(s || []));
+        }
+      }, []);
+
+      useEffect(() => {
+        if (activeTab !== 'overall') {
+          loadTestLeaderboard(selectedTestId);
+        } else {
+          loadOverallLeaderboard();
+        }
+      }, [selectedTestId, activeTab]);
+
+      const loadTestLeaderboard = async (testId) => {
+        setLoading(true);
+        try {
+          if (window.studentStorage?.getTestLeaderboard) {
+            const res = await window.studentStorage.getTestLeaderboard(testId);
+            setLeaderboardData(res);
+          }
+        } catch (e) {
+          console.warn('Error loading leaderboard:', e);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const loadOverallLeaderboard = async () => {
+        setLoading(true);
+        try {
+          if (window.studentStorage?.getOverallLeaderboard) {
+            const res = await window.studentStorage.getOverallLeaderboard();
+            setOverallLeaderboard(res || []);
+          }
+        } catch (e) {
+          console.warn('Error loading overall leaderboard:', e);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const ptaTests = Array.from({ length: 10 }, (_, i) => {
+        const num = String(i + 1).padStart(2, '0');
+        const tid = 'jee-advanced-pta-' + num;
+        return {
+          testId: tid,
+          code: 'PTA ' + num,
+          title: 'JEE Advanced – PTA ' + num,
+          isLive: ['04', '05', '06'].includes(num) || testConfigs[tid] === 'live'
+        };
+      });
+
+      const ptmTests = Array.from({ length: 10 }, (_, i) => {
+        const num = String(i + 1).padStart(2, '0');
+        const tid = 'jee-mains-ptm-' + num;
+        return {
+          testId: tid,
+          code: 'PTM ' + num,
+          title: 'JEE Mains – PTM ' + num,
+          isLive: testConfigs[tid] === 'live'
+        };
+      });
+
+      const currentTestList = activeTab === 'jee-advanced' ? ptaTests : ptmTests;
+
+      const filteredEntries = (leaderboardData?.entries || []).filter(entry =>
+        (entry.displayName || '').toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      const filteredOverall = overallLeaderboard.filter(entry =>
+        (entry.displayName || '').toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      const formatSeconds = (sec) => {
+        if (!sec || sec <= 0) return '—';
+        const hrs = Math.floor(sec / 3600);
+        const mins = Math.floor((sec % 3600) / 60);
+        if (hrs > 0) return `${hrs}h ${mins}m`;
+        return `${mins}m`;
+      };
+
+      return (
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 py-8 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto space-y-8">
+            
+            {/* Header & Breadcrumb */}
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-zinc-800 pb-4">
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => { setView('home'); window.location.hash = '#/'; }}
+                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+                >
+                  ← Back to Portal Home
+                </button>
+                <span className="text-slate-300 dark:text-zinc-700">/</span>
+                <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400">All-India CBT Rankings</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                  100% Free · NTA Percentile Normalized
+                </span>
+              </div>
+            </div>
+
+            {/* Hero Banner */}
+            <div className="relative rounded-3xl bg-gradient-to-r from-amber-500 via-orange-600 to-indigo-700 p-8 sm:p-10 text-white shadow-xl overflow-hidden">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_70%)] pointer-events-none" />
+              <div className="relative z-10 max-w-2xl space-y-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-black uppercase tracking-wider text-amber-100">
+                  <span>🏆</span> Live All-India CBT Leaderboard
+                </div>
+                <h1 className="text-2xl sm:text-4xl font-black tracking-tight">
+                  Authentic JEE Mains &amp; Advanced Rankings
+                </h1>
+                <p className="text-xs sm:text-sm text-amber-100 leading-relaxed">
+                  Transparent, merit-first peer benchmarking mentored by <strong>Nelov Mallick</strong> (IIT Delhi). Inspect who is on top, exact marks scored, and authentic percentile standings.
+                </p>
+              </div>
+            </div>
+
+            {/* Anti-Cheat & 1st-Attempt Fairness Notice */}
+            <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/60 flex items-start sm:items-center justify-between gap-3 text-xs text-indigo-900 dark:text-indigo-200">
+              <div className="flex items-center gap-2.5">
+                <span className="text-base">⚖️</span>
+                <p>
+                  <strong>1st-Attempt-Only Official Rankings:</strong> Ranks, marks, and percentiles are locked to each student's official 1st attempt. Re-attempts (2nd &amp; 3rd) serve strictly for self-practice and never alter leaderboard standings.
+                </p>
+              </div>
+              <span className="shrink-0 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-600 text-white">
+                Anti-Cheat Protected
+              </span>
+            </div>
+
+            {/* 3 Main View Tabs */}
+            <div className="flex items-center border-b border-slate-200 dark:border-zinc-800 gap-2 sm:gap-4 overflow-x-auto">
+              <button
+                type="button"
+                onClick={() => { setActiveTab('jee-advanced'); setSelectedTestId('jee-advanced-pta-04'); }}
+                className={`flex items-center gap-2 py-3 px-4 font-bold text-xs sm:text-sm border-b-2 transition-all whitespace-nowrap ${
+                  activeTab === 'jee-advanced'
+                    ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/20 rounded-t-xl'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-zinc-200'
+                }`}
+              >
+                <span>🎯</span>
+                <span>JEE Advanced (PTA 01–10)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setActiveTab('jee-mains'); setSelectedTestId('jee-mains-ptm-01'); }}
+                className={`flex items-center gap-2 py-3 px-4 font-bold text-xs sm:text-sm border-b-2 transition-all whitespace-nowrap ${
+                  activeTab === 'jee-mains'
+                    ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/20 rounded-t-xl'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-zinc-200'
+                }`}
+              >
+                <span>⚡</span>
+                <span>JEE Mains (PTM 01–10)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('overall')}
+                className={`flex items-center gap-2 py-3 px-4 font-bold text-xs sm:text-sm border-b-2 transition-all whitespace-nowrap ${
+                  activeTab === 'overall'
+                    ? 'border-amber-500 text-amber-600 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20 rounded-t-xl'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-zinc-200'
+                }`}
+              >
+                <span>👑</span>
+                <span>Overall Portal Toppers (All Tests)</span>
+              </button>
+            </div>
+
+            {/* Paper Selector Pills */}
+            {activeTab !== 'overall' && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs text-slate-500 font-bold px-1">
+                  <span>Select Question Paper:</span>
+                  <span>{currentTestList.filter(t => t.isLive).length} Active Live Papers</span>
+                </div>
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
+                  {currentTestList.map((test) => {
+                    const isSelected = selectedTestId === test.testId;
+                    const summary = toppersSummaries.find(s => s.testId === test.testId);
+                    const participantCount = summary?.totalParticipants || 0;
+
+                    return (
+                      <button
+                        key={test.testId}
+                        type="button"
+                        onClick={() => setSelectedTestId(test.testId)}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 border ${
+                          isSelected
+                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-600/30'
+                            : test.isLive
+                            ? 'bg-white dark:bg-[#121318] text-slate-700 dark:text-zinc-200 border-slate-200 dark:border-zinc-800 hover:border-indigo-400'
+                            : 'bg-slate-100 dark:bg-zinc-900/60 text-slate-400 dark:text-zinc-600 border-dashed border-slate-200 dark:border-zinc-800 opacity-60'
+                        }`}
+                      >
+                        <span>{test.code}</span>
+                        {test.isLive ? (
+                          <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-mono ${
+                            isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400'
+                          }`}>
+                            {participantCount} Students
+                          </span>
+                        ) : (
+                          <span className="text-[9px] text-slate-400">Soon</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* ================================================================= */}
+            {/* VIEW 1 & 2: PER-TEST LEADERBOARD */}
+            {/* ================================================================= */}
+            {activeTab !== 'overall' && (
+              <div className="space-y-8 animate-in fade-in duration-200">
+                
+                {/* Locked Window State Banner */}
+                {leaderboardData?.locked && (
+                  <div className="rounded-3xl border-2 border-amber-500/50 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent p-8 sm:p-10 text-center space-y-5 shadow-xl">
+                    <div className="w-16 h-16 rounded-3xl bg-amber-500/20 text-amber-600 dark:text-amber-400 text-3xl flex items-center justify-center mx-auto shadow-inner">
+                      🔒
+                    </div>
+                    <div className="space-y-2 max-w-lg mx-auto">
+                      <span className="px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-amber-500 text-white">
+                        Live Window Underway
+                      </span>
+                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-zinc-50">
+                        Leaderboard Locked Until Scheduled Window Closes
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 leading-relaxed">
+                        To maintain strict exam integrity during this All-India Live Mock, peer ranks, marks, and percentiles will unlock automatically when the window concludes.
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-800/80 max-w-md mx-auto shadow-sm">
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Unlocks In</p>
+                      <p className="text-2xl sm:text-3xl font-mono font-black text-amber-600 dark:text-amber-400 pt-1">
+                        {unlockCountdown.formatted}
+                      </p>
+                      <p className="text-[11px] text-slate-400 pt-1">
+                        {leaderboardData.totalParticipants} students have submitted their official attempt so far.
+                      </p>
+                    </div>
+
+                    {!leaderboardData.myAttemptSubmitted && (
+                      <div className="pt-2">
+                        <button
+                          type="button"
+                          onClick={() => handleSelectTest ? handleSelectTest(selectedTestId) : (window.location.hash = '#/test/jee-advanced/' + selectedTestId.replace('jee-advanced-', ''))}
+                          className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-lg shadow-indigo-600/30 transition-all hover:scale-105"
+                        >
+                          Attempt Test Now Before Window Closes →
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Unlocked Content */}
+                {!leaderboardData?.locked && (
+                  <>
+                    {/* 1. TOP 3 CROWNED PODIUM */}
+                    {leaderboardData?.entries && leaderboardData.entries.length > 0 && (
+                      <div className="space-y-4">
+                        <div className="text-center space-y-1">
+                          <span className="px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wider uppercase bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300">
+                            Top 3 Performers
+                          </span>
+                          <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-zinc-50">
+                            Crowned Toppers Podium
+                          </h3>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end pt-4 max-w-4xl mx-auto">
+                          
+                          {/* #2 Runner-Up Podium Card (Silver) */}
+                          {leaderboardData.entries[1] ? (
+                            <Tilt3DCard maxTilt={8} perspective={1000} className="rounded-3xl border-2 border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#121318] p-6 shadow-lg text-center space-y-4 md:order-1 order-2">
+                              <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 text-xl font-black flex items-center justify-center mx-auto shadow-sm">
+                                🥈 #2
+                              </div>
+                              <div>
+                                <h4 className="text-base font-extrabold text-slate-900 dark:text-zinc-100 line-clamp-1">
+                                  {leaderboardData.entries[1].displayName}
+                                </h4>
+                                <p className="text-[11px] font-bold text-slate-500">Runner-Up</p>
+                              </div>
+                              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 space-y-1">
+                                <div className="text-2xl font-black font-mono text-slate-800 dark:text-zinc-200">
+                                  {leaderboardData.entries[1].marks} <span className="text-xs text-slate-400">/ {leaderboardData.entries[1].maxMarks}</span>
+                                </div>
+                                <div className="flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                  <span>{leaderboardData.entries[1].percentile}%ile</span>
+                                  <span>·</span>
+                                  <span>{leaderboardData.entries[1].accuracy}% Acc</span>
+                                </div>
+                              </div>
+                              <p className="text-[10px] text-slate-400">
+                                Time Taken: {formatSeconds(leaderboardData.entries[1].timeTakenSeconds)}
+                              </p>
+                            </Tilt3DCard>
+                          ) : (
+                            <div className="hidden md:block md:order-1" />
+                          )}
+
+                          {/* #1 Topper Podium Card (Gold Crown, Elevated) */}
+                          {leaderboardData.entries[0] && (
+                            <Tilt3DCard maxTilt={10} perspective={1000} className="rounded-3xl border-2 border-amber-500 bg-gradient-to-b from-amber-500/10 via-white dark:via-[#121318] to-white dark:to-[#121318] p-7 shadow-2xl text-center space-y-4 md:order-2 order-1 md:-translate-y-4 ring-4 ring-amber-500/10">
+                              <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-amber-400 to-amber-600 text-white text-3xl font-black flex items-center justify-center mx-auto shadow-lg shadow-amber-500/30 animate-bounce">
+                                👑
+                              </div>
+                              <span className="px-3 py-1 rounded-full text-xs font-black uppercase bg-amber-500 text-white shadow-sm">
+                                Rank #1 Topper
+                              </span>
+                              <div>
+                                <h4 className="text-lg font-black text-slate-900 dark:text-zinc-50 line-clamp-1">
+                                  {leaderboardData.entries[0].displayName}
+                                </h4>
+                                <p className="text-xs font-bold text-amber-600 dark:text-amber-400">All-India #1 Scorer</p>
+                              </div>
+                              <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/80 space-y-1">
+                                <div className="text-3xl font-black font-mono text-amber-600 dark:text-amber-400">
+                                  {leaderboardData.entries[0].marks} <span className="text-sm text-slate-500 font-semibold">/ {leaderboardData.entries[0].maxMarks}</span>
+                                </div>
+                                <div className="flex items-center justify-center gap-2 text-xs font-extrabold text-emerald-600 dark:text-emerald-400">
+                                  <span>{leaderboardData.entries[0].percentile}%ile</span>
+                                  <span>·</span>
+                                  <span>{leaderboardData.entries[0].accuracy}% Acc</span>
+                                </div>
+                              </div>
+                              <p className="text-[10px] text-slate-500 dark:text-zinc-400">
+                                Pacing: {formatSeconds(leaderboardData.entries[0].timeTakenSeconds)}
+                              </p>
+                            </Tilt3DCard>
+                          )}
+
+                          {/* #3 Bronze Podium Card */}
+                          {leaderboardData.entries[2] ? (
+                            <Tilt3DCard maxTilt={8} perspective={1000} className="rounded-3xl border-2 border-amber-700/50 dark:border-amber-700/40 bg-white dark:bg-[#121318] p-6 shadow-lg text-center space-y-4 md:order-3 order-3">
+                              <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-xl font-black flex items-center justify-center mx-auto shadow-sm">
+                                🥉 #3
+                              </div>
+                              <div>
+                                <h4 className="text-base font-extrabold text-slate-900 dark:text-zinc-100 line-clamp-1">
+                                  {leaderboardData.entries[2].displayName}
+                                </h4>
+                                <p className="text-[11px] font-bold text-slate-500">2nd Runner-Up</p>
+                              </div>
+                              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 space-y-1">
+                                <div className="text-2xl font-black font-mono text-slate-800 dark:text-zinc-200">
+                                  {leaderboardData.entries[2].marks} <span className="text-xs text-slate-400">/ {leaderboardData.entries[2].maxMarks}</span>
+                                </div>
+                                <div className="flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                  <span>{leaderboardData.entries[2].percentile}%ile</span>
+                                  <span>·</span>
+                                  <span>{leaderboardData.entries[2].accuracy}% Acc</span>
+                                </div>
+                              </div>
+                              <p className="text-[10px] text-slate-400">
+                                Time Taken: {formatSeconds(leaderboardData.entries[2].timeTakenSeconds)}
+                              </p>
+                            </Tilt3DCard>
+                          ) : (
+                            <div className="hidden md:block md:order-3" />
+                          )}
+
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 2. YOUR OFFICIAL STANDING CARD (HIGHLIGHTED) */}
+                    <div className="rounded-3xl border-2 border-indigo-600 bg-white dark:bg-[#121318] p-6 sm:p-8 shadow-xl shadow-indigo-600/5 space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-zinc-800 pb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white font-black text-lg flex items-center justify-center shadow-md">
+                            👤
+                          </div>
+                          <div>
+                            <h4 className="text-base font-extrabold text-slate-900 dark:text-zinc-50">
+                              Your Official 1st-Attempt Standing
+                            </h4>
+                            <p className="text-xs text-slate-500">
+                              Benchmarked against {leaderboardData?.totalParticipants || 0} active JEE aspirants
+                            </p>
+                          </div>
+                        </div>
+
+                        {leaderboardData?.myStanding && (
+                          <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 self-start sm:self-auto">
+                            Official Entry Verified
+                          </span>
+                        )}
+                      </div>
+
+                      {leaderboardData?.myStanding ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800">
+                            <p className="text-[11px] font-bold text-slate-400 uppercase">Your Rank</p>
+                            <p className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 pt-1">
+                              #{leaderboardData.myStanding.rank}
+                            </p>
+                            <p className="text-[10px] text-slate-400">of {leaderboardData.totalParticipants} students</p>
+                          </div>
+
+                          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800">
+                            <p className="text-[11px] font-bold text-slate-400 uppercase">Your Marks</p>
+                            <p className="text-2xl sm:text-3xl font-black font-mono text-slate-900 dark:text-zinc-100 pt-1">
+                              {leaderboardData.myStanding.marks}
+                            </p>
+                            <p className="text-[10px] text-slate-400">out of {leaderboardData.myStanding.maxMarks} marks</p>
+                          </div>
+
+                          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800">
+                            <p className="text-[11px] font-bold text-slate-400 uppercase">Your Percentile</p>
+                            <p className="text-2xl sm:text-3xl font-black font-mono text-emerald-600 dark:text-emerald-400 pt-1">
+                              {leaderboardData.myStanding.percentile}%ile
+                            </p>
+                            <p className="text-[10px] text-slate-400">NTA Normalized Formula</p>
+                          </div>
+
+                          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800">
+                            <p className="text-[11px] font-bold text-slate-400 uppercase">Gap to #1 Topper</p>
+                            <p className="text-2xl sm:text-3xl font-black font-mono text-slate-900 dark:text-zinc-100 pt-1">
+                              {leaderboardData.topper ? (
+                                leaderboardData.topper.marks - leaderboardData.myStanding.marks <= 0 ? (
+                                  <span className="text-emerald-600 text-lg font-bold">👑 You are #1</span>
+                                ) : (
+                                  `-${leaderboardData.topper.marks - leaderboardData.myStanding.marks} Mks`
+                                )
+                              ) : '—'}
+                            </p>
+                            <p className="text-[10px] text-slate-400">
+                              {leaderboardData.topper ? `Leader: ${leaderboardData.topper.displayName}` : ''}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-6 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/60 dark:border-indigo-800/40 text-center space-y-3">
+                          <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300">
+                            You haven't attempted this paper yet. Submit your 1st attempt to benchmark your standing on the official All-India Leaderboard!
+                          </p>
+                          <div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (!currentUser && openAuth) {
+                                  openAuth('login', '#/leaderboard/' + selectedTestId);
+                                } else if (handleSelectTest) {
+                                  handleSelectTest(selectedTestId);
+                                }
+                              }}
+                              className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/20 transition-all hover:scale-105"
+                            >
+                              Attempt Test Now →
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 3. FULL RANKINGS TABLE */}
+                    <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 shadow-sm space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                          <h3 className="text-lg font-black text-slate-900 dark:text-zinc-50">
+                            Official Rankings ({filteredEntries.length} Ranked)
+                          </h3>
+                          <p className="text-xs text-slate-500">
+                            Sorted by Score (Desc) · Accuracy (Desc) · Time Taken (Asc)
+                          </p>
+                        </div>
+
+                        <input
+                          type="text"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          placeholder="Search student name..."
+                          className="px-4 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs w-full sm:w-64"
+                        />
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-50 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-500 uppercase font-bold text-[10px]">
+                            <tr>
+                              <th className="p-3.5">Rank</th>
+                              <th className="p-3.5">Student Name</th>
+                              <th className="p-3.5 text-center">Marks Scored</th>
+                              <th className="p-3.5 text-center">Percentile</th>
+                              <th className="p-3.5 text-center">Accuracy</th>
+                              <th className="p-3.5 text-right">Time Taken</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 dark:divide-zinc-800">
+                            {loading ? (
+                              <tr>
+                                <td colSpan={6} className="p-12 text-center text-slate-400">
+                                  <div className="inline-block animate-spin text-2xl pb-2">⟳</div>
+                                  <p>Loading All-India rankings...</p>
+                                </td>
+                              </tr>
+                            ) : filteredEntries.length === 0 ? (
+                              <tr>
+                                <td colSpan={6} className="p-12 text-center text-slate-400 italic">
+                                  No official test attempts recorded for this paper yet. Be the first to claim Rank #1!
+                                </td>
+                              </tr>
+                            ) : (
+                              filteredEntries.map((row) => (
+                                <tr
+                                  key={row.rank + row.displayName}
+                                  className={`transition-colors ${
+                                    row.isCurrentUser
+                                      ? 'bg-indigo-50/70 dark:bg-indigo-950/40 font-bold'
+                                      : 'hover:bg-slate-50 dark:hover:bg-zinc-900/40'
+                                  }`}
+                                >
+                                  <td className="p-3.5 font-bold font-mono">
+                                    {row.rank === 1 ? (
+                                      <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white font-black text-[10px]">
+                                        👑 #1
+                                      </span>
+                                    ) : row.rank === 2 ? (
+                                      <span className="px-2 py-0.5 rounded-full bg-slate-300 dark:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-black text-[10px]">
+                                        🥈 #2
+                                      </span>
+                                    ) : row.rank === 3 ? (
+                                      <span className="px-2 py-0.5 rounded-full bg-amber-700 text-white font-black text-[10px]">
+                                        🥉 #3
+                                      </span>
+                                    ) : (
+                                      `#${row.rank}`
+                                    )}
+                                  </td>
+                                  <td className="p-3.5">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-slate-900 dark:text-zinc-100">{row.displayName}</span>
+                                      {row.isCurrentUser && (
+                                        <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-indigo-600 text-white">
+                                          You
+                                        </span>
+                                      )}
+                                      {row.attemptedInLiveWindow && (
+                                        <span className="px-1.5 py-0.2 rounded text-[8px] font-extrabold uppercase bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                                          Live Window
+                                        </span>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="p-3.5 text-center font-mono font-bold">
+                                    {row.marks} <span className="text-slate-400 font-normal">/ {row.maxMarks}</span>
+                                  </td>
+                                  <td className="p-3.5 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                    {row.percentile}%ile
+                                  </td>
+                                  <td className="p-3.5 text-center font-mono text-slate-600 dark:text-zinc-300">
+                                    {row.accuracy}%
+                                  </td>
+                                  <td className="p-3.5 text-right font-mono text-slate-500">
+                                    {formatSeconds(row.timeTakenSeconds)}
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* ================================================================= */}
+            {/* VIEW 3: OVERALL PORTAL TOPPERS */}
+            {/* ================================================================= */}
+            {activeTab === 'overall' && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 shadow-sm space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-lg font-black text-slate-900 dark:text-zinc-50 flex items-center gap-2">
+                        <span>👑 Overall CBT Champions (Multi-Test Aggregation)</span>
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Ranked by Average Percentile across all official 1st attempts.
+                      </p>
+                    </div>
+
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search candidate name..."
+                      className="px-4 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs w-full sm:w-64"
+                    />
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-50 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-500 uppercase font-bold text-[10px]">
+                        <tr>
+                          <th className="p-3.5">Rank</th>
+                          <th className="p-3.5">Student Name</th>
+                          <th className="p-3.5 text-center">Papers Attempted</th>
+                          <th className="p-3.5 text-center">Avg Percentile</th>
+                          <th className="p-3.5 text-center">Avg Marks %</th>
+                          <th className="p-3.5 text-right">Total Marks Scored</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-zinc-800">
+                        {loading ? (
+                          <tr>
+                            <td colSpan={6} className="p-12 text-center text-slate-400">
+                              <div className="inline-block animate-spin text-2xl pb-2">⟳</div>
+                              <p>Loading Overall Champions...</p>
+                            </td>
+                          </tr>
+                        ) : filteredOverall.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} className="p-12 text-center text-slate-400 italic">
+                              No candidate aggregations available yet.
+                            </td>
+                          </tr>
+                        ) : (
+                          filteredOverall.map((row) => (
+                            <tr
+                              key={row.rank + row.displayName}
+                              className={`transition-colors ${
+                                row.isCurrentUser
+                                  ? 'bg-amber-50/70 dark:bg-amber-950/40 font-bold'
+                                  : 'hover:bg-slate-50 dark:hover:bg-zinc-900/40'
+                              }`}
+                            >
+                              <td className="p-3.5 font-bold font-mono">
+                                {row.rank === 1 ? (
+                                  <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white font-black text-[10px]">
+                                    👑 #1
+                                  </span>
+                                ) : row.rank === 2 ? (
+                                  <span className="px-2 py-0.5 rounded-full bg-slate-300 dark:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-black text-[10px]">
+                                    🥈 #2
+                                  </span>
+                                ) : row.rank === 3 ? (
+                                  <span className="px-2 py-0.5 rounded-full bg-amber-700 text-white font-black text-[10px]">
+                                    🥉 #3
+                                  </span>
+                                ) : (
+                                  `#${row.rank}`
+                                )}
+                              </td>
+                              <td className="p-3.5">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-slate-900 dark:text-zinc-100">{row.displayName}</span>
+                                  {row.isCurrentUser && (
+                                    <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-amber-600 text-white">
+                                      You
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="p-3.5 text-center font-mono font-bold">
+                                {row.testsAttempted} Tests
+                              </td>
+                              <td className="p-3.5 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                {row.avgPercentile}%ile
+                              </td>
+                              <td className="p-3.5 text-center font-mono text-slate-600 dark:text-zinc-300">
+                                {row.avgMarksPercent}%
+                              </td>
+                              <td className="p-3.5 text-right font-mono font-bold text-slate-900 dark:text-zinc-100">
+                                {row.totalMarksScored} <span className="text-slate-400 font-normal">/ {row.totalMaxMarks}</span>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
+      );
+    }
+
     // MAIN APP COMPONENT
     function NelovMallickApp() {
       const [view, setView] = useState('home'); // 'home' | 'instructions' | 'exam' | 'result' | 'progress' | 'notebook'
@@ -11798,6 +13269,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         'jee-advanced-pta-05': 'live',
         'jee-advanced-pta-06': 'live'
       });
+      const [activeLeaderboardTestId, setActiveLeaderboardTestId] = useState('jee-advanced-pta-04');
+      const [detailedConfigs, setDetailedConfigs] = useState({});
+      const [toppersSummaries, setToppersSummaries] = useState([]);
 
       // Synchronize active authentication state from authStore & Supabase in real time
       useEffect(() => {
@@ -11821,6 +13295,16 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           window.studentStorage.getTestConfigs().then(cfg => {
             if (cfg) setTestConfigs(cfg);
           });
+        }
+        if (window.studentStorage?.getTestConfigsDetails) {
+          window.studentStorage.getTestConfigsDetails().then(d => {
+            const map = {};
+            (d || []).forEach(item => { map[item.testId] = item; });
+            setDetailedConfigs(map);
+          });
+        }
+        if (window.studentStorage?.getTestToppersSummary) {
+          window.studentStorage.getTestToppersSummary().then(s => setToppersSummaries(s || []));
         }
         const handleConfigChange = () => {
           if (window.studentStorage?.getTestConfigs) {
@@ -12123,6 +13607,16 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return;
         }
 
+        if (hash === '#/leaderboard' || hash === '#leaderboard' || hash.startsWith('#/leaderboard/') || hash.startsWith('#leaderboard/')) {
+          const parts = hash.split('/');
+          if (parts.length > 2 && parts[2]) {
+            setActiveLeaderboardTestId(parts[2]);
+          }
+          setView('leaderboard');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+
         if (hash === '#/notebook' || hash === '#notebook') {
           if (!activeUser) {
             openAuth('login', '#/notebook', 'Sign in or create a free account to access your personal Revision Notebook.');
@@ -12284,6 +13778,23 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         // Check if test is coming soon
         const all = window.allTests || [];
         const meta = window.getTestById ? window.getTestById(canonicalId) : all.find(t => t.id === canonicalId);
+        // Check Scheduled Mock Window start-time guard
+        const sched = detailedConfigs[canonicalId];
+        if (sched && sched.isScheduledWindow && sched.startsAt) {
+          const startTime = new Date(sched.startsAt).getTime();
+          const isAdmin = user.email && ['mallicknelov@gmail.com', 'nelovmallick@gmail.com'].includes(user.email.toLowerCase()) || user.role === 'admin';
+          if (startTime > Date.now() && !isAdmin) {
+            setNoticeModal({
+              title: '⏰ Scheduled All-India Mock Window',
+              message: `This official mock test window opens on ${formatIST(sched.startsAt)}. Submissions will be unlocked for all candidates as soon as the test begins.`,
+              activeCategory: meta ? meta.examCategory : 'jee-advanced',
+              isScheduled: true,
+              startsAt: sched.startsAt
+            });
+            return;
+          }
+        }
+
         const configuredStatus = testConfigs[canonicalId] || (meta ? meta.status : 'live');
         if (configuredStatus === 'coming_soon') {
           setNoticeModal({
@@ -12480,6 +13991,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           unattemptedCount: evalResults.unattemptedCount,
           predictedAirDisplay: evalResults.rankPrediction ? evalResults.rankPrediction.predictedAirDisplay : 'N/A',
           tierLabel: evalResults.rankPrediction ? evalResults.rankPrediction.tierLabel : 'N/A',
+          timeTakenSeconds: 180 * 60 - timeLeft,
           completedAt: new Date().toISOString(),
           subjectStats: evalResults.subjectStats,
           timeAnalysis: evalResults.timeAnalysis,
@@ -13366,6 +14878,15 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               {/* 1. ESTIMATED JEE RANK PREDICTOR CARD */}
               <RankPredictorCard prediction={ev.rankPrediction} candidateName={candidateName} />
 
+              {/* LIVE ALL-INDIA CBT LEADERBOARD & TOPPERS COMPARISON CARD */}
+              <LiveLeaderboardResultsCard
+                currentPaper={currentPaper}
+                candidateName={candidateName}
+                evaluationData={ev}
+                currentUser={currentUser}
+                setView={setView}
+              />
+
               {/* 2. GRAPHICAL PERFORMANCE ANALYSIS DASHBOARD */}
               <div className="space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-slate-200 dark:border-zinc-800 pb-3">
@@ -13852,6 +15373,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               setView={setView}
               testConfigs={testConfigs}
               setTestConfigs={setTestConfigs}
+              detailedConfigs={detailedConfigs}
+              setDetailedConfigs={setDetailedConfigs}
             />
             <AuthModalDialog
               isOpen={authModal.isOpen}
@@ -14291,6 +15814,45 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         );
       }
 
+      if (view === 'leaderboard') {
+        return (
+          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
+            <MainNavbar
+              currentUser={currentUser}
+              activeCategory={activeCategory}
+              setActiveCategory={setActiveCategory}
+              isDark={isDark}
+              setIsDark={setIsDark}
+              openAuth={openAuth}
+              handleLogOut={handleLogOut}
+              setView={setView}
+              view={view}
+              userDropdownOpen={userDropdownOpen}
+              setUserDropdownOpen={setUserDropdownOpen}
+            />
+            <LeaderboardView
+              currentUser={currentUser}
+              setView={setView}
+              openAuth={openAuth}
+              initialTestId={activeLeaderboardTestId || 'jee-advanced-pta-04'}
+              handleSelectTest={handleSelectTest}
+              testConfigs={testConfigs}
+              detailedConfigs={detailedConfigs}
+            />
+            <PlatformFooter onOpenAuth={openAuth} />
+            <AuthModalDialog
+              isOpen={authModal.isOpen}
+              mode={authModal.mode}
+              redirectUrl={authModal.redirectUrl}
+              message={authModal.message}
+              onClose={closeAuth}
+              onAuthSuccess={handleAuthSuccess}
+            />
+            <StorageNoticeBanner />
+          </div>
+        );
+      }
+
       // -------------------------------------------------------------
       // RENDER: HOMEPAGE (Default View)
       // -------------------------------------------------------------
@@ -14657,6 +16219,40 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   </span>
                 </div>
 
+                {/* LIVE ALL-INDIA LEADERBOARDS & TOPPERS SHOWCASE STRIP */}
+                <div className="max-w-6xl mx-auto p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-amber-500/15 via-indigo-600/10 to-amber-500/15 border-2 border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white text-xl flex items-center justify-center font-black shadow-md shadow-amber-500/30">
+                      🏆
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-black text-slate-900 dark:text-zinc-50">
+                          Supabase Live All-India CBT Leaderboard
+                        </h4>
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-amber-500 text-white">
+                          Live &amp; Verified
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-zinc-400">
+                        1st-attempt official rankings, exact marks, and official NTA percentiles mentored by Nelov Mallick (IIT Delhi).
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setView('leaderboard');
+                      window.location.hash = '#/leaderboard';
+                    }}
+                    className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs shadow-md shadow-amber-500/30 transition-all flex items-center gap-1.5 shrink-0 hover:scale-105"
+                  >
+                    <span>View All Toppers &amp; Standings</span>
+                    <span>→</span>
+                  </button>
+                </div>
+
                 {/* 10 Tests Grid (Numbered PTA 01 -> PTA 10) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
                   {activeCategoryList.map((t) => {
@@ -14681,16 +16277,14 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                               {t.code}
                             </span>
 
-                            {isLive ? (
-                              <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-500 text-white shadow-sm flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                                Live Now · Free
-                              </span>
-                            ) : (
-                              <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700">
-                                Coming Soon
-                              </span>
-                            )}
+                            <MockWindowBadge
+                              isScheduled={detailedConfigs[t.id]?.isScheduledWindow}
+                              startsAt={detailedConfigs[t.id]?.startsAt}
+                              endsAt={detailedConfigs[t.id]?.endsAt}
+                              windowLabel={detailedConfigs[t.id]?.windowLabel}
+                              isLive={isLive}
+                              allowPractice={detailedConfigs[t.id]?.allowPracticeAfterEnd ?? true}
+                            />
                           </div>
 
                           {/* Title & Description */}
@@ -14720,8 +16314,27 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           </div>
                         </div>
 
+                        {/* Toppers Mini-Strip */}
+                          {(() => {
+                            const summary = toppersSummaries.find(s => s.testId === t.id);
+                            if (!summary || !summary.topper_name || summary.is_locked) return null;
+                            return (
+                              <div className="p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between text-xs">
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  <span className="text-amber-500 shrink-0">🏆</span>
+                                  <span className="font-bold text-slate-800 dark:text-zinc-200 truncate">
+                                    Topper: {summary.topper_name}
+                                  </span>
+                                </div>
+                                <span className="font-mono font-extrabold text-amber-600 dark:text-amber-400 shrink-0">
+                                  {summary.topper_marks}/{summary.max_marks} ({summary.topper_percentile}%ile)
+                                </span>
+                              </div>
+                            );
+                          })()}
+
                         {/* Card CTA */}
-                        <div className="pt-6">
+                        <div className="pt-6 space-y-2">
                           {isLive ? (
                             <button
                               type="button"
@@ -14738,6 +16351,20 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                               className="w-full py-3 rounded-xl font-semibold text-xs border border-slate-200 dark:border-zinc-700 text-slate-400 dark:text-zinc-500 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
                             >
                               Coming Soon · Upload Slot
+                            </button>
+                          )}
+
+                          {isLive && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveLeaderboardTestId(t.id);
+                                setView('leaderboard');
+                                window.location.hash = `#/leaderboard/${t.id}`;
+                              }}
+                              className="w-full py-2 rounded-xl font-bold text-xs border border-amber-300 dark:border-amber-700/60 bg-amber-50/60 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-950/40 transition-colors flex items-center justify-center gap-1.5"
+                            >
+                              <span>🏆 View Leaderboard &amp; Toppers</span>
                             </button>
                           )}
                         </div>
@@ -15000,7 +16627,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
               <div className="w-full max-w-md rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 sm:p-8 shadow-2xl space-y-5">
                 <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-2xl flex items-center justify-center mx-auto shadow-md">
-                  📄
+                  {noticeModal.isScheduled ? '⏰' : '📄'}
                 </div>
                 <div className="text-center space-y-2">
                   <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-50">
@@ -15011,16 +16638,30 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   </p>
                 </div>
                 <div className="pt-2 flex flex-col gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setNoticeModal(null);
-                      handleSelectTest('jee-advanced-pta-04');
-                    }}
-                    className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all"
-                  >
-                    Start Live Test PTA 04 Now
-                  </button>
+                  {noticeModal.isScheduled ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNoticeModal(null);
+                        setView('leaderboard');
+                        window.location.hash = '#/leaderboard';
+                      }}
+                      className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <span>🏆 View Live Leaderboard & Standings</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNoticeModal(null);
+                        handleSelectTest('jee-advanced-pta-04');
+                      }}
+                      className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all"
+                    >
+                      Start Live Test PTA 04 Now
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => setNoticeModal(null)}

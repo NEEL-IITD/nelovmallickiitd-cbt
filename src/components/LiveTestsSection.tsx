@@ -1,12 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { jeeMainsTests, jeeAdvancedTests } from '../data/testsIndex';
+import { studentStorage } from '../utils/studentStorage';
+import { TopperSummaryItem } from '../types';
+import { MockWindowBadge } from './MockWindowBadge';
 
 interface LiveTestsSectionProps {
   onSelectTest?: (testId: string) => void;
+  onOpenLeaderboard?: (testId: string) => void;
 }
 
-export const LiveTestsSection: React.FC<LiveTestsSectionProps> = ({ onSelectTest }) => {
+export const LiveTestsSection: React.FC<LiveTestsSectionProps> = ({ onSelectTest, onOpenLeaderboard }) => {
   const [activeCategory, setActiveCategory] = useState<'jee-advanced' | 'jee-mains'>('jee-advanced');
+  const [toppersSummaries, setToppersSummaries] = useState<TopperSummaryItem[]>([]);
+  const [testConfigs, setTestConfigs] = useState<Record<string, any>>({});
+
+  useEffect(() => {
+    loadSummaries();
+  }, []);
+
+  const loadSummaries = async () => {
+    try {
+      const summaries = await studentStorage.getTestToppersSummary();
+      setToppersSummaries(summaries);
+      const configs = await studentStorage.getTestConfigs();
+      setTestConfigs(configs);
+    } catch (e) {
+      console.warn('Could not load toppers summary in LiveTestsSection:', e);
+    }
+  };
 
   const testsList = activeCategory === 'jee-advanced' ? jeeAdvancedTests : jeeMainsTests;
 
@@ -83,7 +104,8 @@ export const LiveTestsSection: React.FC<LiveTestsSectionProps> = ({ onSelectTest
         {/* 10 Test Cards Grid (PTA 01 to PTA 10) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {testsList.map((test) => {
-            const isLive = test.status === 'live';
+            const isLive = test.status === 'live' || testConfigs[test.id] === 'live';
+            const summary = toppersSummaries.find((s) => s.testId === test.id);
 
             return (
               <div
@@ -101,16 +123,13 @@ export const LiveTestsSection: React.FC<LiveTestsSectionProps> = ({ onSelectTest
                       {test.code}
                     </span>
 
-                    {isLive ? (
-                      <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-500 text-white shadow-sm flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                        Live Now · Free
-                      </span>
-                    ) : (
-                      <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700">
-                        Coming Soon
-                      </span>
-                    )}
+                    <MockWindowBadge
+                      isScheduled={summary?.isScheduledWindow}
+                      startsAt={summary?.startsAt}
+                      endsAt={summary?.endsAt}
+                      windowLabel={summary?.windowLabel}
+                      isLive={isLive}
+                    />
                   </div>
 
                   <div>
@@ -121,6 +140,21 @@ export const LiveTestsSection: React.FC<LiveTestsSectionProps> = ({ onSelectTest
                       {test.description}
                     </p>
                   </div>
+
+                  {/* Topper Mini-Strip (Who is on Top) */}
+                  {isLive && summary && !summary.isLocked && summary.topperName && (
+                    <div className="p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1.5 truncate">
+                        <span className="text-sm">🏆</span>
+                        <span className="font-bold text-amber-800 dark:text-amber-300 truncate">
+                          Topper: {summary.topperName}
+                        </span>
+                      </div>
+                      <div className="font-mono font-black text-amber-700 dark:text-amber-400 shrink-0 pl-2">
+                        {summary.topperMarks}/{summary.maxMarks} ({summary.topperPercentile}%ile)
+                      </div>
+                    </div>
+                  )}
 
                   {/* Metrics */}
                   <div className="grid grid-cols-3 gap-1.5 py-3 border-y border-slate-100 dark:border-zinc-800 text-center">
@@ -139,16 +173,26 @@ export const LiveTestsSection: React.FC<LiveTestsSectionProps> = ({ onSelectTest
                   </div>
                 </div>
 
-                <div className="pt-6">
+                <div className="pt-6 space-y-2">
                   {isLive ? (
-                    <button
-                      type="button"
-                      onClick={() => onSelectTest ? onSelectTest(test.id) : (window.location.hash = `#/test/${test.id}`)}
-                      className="w-full py-3.5 rounded-xl font-bold text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-1.5"
-                    >
-                      <span>Attempt Test Free</span>
-                      <span>→</span>
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => onSelectTest ? onSelectTest(test.id) : (window.location.hash = `#/test/${test.id}`)}
+                        className="w-full py-3.5 rounded-xl font-bold text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-1.5"
+                      >
+                        <span>Attempt Test Free</span>
+                        <span>→</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => onOpenLeaderboard ? onOpenLeaderboard(test.id) : (window.location.hash = `#/leaderboard/${test.id}`)}
+                        className="w-full py-2.5 rounded-xl font-bold text-xs bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 transition-all flex items-center justify-center gap-1.5"
+                      >
+                        <span>🏆 View Leaderboard &amp; Toppers ({summary?.totalParticipants || 0})</span>
+                      </button>
+                    </>
                   ) : (
                     <button
                       type="button"

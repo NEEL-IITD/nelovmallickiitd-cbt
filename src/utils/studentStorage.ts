@@ -5,7 +5,17 @@
 // ==============================================================================
 
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { ErrorReportItem, ErrorReportStatus, ErrorIssueType, MistakeTagType } from '../types';
+import { 
+  ErrorReportItem, 
+  ErrorReportStatus, 
+  ErrorIssueType, 
+  MistakeTagType,
+  LeaderboardEntry,
+  LeaderboardResult,
+  OverallLeaderboardEntry,
+  TopperSummaryItem,
+  TestConfigItem
+} from '../types';
 import { authService } from '../services/authService';
 
 export interface TestAttemptRecord {
@@ -506,6 +516,268 @@ export const studentStorage = {
       current[testId] = status;
       localStorage.setItem('nelov_test_configs_overrides', JSON.stringify(current));
     } catch (e) {}
+  },
+
+  async getTestConfigsDetails(): Promise<TestConfigItem[]> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.from('test_configs').select('*');
+        if (!error && data) {
+          return data.map((d: any) => ({
+            testId: d.test_id,
+            examType: d.exam_type,
+            code: d.code,
+            title: d.title,
+            status: d.status,
+            isScheduledWindow: d.is_scheduled_window || false,
+            startsAt: d.starts_at || null,
+            endsAt: d.ends_at || null,
+            windowLabel: d.window_label || null,
+            lockLeaderboardUntilEnd: d.lock_leaderboard_until_end ?? true,
+            allowPracticeAfterEnd: d.allow_practice_after_end ?? true,
+            updatedAt: d.updated_at
+          }));
+        }
+      } catch (e) {}
+    }
+    return [];
+  },
+
+  async updateTestSchedule(
+    testId: string, 
+    scheduleData: {
+      is_scheduled_window: boolean;
+      starts_at: string | null;
+      ends_at: string | null;
+      window_label: string | null;
+      lock_leaderboard_until_end: boolean;
+      allow_practice_after_end: boolean;
+    }
+  ): Promise<boolean> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { error } = await supabase
+          .from('test_configs')
+          .update({
+            ...scheduleData,
+            updated_at: new Date().toISOString()
+          })
+          .eq('test_id', testId);
+        if (error) {
+          console.error('[Supabase] updateTestSchedule error:', error);
+          return false;
+        }
+      } catch (e) {
+        console.error('[Supabase] updateTestSchedule error:', e);
+      }
+    }
+
+    try {
+      const local = localStorage.getItem('nelov_test_schedules') || '{}';
+      const parsed = JSON.parse(local);
+      parsed[testId] = scheduleData;
+      localStorage.setItem('nelov_test_schedules', JSON.stringify(parsed));
+      window.dispatchEvent(new CustomEvent('nelov_test_configs_changed', { detail: { testId, scheduleData } }));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  },
+
+  async getTestLeaderboard(testId: string): Promise<LeaderboardResult> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.rpc('get_test_leaderboard', { p_test_id: testId });
+        if (!error && data) {
+          return {
+            locked: data.locked || false,
+            unlocksAt: data.unlocks_at || null,
+            totalParticipants: data.total_participants || 0,
+            averageMarks: data.average_marks || 0,
+            highestMarks: data.highest_marks || 0,
+            topper: data.topper ? {
+              rank: data.topper.rank,
+              displayName: data.topper.display_name,
+              marks: data.topper.marks,
+              maxMarks: data.topper.max_marks,
+              percentage: data.topper.percentage,
+              percentile: data.topper.percentile,
+              accuracy: data.topper.accuracy,
+              timeTakenSeconds: data.topper.time_taken_seconds,
+              submittedAt: data.topper.submitted_at,
+              attemptedInLiveWindow: data.topper.attempted_in_live_window,
+              isCurrentUser: data.topper.is_current_user
+            } : null,
+            myStanding: data.my_standing ? {
+              rank: data.my_standing.rank,
+              displayName: data.my_standing.display_name,
+              marks: data.my_standing.marks,
+              maxMarks: data.my_standing.max_marks,
+              percentage: data.my_standing.percentage,
+              percentile: data.my_standing.percentile,
+              accuracy: data.my_standing.accuracy,
+              timeTakenSeconds: data.my_standing.time_taken_seconds,
+              submittedAt: data.my_standing.submitted_at,
+              attemptedInLiveWindow: data.my_standing.attempted_in_live_window,
+              isCurrentUser: data.my_standing.is_current_user
+            } : null,
+            entries: (data.entries || []).map((e: any) => ({
+              rank: e.rank,
+              displayName: e.display_name,
+              marks: e.marks,
+              maxMarks: e.max_marks,
+              percentage: e.percentage,
+              percentile: e.percentile,
+              accuracy: e.accuracy,
+              timeTakenSeconds: e.time_taken_seconds,
+              submittedAt: e.submitted_at,
+              attemptedInLiveWindow: e.attempted_in_live_window,
+              isCurrentUser: e.is_current_user
+            })),
+            myAttemptSubmitted: data.my_attempt_submitted
+          };
+        }
+      } catch (e) {
+        console.warn('[Supabase] get_test_leaderboard rpc fallback:', e);
+      }
+    }
+
+    return await this.calculateLocalTestLeaderboard(testId);
+  },
+
+  async calculateLocalTestLeaderboard(testId: string): Promise<LeaderboardResult> {
+    const all = await this.getAllAttempts();
+    const currentUser = authService.getCurrentUser();
+    const currentUid = currentUser?.id;
+
+    // Filter by testId and pick 1st attempt per user strictly
+    const userAttemptsMap: Record<string, any> = {};
+    (all || [])
+      .filter((a: any) => (a.testId === testId || a.testCode === testId || a.code === testId))
+      .sort((a: any, b: any) => new Date(a.completedAt || a.submitted_at).getTime() - new Date(b.completedAt || b.submitted_at).getTime())
+      .forEach((a: any) => {
+        const uId = a.userId || a.user_id;
+        if (uId && !userAttemptsMap[uId]) {
+          userAttemptsMap[uId] = a;
+        }
+      });
+
+    const firstAttempts = Object.values(userAttemptsMap);
+    const totalParticipants = firstAttempts.length;
+
+    if (totalParticipants === 0) {
+      return {
+        locked: false,
+        unlocksAt: null,
+        totalParticipants: 0,
+        averageMarks: 0,
+        highestMarks: 0,
+        topper: null,
+        myStanding: null,
+        entries: [],
+        myAttemptSubmitted: false
+      };
+    }
+
+    // Sort by Score DESC, Accuracy DESC, Time ASC
+    firstAttempts.sort((a, b) => {
+      if (b.totalMarksScored !== a.totalMarksScored) return b.totalMarksScored - a.totalMarksScored;
+      if (b.accuracy !== a.accuracy) return b.accuracy - a.accuracy;
+      return (a.timeTakenSeconds || 0) - (b.timeTakenSeconds || 0);
+    });
+
+    const highestMarks = firstAttempts[0]?.totalMarksScored || 0;
+    const avgMarks = Math.round((firstAttempts.reduce((sum, a) => sum + (a.totalMarksScored || 0), 0) / totalParticipants) * 10) / 10;
+
+    const entries: LeaderboardEntry[] = firstAttempts.map((a, index) => {
+      const rank = index + 1;
+      // NTA percentile formula
+      const countBelowOrEqual = firstAttempts.filter((other) => other.totalMarksScored <= a.totalMarksScored).length;
+      const percentile = Math.round((countBelowOrEqual / totalParticipants) * 10000) / 100;
+      const uId = a.userId || a.user_id;
+
+      return {
+        rank,
+        displayName: a.candidateName || a.profiles?.full_name || 'JEE Aspirant',
+        marks: a.totalMarksScored,
+        maxMarks: a.totalMaxMarks,
+        percentage: a.percentage,
+        percentile,
+        accuracy: a.accuracy,
+        timeTakenSeconds: a.timeTakenSeconds || 0,
+        submittedAt: a.completedAt || a.submitted_at,
+        attemptedInLiveWindow: !!a.attemptedInLiveWindow,
+        isCurrentUser: currentUid === uId
+      };
+    });
+
+    const topper = entries[0] || null;
+    const myStanding = entries.find((e) => e.isCurrentUser) || null;
+    const myAttemptSubmitted = !!firstAttempts.find((a) => (a.userId || a.user_id) === currentUid);
+
+    return {
+      locked: false,
+      unlocksAt: null,
+      totalParticipants,
+      averageMarks: avgMarks,
+      highestMarks,
+      topper,
+      myStanding,
+      entries: entries.slice(0, 100),
+      myAttemptSubmitted
+    };
+  },
+
+  async getTestToppersSummary(): Promise<TopperSummaryItem[]> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.rpc('get_test_toppers_summary');
+        if (!error && Array.isArray(data)) {
+          return data.map((d: any) => ({
+            testId: d.test_id,
+            code: d.code,
+            title: d.title,
+            examType: d.exam_type,
+            isScheduledWindow: d.is_scheduled_window || false,
+            startsAt: d.starts_at || null,
+            endsAt: d.ends_at || null,
+            windowLabel: d.window_label || null,
+            isLocked: d.is_locked || false,
+            totalParticipants: d.total_participants || 0,
+            topperName: d.topper_name || null,
+            topperMarks: d.topper_marks || null,
+            maxMarks: d.max_marks || null,
+            topperPercentile: d.topper_percentile || null
+          }));
+        }
+      } catch (e) {
+        console.warn('[Supabase] get_test_toppers_summary fallback:', e);
+      }
+    }
+    return [];
+  },
+
+  async getOverallLeaderboard(): Promise<OverallLeaderboardEntry[]> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.rpc('get_overall_leaderboard');
+        if (!error && Array.isArray(data)) {
+          return data.map((d: any) => ({
+            rank: d.rank,
+            displayName: d.display_name,
+            testsAttempted: d.tests_attempted,
+            avgPercentile: d.avg_percentile,
+            avgMarksPercent: d.avg_marks_percent,
+            totalMarksScored: d.total_marks_scored,
+            totalMaxMarks: d.total_max_marks,
+            isCurrentUser: d.is_current_user
+          }));
+        }
+      } catch (e) {
+        console.warn('[Supabase] get_overall_leaderboard fallback:', e);
+      }
+    }
+    return [];
   },
 
   // ----------------------------------------------------------------------------

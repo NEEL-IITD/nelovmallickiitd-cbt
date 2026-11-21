@@ -25,8 +25,68 @@ export interface TestConfigItem {
   code: string;
   title: string;
   status: 'live' | 'coming_soon';
+  isScheduledWindow?: boolean;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  windowLabel?: string | null;
+  lockLeaderboardUntilEnd?: boolean;
+  allowPracticeAfterEnd?: boolean;
   updatedAt?: string;
   readyQuestionsCount?: number;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  displayName: string;
+  marks: number;
+  maxMarks: number;
+  percentage: number;
+  percentile: number;
+  accuracy: number;
+  timeTakenSeconds: number;
+  submittedAt: string;
+  attemptedInLiveWindow?: boolean;
+  isCurrentUser?: boolean;
+}
+
+export interface LeaderboardResult {
+  locked: boolean;
+  unlocksAt: string | null;
+  totalParticipants: number;
+  averageMarks: number;
+  highestMarks: number;
+  topper: LeaderboardEntry | null;
+  myStanding: LeaderboardEntry | null;
+  entries: LeaderboardEntry[];
+  myAttemptSubmitted?: boolean;
+}
+
+export interface TopperSummaryItem {
+  testId: string;
+  code: string;
+  title: string;
+  examType: string;
+  isScheduledWindow: boolean;
+  startsAt: string | null;
+  endsAt: string | null;
+  windowLabel: string | null;
+  isLocked: boolean;
+  totalParticipants: number;
+  topperName: string | null;
+  topperMarks: number | null;
+  maxMarks: number | null;
+  topperPercentile: number | null;
+}
+
+export interface OverallLeaderboardEntry {
+  rank: number;
+  displayName: string;
+  testsAttempted: number;
+  avgPercentile: number;
+  avgMarksPercent: number;
+  totalMarksScored: number;
+  totalMaxMarks: number;
+  isCurrentUser: boolean;
 }
 
 export type MistakeTagType =

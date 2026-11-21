@@ -7,13 +7,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { studentStorage } from '../utils/studentStorage';
-import { ErrorReportItem, ErrorReportStatus } from '../types';
+import { ErrorReportItem, ErrorReportStatus, LeaderboardResult, TestConfigItem } from '../types';
 import { VaultContentManager } from './vault/VaultContentManager';
 import { ExerciseTestShellModal } from './physics/ExerciseTestShellModal';
+import { formatISTWindow } from '../hooks/useCountdown';
 
 export const AdminDashboard: React.FC = () => {
   const { isCloudConnected, user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'students' | 'attempts' | 'tests' | 'reports' | 'vault'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'students' | 'attempts' | 'tests' | 'reports' | 'vault' | 'leaderboards'>('overview');
   const [testToLaunch, setTestToLaunch] = useState<any | null>(null);
 
   // Core Data States
@@ -23,6 +24,26 @@ export const AdminDashboard: React.FC = () => {
   const [allLectures, setAllLectures] = useState<any[]>([]);
   const [reports, setReports] = useState<ErrorReportItem[]>([]);
   const [testConfigs, setTestConfigs] = useState<Record<string, 'live' | 'coming_soon'>>({});
+  const [detailedConfigs, setDetailedConfigs] = useState<Record<string, TestConfigItem>>({});
+
+  // Leaderboard Inspection Tab
+  const [adminLeaderboardTestId, setAdminLeaderboardTestId] = useState('jee-advanced-pta-04');
+  const [adminLeaderboardData, setAdminLeaderboardData] = useState<LeaderboardResult | null>(null);
+  const [adminLeaderboardLoading, setAdminLeaderboardLoading] = useState(false);
+
+  // Schedule Window Modal
+  const [scheduleModal, setScheduleModal] = useState<{
+    isOpen: boolean;
+    testId: string;
+    code: string;
+    title: string;
+    isScheduled: boolean;
+    startsAt: string;
+    endsAt: string;
+    windowLabel: string;
+    lockLeaderboard: boolean;
+    allowPractice: boolean;
+  } | null>(null);
 
   // UI / Filter States
   const [loading, setLoading] = useState(true);
@@ -81,12 +102,145 @@ export const AdminDashboard: React.FC = () => {
       setAllLectures(lecturesData || []);
       setReports(reportsData || []);
       setTestConfigs(configsData || {});
+
+      const detailed = await studentStorage.getTestConfigsDetails();
+      const map: Record<string, TestConfigItem> = {};
+      detailed.forEach(d => { map[d.testId] = d; });
+      setDetailedConfigs(map);
     } catch (e: any) {
       console.warn('Error loading admin portal data:', e);
       setSupabaseError(e?.message || 'Unexpected error loading data from cloud.');
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'leaderboards') {
+      loadAdminLeaderboard(adminLeaderboardTestId);
+    }
+  }, [activeTab, adminLeaderboardTestId]);
+
+  const loadAdminLeaderboard = async (testId: string) => {
+    setAdminLeaderboardLoading(true);
+    try {
+      const res = await studentStorage.getTestLeaderboard(testId);
+      setAdminLeaderboardData(res);
+    } catch (e) {
+      console.error('Failed to load admin leaderboard:', e);
+    } finally {
+      setAdminLeaderboardLoading(false);
+    }
+  };
+
+  const handleSetNextSundayPreset = () => {
+    const now = new Date();
+    const nextSunday = new Date();
+    const dayOfWeek = now.getDay();
+    const daysUntilSunday = dayOfWeek === 0 ? 7 : (7 - dayOfWeek);
+    nextSunday.setDate(now.getDate() + daysUntilSunday);
+    
+    const year = nextSunday.getFullYear();
+    const month = String(nextSunday.getMonth() + 1).padStart(2, '0');
+    const day = String(nextSunday.getDate()).padStart(2, '0');
+
+    setScheduleModal(prev => prev ? ({
+      ...prev,
+      isScheduled: true,
+      startsAt: `${year}-${month}-${day}T09:00`,
+      endsAt: `${year}-${month}-${day}T14:00`,
+      windowLabel: 'Sunday All-India Live Mock'
+    }) : null);
+  };
+
+  const handleSaveSchedule = async () => {
+    if (!scheduleModal) return;
+    const startsAtIso = scheduleModal.startsAt ? new Date(scheduleModal.startsAt).toISOString() : null;
+    const endsAtIso = scheduleModal.endsAt ? new Date(scheduleModal.endsAt).toISOString() : null;
+
+    const ok = await studentStorage.updateTestSchedule(scheduleModal.testId, {
+      is_scheduled_window: scheduleModal.isScheduled,
+      starts_at: startsAtIso,
+      ends_at: endsAtIso,
+      window_label: scheduleModal.windowLabel,
+      lock_leaderboard_until_end: scheduleModal.lockLeaderboard,
+      allow_practice_after_end: scheduleModal.allowPractice
+    });
+
+    if (ok) {
+      setDetailedConfigs(prev => ({
+        ...prev,
+        [scheduleModal.testId]: {
+          ...(prev[scheduleModal.testId] || {}),
+          testId: scheduleModal.testId,
+          code: scheduleModal.code,
+          title: scheduleModal.title,
+          status: 'live',
+          examType: 'JEE Advanced',
+          isScheduledWindow: scheduleModal.isScheduled,
+          startsAt: startsAtIso,
+          endsAt: endsAtIso,
+          windowLabel: scheduleModal.windowLabel,
+          lockLeaderboardUntilEnd: scheduleModal.lockLeaderboard,
+          allowPracticeAfterEnd: scheduleModal.allowPractice
+        }
+      }));
+      setScheduleModal(null);
+    }
+  };
+
+  const handleClearSchedule = async (testId: string) => {
+    const ok = await studentStorage.updateTestSchedule(testId, {
+      is_scheduled_window: false,
+      starts_at: null,
+      ends_at: null,
+      window_label: null,
+      lock_leaderboard_until_end: true,
+      allow_practice_after_end: true
+    });
+    if (ok) {
+      setDetailedConfigs(prev => ({
+        ...prev,
+        [testId]: {
+          ...(prev[testId] || {}),
+          isScheduledWindow: false,
+          startsAt: null,
+          endsAt: null,
+          windowLabel: null
+        }
+      }));
+      setScheduleModal(null);
+    }
+  };
+
+  const handleExportLeaderboardCSV = () => {
+    if (!adminLeaderboardData?.entries || adminLeaderboardData.entries.length === 0) {
+      alert('No leaderboard entries available to export for this test.');
+      return;
+    }
+
+    const headers = ['Rank', 'Student Name', 'Marks Scored', 'Max Marks', 'Percentage', 'Percentile', 'Accuracy', 'Time Taken (Seconds)', 'Attempted in Live Window', 'Submitted At'];
+    const rows = adminLeaderboardData.entries.map((e) => [
+      e.rank,
+      `"${e.displayName.replace(/"/g, '""')}"`,
+      e.marks,
+      e.maxMarks,
+      `${e.percentage}%`,
+      `${e.percentile}%ile`,
+      `${e.accuracy}%`,
+      e.timeTakenSeconds,
+      e.attemptedInLiveWindow ? 'Yes' : 'No',
+      `"${e.submittedAt}"`
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `Nelov_Leaderboard_${adminLeaderboardTestId}_${new Date().toISOString().substring(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // Copy contact number with visual feedback
@@ -334,6 +488,7 @@ export const AdminDashboard: React.FC = () => {
             { id: 'students', label: `All Students (${totalStudents})`, icon: '👥' },
             { id: 'attempts', label: `Test Attempts (${totalAttemptsCount})`, icon: '📝' },
             { id: 'tests', label: `Manage Tests (${liveTestsCount}/20 Live)`, icon: '⚙️' },
+            { id: 'leaderboards', label: 'Live Leaderboards', icon: '🏆' },
             { id: 'reports', label: `Error Reports (${openReportsCount} Open)`, icon: '⚠️' }
           ].map((tab) => (
             <button
@@ -913,6 +1068,25 @@ export const AdminDashboard: React.FC = () => {
                 {jeeAdvancedList.map((test) => {
                   const status = testConfigs[test.testId] || (test.questionCount > 0 ? 'live' : 'coming_soon');
                   const isLive = status === 'live';
+                  const detailed = detailedConfigs[test.testId];
+                  const isSched = !!detailed?.isScheduledWindow;
+                  const nowMs = Date.now();
+                  const sTime = detailed?.startsAt ? new Date(detailed.startsAt).getTime() : 0;
+                  const eTime = detailed?.endsAt ? new Date(detailed.endsAt).getTime() : 0;
+                  let schedBadge = 'Always Open';
+                  let schedBadgeClass = 'bg-slate-100 dark:bg-zinc-800 text-slate-500';
+                  if (isSched) {
+                    if (sTime > 0 && nowMs < sTime) {
+                      schedBadge = 'Scheduled Window';
+                      schedBadgeClass = 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300';
+                    } else if (sTime > 0 && eTime > 0 && nowMs >= sTime && nowMs <= eTime) {
+                      schedBadge = '🔴 LIVE NOW';
+                      schedBadgeClass = 'bg-rose-600 text-white animate-pulse';
+                    } else if (eTime > 0 && nowMs > eTime) {
+                      schedBadge = 'Window Closed';
+                      schedBadgeClass = 'bg-slate-200 dark:bg-zinc-700 text-slate-600 dark:text-zinc-300';
+                    }
+                  }
 
                   return (
                     <div key={test.testId} className="p-4 rounded-2xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-3 flex flex-col justify-between">
@@ -927,16 +1101,49 @@ export const AdminDashboard: React.FC = () => {
                         <p className="text-[10px] text-slate-400 mt-0.5">{test.questionCount > 0 ? `${test.questionCount} Questions Verified` : 'Draft / Template'}</p>
                       </div>
 
-                      <button
-                        onClick={() => handleToggleClick(test)}
-                        className={`w-full py-2 rounded-xl text-xs font-bold transition-all ${
-                          isLive
-                            ? 'bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200'
-                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
-                        }`}
-                      >
-                        {isLive ? 'Deactivate (Coming Soon)' : 'Make Live 🚀'}
-                      </button>
+                      <div className="space-y-2">
+                        <button
+                          onClick={() => handleToggleClick(test)}
+                          className={`w-full py-2 rounded-xl text-xs font-bold transition-all ${
+                            isLive
+                              ? 'bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200'
+                              : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
+                          }`}
+                        >
+                          {isLive ? 'Deactivate (Coming Soon)' : 'Make Live 🚀'}
+                        </button>
+
+                        <div className="pt-2 flex flex-col gap-1.5 border-t border-slate-100 dark:border-zinc-800/80">
+                          <div className="flex items-center justify-between text-[10px]">
+                            <span className="text-slate-400">Schedule:</span>
+                            <span className={`px-2 py-0.5 rounded-full font-bold ${schedBadgeClass}`}>{schedBadge}</span>
+                          </div>
+                          {isSched && detailed?.startsAt && (
+                            <p className="text-[10px] text-slate-500 truncate">{formatISTWindow(detailed.startsAt, detailed.endsAt)}</p>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const d = detailedConfigs[test.testId];
+                              setScheduleModal({
+                                isOpen: true,
+                                testId: test.testId,
+                                code: test.code,
+                                title: test.title,
+                                isScheduled: d?.isScheduledWindow || false,
+                                startsAt: d?.startsAt ? new Date(d.startsAt).toISOString().substring(0, 16) : '',
+                                endsAt: d?.endsAt ? new Date(d.endsAt).toISOString().substring(0, 16) : '',
+                                windowLabel: d?.windowLabel || 'Sunday All-India Live Mock',
+                                lockLeaderboard: d?.lockLeaderboardUntilEnd ?? true,
+                                allowPractice: d?.allowPracticeAfterEnd ?? true
+                              });
+                            }}
+                            className="w-full py-1.5 rounded-xl text-[11px] font-bold border border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 transition-colors flex items-center justify-center gap-1"
+                          >
+                            <span>📅</span> Schedule Window
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
@@ -952,6 +1159,25 @@ export const AdminDashboard: React.FC = () => {
                 {jeeMainsList.map((test) => {
                   const status = testConfigs[test.testId] || 'coming_soon';
                   const isLive = status === 'live';
+                  const detailed = detailedConfigs[test.testId];
+                  const isSched = !!detailed?.isScheduledWindow;
+                  const nowMs = Date.now();
+                  const sTime = detailed?.startsAt ? new Date(detailed.startsAt).getTime() : 0;
+                  const eTime = detailed?.endsAt ? new Date(detailed.endsAt).getTime() : 0;
+                  let schedBadge = 'Always Open';
+                  let schedBadgeClass = 'bg-slate-100 dark:bg-zinc-800 text-slate-500';
+                  if (isSched) {
+                    if (sTime > 0 && nowMs < sTime) {
+                      schedBadge = 'Scheduled Window';
+                      schedBadgeClass = 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300';
+                    } else if (sTime > 0 && eTime > 0 && nowMs >= sTime && nowMs <= eTime) {
+                      schedBadge = '🔴 LIVE NOW';
+                      schedBadgeClass = 'bg-rose-600 text-white animate-pulse';
+                    } else if (eTime > 0 && nowMs > eTime) {
+                      schedBadge = 'Window Closed';
+                      schedBadgeClass = 'bg-slate-200 dark:bg-zinc-700 text-slate-600 dark:text-zinc-300';
+                    }
+                  }
 
                   return (
                     <div key={test.testId} className="p-4 rounded-2xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-3 flex flex-col justify-between">
@@ -966,19 +1192,165 @@ export const AdminDashboard: React.FC = () => {
                         <p className="text-[10px] text-slate-400 mt-0.5">JEE Mains Format</p>
                       </div>
 
-                      <button
-                        onClick={() => handleToggleClick(test)}
-                        className={`w-full py-2 rounded-xl text-xs font-bold transition-all ${
-                          isLive
-                            ? 'bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200'
-                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
-                        }`}
-                      >
-                        {isLive ? 'Deactivate (Coming Soon)' : 'Make Live 🚀'}
-                      </button>
+                      <div className="space-y-2">
+                        <button
+                          onClick={() => handleToggleClick(test)}
+                          className={`w-full py-2 rounded-xl text-xs font-bold transition-all ${
+                            isLive
+                              ? 'bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200'
+                              : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
+                          }`}
+                        >
+                          {isLive ? 'Deactivate (Coming Soon)' : 'Make Live 🚀'}
+                        </button>
+
+                        <div className="pt-2 flex flex-col gap-1.5 border-t border-slate-100 dark:border-zinc-800/80">
+                          <div className="flex items-center justify-between text-[10px]">
+                            <span className="text-slate-400">Schedule:</span>
+                            <span className={`px-2 py-0.5 rounded-full font-bold ${schedBadgeClass}`}>{schedBadge}</span>
+                          </div>
+                          {isSched && detailed?.startsAt && (
+                            <p className="text-[10px] text-slate-500 truncate">{formatISTWindow(detailed.startsAt, detailed.endsAt)}</p>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const d = detailedConfigs[test.testId];
+                              setScheduleModal({
+                                isOpen: true,
+                                testId: test.testId,
+                                code: test.code,
+                                title: test.title,
+                                isScheduled: d?.isScheduledWindow || false,
+                                startsAt: d?.startsAt ? new Date(d.startsAt).toISOString().substring(0, 16) : '',
+                                endsAt: d?.endsAt ? new Date(d.endsAt).toISOString().substring(0, 16) : '',
+                                windowLabel: d?.windowLabel || 'Sunday All-India Live Mock',
+                                lockLeaderboard: d?.lockLeaderboardUntilEnd ?? true,
+                                allowPractice: d?.allowPracticeAfterEnd ?? true
+                              });
+                            }}
+                            className="w-full py-1.5 rounded-xl text-[11px] font-bold border border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 transition-colors flex items-center justify-center gap-1"
+                          >
+                            <span>📅</span> Schedule Window
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================================================================== */}
+        {/* TAB: LIVE LEADERBOARDS INSPECTION & CSV EXPORT */}
+        {/* ==================================================================== */}
+        {activeTab === 'leaderboards' && (
+          <div className="space-y-6 animate-in fade-in">
+            <div className="p-5 rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="font-black text-lg text-slate-900 dark:text-zinc-100 flex items-center gap-2">
+                  <span>🏆 Live CBT Leaderboards &amp; All-India Rankings</span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
+                    Admin Inspector
+                  </span>
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
+                  Real-time 1st-attempt official rankings, marks, percentiles, accuracy, and pacing for any paper. Accessible even while test windows are locked.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleExportLeaderboardCSV}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5"
+                >
+                  <span>📥</span> Export Leaderboard CSV
+                </button>
+              </div>
+            </div>
+
+            {/* Test Selector */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
+              {[...jeeAdvancedList, ...jeeMainsList].map((t) => (
+                <button
+                  key={t.testId}
+                  onClick={() => setAdminLeaderboardTestId(t.testId)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all border ${
+                    adminLeaderboardTestId === t.testId
+                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                      : 'bg-white dark:bg-[#121318] text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-800'
+                  }`}
+                >
+                  {t.code}
+                </button>
+              ))}
+            </div>
+
+            {/* Leaderboard Table */}
+            <div className="rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm overflow-hidden p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-extrabold text-sm text-slate-900 dark:text-zinc-100">
+                    Leaderboard: {adminLeaderboardTestId} ({adminLeaderboardData?.totalParticipants || 0} Participants)
+                  </h4>
+                  <p className="text-xs text-slate-400">
+                    Highest Marks: {adminLeaderboardData?.highestMarks || 0} · Average: {adminLeaderboardData?.averageMarks || 0}
+                  </p>
+                </div>
+                {adminLeaderboardData?.locked && (
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">
+                    🔒 Window Locked for Students
+                  </span>
+                )}
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-500 uppercase font-bold text-[10px]">
+                    <tr>
+                      <th className="p-3">Rank</th>
+                      <th className="p-3">Student Name</th>
+                      <th className="p-3 text-center">Marks Scored</th>
+                      <th className="p-3 text-center">Percentile</th>
+                      <th className="p-3 text-center">Accuracy</th>
+                      <th className="p-3 text-right">Time Taken</th>
+                      <th className="p-3 text-right">Submitted At</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-zinc-800">
+                    {adminLeaderboardLoading ? (
+                      <tr>
+                        <td colSpan={7} className="p-8 text-center text-slate-400">Loading rankings...</td>
+                      </tr>
+                    ) : (adminLeaderboardData?.entries || []).length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="p-8 text-center text-slate-400 italic">No attempt entries recorded for this paper yet.</td>
+                      </tr>
+                    ) : (
+                      (adminLeaderboardData?.entries || []).map((row) => (
+                        <tr key={row.rank + row.displayName} className="hover:bg-slate-50 dark:hover:bg-zinc-900/40">
+                          <td className="p-3 font-mono font-bold">#{row.rank}</td>
+                          <td className="p-3 font-semibold text-slate-900 dark:text-zinc-100">
+                            {row.displayName}
+                            {row.attemptedInLiveWindow && (
+                              <span className="ml-2 px-1.5 py-0.2 rounded text-[9px] bg-emerald-100 text-emerald-700 font-bold uppercase">
+                                Live Window
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-3 text-center font-mono font-bold">{row.marks} / {row.maxMarks}</td>
+                          <td className="p-3 text-center font-mono font-bold text-emerald-600">{row.percentile}%ile</td>
+                          <td className="p-3 text-center font-mono">{row.accuracy}%</td>
+                          <td className="p-3 text-right font-mono text-slate-500">{row.timeTakenSeconds ? `${Math.round(row.timeTakenSeconds / 60)}m` : '—'}</td>
+                          <td className="p-3 text-right text-slate-400 text-[11px]">{new Date(row.submittedAt).toLocaleString()}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -1233,6 +1605,140 @@ export const AdminDashboard: React.FC = () => {
               >
                 Proceed & Make Live
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Schedule Window Modal */}
+      {scheduleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-lg rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 sm:p-7 shadow-2xl space-y-5">
+            <div className="flex items-start justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-zinc-50">
+                  📅 Schedule All-India Mock Window
+                </h3>
+                <p className="text-xs text-slate-500">{scheduleModal.code} — {scheduleModal.title}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setScheduleModal(null)}
+                className="w-8 h-8 rounded-full border border-slate-200 dark:border-zinc-700 flex items-center justify-center text-slate-500 hover:bg-slate-100 text-xs font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              {/* Toggle Enable Scheduled Window */}
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/60 dark:border-zinc-800/60">
+                <div>
+                  <span className="font-bold text-slate-900 dark:text-zinc-100">Enable Scheduled All-India Window</span>
+                  <p className="text-[11px] text-slate-500">Activates countdown, start-time gate, and window badges.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setScheduleModal({ ...scheduleModal, isScheduled: !scheduleModal.isScheduled })}
+                  className={`w-11 h-6 rounded-full transition-colors relative ${scheduleModal.isScheduled ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-zinc-700'}`}
+                >
+                  <span className={`block w-5 h-5 rounded-full bg-white shadow transform transition-transform ${scheduleModal.isScheduled ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                </button>
+              </div>
+
+              {/* 1-Click Preset */}
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleSetNextSundayPreset}
+                  className="px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800 text-[11px] font-extrabold hover:bg-amber-100 transition-colors"
+                >
+                  ⚡ One-Click Preset: Next Sunday (9:00 AM – 2:00 PM IST)
+                </button>
+              </div>
+
+              {/* Window Label */}
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700 dark:text-zinc-300">Window Label</label>
+                <input
+                  type="text"
+                  value={scheduleModal.windowLabel}
+                  onChange={(e) => setScheduleModal({ ...scheduleModal, windowLabel: e.target.value })}
+                  placeholder="e.g. Sunday All-India Live Mock"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900"
+                />
+              </div>
+
+              {/* Start & End Pickers (IST) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 dark:text-zinc-300">Starts At (Date &amp; Time)</label>
+                  <input
+                    type="datetime-local"
+                    value={scheduleModal.startsAt}
+                    onChange={(e) => setScheduleModal({ ...scheduleModal, startsAt: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs font-mono"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 dark:text-zinc-300">Ends At (Date &amp; Time)</label>
+                  <input
+                    type="datetime-local"
+                    value={scheduleModal.endsAt}
+                    onChange={(e) => setScheduleModal({ ...scheduleModal, endsAt: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* Toggles */}
+              <div className="space-y-2 pt-1">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={scheduleModal.lockLeaderboard}
+                    onChange={(e) => setScheduleModal({ ...scheduleModal, lockLeaderboard: e.target.checked })}
+                    className="w-4 h-4 rounded text-indigo-600"
+                  />
+                  <span>Lock Leaderboard Until Window Closes (prevents peeking at ranks)</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={scheduleModal.allowPractice}
+                    onChange={(e) => setScheduleModal({ ...scheduleModal, allowPractice: e.target.checked })}
+                    className="w-4 h-4 rounded text-indigo-600"
+                  />
+                  <span>Allow Practice Attempts After Window Ends</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between border-t border-slate-100 dark:border-zinc-800 pt-3">
+              <button
+                type="button"
+                onClick={() => handleClearSchedule(scheduleModal.testId)}
+                className="px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-bold transition-colors"
+              >
+                Clear Schedule
+              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setScheduleModal(null)}
+                  className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 text-xs font-semibold hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveSchedule}
+                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold shadow-md shadow-indigo-600/30"
+                >
+                  Save Schedule ✓
+                </button>
+              </div>
             </div>
           </div>
         </div>
