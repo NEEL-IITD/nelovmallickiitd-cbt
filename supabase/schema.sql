@@ -118,13 +118,11 @@ BEGIN
   IF LOWER(COALESCE(NEW.email, '')) IN (
     'mallicknelov@gmail.com',
     'nelovmallick@gmail.com',
-    'nelovmallick@iitd.ac.in',
-    'your_admin_email@gmail.com'
+    'nelovmallick@iitd.ac.in'
   ) OR LOWER(COALESCE(v_email, '')) IN (
     'mallicknelov@gmail.com',
     'nelovmallick@gmail.com',
-    'nelovmallick@iitd.ac.in',
-    'your_admin_email@gmail.com'
+    'nelovmallick@iitd.ac.in'
   ) THEN
     v_role := 'admin';
   END IF;
@@ -378,8 +376,7 @@ BEGIN
   IF v_jwt_email IN (
     'mallicknelov@gmail.com',
     'nelovmallick@gmail.com',
-    'nelovmallick@iitd.ac.in',
-    'your_admin_email@gmail.com'
+    'nelovmallick@iitd.ac.in'
   ) THEN
     RETURN TRUE;
   END IF;

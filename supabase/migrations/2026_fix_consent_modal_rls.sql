@@ -69,3 +69,40 @@ CREATE POLICY "profiles_update_policy"
     auth.uid() = id
     OR public.is_admin()
   );
+
+-- 4. Set mallicknelov@gmail.com as Administrator and Pre-Approve Consent
+INSERT INTO public.profiles (
+  id, full_name, email, auth_method, target_exam, role, accepted_terms_at, accepted_terms_version, parental_consent_confirmed, created_at, last_login_at
+)
+SELECT
+  u.id,
+  COALESCE(NULLIF(TRIM(u.raw_user_meta_data->>'full_name'), ''), NULLIF(TRIM(u.raw_user_meta_data->>'name'), ''), 'Nelov Mallick'),
+  u.email,
+  'google',
+  'JEE Advanced',
+  'admin',
+  NOW(),
+  '2026-11',
+  TRUE,
+  COALESCE(u.created_at, NOW()),
+  NOW()
+FROM auth.users u
+WHERE LOWER(COALESCE(u.email, '')) IN ('mallicknelov@gmail.com', 'nelovmallick@gmail.com', 'nelovmallick@iitd.ac.in')
+ON CONFLICT (id) DO UPDATE SET
+  role = 'admin',
+  accepted_terms_at = COALESCE(public.profiles.accepted_terms_at, NOW()),
+  accepted_terms_version = '2026-11',
+  parental_consent_confirmed = TRUE,
+  last_login_at = NOW();
+
+UPDATE public.profiles
+SET 
+  role = 'admin',
+  accepted_terms_at = COALESCE(accepted_terms_at, NOW()),
+  accepted_terms_version = '2026-11',
+  parental_consent_confirmed = TRUE
+WHERE LOWER(COALESCE(email, '')) IN (
+  'mallicknelov@gmail.com',
+  'nelovmallick@gmail.com',
+  'nelovmallick@iitd.ac.in'
+);

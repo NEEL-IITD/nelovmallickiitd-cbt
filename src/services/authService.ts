@@ -35,9 +35,8 @@ const SESSION_STORAGE_KEY = 'nelov_active_session';
 const REDIRECT_STORAGE_KEY = 'nelov_auth_redirect';
 
 export const ADMIN_EMAILS = [
-  'your_admin_email@gmail.com',
-  'nelovmallick@gmail.com',
   'mallicknelov@gmail.com',
+  'nelovmallick@gmail.com',
   'nelovmallick@iitd.ac.in'
 ];
 
