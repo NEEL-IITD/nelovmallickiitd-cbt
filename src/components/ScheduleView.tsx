@@ -3,7 +3,7 @@
 // Curated by Nelov Mallick (IIT Delhi) · 100% Free Forever
 // ==============================================================================
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { JEE_MAINS_2027_SCHEDULE, FINAL_REVISION_CARD, ScheduleTestItem } from '../data/scheduleData';
 import { Tilt3DCard } from './ui/Tilt3DCard';
 import { useAuth } from '../context/AuthContext';
@@ -20,12 +20,25 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
   onNavigate = (hash) => { window.location.hash = hash; },
   onSelectTest
 }) => {
-  const { user, openAuthModal } = useAuth();
+  const { user, isAdmin, openAuthModal } = useAuth();
 
   // Filter & Layout States
   const [selectedPhase, setSelectedPhase] = useState<number | 'all'>('all');
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const [copiedToast, setCopiedToast] = useState(false);
+
+  // Live real-time clock for real-time countdown & auto-unlock
+  const [now, setNow] = useState<number>(Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Modal state for Preview Details (Syllabus + Instructions)
+  const [previewItem, setPreviewItem] = useState<ScheduleTestItem | null>(null);
+  const [previewTab, setPreviewTab] = useState<'syllabus' | 'instructions'>('syllabus');
 
   // Map of test configs / live statuses from testsIndex
   const liveStatusMap = useMemo(() => {
@@ -44,10 +57,28 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
 
   // Check if test is currently within its live window
   const isInsideWindow = (startIso: string, endIso: string) => {
-    const now = Date.now();
     const start = new Date(startIso).getTime();
     const end = new Date(endIso).getTime();
     return now >= start && now <= end;
+  };
+
+  // Check if test start time has arrived
+  const hasStarted = (startIso: string) => {
+    return now >= new Date(startIso).getTime();
+  };
+
+  // Calculate live countdown string
+  const formatCountdown = (startIso: string) => {
+    const diff = new Date(startIso).getTime() - now;
+    if (diff <= 0) return null;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    if (days > 0) {
+      return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+    return `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
   };
 
   // Get student attempt count for this test
@@ -69,21 +100,40 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     window.print();
   };
 
+  const openPreview = (item: ScheduleTestItem, initialTab: 'syllabus' | 'instructions' = 'syllabus') => {
+    setPreviewItem(item);
+    setPreviewTab(initialTab);
+  };
+
   const handleAction = (item: ScheduleTestItem) => {
     const isLive = liveStatusMap[item.id] === 'live';
+    const started = hasStarted(item.startIso);
+
     if (!user) {
       openAuthModal('login', item.hashRoute, `Sign in or create a free account to attempt ${item.code}.`);
       return;
     }
-    if (isLive) {
+
+    // Admin bypass: can enter regardless of scheduled start
+    if (isAdmin) {
+      if (onSelectTest) {
+        onSelectTest(item.id);
+      } else {
+        onNavigate(item.hashRoute);
+      }
+      return;
+    }
+
+    // For students: check if scheduled window has unlocked
+    if (isLive && started) {
       if (onSelectTest) {
         onSelectTest(item.id);
       } else {
         onNavigate(item.hashRoute);
       }
     } else {
-      // Coming soon notice
-      alert(`${item.code} is scheduled for ${item.dateStr} (${item.windowStr}). Every test is released according to this calendar and remains 100% open anytime afterward!`);
+      // Locked before start time: open preview details with countdown
+      openPreview(item, 'syllabus');
     }
   };
 
@@ -324,7 +374,10 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
             {filteredSchedule.map((item) => {
               const isLive = liveStatusMap[item.id] === 'live';
               const inWindow = isInsideWindow(item.startIso, item.endIso);
+              const started = hasStarted(item.startIso);
               const attempts = getAttemptCount(item.id);
+              const countdown = formatCountdown(item.startIso);
+              const isCurrentlyLocked = !started && !isAdmin;
 
               return (
                 <Tilt3DCard
@@ -375,43 +428,79 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                       </div>
                     </div>
 
-                    {/* Status Badge */}
-                    <div className="flex flex-wrap items-center gap-2 mb-5">
-                      {inWindow ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                          LIVE WINDOW NOW
-                        </span>
-                      ) : isLive ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/30">
-                          <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                          Open Anytime
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-300 dark:border-zinc-700">
-                          Scheduled · Coming Soon
-                        </span>
-                      )}
+                    {/* Status Badge + Live Countdown */}
+                    <div className="space-y-2.5 mb-5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {inWindow ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                            LIVE WINDOW NOW
+                          </span>
+                        ) : isLive && started ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/30">
+                            <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                            Open Anytime
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                            Scheduled / Upcoming
+                          </span>
+                        )}
 
-                      {attempts > 0 && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">
-                          ✓ Attempted ({attempts}/3)
-                        </span>
+                        {attempts > 0 && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                            ✓ Attempted ({attempts}/3)
+                          </span>
+                        )}
+
+                        {isAdmin && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">
+                            ⚡ Admin Bypass
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Live Ticking Countdown Pill before start time */}
+                      {countdown && (
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 text-xs font-mono font-bold text-amber-800 dark:text-amber-300">
+                          <svg className="w-3.5 h-3.5 animate-spin text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span>Starts in {countdown}</span>
+                        </div>
                       )}
                     </div>
                   </div>
 
-                  {/* Card Bottom CTA */}
-                  <button
-                    onClick={() => handleAction(item)}
-                    className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all ${
-                      isLive
-                        ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/20'
-                        : 'bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-300 dark:hover:bg-zinc-700'
-                    }`}
-                  >
-                    {isLive ? `Attempt ${item.code} →` : `Scheduled · Preview Details`}
-                  </button>
+                  {/* Card Bottom CTAs */}
+                  <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-zinc-800/80">
+                    <button
+                      type="button"
+                      onClick={() => openPreview(item, 'syllabus')}
+                      className="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200/80 dark:border-zinc-700/80 transition-all text-center"
+                    >
+                      Preview Details
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleAction(item)}
+                      className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                        !isCurrentlyLocked || isAdmin
+                          ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/20'
+                          : 'bg-slate-200/80 dark:bg-zinc-800/80 text-slate-400 dark:text-zinc-500 cursor-not-allowed'
+                      }`}
+                    >
+                      {isAdmin ? (
+                        <span>⚡ Admin Start →</span>
+                      ) : !isCurrentlyLocked ? (
+                        <span>Attempt {item.code} →</span>
+                      ) : (
+                        <span>🔒 Locked</span>
+                      )}
+                    </button>
+                  </div>
                 </Tilt3DCard>
               );
             })}
@@ -430,15 +519,18 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                   <th className="py-3.5 px-4">Date</th>
                   <th className="py-3.5 px-4">Live Window (IST)</th>
                   <th className="py-3.5 px-4">Event Tag</th>
-                  <th className="py-3.5 px-4">Status & Access</th>
-                  <th className="py-3.5 px-4 text-right no-print">Action</th>
+                  <th className="py-3.5 px-4">Status & Countdown</th>
+                  <th className="py-3.5 px-4 text-right no-print">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60 font-medium">
                 {filteredSchedule.map((item) => {
                   const isLive = liveStatusMap[item.id] === 'live';
                   const inWindow = isInsideWindow(item.startIso, item.endIso);
+                  const started = hasStarted(item.startIso);
                   const attempts = getAttemptCount(item.id);
+                  const countdown = formatCountdown(item.startIso);
+                  const isCurrentlyLocked = !started && !isAdmin;
 
                   return (
                     <tr
@@ -477,13 +569,13 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                             <span className="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                               ● Live Window
                             </span>
-                          ) : isLive ? (
+                          ) : isLive && started ? (
                             <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/30">
                               ● Open Anytime
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-200 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400">
-                              Scheduled
+                            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                              {countdown ? `Starts in ${countdown}` : 'Scheduled'}
                             </span>
                           )}
                           {attempts > 0 && (
@@ -494,16 +586,26 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                         </div>
                       </td>
                       <td className="py-3 px-4 text-right no-print">
-                        <button
-                          onClick={() => handleAction(item)}
-                          className={`px-3 py-1.5 rounded-xl font-bold text-xs whitespace-nowrap transition-all ${
-                            isLive
-                              ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs'
-                              : 'bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-300 dark:hover:bg-zinc-700'
-                          }`}
-                        >
-                          {isLive ? `Attempt →` : `Preview`}
-                        </button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => openPreview(item, 'syllabus')}
+                            className="px-2.5 py-1 rounded-lg font-bold text-xs bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200/80 dark:border-zinc-700/80 transition-all"
+                          >
+                            Details
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleAction(item)}
+                            className={`px-3 py-1 rounded-lg font-bold text-xs whitespace-nowrap transition-all ${
+                              !isCurrentlyLocked || isAdmin
+                                ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs'
+                                : 'bg-slate-200 dark:bg-zinc-800 text-slate-400 dark:text-zinc-500 cursor-not-allowed'
+                            }`}
+                          >
+                            {isAdmin ? '⚡ Admin' : (!isCurrentlyLocked ? 'Attempt →' : '🔒 Locked')}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -536,6 +638,385 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
         </div>
 
       </div>
+
+      {/* ======================================================================== */}
+      {/* PREVIEW DETAILS MODAL: SYLLABUS + TEST INSTRUCTIONS                      */}
+      {/* ======================================================================== */}
+      {previewItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in no-print">
+          <div
+            className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white dark:bg-[#121217] border border-slate-200 dark:border-zinc-800 shadow-2xl text-slate-900 dark:text-zinc-100 flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="sticky top-0 z-20 flex items-start justify-between p-6 pb-4 bg-white/95 dark:bg-[#121217]/95 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800">
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">
+                    {previewItem.code}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400">
+                    Phase {previewItem.phase}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                    300 Marks · 3 Hours · 75 Questions
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                  {previewItem.code}: Test Syllabus & Instructions
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+                  Scheduled for {previewItem.dateStr} ({previewItem.windowStr}) · Curated by Nelov Mallick (IIT Delhi)
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setPreviewItem(null)}
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center font-bold text-sm transition-colors"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Navigation Tabs */}
+            <div className="flex items-center gap-2 px-6 pt-4 border-b border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50">
+              <button
+                type="button"
+                onClick={() => setPreviewTab('syllabus')}
+                className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all ${
+                  previewTab === 'syllabus'
+                    ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                    : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white'
+                }`}
+              >
+                <span>📘</span>
+                <span>Test Syllabus (PCM)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPreviewTab('instructions')}
+                className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-all ${
+                  previewTab === 'instructions'
+                    ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                    : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white'
+                }`}
+              >
+                <span>📋</span>
+                <span>General Instructions & Marking</span>
+              </button>
+            </div>
+
+            {/* Modal Body Content */}
+            <div className="p-6 space-y-6 flex-1 overflow-y-auto">
+              
+              {/* TAB 1: SYLLABUS */}
+              {previewTab === 'syllabus' && (
+                <div className="space-y-6 animate-fade-in">
+                  
+                  {/* Banner note */}
+                  <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/50 text-xs text-indigo-900 dark:text-indigo-200 flex items-start gap-3">
+                    <span className="text-lg">🎯</span>
+                    <div className="space-y-1">
+                      <p className="font-bold">Mastery Checklist for {previewItem.code}:</p>
+                      <p className="text-[11px] text-indigo-800/90 dark:text-indigo-300">
+                        This test evaluates exact NTA weightage across standard syllabus chapters. Revise formulas and standard derivations thoroughly before attempting.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Physics Syllabus Card */}
+                  <div className="rounded-2xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/30 dark:bg-sky-950/20 p-5 space-y-3">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-8 h-8 rounded-xl bg-sky-500/20 border border-sky-400/40 text-sky-600 dark:text-sky-300 flex items-center justify-center font-black text-xs">
+                        PH
+                      </span>
+                      <div>
+                        <h4 className="font-black text-sm text-sky-950 dark:text-sky-200">
+                          Physics Syllabus (25 Questions · 100 Marks)
+                        </h4>
+                        <p className="text-[11px] text-sky-800/80 dark:text-sky-400">
+                          Thermodynamics & Kinetic Theory Focus
+                        </p>
+                      </div>
+                    </div>
+
+                    <ul className="space-y-2 text-xs text-slate-700 dark:text-zinc-300 pl-1">
+                      {previewItem.syllabus?.physics ? (
+                        previewItem.syllabus.physics.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-2.5">
+                            <span className="text-sky-500 font-bold mt-0.5">•</span>
+                            <span>{item}</span>
+                          </li>
+                        ))
+                      ) : (
+                        <>
+                          <li className="flex items-start gap-2.5">
+                            <span className="text-sky-500 font-bold mt-0.5">•</span>
+                            <span><strong>Kinetic Theory of Gases (KTG):</strong> Degrees of freedom, Maxwell-Boltzmann velocity distribution, RMS speed, average speed, most probable speed, mean free path, and relaxation time.</span>
+                          </li>
+                          <li className="flex items-start gap-2.5">
+                            <span className="text-sky-500 font-bold mt-0.5">•</span>
+                            <span><strong>Thermodynamics:</strong> Zeroth and First Law, work done in isobaric, isothermal, adiabatic, isochoric, and cyclic processes; indicator diagrams (P-V, T-S); Carnot engine efficiency; adiabatic bulk modulus.</span>
+                          </li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+
+                  {/* Chemistry Syllabus Card */}
+                  <div className="rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/30 dark:bg-emerald-950/20 p-5 space-y-3">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-600 dark:text-emerald-300 flex items-center justify-center font-black text-xs">
+                        CH
+                      </span>
+                      <div>
+                        <h4 className="font-black text-sm text-emerald-950 dark:text-emerald-200">
+                          Chemistry Syllabus (25 Questions · 100 Marks)
+                        </h4>
+                        <p className="text-[11px] text-emerald-800/80 dark:text-emerald-400">
+                          Organic Chemistry Foundations & Hydrocarbons
+                        </p>
+                      </div>
+                    </div>
+
+                    <ul className="space-y-2 text-xs text-slate-700 dark:text-zinc-300 pl-1">
+                      {previewItem.syllabus?.chemistry ? (
+                        previewItem.syllabus.chemistry.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-2.5">
+                            <span className="text-emerald-500 font-bold mt-0.5">•</span>
+                            <span>{item}</span>
+                          </li>
+                        ))
+                      ) : (
+                        <>
+                          <li className="flex items-start gap-2.5">
+                            <span className="text-emerald-500 font-bold mt-0.5">•</span>
+                            <span><strong>Hydrocarbons:</strong> Alkanes, alkenes, alkynes; free-radical halogenation; oxymercuration-demercuration; conjugated dienes; Wurtz and Wurtz-Fittig reactions.</span>
+                          </li>
+                          <li className="flex items-start gap-2.5">
+                            <span className="text-emerald-500 font-bold mt-0.5">•</span>
+                            <span><strong>General Organic Chemistry (GOC):</strong> Aromaticity and Hückel&apos;s Rule (4n+2 π electrons), relative acidic strength (pKa comparisons), dipole moments in substituted alkanes and halides.</span>
+                          </li>
+                          <li className="flex items-start gap-2.5">
+                            <span className="text-emerald-500 font-bold mt-0.5">•</span>
+                            <span><strong>Purification & Practical Organic Chemistry (POC):</strong> Simple, fractional, vacuum, and steam distillation principles; Thin Layer Chromatography ($R_f$ factor); quantitative Kjeldahl's method for nitrogen.</span>
+                          </li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+
+                  {/* Mathematics Syllabus Card */}
+                  <div className="rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/30 dark:bg-amber-950/20 p-5 space-y-3">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-600 dark:text-amber-300 flex items-center justify-center font-black text-xs">
+                        MA
+                      </span>
+                      <div>
+                        <h4 className="font-black text-sm text-amber-950 dark:text-amber-200">
+                          Mathematics Syllabus (25 Questions · 100 Marks)
+                        </h4>
+                        <p className="text-[11px] text-amber-800/80 dark:text-amber-400">
+                          Trigonometry & Functional Relations
+                        </p>
+                      </div>
+                    </div>
+
+                    <ul className="space-y-2 text-xs text-slate-700 dark:text-zinc-300 pl-1">
+                      {previewItem.syllabus?.mathematics ? (
+                        previewItem.syllabus.mathematics.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-2.5">
+                            <span className="text-amber-500 font-bold mt-0.5">•</span>
+                            <span>{item}</span>
+                          </li>
+                        ))
+                      ) : (
+                        <>
+                          <li className="flex items-start gap-2.5">
+                            <span className="text-amber-500 font-bold mt-0.5">•</span>
+                            <span><strong>Trigonometric Ratios & Identities:</strong> Compound angles, multiple & submultiple angle formulas, transformation product-to-sum, summation of cosine and sine series.</span>
+                          </li>
+                          <li className="flex items-start gap-2.5">
+                            <span className="text-amber-500 font-bold mt-0.5">•</span>
+                            <span><strong>Trigonometric Functions & Properties:</strong> Domain, range, periodicity, greatest integer function [sin x] combinations, graphs of reciprocal and inverse functions.</span>
+                          </li>
+                          <li className="flex items-start gap-2.5">
+                            <span className="text-amber-500 font-bold mt-0.5">•</span>
+                            <span><strong>Trigonometric Equations:</strong> General solution families, counting number of roots in bounded intervals [0, 2π] or [-π, π], and simultaneous systems.</span>
+                          </li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+
+                </div>
+              )}
+
+              {/* TAB 2: GENERAL INSTRUCTIONS */}
+              {previewTab === 'instructions' && (
+                <div className="space-y-6 animate-fade-in text-xs text-slate-700 dark:text-zinc-300">
+                  
+                  {/* Pattern Badges Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-zinc-800/70 border border-slate-200 dark:border-zinc-700 text-center">
+                      <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-zinc-400">Duration</p>
+                      <p className="text-base font-black text-slate-900 dark:text-white mt-1">180 Mins</p>
+                      <p className="text-[10px] text-slate-500">3 Clock Hours</p>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-zinc-800/70 border border-slate-200 dark:border-zinc-700 text-center">
+                      <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-zinc-400">Total Marks</p>
+                      <p className="text-base font-black text-indigo-600 dark:text-indigo-400 mt-1">300 Marks</p>
+                      <p className="text-[10px] text-slate-500">100 per Subject</p>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-zinc-800/70 border border-slate-200 dark:border-zinc-700 text-center">
+                      <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-zinc-400">Total Questions</p>
+                      <p className="text-base font-black text-slate-900 dark:text-white mt-1">75 Qs</p>
+                      <p className="text-[10px] text-slate-500">25 PH · 25 CH · 25 MA</p>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-zinc-800/70 border border-slate-200 dark:border-zinc-700 text-center">
+                      <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-zinc-400">Marking</p>
+                      <p className="text-base font-black text-emerald-600 dark:text-emerald-400 mt-1">+4 / -1</p>
+                      <p className="text-[10px] text-slate-500">Negative Marking</p>
+                    </div>
+                  </div>
+
+                  {/* Section Breakdown Card */}
+                  <div className="p-4 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/50 space-y-3">
+                    <h4 className="font-black text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                      <span>⚖️</span> Examination Structure & Section Marking
+                    </h4>
+                    
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead>
+                          <tr className="border-b border-slate-200 dark:border-zinc-700 text-[11px] font-bold text-slate-500">
+                            <th className="pb-2">Section</th>
+                            <th className="pb-2">Question Type</th>
+                            <th className="pb-2">Count</th>
+                            <th className="pb-2">Correct</th>
+                            <th className="pb-2">Incorrect</th>
+                            <th className="pb-2">Unanswered</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-zinc-800 text-[11px]">
+                          <tr>
+                            <td className="py-2.5 font-bold text-slate-900 dark:text-zinc-100">Section I</td>
+                            <td className="py-2.5">Multiple Choice (Single Correct)</td>
+                            <td className="py-2.5 font-mono">20 Qs / Subject</td>
+                            <td className="py-2.5 text-emerald-600 dark:text-emerald-400 font-bold">+4</td>
+                            <td className="py-2.5 text-rose-600 dark:text-rose-400 font-bold">-1</td>
+                            <td className="py-2.5 text-slate-500">0</td>
+                          </tr>
+                          <tr>
+                            <td className="py-2.5 font-bold text-slate-900 dark:text-zinc-100">Section II</td>
+                            <td className="py-2.5">Numerical Value (Nearest Integer)</td>
+                            <td className="py-2.5 font-mono">5 Qs / Subject</td>
+                            <td className="py-2.5 text-emerald-600 dark:text-emerald-400 font-bold">+4</td>
+                            <td className="py-2.5 text-rose-600 dark:text-rose-400 font-bold">-1</td>
+                            <td className="py-2.5 text-slate-500">0</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Test-Taking Rules List */}
+                  <div className="space-y-2.5">
+                    <h4 className="font-black text-sm text-slate-900 dark:text-white">
+                      Strict Candidate Code of Conduct:
+                    </h4>
+                    <ul className="space-y-2 pl-1">
+                      <li className="flex items-start gap-2.5">
+                        <span className="text-indigo-500 font-bold mt-0.5">1.</span>
+                        <span><strong>Calculators and Devices:</strong> No calculators, mobile phones, slide rules, or external aids are permitted. Calculations must be carried out on rough paper.</span>
+                      </li>
+                      <li className="flex items-start gap-2.5">
+                        <span className="text-indigo-500 font-bold mt-0.5">2.</span>
+                        <span><strong>Numerical Rounding:</strong> In Section II, enter your response rounded off to the <em>nearest integer</em> unless explicitly specified otherwise.</span>
+                      </li>
+                      <li className="flex items-start gap-2.5">
+                        <span className="text-indigo-500 font-bold mt-0.5">3.</span>
+                        <span><strong>Real CBT Palette:</strong> Use the Question Palette to track visited (grey), not answered (red), answered (green), and marked for review (purple) statuses.</span>
+                      </li>
+                      <li className="flex items-start gap-2.5">
+                        <span className="text-indigo-500 font-bold mt-0.5">4.</span>
+                        <span><strong>Auto-Submission:</strong> When the 180-minute countdown expires, your examination will automatically freeze and submit. Answers marked for review will be evaluated.</span>
+                      </li>
+                      <li className="flex items-start gap-2.5">
+                        <span className="text-indigo-500 font-bold mt-0.5">5.</span>
+                        <span><strong>1st-Attempt Leaderboard:</strong> Only your first verified attempt is counted for the All-India Percentile and Rank Leaderboard, maintaining authentic calibration.</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                </div>
+              )}
+
+            </div>
+
+            {/* Modal Footer with Status & Action */}
+            <div className="p-6 bg-slate-50 dark:bg-zinc-900/80 border-t border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                {!hasStarted(previewItem.startIso) && !isAdmin ? (
+                  <div className="flex items-center gap-2 text-xs font-semibold text-amber-700 dark:text-amber-300">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                    <span>Locked until {previewItem.dateStr}, 10:00 AM IST ({formatCountdown(previewItem.startIso) ? `Starts in ${formatCountdown(previewItem.startIso)}` : 'Upcoming'})</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span>{isAdmin ? 'Admin Bypass Enabled · Ready to Attempt' : 'Test is Live · 100% Free Forever'}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setPreviewItem(null)}
+                  className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 transition-colors"
+                >
+                  Close Preview
+                </button>
+
+                {!hasStarted(previewItem.startIso) && !isAdmin ? (
+                  <button
+                    type="button"
+                    disabled
+                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-200 dark:bg-zinc-800 text-slate-400 dark:text-zinc-500 cursor-not-allowed border border-slate-300 dark:border-zinc-700"
+                  >
+                    🔒 Locked until 10:00 AM IST
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const item = previewItem;
+                      setPreviewItem(null);
+                      if (onSelectTest) {
+                        onSelectTest(item.id);
+                      } else {
+                        onNavigate(item.hashRoute);
+                      }
+                    }}
+                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/25 transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <span>{isAdmin ? '⚡ Admin Start' : 'Start Test Now'} →</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

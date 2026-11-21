@@ -71,6 +71,13 @@ export interface TestPaper {
   totalQuestions: number;
   sectionsSummary: SubjectSectionSummary[];
   questions: Question[];
+  scheduledStartTime?: string;
+  scheduledEndTime?: string;
+  syllabus?: {
+    physics?: string[];
+    chemistry?: string[];
+    mathematics?: string[];
+  };
 }
 
 export interface TestMetadata {

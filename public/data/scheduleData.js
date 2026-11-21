@@ -15,7 +15,23 @@
       startIso: "2026-11-22T10:00:00+05:30",
       endIso: "2026-11-22T20:00:00+05:30",
       route: "/test/jee-mains/ptm-01",
-      hashRoute: "#/test/jee-mains/ptm-01"
+      hashRoute: "#/test/jee-mains/ptm-01",
+      syllabus: {
+        physics: [
+          "Kinetic Theory of Gases (degrees of freedom, RMS, average and most probable speeds, Maxwell distribution, mean free path, relaxation time)",
+          "Thermodynamics (First Law of Thermodynamics, work done in isobaric, isothermal, adiabatic, isochoric and cyclic processes, Carnot engine efficiency, adiabatic bulk modulus)"
+        ],
+        chemistry: [
+          "Hydrocarbons (alkanes, alkenes, alkynes, free-radical halogenation, oxymercuration-demercuration, conjugated dienes, Wurtz-Fittig reaction)",
+          "General Organic Chemistry (Aromaticity, Huckel's rule, acidic strength and pKa, dipole moment of alkyl halides)",
+          "Purification & Separation Methods (distillation types: simple, fractional, steam, vacuum; chromatography: TLC; Kjeldahl's method)"
+        ],
+        mathematics: [
+          "Trigonometric Ratios & Identities (compound angles, multiple & submultiple angles, transformation formulas, summation of trigonometric series)",
+          "Trigonometric Functions & Properties (domain, range, periodicity, greatest integer combinations)",
+          "Trigonometric Equations (number of roots, general solutions, system of equations)"
+        ]
+      }
     },
     {
       id: "jee-mains-ptm-02",
