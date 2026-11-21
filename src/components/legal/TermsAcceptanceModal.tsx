@@ -9,13 +9,15 @@ import { LEGAL_CONFIG } from '../../config/legal';
 interface TermsAcceptanceModalProps {
   isOpen: boolean;
   userName?: string;
-  onAccept: () => Promise<void>;
+  onAccept: (parentalConsent?: boolean) => Promise<void>;
+  onSignOut?: () => void;
 }
 
 export const TermsAcceptanceModal: React.FC<TermsAcceptanceModalProps> = ({
   isOpen,
   userName = 'Student Aspirant',
-  onAccept
+  onAccept,
+  onSignOut
 }) => {
   const [agreed, setAgreed] = useState<boolean>(false);
   const [parentalConfirmed, setParentalConfirmed] = useState<boolean>(false);
@@ -32,8 +34,9 @@ export const TermsAcceptanceModal: React.FC<TermsAcceptanceModalProps> = ({
     setError('');
     setLoading(true);
     try {
-      await onAccept();
+      await onAccept(parentalConfirmed);
     } catch (err: any) {
+      console.error('Consent recording error:', err);
       setError(err?.message || 'Failed to record consent. Please try again.');
     } finally {
       setLoading(false);
@@ -131,12 +134,34 @@ export const TermsAcceptanceModal: React.FC<TermsAcceptanceModalProps> = ({
           type="button"
           className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2"
         >
-          {loading ? 'Recording Consent...' : 'Accept & Enter Portal →'}
+          {loading ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>Saving & Entering Portal...</span>
+            </>
+          ) : (
+            'Accept & Enter Portal →'
+          )}
         </button>
 
         <p className="text-[10px] text-center text-slate-400 dark:text-zinc-500">
-          Mentored by {LEGAL_CONFIG.OWNER_NAME} (IIT Delhi) · Policy Version {LEGAL_CONFIG.POLICY_VERSION}
+          Mentored by {LEGAL_CONFIG.OWNER_NAME} · Policy Version {LEGAL_CONFIG.POLICY_VERSION}
         </p>
+
+        {onSignOut && (
+          <div className="pt-1 text-center">
+            <button
+              type="button"
+              onClick={onSignOut}
+              className="text-[11px] font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-zinc-300 underline transition-colors"
+            >
+              Sign out of this account
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

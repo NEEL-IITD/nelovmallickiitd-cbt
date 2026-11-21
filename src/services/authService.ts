@@ -607,30 +607,61 @@ export const authService = {
   },
 
   /**
-   * Save legal terms consent timestamp (DPDP Act 2023)
+   * Save legal terms consent timestamp (DPDP Act 2023) - Multi-Layer Resilient Persistence
    */
-  async acceptTerms(version = '2026-11'): Promise<User | null> {
+  async acceptTerms(version = '2026-11', parentalConsent = false): Promise<User | null> {
     const current = this.getCurrentUser();
     if (!current) return null;
     const now = new Date().toISOString();
     current.acceptedTermsAt = now;
     current.acceptedTermsVersion = version;
+    current.parentalConsentConfirmed = parentalConsent;
 
+    // 1. Immediate Local Storage & User Consent Cache
     if (typeof window !== 'undefined') {
-      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(current));
+      try {
+        localStorage.setItem(`consent_v2026_11_${current.id}`, now);
+        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(current));
+      } catch (e) {
+        console.warn('LocalStorage error in acceptTerms:', e);
+      }
     }
 
     if (this.isCloudConnected() && supabase) {
+      // 2. Step A: Supabase Auth user metadata update (always works without custom table migrations)
       try {
+        console.log('[authService] Updating user metadata with legal consent...');
+        await supabase.auth.updateUser({
+          data: {
+            accepted_terms_at: now,
+            accepted_terms_version: version,
+            parental_consent_confirmed: parentalConsent
+          }
+        });
+      } catch (metaErr) {
+        console.warn('[authService] Supabase updateUser consent notice:', metaErr);
+      }
+
+      // 3. Step B: Sync to public.profiles via resilient upsert
+      try {
+        console.log('[authService] Upserting consent to public.profiles...');
         await supabase
           .from('profiles')
-          .update({
+          .upsert({
+            id: current.id,
+            email: current.email,
+            full_name: current.name || 'Student Aspirant',
+            contact_number: current.contactNumber,
+            auth_method: current.authMethod,
+            target_exam: current.targetExam || 'JEE Advanced',
+            role: current.role || 'student',
             accepted_terms_at: now,
-            accepted_terms_version: version
-          })
-          .eq('id', current.id);
+            accepted_terms_version: version,
+            parental_consent_confirmed: parentalConsent,
+            last_login_at: now
+          }, { onConflict: 'id' });
       } catch (e) {
-        console.warn('Failed to update accepted_terms_at in Supabase:', e);
+        console.warn('[authService] Failed to upsert accepted_terms_at in public.profiles (non-fatal):', e);
       }
     }
     return current;

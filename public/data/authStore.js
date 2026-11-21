@@ -1158,25 +1158,55 @@
       } catch (e) {}
     },
 
-    async acceptTerms(version = '2026-11') {
+    async acceptTerms(version = '2026-11', parentalConsent = false) {
       const current = this.getCurrentUser();
       if (!current) return null;
       const now = new Date().toISOString();
       current.acceptedTermsAt = now;
       current.acceptedTermsVersion = version;
+      current.parentalConsentConfirmed = parentalConsent;
+
+      // 1. Immediate Local Storage & User Consent Cache
+      try {
+        localStorage.setItem(`consent_v2026_11_${current.id}`, now);
+      } catch (e) {}
       this.setActiveSession(current);
 
       if (this.isCloudConnected() && supabaseClient) {
+        // Step A: Supabase Auth metadata
         try {
+          console.log('[authStore] Saving consent to Supabase Auth metadata...');
+          await supabaseClient.auth.updateUser({
+            data: {
+              accepted_terms_at: now,
+              accepted_terms_version: version,
+              parental_consent_confirmed: parentalConsent
+            }
+          });
+        } catch (e) {
+          console.warn('[authStore] Supabase updateUser notice:', e);
+        }
+
+        // Step B: Resilient upsert to public.profiles
+        try {
+          console.log('[authStore] Upserting consent to public.profiles...');
           await supabaseClient
             .from('profiles')
-            .update({
+            .upsert({
+              id: current.id,
+              email: current.email,
+              full_name: current.name || 'Student Aspirant',
+              contact_number: current.contactNumber,
+              auth_method: current.authMethod,
+              target_exam: current.targetExam || 'JEE Advanced',
+              role: current.role || 'student',
               accepted_terms_at: now,
-              accepted_terms_version: version
-            })
-            .eq('id', current.id);
+              accepted_terms_version: version,
+              parental_consent_confirmed: parentalConsent,
+              last_login_at: now
+            }, { onConflict: 'id' });
         } catch (e) {
-          console.warn('[authStore] Error saving terms consent to Supabase:', e);
+          console.warn('[authStore] Error saving terms consent to Supabase (non-fatal):', e);
         }
       }
       return current;
@@ -1226,8 +1256,9 @@
         let contactNumber = session.user.user_metadata?.contact_number || null;
         let authMethod = isPhone ? 'phone' : (session.user.app_metadata?.provider === 'google' ? 'google' : 'gmail');
         let displayEmail = isPhone ? null : session.user.email;
-        let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || null;
-        let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || null;
+        const localConsent = typeof window !== 'undefined' ? localStorage.getItem(`consent_v2026_11_${session.user.id}`) : null;
+        let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || localConsent || null;
+        let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || (localConsent ? '2026-11' : null);
         let parentalConsentConfirmed = Boolean(session.user.user_metadata?.parental_consent_confirmed);
 
         try {
@@ -1244,7 +1275,15 @@
             if (profile.email && !profile.email.includes('@phone.nelovportal.local')) displayEmail = profile.email;
             if (profile.accepted_terms_at) acceptedTermsAt = profile.accepted_terms_at;
             if (profile.accepted_terms_version) acceptedTermsVersion = profile.accepted_terms_version;
-            if (profile.parental_consent_confirmed) parentalConsentConfirmed = Boolean(profile.parental_consent_confirmed);
+            if (profile.parental_consent_confirmed !== null && profile.parental_consent_confirmed !== undefined) {
+              parentalConsentConfirmed = Boolean(profile.parental_consent_confirmed);
+            }
+          }
+
+          if (acceptedTermsAt && typeof window !== 'undefined') {
+            try {
+              localStorage.setItem(`consent_v2026_11_${session.user.id}`, acceptedTermsAt);
+            } catch (e) {}
           }
 
           const targetRole = (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) ? 'admin' : role;

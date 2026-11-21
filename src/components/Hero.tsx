@@ -47,7 +47,7 @@ export const Hero: React.FC<HeroProps> = ({
             {/* Subheading */}
             <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
               {exam === 'jee'
-                ? "The exact NTA CBT exam interface, pinpoint AI mistake analytics, chapter-level diagnostic mastery, and mentorship from IIT Delhi's Nelov Mallick and top rankers."
+                ? "The exact NTA CBT exam interface, pinpoint AI mistake analytics, chapter-level diagnostic mastery, and mentorship from Nelov Mallick (IIT Delhi alumnus)."
                 : 'Experience the real NEET UG timing and interface, deep subject diagnostics in Biology, Physics & Chemistry, with personalized mentorship from top medical rankers.'}
             </p>
 

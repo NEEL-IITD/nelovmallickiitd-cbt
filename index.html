@@ -11071,7 +11071,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       );
     }
 
-    function TermsAcceptanceModalDialog({ isOpen, currentUser, onAccepted, onClose }) {
+    function TermsAcceptanceModalDialog({ isOpen, currentUser, onAccepted, onSignOut }) {
       const config = window.LEGAL_CONFIG || {
         OWNER_NAME: "Nelov Mallick",
         POLICY_VERSION: "2026-11"
@@ -11093,10 +11093,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         setLoading(true);
         try {
           if (window.authService && window.authService.acceptTerms) {
-            await window.authService.acceptTerms(config.POLICY_VERSION);
+            await window.authService.acceptTerms(config.POLICY_VERSION, parentalConfirmed);
           }
           if (onAccepted) onAccepted();
         } catch (err) {
+          console.error('Consent error:', err);
           setError(err?.message || 'Failed to record consent. Please try again.');
         } finally {
           setLoading(false);
@@ -11194,12 +11195,34 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               type="button"
               className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2"
             >
-              {loading ? 'Recording Consent...' : 'Accept & Enter Portal →'}
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Saving & Entering Portal...</span>
+                </>
+              ) : (
+                'Accept & Enter Portal →'
+              )}
             </button>
 
             <p className="text-[10px] text-center text-slate-400 dark:text-zinc-500">
-              Mentored by {config.OWNER_NAME} (IIT Delhi) · Policy Version {config.POLICY_VERSION}
+              Mentored by {config.OWNER_NAME} · Policy Version {config.POLICY_VERSION}
             </p>
+
+            {onSignOut && (
+              <div className="pt-1 text-center">
+                <button
+                  type="button"
+                  onClick={onSignOut}
+                  className="text-[11px] font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-zinc-300 underline transition-colors"
+                >
+                  Sign out of this account
+                </button>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -14368,11 +14391,17 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
           {/* FIRST-TIME DPDP TERMS CONSENT MODAL */}
           <TermsAcceptanceModalDialog
-            isOpen={Boolean(currentUser && !currentUser.acceptedTermsAt)}
+            isOpen={Boolean(currentUser && !currentUser.acceptedTermsAt && !(typeof window !== 'undefined' && localStorage.getItem('consent_v2026_11_' + currentUser.id)))}
             currentUser={currentUser}
             onAccepted={() => {
               const updated = window.authService?.getCurrentUser() || null;
               setCurrentUser(updated);
+            }}
+            onSignOut={() => {
+              if (window.authService && window.authService.logOut) {
+                window.authService.logOut();
+              }
+              setCurrentUser(null);
             }}
           />
 

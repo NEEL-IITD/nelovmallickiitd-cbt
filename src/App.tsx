@@ -39,7 +39,7 @@ import { StorageNotice } from './components/legal/StorageNotice';
 import { TermsAcceptanceModal } from './components/legal/TermsAcceptanceModal';
 
 export const AppContent: React.FC = () => {
-  const { user, isCloudConnected, openAuthModal, acceptTerms } = useAuth();
+  const { user, isCloudConnected, openAuthModal, acceptTerms, logOut } = useAuth();
 
   // Global State
   const [exam, setExam] = useState<ExamType>('jee');
@@ -255,11 +255,12 @@ export const AppContent: React.FC = () => {
 
       {/* First-Time Google Sign-In & DPDP Terms Consent Modal */}
       <TermsAcceptanceModal
-        isOpen={Boolean(user && !user.acceptedTermsAt)}
+        isOpen={Boolean(user && !user.acceptedTermsAt && !(typeof window !== 'undefined' && localStorage.getItem(`consent_v2026_11_${user.id}`)))}
         userName={user?.name}
-        onAccept={async () => {
-          await acceptTerms();
+        onAccept={async (parentalConsent) => {
+          await acceptTerms('2026-11', parentalConsent);
         }}
+        onSignOut={logOut}
       />
 
     </div>

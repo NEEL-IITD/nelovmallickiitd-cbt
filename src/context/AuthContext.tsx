@@ -25,7 +25,7 @@ interface AuthContextType {
   signUp: (params: SignUpParams) => Promise<User>;
   signInWithGoogle: (redirectTo?: string) => Promise<void>;
   logOut: () => Promise<void>;
-  acceptTerms: (version?: string) => Promise<User | null>;
+  acceptTerms: (version?: string, parentalConsent?: boolean) => Promise<User | null>;
   deleteMyAccount: () => Promise<void>;
   openAuthModal: (mode?: 'login' | 'signup' | 'forgot', redirectUrl?: string, message?: string) => void;
   closeAuthModal: () => void;
@@ -60,8 +60,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             let authMethod = isPhone ? 'phone' : (session.user.app_metadata?.provider === 'google' ? 'google' : 'gmail');
             let displayEmail = isPhone ? null : (session.user.email || null);
 
-            let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || null;
-            let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || null;
+            const localConsent = typeof window !== 'undefined' ? localStorage.getItem(`consent_v2026_11_${session.user.id}`) : null;
+            let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || localConsent || null;
+            let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || (localConsent ? '2026-11' : null);
             let parentalConsentConfirmed = Boolean(session.user.user_metadata?.parental_consent_confirmed);
 
             try {
@@ -79,10 +80,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 if (profile.target_exam) targetExam = profile.target_exam;
                 if (profile.accepted_terms_at) acceptedTermsAt = profile.accepted_terms_at;
                 if (profile.accepted_terms_version) acceptedTermsVersion = profile.accepted_terms_version;
-                if (profile.parental_consent_confirmed) parentalConsentConfirmed = Boolean(profile.parental_consent_confirmed);
+                if (profile.parental_consent_confirmed !== undefined && profile.parental_consent_confirmed !== null) {
+                  parentalConsentConfirmed = Boolean(profile.parental_consent_confirmed);
+                }
                 if (profile.email && !profile.email.endsWith('@phone.nelovportal.local')) {
                   displayEmail = profile.email;
                 }
+              }
+
+              // Lock consent into local storage if verified from any source
+              if (acceptedTermsAt && typeof window !== 'undefined') {
+                try {
+                  localStorage.setItem(`consent_v2026_11_${session.user.id}`, acceptedTermsAt);
+                } catch (e) {}
               }
 
               // Self-healing: If profile was missing in Supabase, upsert it immediately
@@ -170,8 +180,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           let authMethod = isPhone ? 'phone' : (session.user.app_metadata?.provider === 'google' ? 'google' : 'gmail');
           let displayEmail = isPhone ? null : (session.user.email || null);
 
-          let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || null;
-          let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || null;
+          const localConsent = typeof window !== 'undefined' ? localStorage.getItem(`consent_v2026_11_${session.user.id}`) : null;
+          let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || localConsent || null;
+          let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || (localConsent ? '2026-11' : null);
           let parentalConsentConfirmed = Boolean(session.user.user_metadata?.parental_consent_confirmed);
 
           try {
@@ -190,10 +201,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 if (profile.target_exam) targetExam = profile.target_exam;
                 if (profile.accepted_terms_at) acceptedTermsAt = profile.accepted_terms_at;
                 if (profile.accepted_terms_version) acceptedTermsVersion = profile.accepted_terms_version;
-                if (profile.parental_consent_confirmed) parentalConsentConfirmed = Boolean(profile.parental_consent_confirmed);
+                if (profile.parental_consent_confirmed !== undefined && profile.parental_consent_confirmed !== null) {
+                  parentalConsentConfirmed = Boolean(profile.parental_consent_confirmed);
+                }
                 if (profile.email && !profile.email.endsWith('@phone.nelovportal.local')) {
                   displayEmail = profile.email;
                 }
+              }
+
+              // Lock consent into local storage if verified from any source
+              if (acceptedTermsAt && typeof window !== 'undefined') {
+                try {
+                  localStorage.setItem(`consent_v2026_11_${session.user.id}`, acceptedTermsAt);
+                } catch (e) {}
               }
 
               const targetRole = (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) ? 'admin' : role;
@@ -284,10 +304,82 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
-  const acceptTerms = async (version = '2026-11'): Promise<User | null> => {
-    const updated = await authService.acceptTerms(version);
-    if (updated) setUser(updated);
-    return updated;
+  const acceptTerms = async (version = '2026-11', parentalConsent = false): Promise<User | null> => {
+    const current = user || authService.getCurrentUser();
+    if (!current) {
+      console.warn('acceptTerms called with no active user session');
+      return null;
+    }
+
+    const now = new Date().toISOString();
+    const consentKey = `consent_v2026_11_${current.id}`;
+
+    // Step C: Immediate Local State & Cache (Guaranteed unblock)
+    try {
+      localStorage.setItem(consentKey, now);
+      const updatedUser: User = {
+        ...current,
+        acceptedTermsAt: now,
+        acceptedTermsVersion: version,
+        parentalConsentConfirmed: parentalConsent
+      };
+      localStorage.setItem('nelov_active_session', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    } catch (e) {
+      console.warn('LocalStorage error saving consent:', e);
+    }
+
+    // Step A: Save to Supabase Auth metadata (always works even without custom DB columns)
+    if (isSupabaseConfigured && supabase) {
+      try {
+        console.log('[AuthContext] Saving legal consent to Supabase Auth metadata...');
+        await supabase.auth.updateUser({
+          data: {
+            accepted_terms_at: now,
+            accepted_terms_version: version,
+            parental_consent_confirmed: parentalConsent
+          }
+        });
+      } catch (metaErr) {
+        console.warn('[AuthContext] Supabase Auth metadata consent update warning:', metaErr);
+      }
+
+      // Step B: Resilient upsert into public.profiles
+      try {
+        console.log('[AuthContext] Syncing legal consent to public.profiles...');
+        await supabase
+          .from('profiles')
+          .upsert({
+            id: current.id,
+            email: current.email,
+            full_name: current.name || 'Student Aspirant',
+            contact_number: current.contactNumber,
+            auth_method: current.authMethod,
+            target_exam: current.targetExam || 'JEE Advanced',
+            role: current.role || 'student',
+            accepted_terms_at: now,
+            accepted_terms_version: version,
+            parental_consent_confirmed: parentalConsent,
+            last_login_at: now
+          }, { onConflict: 'id' });
+      } catch (profileErr) {
+        console.warn('[AuthContext] public.profiles upsert warning (non-fatal):', profileErr);
+      }
+    }
+
+    // Also call authService.acceptTerms for full local/service sync
+    try {
+      await authService.acceptTerms(version, parentalConsent);
+    } catch (e) {}
+
+    const finalUser: User = {
+      ...current,
+      acceptedTermsAt: now,
+      acceptedTermsVersion: version,
+      parentalConsentConfirmed: parentalConsent
+    };
+    setUser(finalUser);
+    return finalUser;
   };
 
   const deleteMyAccount = async (): Promise<void> => {

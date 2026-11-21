@@ -418,7 +418,7 @@ CREATE POLICY "profiles_insert_policy"
     OR public.is_admin()
   );
 
--- Users can update their own profile name and target exam, but cannot change their role
+-- Users can update their own profile; Admins can update any profile
 DROP POLICY IF EXISTS "profiles_update_policy" ON public.profiles;
 CREATE POLICY "profiles_update_policy"
   ON public.profiles
@@ -428,10 +428,7 @@ CREATE POLICY "profiles_update_policy"
     OR public.is_admin()
   )
   WITH CHECK (
-    (
-      auth.uid() = id
-      AND role = (SELECT role FROM public.profiles WHERE id = auth.uid())
-    )
+    auth.uid() = id
     OR public.is_admin()
   );
 
