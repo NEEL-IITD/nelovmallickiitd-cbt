@@ -151,7 +151,7 @@ export const LecturesSection: React.FC<LecturesSectionProps> = ({
                 {/* Footer Action */}
                 <div className="pt-4 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between">
                   <div className="text-[11px] font-semibold text-slate-500 dark:text-zinc-400 flex items-center gap-1">
-                    <span>👨‍🏫</span> Nelov Mallick (IITD)
+                    <span>👨‍🏫</span> Nelov Mallick
                   </div>
                   <span className="inline-flex items-center gap-1 text-xs font-bold text-red-600 dark:text-red-400 group-hover:translate-x-0.5 transition-transform">
                     Start Chapter →

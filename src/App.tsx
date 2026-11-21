@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { ExamType } from './types';
 import { AuthProvider, useAuth, ProtectedRoute, AdminRoute } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
+import { AnnouncementBanner } from './components/AnnouncementBanner';
 import { Hero } from './components/Hero';
 import { Founders } from './components/Founders';
 import { Features } from './components/Features';
@@ -103,6 +104,16 @@ export const AppContent: React.FC = () => {
         isDark={isDark}
         toggleTheme={toggleTheme}
         onNavigate={handleNavigate}
+      />
+
+      {/* Live Now Announcement Strip (TestonGo Inspired) */}
+      <AnnouncementBanner
+        onNavigate={handleNavigate}
+        onSelectTest={(testId) => {
+          if (testId.includes('pta-04')) handleNavigate('#/test/jee-advanced/pta-04');
+          else if (testId.includes('pta-05')) handleNavigate('#/test/jee-advanced/pta-05');
+          else handleNavigate('#/test/jee-advanced/pta-06');
+        }}
       />
 
       {/* Route-Based Content Rendering */}

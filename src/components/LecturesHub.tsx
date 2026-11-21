@@ -312,7 +312,7 @@ export const LecturesHub: React.FC<LecturesHubProps> = ({
 
                       <div className="flex items-center justify-between pt-1">
                         <span className="text-[11px] font-semibold text-slate-500 dark:text-zinc-400">
-                          Nelov Mallick (IITD)
+                          Nelov Mallick
                         </span>
                         <span className="inline-flex items-center gap-1 text-xs font-bold text-red-600 dark:text-red-400 group-hover:translate-x-0.5 transition-transform">
                           {completedInChapter > 0 && firstUnwatched ? `Continue ${firstUnwatched.lectureNumber} →` : 'Start Watching →'}

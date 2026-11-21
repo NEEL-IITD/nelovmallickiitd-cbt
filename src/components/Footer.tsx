@@ -27,7 +27,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAuth }) => {
                 NM
               </div>
               <span className="font-extrabold text-base tracking-tight text-slate-900 dark:text-zinc-50">
-                NelovMallick<span className="text-indigo-600 dark:text-indigo-400">IITD</span>
+                Nelov <span className="text-indigo-600 dark:text-indigo-400">Mallick</span>
               </span>
             </div>
 
