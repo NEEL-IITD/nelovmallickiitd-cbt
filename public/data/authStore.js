@@ -328,7 +328,28 @@
               displayEmail = profile.email;
             }
           }
-        } catch (e) {}
+
+          const targetRole = (isAdminEmail(displayEmail) || isAdminEmail(data.user.email)) ? 'admin' : role;
+          if (targetRole === 'admin') role = 'admin';
+
+          if (!profile) {
+            await supabaseClient.from('profiles').upsert({
+              id: data.user.id,
+              full_name: fullName,
+              email: displayEmail,
+              contact_number: userContact,
+              auth_method: authMethod,
+              target_exam: targetExam,
+              role: targetRole,
+              accepted_terms_at: acceptedTermsAt,
+              accepted_terms_version: acceptedTermsVersion,
+              parental_consent_confirmed: parentalConsentConfirmed,
+              last_login_at: new Date().toISOString()
+            }, { onConflict: 'id' });
+          }
+        } catch (e) {
+          console.warn('Profile sync notice:', e);
+        }
 
         if (isAdminEmail(displayEmail) || isAdminEmail(data.user.email)) {
           role = 'admin';
@@ -993,16 +1014,32 @@
       return this.getTestAttemptsCount(userId, testId) < 3;
     },
 
-    async getAllProfiles() {
+    async getProfilesWithStatus() {
       if (window.authService && window.authService.isCloudConnected() && supabaseClient) {
         try {
           const { data, error } = await supabaseClient
             .from('profiles')
             .select('*')
             .order('created_at', { ascending: false });
-          if (!error && data) return data;
-        } catch (e) {}
+          if (error) {
+            console.error('[Supabase] getAllProfiles error:', error);
+            return { data: [], error };
+          }
+          return { data: data || [], error: null };
+        } catch (e) {
+          console.error('[Supabase] getAllProfiles exception:', e);
+          return { data: [], error: e };
+        }
       }
+      return {
+        data: (window.authService && window.authService.getAllUsers) ? window.authService.getAllUsers() : [],
+        error: null
+      };
+    },
+
+    async getAllProfiles() {
+      const res = await this.getProfilesWithStatus();
+      if (res.data && res.data.length > 0) return res.data;
       return (window.authService && window.authService.getAllUsers) ? window.authService.getAllUsers() : [];
     },
 
@@ -1209,7 +1246,28 @@
             if (profile.accepted_terms_version) acceptedTermsVersion = profile.accepted_terms_version;
             if (profile.parental_consent_confirmed) parentalConsentConfirmed = Boolean(profile.parental_consent_confirmed);
           }
-        } catch (e) {}
+
+          const targetRole = (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) ? 'admin' : role;
+          if (targetRole === 'admin') role = 'admin';
+
+          if (!profile) {
+            await supabaseClient.from('profiles').upsert({
+              id: session.user.id,
+              full_name: fullName,
+              email: displayEmail,
+              contact_number: contactNumber,
+              auth_method: authMethod,
+              target_exam: session.user.user_metadata?.target_exam || 'JEE Advanced',
+              role: targetRole,
+              accepted_terms_at: acceptedTermsAt,
+              accepted_terms_version: acceptedTermsVersion,
+              parental_consent_confirmed: parentalConsentConfirmed,
+              last_login_at: new Date().toISOString()
+            }, { onConflict: 'id' });
+          }
+        } catch (e) {
+          console.warn('Profile sync notice on login:', e);
+        }
 
         if (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) {
           role = 'admin';

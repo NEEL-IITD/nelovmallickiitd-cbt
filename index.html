@@ -8513,6 +8513,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [allBookmarks, setAllBookmarks] = useState([]);
       const [allLectures, setAllLectures] = useState([]);
       const [reports, setReports] = useState([]);
+      const [supabaseError, setSupabaseError] = useState(null);
 
       // Filters & Modals
       const [studentSearch, setStudentSearch] = useState('');
@@ -8543,14 +8544,32 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       const loadData = async () => {
         setLoading(true);
+        setSupabaseError(null);
         try {
           let pList = [];
-          if (window.studentStorage?.getAllProfiles) {
+          if (window.studentStorage?.getProfilesWithStatus) {
+            const pRes = await window.studentStorage.getProfilesWithStatus();
+            if (pRes.error) {
+              setSupabaseError(pRes.error.message || 'Supabase profiles query error');
+            }
+            pList = pRes.data || [];
+          } else if (window.studentStorage?.getAllProfiles) {
             pList = await window.studentStorage.getAllProfiles();
           }
           if ((!pList || pList.length === 0) && window.authService?.getAllUsers) {
             pList = window.authService.getAllUsers() || [];
           }
+
+          // Normalize student records so name and full_name are always defined
+          pList = (pList || []).map(s => {
+            const displayName = s.full_name || s.name || (s.email ? s.email.split('@')[0] : 'Student Aspirant');
+            return {
+              ...s,
+              name: displayName,
+              full_name: displayName
+            };
+          });
+          setStudents(pList);
 
           let atts = [];
           if (window.studentStorage?.getAllAttempts) {
@@ -8747,7 +8766,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const filteredStudents = students.filter(s => {
         if (studentSearch) {
           const q = studentSearch.toLowerCase();
-          const matchName = (s.name || '').toLowerCase().includes(q);
+          const matchName = (s.name || s.full_name || '').toLowerCase().includes(q);
           const matchEmail = (s.email || '').toLowerCase().includes(q);
           const matchPhone = (s.contact_number || '').includes(q);
           if (!matchName && !matchEmail && !matchPhone) return false;
@@ -8868,6 +8887,25 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
           {/* Main Content Area */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+
+            {/* Supabase Cloud Connection / RLS Warning Banner */}
+            {supabaseError && (
+              <div className="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">⚠️</span>
+                  <div>
+                    <p className="font-bold text-xs uppercase tracking-wider text-amber-700 dark:text-amber-400">Database Connection Notice</p>
+                    <p className="text-xs">{supabaseError} — Showing local/cached student records if available.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => loadData()}
+                  className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap"
+                >
+                  <span>↻</span> Retry Supabase Sync
+                </button>
+              </div>
+            )}
 
             {/* 1. OVERVIEW & ANALYTICS TAB */}
             {adminTab === 'overview' && (

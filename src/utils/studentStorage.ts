@@ -644,21 +644,46 @@ export const studentStorage = {
   // ----------------------------------------------------------------------------
   // ADMIN AGGREGATIONS & CLOUD DIRECTORY
   // ----------------------------------------------------------------------------
-  async getAllProfiles(): Promise<any[]> {
+  async getProfilesWithStatus(): Promise<{ data: any[]; error: any | null }> {
     if (isSupabaseConfigured && supabase) {
       try {
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .order('created_at', { ascending: false });
-        if (!error && data) {
-          return data;
+        if (error) {
+          console.error('[Supabase] getAllProfiles error:', error);
+          // Return empty data but pass along error for visibility
+          return { data: [], error };
         }
-      } catch (e) {
-        console.warn('Error fetching all profiles from Supabase:', e);
+        return { data: data || [], error: null };
+      } catch (e: any) {
+        console.error('[Supabase] getAllProfiles exception:', e);
+        return { data: [], error: e };
       }
     }
-    // Local storage fallback
+    const users = (authService as any).getAllUsers ? (authService as any).getAllUsers() : [];
+    return {
+      data: users.map((u: any) => ({
+        id: u.id,
+        full_name: u.name,
+        email: u.email,
+        contact_number: u.contactNumber,
+        auth_method: u.authMethod || (u.contactNumber ? 'phone' : 'gmail'),
+        target_exam: u.targetExam,
+        role: u.role,
+        created_at: u.createdAt
+      })),
+      error: null
+    };
+  },
+
+  async getAllProfiles(): Promise<any[]> {
+    const res = await this.getProfilesWithStatus();
+    if (res.data && res.data.length > 0) {
+      return res.data;
+    }
+    // Local storage fallback if Supabase returns nothing or in local-only mode
     const users = (authService as any).getAllUsers ? (authService as any).getAllUsers() : [];
     return users.map((u: any) => ({
       id: u.id,

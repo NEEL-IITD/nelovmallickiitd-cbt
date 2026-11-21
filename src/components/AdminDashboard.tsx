@@ -26,6 +26,7 @@ export const AdminDashboard: React.FC = () => {
 
   // UI / Filter States
   const [loading, setLoading] = useState(true);
+  const [supabaseError, setSupabaseError] = useState<string | null>(null);
   const [studentSearch, setStudentSearch] = useState('');
   const [studentAuthFilter, setStudentAuthFilter] = useState<'All' | 'google' | 'gmail' | 'phone' | 'email_with_phone'>('All');
   const [studentExamFilter, setStudentExamFilter] = useState<'All' | 'JEE Mains' | 'JEE Advanced' | 'Both'>('All');
@@ -58,9 +59,10 @@ export const AdminDashboard: React.FC = () => {
 
   const loadAllAdminData = async () => {
     setLoading(true);
+    setSupabaseError(null);
     try {
-      const [profilesData, attemptsData, bookmarksData, lecturesData, reportsData, configsData] = await Promise.all([
-        studentStorage.getAllProfiles(),
+      const [profilesResult, attemptsData, bookmarksData, lecturesData, reportsData, configsData] = await Promise.all([
+        studentStorage.getProfilesWithStatus(),
         studentStorage.getAllAttempts(),
         studentStorage.getAllBookmarks(),
         studentStorage.getAllLectureProgress(),
@@ -68,14 +70,20 @@ export const AdminDashboard: React.FC = () => {
         studentStorage.getTestConfigs()
       ]);
 
-      setStudents(profilesData || []);
+      if (profilesResult.error) {
+        console.warn('Supabase profiles fetch notice:', profilesResult.error);
+        setSupabaseError(profilesResult.error.message || 'Supabase profiles query returned an error or was restricted by RLS.');
+      }
+
+      setStudents(profilesResult.data || []);
       setAllAttempts(attemptsData || []);
       setAllBookmarks(bookmarksData || []);
       setAllLectures(lecturesData || []);
       setReports(reportsData || []);
       setTestConfigs(configsData || {});
-    } catch (e) {
+    } catch (e: any) {
       console.warn('Error loading admin portal data:', e);
+      setSupabaseError(e?.message || 'Unexpected error loading data from cloud.');
     } finally {
       setLoading(false);
     }
@@ -225,7 +233,15 @@ export const AdminDashboard: React.FC = () => {
     }
     if (studentAuthFilter !== 'All') {
       const m = s.auth_method || (s.contact_number && !s.email ? 'phone' : 'gmail');
-      if (m !== studentAuthFilter) return false;
+      if (studentAuthFilter === 'google' || studentAuthFilter === 'gmail') {
+        if (m !== 'google' && m !== 'gmail' && !(s.email && s.email.includes('@gmail.com'))) return false;
+      } else if (studentAuthFilter === 'phone') {
+        if (m !== 'phone' && !(s.contact_number && !s.email)) return false;
+      } else if (studentAuthFilter === 'email_with_phone') {
+        if (m !== 'email_with_phone') return false;
+      } else if (m !== studentAuthFilter) {
+        return false;
+      }
     }
     if (studentExamFilter !== 'All') {
       if (s.target_exam !== studentExamFilter) return false;
@@ -341,6 +357,25 @@ export const AdminDashboard: React.FC = () => {
         {loading && (
           <div className="py-8 text-center text-xs font-bold text-slate-400 animate-pulse">
             Syncing real-time admin portal data from Supabase...
+          </div>
+        )}
+
+        {/* Supabase Cloud Connection / RLS Warning Banner */}
+        {supabaseError && (
+          <div className="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-sm">
+            <div className="flex items-center gap-3">
+              <span className="text-xl">⚠️</span>
+              <div>
+                <p className="font-bold text-xs uppercase tracking-wider text-amber-700 dark:text-amber-400">Database Connection Notice</p>
+                <p className="text-xs">{supabaseError} — Showing local/cached records if available.</p>
+              </div>
+            </div>
+            <button
+              onClick={() => loadAllAdminData()}
+              className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap"
+            >
+              <span>↻</span> Retry Supabase Sync
+            </button>
           </div>
         )}
 

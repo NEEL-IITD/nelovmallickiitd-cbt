@@ -84,8 +84,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   displayEmail = profile.email;
                 }
               }
+
+              // Self-healing: If profile was missing in Supabase, upsert it immediately
+              const targetRole = (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) ? 'admin' : role;
+              if (targetRole === 'admin') role = 'admin';
+
+              if (!profile) {
+                await supabase.from('profiles').upsert({
+                  id: session.user.id,
+                  full_name: fullName,
+                  email: displayEmail,
+                  contact_number: contactNumber,
+                  auth_method: authMethod,
+                  target_exam: targetExam,
+                  role: targetRole,
+                  accepted_terms_at: acceptedTermsAt,
+                  accepted_terms_version: acceptedTermsVersion,
+                  parental_consent_confirmed: parentalConsentConfirmed,
+                  last_login_at: new Date().toISOString()
+                }, { onConflict: 'id' });
+              }
             } catch (err) {
-              console.warn('Profile fetch error:', err);
+              console.warn('Profile fetch/sync error:', err);
             }
 
             // Auto Admin Recognition
@@ -175,8 +195,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   displayEmail = profile.email;
                 }
               }
+
+              const targetRole = (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) ? 'admin' : role;
+              if (targetRole === 'admin') role = 'admin';
+
+              if (!profile) {
+                await supabase.from('profiles').upsert({
+                  id: session.user.id,
+                  full_name: fullName,
+                  email: displayEmail,
+                  contact_number: contactNumber,
+                  auth_method: authMethod,
+                  target_exam: targetExam,
+                  role: targetRole,
+                  accepted_terms_at: acceptedTermsAt,
+                  accepted_terms_version: acceptedTermsVersion,
+                  parental_consent_confirmed: parentalConsentConfirmed,
+                  last_login_at: new Date().toISOString()
+                }, { onConflict: 'id' });
+              }
             }
-          } catch (err) {}
+          } catch (err) {
+            console.warn('Profile fetch/sync error on auth state change:', err);
+          }
 
           // Auto Admin Recognition
           if (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) {

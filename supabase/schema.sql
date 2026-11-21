@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_login_at TIMESTAMPTZ DEFAULT NOW(),
   CONSTRAINT check_email_or_contact CHECK (
+    (auth_method IN ('google', 'gmail') AND email IS NOT NULL) OR
     (email ILIKE '%@gmail.com') OR 
     (contact_number IS NOT NULL AND length(trim(contact_number)) >= 10) OR 
     (role = 'admin')
@@ -44,7 +45,7 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
 DECLARE
   v_full_name TEXT;
@@ -68,10 +69,13 @@ BEGIN
 
   -- Extract full name from user metadata or fallback
   v_full_name := COALESCE(
-    NEW.raw_user_meta_data->>'full_name',
-    NEW.raw_user_meta_data->>'name',
-    CASE WHEN v_is_phone_user THEN 'Student Aspirant' ELSE SPLIT_PART(NEW.email, '@', 1) END,
-    'Student Aspirant'
+    NULLIF(TRIM(NEW.raw_user_meta_data->>'full_name'), ''),
+    NULLIF(TRIM(NEW.raw_user_meta_data->>'name'), ''),
+    CASE
+      WHEN v_is_phone_user THEN 'Student Aspirant'
+      WHEN v_email IS NOT NULL AND POSITION('@' IN v_email) > 1 THEN SPLIT_PART(v_email, '@', 1)
+      ELSE 'Student Aspirant'
+    END
   );
 
   v_target_exam := COALESCE(
@@ -82,20 +86,18 @@ BEGIN
     v_target_exam := 'JEE Advanced';
   END IF;
 
-  v_contact_number := NEW.raw_user_meta_data->>'contact_number';
-  IF v_contact_number IS NOT NULL AND TRIM(v_contact_number) = '' THEN
-    v_contact_number := NULL;
-  END IF;
+  v_contact_number := NULLIF(TRIM(NEW.raw_user_meta_data->>'contact_number'), '');
 
-  v_auth_method := COALESCE(
-    NEW.raw_user_meta_data->>'auth_method',
-    CASE 
-      WHEN v_is_phone_user THEN 'phone'
-      WHEN NEW.raw_app_meta_data->>'provider' = 'google' THEN 'google'
-      WHEN v_email ILIKE '%@gmail.com' THEN 'gmail'
-      ELSE 'email_with_phone'
-    END
-  );
+  -- Determine Auth Method (Google OAuth vs Gmail vs Phone)
+  IF NEW.raw_app_meta_data->>'provider' = 'google' OR NEW.raw_user_meta_data->>'auth_method' = 'google' THEN
+    v_auth_method := 'google';
+  ELSIF v_is_phone_user THEN
+    v_auth_method := 'phone';
+  ELSIF v_email ILIKE '%@gmail.com' THEN
+    v_auth_method := 'gmail';
+  ELSE
+    v_auth_method := COALESCE(NEW.raw_user_meta_data->>'auth_method', 'google');
+  END IF;
 
   -- Extract legal consent and parental approval metadata
   IF NEW.raw_user_meta_data->>'accepted_terms_at' IS NOT NULL THEN
@@ -113,10 +115,17 @@ BEGIN
   END IF;
 
   -- Auto Admin Recognition:
-  IF LOWER(COALESCE(NEW.email, '')) = LOWER('YOUR_ADMIN_EMAIL@gmail.com')
-     OR LOWER(COALESCE(NEW.email, '')) IN ('nelovmallick@gmail.com', 'mallicknelov@gmail.com', 'nelovmallick@iitd.ac.in')
-     OR LOWER(COALESCE(v_email, '')) = LOWER('YOUR_ADMIN_EMAIL@gmail.com')
-     OR LOWER(COALESCE(v_email, '')) IN ('nelovmallick@gmail.com', 'mallicknelov@gmail.com', 'nelovmallick@iitd.ac.in') THEN
+  IF LOWER(COALESCE(NEW.email, '')) IN (
+    'mallicknelov@gmail.com',
+    'nelovmallick@gmail.com',
+    'nelovmallick@iitd.ac.in',
+    'your_admin_email@gmail.com'
+  ) OR LOWER(COALESCE(v_email, '')) IN (
+    'mallicknelov@gmail.com',
+    'nelovmallick@gmail.com',
+    'nelovmallick@iitd.ac.in',
+    'your_admin_email@gmail.com'
+  ) THEN
     v_role := 'admin';
   END IF;
 
@@ -145,19 +154,20 @@ BEGIN
     v_accepted_terms_at,
     v_accepted_terms_version,
     v_parental_consent,
-    NOW(),
+    COALESCE(NEW.created_at, NOW()),
     NOW()
   )
   ON CONFLICT (id) DO UPDATE
   SET
     full_name = EXCLUDED.full_name,
-    email = COALESCE(EXCLUDED.email, profiles.email),
-    contact_number = COALESCE(EXCLUDED.contact_number, profiles.contact_number),
-    auth_method = COALESCE(EXCLUDED.auth_method, profiles.auth_method),
-    role = CASE WHEN v_role = 'admin' THEN 'admin' ELSE profiles.role END,
-    accepted_terms_at = COALESCE(profiles.accepted_terms_at, EXCLUDED.accepted_terms_at),
-    accepted_terms_version = COALESCE(profiles.accepted_terms_version, EXCLUDED.accepted_terms_version),
-    parental_consent_confirmed = COALESCE(profiles.parental_consent_confirmed, EXCLUDED.parental_consent_confirmed),
+    email = COALESCE(EXCLUDED.email, public.profiles.email),
+    contact_number = COALESCE(EXCLUDED.contact_number, public.profiles.contact_number),
+    auth_method = COALESCE(EXCLUDED.auth_method, public.profiles.auth_method),
+    target_exam = COALESCE(EXCLUDED.target_exam, public.profiles.target_exam),
+    role = CASE WHEN v_role = 'admin' THEN 'admin' ELSE public.profiles.role END,
+    accepted_terms_at = COALESCE(public.profiles.accepted_terms_at, EXCLUDED.accepted_terms_at),
+    accepted_terms_version = COALESCE(public.profiles.accepted_terms_version, EXCLUDED.accepted_terms_version),
+    parental_consent_confirmed = COALESCE(public.profiles.parental_consent_confirmed, EXCLUDED.parental_consent_confirmed),
     last_login_at = NOW();
 
   RETURN NEW;
@@ -335,24 +345,46 @@ CREATE INDEX IF NOT EXISTS idx_error_reports_test ON public.error_reports(test_i
 -- ==============================================================================
 
 -- Helper function: Safely check if current authenticated user has 'admin' role
--- SECURITY DEFINER prevents infinite RLS recursion loops
+-- SECURITY DEFINER prevents infinite RLS recursion loops; searches path securely
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = ''
 AS $$
+DECLARE
+  v_jwt_email TEXT;
 BEGIN
   IF auth.uid() IS NULL THEN
     RETURN FALSE;
   END IF;
 
-  RETURN EXISTS (
+  -- Step A: Check role directly in public.profiles
+  IF EXISTS (
     SELECT 1
     FROM public.profiles
     WHERE id = auth.uid()
       AND role = 'admin'
-  );
+  ) THEN
+    RETURN TRUE;
+  END IF;
+
+  -- Step B: Fallback check against verified email in Supabase JWT claim
+  v_jwt_email := LOWER(COALESCE(
+    auth.jwt()->>'email',
+    current_setting('request.jwt.claim.email', true)
+  ));
+
+  IF v_jwt_email IN (
+    'mallicknelov@gmail.com',
+    'nelovmallick@gmail.com',
+    'nelovmallick@iitd.ac.in',
+    'your_admin_email@gmail.com'
+  ) THEN
+    RETURN TRUE;
+  END IF;
+
+  RETURN FALSE;
 END;
 $$;
 
@@ -367,6 +399,7 @@ ALTER TABLE public.error_reports ENABLE ROW LEVEL SECURITY;
 -- RLS Policies: Profiles
 -- ------------------------------------------------------------------------------
 -- Users can view their own profile; Admins can view all profiles
+DROP POLICY IF EXISTS "profiles_select_policy" ON public.profiles;
 CREATE POLICY "profiles_select_policy"
   ON public.profiles
   FOR SELECT
@@ -375,7 +408,18 @@ CREATE POLICY "profiles_select_policy"
     OR public.is_admin()
   );
 
+-- Users can insert their own profile on signup/self-healing sync; Admins can insert any profile
+DROP POLICY IF EXISTS "profiles_insert_policy" ON public.profiles;
+CREATE POLICY "profiles_insert_policy"
+  ON public.profiles
+  FOR INSERT
+  WITH CHECK (
+    auth.uid() = id
+    OR public.is_admin()
+  );
+
 -- Users can update their own profile name and target exam, but cannot change their role
+DROP POLICY IF EXISTS "profiles_update_policy" ON public.profiles;
 CREATE POLICY "profiles_update_policy"
   ON public.profiles
   FOR UPDATE
