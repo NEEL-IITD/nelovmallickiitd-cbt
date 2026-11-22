@@ -6207,19 +6207,20 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             </div>
           </div>
 
-          {/* Top 3 Performers Mini-Bar */}
+          {/* Top 5 Performers Mini-Bar */}
           {leaderboardData?.entries && leaderboardData.entries.length > 0 && (
             <div className="space-y-2 pt-2">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Top 3 Candidates on this Paper:</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {leaderboardData.entries.slice(0, 3).map((entry, idx) => (
-                  <div key={idx} className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="font-bold">{idx === 0 ? 'ðŸ‘‘ #1' : (idx === 1 ? 'ðŸ¥ˆ #2' : 'ðŸ¥‰ #3')}</span>
-                      <span className="font-semibold text-slate-800 dark:text-zinc-200 truncate">{entry.displayName}</span>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Top 5 Candidates on this Paper:</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+                {leaderboardData.entries.slice(0, 5).map((entry, idx) => (
+                  <div key={idx} className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800 flex flex-col justify-between text-xs space-y-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-bold text-[10px]">{idx === 0 ? '👑 #1' : (idx === 1 ? '🥈 #2' : (idx === 2 ? '🥉 #3' : `🎖️ #${idx + 1}`))}</span>
+                      <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400">{entry.percentile}%ile</span>
                     </div>
-                    <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 shrink-0">
-                      {entry.marks} Mks ({entry.percentile}%ile)
+                    <span className="font-semibold text-slate-800 dark:text-zinc-200 truncate text-[11px]">{entry.displayName}</span>
+                    <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 text-[11px]">
+                      {entry.marks} <span className="text-[9px] text-slate-400">/ {entry.maxMarks}</span>
                     </span>
                   </div>
                 ))}
@@ -9424,7 +9425,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
     // Full Visibility for Admin Gmail (Students, Contact Numbers, Attempts, Lectures, Bookmarks, Reports)
     // =========================================================================
     function AdminDashboardView({ currentUser, setView, testConfigs, setTestConfigs, detailedConfigs: propDetailedConfigs, setDetailedConfigs: propSetDetailedConfigs }) {
-      const [adminLeaderboardTestId, setAdminLeaderboardTestId] = useState('jee-advanced-pta-04');
+      const [adminLeaderboardTestId, setAdminLeaderboardTestId] = useState('jee-mains-ptm-01');
       const [adminLeaderboardData, setAdminLeaderboardData] = useState(null);
       const [adminLeaderboardLoading, setAdminLeaderboardLoading] = useState(false);
       const [scheduleModal, setScheduleModal] = useState(null);
@@ -9447,6 +9448,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [studentSearch, setStudentSearch] = useState('');
       const [studentAuthFilter, setStudentAuthFilter] = useState('All');
       const [studentExamFilter, setStudentExamFilter] = useState('All');
+      const [studentQuickFilter, setStudentQuickFilter] = useState('All'); // 'All' | 'attempted_ge_1' | 'attempted_ptm01' | 'zero_attempts'
+      const [studentSortBy, setStudentSortBy] = useState('most_tests'); // 'most_tests' | 'highest_avg' | 'newest_joined' | 'name'
       const [selectedStudent, setSelectedStudent] = useState(null);
       const [copiedPhone, setCopiedPhone] = useState(null);
 
@@ -9572,10 +9575,19 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return;
         }
 
-        const headers = ['Full Name', 'Gmail / Email', 'Contact Number', 'Login Method', 'Target Exam', 'Role', 'Joined Date', 'Terms Accepted At', 'Terms Version', 'Parental Consent', 'Tests Attempted', 'Avg Score %', 'Lectures Completed', 'Bookmarks'];
+        const headers = ['Full Name', 'Gmail / Email', 'Contact Number', 'Login Method', 'Target Exam', 'Role', 'Joined Date', 'Unique Tests Given', 'Total Attempts', 'Tests Breakdown', 'Avg Score %', 'Lectures Completed', 'Bookmarks'];
         const rows = students.map((s) => {
           const sId = s.id;
-          const studentAttempts = allAttempts.filter((a) => (a.userId === sId || a.user_id === sId));
+          const studentAttempts = allAttempts.filter((a) => (a.userId === sId || a.user_id === sId) || (s.email && (a.studentEmail === s.email || a.email === s.email)));
+          const uniqueTests = new Set(studentAttempts.map(a => a.testCode || a.code || a.testId)).size;
+
+          const attemptCountByTest = {};
+          studentAttempts.forEach(a => {
+            const code = a.testCode || a.code || (a.testId ? a.testId.replace('jee-mains-', '').replace('jee-advanced-', '').toUpperCase() : 'Test');
+            attemptCountByTest[code] = (attemptCountByTest[code] || 0) + 1;
+          });
+          const breakdown = Object.entries(attemptCountByTest).map(([c, count]) => `${c} (${count}/3)`).join('; ') || 'No tests yet';
+
           const studentLectures = allLectures.filter((l) => (l.user_id === sId || l.userId === sId) && l.completed);
           const studentBookmarks = allBookmarks.filter((b) => (b.user_id === sId || b.userId === sId));
           const avgScore = studentAttempts.length > 0
@@ -9590,10 +9602,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             `"${s.target_exam || 'JEE Advanced'}"`,
             `"${s.role || 'student'}"`,
             `"${s.created_at ? new Date(s.created_at).toLocaleDateString() : ''}"`,
-            `"${s.accepted_terms_at || s.acceptedTermsAt || 'Pending'}"`,
-            `"${s.accepted_terms_version || s.acceptedTermsVersion || '2026-11'}"`,
-            `"${s.parental_consent_confirmed || s.parentalConsentConfirmed ? 'Yes' : 'No'}"`,
+            uniqueTests,
             studentAttempts.length,
+            `"${breakdown}"`,
             `${avgScore}%`,
             studentLectures.length,
             studentBookmarks.length
@@ -9832,8 +9843,30 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const liveTestsCount = Object.values(testConfigs).filter(s => s === 'live').length;
       const openReportsCount = reports.filter(r => r.status === 'open').length;
 
-      // Filtered Students
+      // Filtered Students & Quick Filter Counts
+      const attemptedStudentsCount = students.filter(s => {
+        const atts = allAttempts.filter(a => (a.userId || a.user_id) === s.id || (s.email && (a.studentEmail || a.email) === s.email));
+        return atts.length >= 1;
+      }).length;
+
+      const ptm01StudentsCount = students.filter(s => {
+        const atts = allAttempts.filter(a => (a.userId || a.user_id) === s.id || (s.email && (a.studentEmail || a.email) === s.email));
+        return atts.some(a => (a.testCode === 'PTM 01' || a.testId === 'jee-mains-ptm-01' || a.code === 'PTM 01'));
+      }).length;
+
+      const zeroAttemptStudentsCount = students.filter(s => {
+        const atts = allAttempts.filter(a => (a.userId || a.user_id) === s.id || (s.email && (a.studentEmail || a.email) === s.email));
+        return atts.length === 0;
+      }).length;
+
       const filteredStudents = students.filter(s => {
+        const sAtts = allAttempts.filter(a => (a.userId || a.user_id) === s.id || (s.email && (a.studentEmail || a.email) === s.email));
+
+        // Quick Filters
+        if (studentQuickFilter === 'attempted_ge_1' && sAtts.length < 1) return false;
+        if (studentQuickFilter === 'attempted_ptm01' && !sAtts.some(a => (a.testCode === 'PTM 01' || a.testId === 'jee-mains-ptm-01' || a.code === 'PTM 01'))) return false;
+        if (studentQuickFilter === 'zero_attempts' && sAtts.length > 0) return false;
+
         if (studentSearch) {
           const q = studentSearch.toLowerCase();
           const matchName = (s.name || s.full_name || '').toLowerCase().includes(q);
@@ -9854,6 +9887,28 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return false;
         }
         return true;
+      }).sort((sA, sB) => {
+        const attsA = allAttempts.filter(a => (a.userId || a.user_id) === sA.id || (sA.email && (a.studentEmail || a.email) === sA.email));
+        const attsB = allAttempts.filter(a => (a.userId || a.user_id) === sB.id || (sB.email && (a.studentEmail || a.email) === sB.email));
+        const uniqueA = new Set(attsA.map(a => a.testCode || a.code || a.testId)).size;
+        const uniqueB = new Set(attsB.map(a => a.testCode || a.code || a.testId)).size;
+
+        if (studentSortBy === 'most_tests') {
+          if (uniqueB !== uniqueA) return uniqueB - uniqueA;
+          return attsB.length - attsA.length;
+        }
+        if (studentSortBy === 'highest_avg') {
+          const avgA = attsA.length > 0 ? (attsA.reduce((sum, a) => sum + (a.percentage || 0), 0) / attsA.length) : 0;
+          const avgB = attsB.length > 0 ? (attsB.reduce((sum, a) => sum + (a.percentage || 0), 0) / attsB.length) : 0;
+          return avgB - avgA;
+        }
+        if (studentSortBy === 'newest_joined') {
+          return new Date(sB.created_at || 0).getTime() - new Date(sA.created_at || 0).getTime();
+        }
+        if (studentSortBy === 'name') {
+          return (sA.name || '').localeCompare(sB.name || '');
+        }
+        return 0;
       });
 
       // Filtered Attempts
@@ -10093,45 +10148,89 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             {/* 2. ALL STUDENTS DIRECTORY TAB */}
             {adminTab === 'students' && (
               <div className="space-y-6 animate-in fade-in">
-                {/* Search, Filter & Export Bar */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#121318] p-5 rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-sm">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-1">
-                    <input
-                      type="text"
-                      value={studentSearch}
-                      onChange={(e) => setStudentSearch(e.target.value)}
-                      placeholder="Search by Name, Gmail, or Contact Number..."
-                      className="flex-1 max-w-md px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs text-slate-900 dark:text-zinc-100"
-                    />
-
-                    {/* Auth Method Filter */}
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[11px] font-bold text-slate-500">Method:</span>
-                      {['All', 'gmail', 'phone', 'email_with_phone'].map((m) => (
-                        <button
-                          key={m}
-                          onClick={() => setStudentAuthFilter(m)}
-                          className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                            studentAuthFilter === m
-                              ? 'bg-indigo-600 text-white shadow-sm'
-                              : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300'
-                          }`}
-                        >
-                          {m === 'All' ? 'All' : m === 'gmail' ? 'Gmail' : m === 'phone' ? 'Phone' : 'Email+Phone'}
-                        </button>
-                      ))}
-                    </div>
+                {/* Search, Quick Filters & Export Bar */}
+                <div className="flex flex-col gap-4 bg-white dark:bg-[#121318] p-5 rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-sm">
+                  {/* Quick Filters Row */}
+                  <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider shrink-0">Quick Filter:</span>
+                    {[
+                      { id: 'All', label: `All Students (${students.length})` },
+                      { id: 'attempted_ge_1', label: `Attempted ≥ 1 Test (${attemptedStudentsCount})` },
+                      { id: 'attempted_ptm01', label: `Attempted PTM 01 (${ptm01StudentsCount})` },
+                      { id: 'zero_attempts', label: `0 Tests Taken (${zeroAttemptStudentsCount})` }
+                    ].map(tab => (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setStudentQuickFilter(tab.id)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 border ${
+                          studentQuickFilter === tab.id
+                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                            : 'bg-slate-50 dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-800 hover:border-indigo-400'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={handleExportStudentsCSV}
-                      className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md flex items-center gap-2 transition-transform hover:scale-105 active:scale-95"
-                    >
-                      <span>📥</span>
-                      <span>Export Students CSV</span>
-                    </button>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-zinc-800/80">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 flex-1 flex-wrap">
+                      <input
+                        type="text"
+                        value={studentSearch}
+                        onChange={(e) => setStudentSearch(e.target.value)}
+                        placeholder="Search by Name, Gmail, or Contact Number..."
+                        className="flex-1 min-w-[200px] max-w-sm px-4 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs text-slate-900 dark:text-zinc-100"
+                      />
+
+                      {/* Auth Method Filter */}
+                      <select
+                        value={studentAuthFilter}
+                        onChange={(e) => setStudentAuthFilter(e.target.value)}
+                        className="px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs font-bold text-slate-700 dark:text-zinc-300"
+                      >
+                        <option value="All">All Auth Methods</option>
+                        <option value="gmail">Gmail OAuth</option>
+                        <option value="phone">Name + Phone</option>
+                        <option value="email_with_phone">Email + Phone</option>
+                      </select>
+
+                      {/* Target Exam Filter */}
+                      <select
+                        value={studentExamFilter}
+                        onChange={(e) => setStudentExamFilter(e.target.value)}
+                        className="px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs font-bold text-slate-700 dark:text-zinc-300"
+                      >
+                        <option value="All">All Exams</option>
+                        <option value="JEE Advanced">JEE Advanced</option>
+                        <option value="JEE Mains">JEE Mains</option>
+                        <option value="Both">Both</option>
+                      </select>
+
+                      {/* Sort Options */}
+                      <select
+                        value={studentSortBy}
+                        onChange={(e) => setStudentSortBy(e.target.value)}
+                        className="px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs font-bold text-slate-700 dark:text-zinc-300"
+                      >
+                        <option value="most_tests">Sort: Most Tests Taken</option>
+                        <option value="highest_avg">Sort: Highest Avg Score</option>
+                        <option value="newest_joined">Sort: Newest Joined</option>
+                        <option value="name">Sort: Name (A-Z)</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={handleExportStudentsCSV}
+                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md flex items-center gap-2 transition-transform hover:scale-105 active:scale-95"
+                      >
+                        <span>📥</span>
+                        <span>Export CSV</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -10141,32 +10240,42 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     <table className="w-full text-left text-xs">
                       <thead className="bg-slate-50 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-500 uppercase font-bold text-[10px]">
                         <tr>
-                          <th className="p-4">Student</th>
-                          <th className="p-4">Gmail / Email</th>
-                          <th className="p-4">Contact Number</th>
-                          <th className="p-4">Login Method</th>
-                          <th className="p-4">Target Exam</th>
-                          <th className="p-4 text-center">Consent / Terms</th>
-                          <th className="p-4 text-center">Attempts</th>
-                          <th className="p-4 text-center">Avg %</th>
-                          <th className="p-4 text-center">Lectures</th>
-                          <th className="p-4 text-center">Bookmarks</th>
-                          <th className="p-4 text-right">Actions</th>
+                          <th className="p-3.5">Student</th>
+                          <th className="p-3.5">Gmail / Email</th>
+                          <th className="p-3.5">Contact Number</th>
+                          <th className="p-3.5">Login Method</th>
+                          <th className="p-3.5">Target</th>
+                          <th className="p-3.5 text-center">Unique Tests</th>
+                          <th className="p-3.5 text-center">Total Attempts</th>
+                          <th className="p-3.5">Tests Breakdown</th>
+                          <th className="p-3.5 text-center">Avg %</th>
+                          <th className="p-3.5 text-right">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 dark:divide-zinc-800">
                         {filteredStudents.length === 0 ? (
                           <tr>
-                            <td colSpan="10" className="p-12 text-center text-slate-400">
+                            <td colSpan="10" className="p-12 text-center text-slate-400 italic">
                               No student records found matching this filter.
                             </td>
                           </tr>
                         ) : (
                           filteredStudents.map((s, idx) => {
                             const sId = s.id;
-                            const studentAttempts = allAttempts.filter((a) => a.userId === sId || a.user_id === sId);
-                            const studentLectures = allLectures.filter((l) => (l.user_id === sId || l.userId === sId) && l.completed);
-                            const studentBookmarks = allBookmarks.filter((b) => (b.user_id === sId || b.userId === sId));
+                            const studentAttempts = allAttempts.filter((a) => (a.userId === sId || a.user_id === sId) || (s.email && (a.studentEmail === s.email || a.email === s.email)));
+                            const uniqueTestsCount = new Set(studentAttempts.map(a => a.testCode || a.code || a.testId)).size;
+
+                            // Count attempts per test
+                            const testCountMap = {};
+                            studentAttempts.forEach(a => {
+                              const code = a.testCode || a.code || (a.testId ? a.testId.replace('jee-mains-', '').replace('jee-advanced-', '').toUpperCase() : 'Test');
+                              testCountMap[code] = (testCountMap[code] || 0) + 1;
+                            });
+                            const breakdownBadges = Object.entries(testCountMap).map(([tCode, count]) => ({
+                              code: tCode,
+                              label: `${tCode} (${count}/3)`
+                            }));
+
                             const avgScore = studentAttempts.length > 0
                               ? Math.round(studentAttempts.reduce((acc, a) => acc + (a.percentage || 0), 0) / studentAttempts.length)
                               : 0;
@@ -10176,11 +10285,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
                             return (
                               <tr
-                                key={idx}
+                                key={s.id || idx}
                                 onClick={() => setSelectedStudent(s)}
                                 className="hover:bg-slate-50 dark:hover:bg-zinc-800/40 cursor-pointer transition-colors"
                               >
-                                <td className="p-4">
+                                <td className="p-3.5">
                                   <div className="flex items-center gap-2.5">
                                     <div className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-black flex items-center justify-center text-xs">
                                       {s.name ? s.name.substring(0, 2).toUpperCase() : 'ST'}
@@ -10191,10 +10300,10 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                     </div>
                                   </div>
                                 </td>
-                                <td className="p-4 text-slate-600 dark:text-zinc-300 font-mono">
-                                  {s.email ? s.email : <span className="text-slate-400 italic">No email (Phone Only)</span>}
+                                <td className="p-3.5 text-slate-600 dark:text-zinc-300 font-mono">
+                                  {s.email ? s.email : <span className="text-slate-400 italic">None (Phone Only)</span>}
                                 </td>
-                                <td className="p-4 font-mono font-bold">
+                                <td className="p-3.5 font-mono font-bold">
                                   {s.contact_number ? (
                                     <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                                       <span className="text-slate-900 dark:text-zinc-100">{s.contact_number}</span>
@@ -10211,7 +10320,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                     <span className="text-slate-400 font-normal">—</span>
                                   )}
                                 </td>
-                                <td className="p-4">
+                                <td className="p-3.5">
                                   {isGmailAuth ? (
                                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                                       Gmail
@@ -10226,24 +10335,41 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                     </span>
                                   )}
                                 </td>
-                                <td className="p-4">
+                                <td className="p-3.5">
                                   <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-[10px] font-bold">
                                     {s.target_exam || 'JEE Advanced'}
                                   </span>
                                 </td>
-                                <td className="p-4 text-center font-bold text-indigo-600 dark:text-indigo-400 font-mono">
-                                  {studentAttempts.length}
+                                <td className="p-3.5 text-center font-bold font-mono">
+                                  <span className={`px-2 py-0.5 rounded-full text-xs ${uniqueTestsCount > 0 ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800' : 'text-slate-400'}`}>
+                                    {uniqueTestsCount} {uniqueTestsCount === 1 ? 'Test' : 'Tests'}
+                                  </span>
                                 </td>
-                                <td className="p-4 text-center font-bold font-mono">
+                                <td className="p-3.5 text-center font-bold font-mono">
+                                  <span className={`px-2 py-0.5 rounded-full text-xs ${studentAttempts.length > 0 ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'text-slate-400'}`}>
+                                    {studentAttempts.length}
+                                  </span>
+                                </td>
+                                <td className="p-3.5">
+                                  <div className="flex items-center gap-1.5 flex-wrap max-w-xs">
+                                    {breakdownBadges.length === 0 ? (
+                                      <span className="text-[10px] text-slate-400 italic">No tests yet</span>
+                                    ) : (
+                                      breakdownBadges.map((b, bIdx) => (
+                                        <span
+                                          key={bIdx}
+                                          className="px-2 py-0.5 rounded-md text-[10px] font-bold font-mono bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700"
+                                        >
+                                          {b.label}
+                                        </span>
+                                      ))
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="p-3.5 text-center font-bold font-mono">
                                   {avgScore > 0 ? `${avgScore}%` : '—'}
                                 </td>
-                                <td className="p-4 text-center font-mono">
-                                  {studentLectures.length}
-                                </td>
-                                <td className="p-4 text-center font-mono">
-                                  {studentBookmarks.length}
-                                </td>
-                                <td className="p-4 text-right">
+                                <td className="p-3.5 text-right">
                                   <button
                                     type="button"
                                     onClick={() => setSelectedStudent(s)}
@@ -10309,23 +10435,51 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
                       {/* Student Attempts History */}
                       <div className="space-y-3">
-                        <h4 className="text-sm font-extrabold text-slate-900 dark:text-zinc-50">Test Attempt History</h4>
-                        {allAttempts.filter(a => a.userId === selectedStudent.id || a.user_id === selectedStudent.id).length === 0 ? (
-                          <p className="text-xs text-slate-400 italic">No test attempts submitted yet.</p>
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-extrabold text-slate-900 dark:text-zinc-50">
+                            Test Attempt History ({allAttempts.filter(a => (a.userId === selectedStudent.id || a.user_id === selectedStudent.id) || (selectedStudent.email && (a.studentEmail === selectedStudent.email || a.email === selectedStudent.email))).length} Attempts)
+                          </h4>
+                        </div>
+                        {allAttempts.filter(a => (a.userId === selectedStudent.id || a.user_id === selectedStudent.id) || (selectedStudent.email && (a.studentEmail === selectedStudent.email || a.email === selectedStudent.email))).length === 0 ? (
+                          <p className="text-xs text-slate-400 italic p-4 rounded-xl bg-slate-50 dark:bg-zinc-900/40 text-center">No test attempts submitted yet.</p>
                         ) : (
                           <div className="space-y-2">
-                            {allAttempts.filter(a => a.userId === selectedStudent.id || a.user_id === selectedStudent.id).map((att, i) => (
-                              <div key={i} className="p-3 rounded-xl border border-slate-200 dark:border-zinc-800 flex items-center justify-between text-xs">
-                                <div>
-                                  <span className="font-bold text-indigo-600">{att.testCode || att.testId}</span>
-                                  <p className="text-[10px] text-slate-500">{att.completedAt ? new Date(att.completedAt).toLocaleString() : 'Recent'}</p>
-                                </div>
-                                <div className="text-right">
-                                  <p className="font-mono font-bold">{att.totalMarksScored} / {att.totalMaxMarks} ({att.percentage}%)</p>
-                                  <p className="text-[10px] text-slate-400">Accuracy: {att.accuracy}% · {att.predictedAirDisplay || 'Qualified'}</p>
-                                </div>
-                              </div>
-                            ))}
+                            {allAttempts
+                              .filter(a => (a.userId === selectedStudent.id || a.user_id === selectedStudent.id) || (selectedStudent.email && (a.studentEmail === selectedStudent.email || a.email === selectedStudent.email)))
+                              .sort((a, b) => new Date(a.submittedAt || a.completedAt).getTime() - new Date(b.submittedAt || b.completedAt).getTime())
+                              .map((att, i, arr) => {
+                                const thisTestCode = att.testCode || att.code || (att.testId ? att.testId.replace('jee-mains-', '').replace('jee-advanced-', '').toUpperCase() : 'Test');
+                                const attemptsOfThisTest = arr.filter(x => (x.testCode || x.code || x.testId) === (att.testCode || att.code || att.testId));
+                                const attemptNum = attemptsOfThisTest.indexOf(att) + 1;
+                                const marks = Number(att.obtainedMarks ?? att.totalMarksScored ?? 0);
+                                const maxMarks = Number(att.totalMarks ?? att.totalMaxMarks ?? 300);
+                                const timeStr = att.timeTakenSeconds ? `${Math.floor(att.timeTakenSeconds / 60)}m ${att.timeTakenSeconds % 60}s` : '—';
+                                const istDate = new Date(att.submittedAt || att.completedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
+
+                                return (
+                                  <div key={att.id || i} className="p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs hover:bg-slate-50 dark:hover:bg-zinc-900/40 transition-colors">
+                                    <div>
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-bold text-indigo-600 dark:text-indigo-400 text-sm">{thisTestCode}</span>
+                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                                          Attempt {attemptNum} of 3
+                                        </span>
+                                      </div>
+                                      <p className="text-[10px] text-slate-500 pt-0.5">
+                                        Submitted: {istDate} IST · Time: {timeStr}
+                                      </p>
+                                    </div>
+                                    <div className="text-left sm:text-right">
+                                      <p className="font-mono font-bold text-slate-900 dark:text-zinc-100">
+                                        {marks} / {maxMarks} ({att.percentage}%)
+                                      </p>
+                                      <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                                        Accuracy: {att.accuracy}% · {att.predictedAirDisplay || att.estimatedRankLabel || 'AIR Qualified'}
+                                      </p>
+                                    </div>
+                                  </div>
+                                );
+                              })}
                           </div>
                         )}
                       </div>
@@ -10364,7 +10518,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
                 {/* Test Selector */}
                 <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
-                  {[...jeeAdvancedTestsList, ...jeeMainsTestsList].map((t) => (
+                  {[...jeeMainsTestsList, ...jeeAdvancedTestsList].map((t) => (
                     <button
                       key={t.testId}
                       onClick={() => setAdminLeaderboardTestId(t.testId)}
@@ -10379,7 +10533,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   ))}
                 </div>
 
-                {/* Leaderboard Table */}
+                {/* Leaderboard Table & Top 5 Showcase */}
                 <div className="rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm overflow-hidden p-6 space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -10396,6 +10550,44 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       </span>
                     )}
                   </div>
+
+                  {/* Top 5 Performers Showcase in Admin */}
+                  {adminLeaderboardData?.entries && adminLeaderboardData.entries.length > 0 && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-1">
+                      {adminLeaderboardData.entries.slice(0, 5).map((entry, idx) => (
+                        <div
+                          key={entry.rank}
+                          className={`p-3.5 rounded-2xl border ${
+                            idx === 0
+                              ? 'border-amber-400 bg-amber-50/60 dark:bg-amber-950/20 ring-2 ring-amber-400/20'
+                              : idx === 1
+                              ? 'border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/40'
+                              : idx === 2
+                              ? 'border-amber-700/40 bg-amber-50/40 dark:bg-amber-950/10'
+                              : 'border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/30 dark:bg-indigo-950/10'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between pb-1">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                              {idx === 0 ? '👑 Rank 1' : idx === 1 ? '🥈 Rank 2' : idx === 2 ? '🥉 Rank 3' : `🎖️ Rank ${idx + 1}`}
+                            </span>
+                            <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                              {entry.percentile}%ile
+                            </span>
+                          </div>
+                          <p className="font-extrabold text-xs text-slate-900 dark:text-zinc-100 truncate">
+                            {entry.displayName}
+                          </p>
+                          <div className="flex items-center justify-between text-[11px] pt-1">
+                            <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                              {entry.marks} / {entry.maxMarks} Mks
+                            </span>
+                            <span className="text-slate-400">{entry.accuracy}% Acc</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
@@ -10422,7 +10614,31 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         ) : (
                           (adminLeaderboardData?.entries || []).map((row) => (
                             <tr key={row.rank + row.displayName} className="hover:bg-slate-50 dark:hover:bg-zinc-900/40">
-                              <td className="p-3 font-mono font-bold">#{row.rank}</td>
+                              <td className="p-3 font-mono font-bold">
+                                {row.rank === 1 ? (
+                                  <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white font-black text-[10px]">
+                                    👑 #1
+                                  </span>
+                                ) : row.rank === 2 ? (
+                                  <span className="px-2 py-0.5 rounded-full bg-slate-300 dark:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-black text-[10px]">
+                                    🥈 #2
+                                  </span>
+                                ) : row.rank === 3 ? (
+                                  <span className="px-2 py-0.5 rounded-full bg-amber-700 text-white font-black text-[10px]">
+                                    🥉 #3
+                                  </span>
+                                ) : row.rank === 4 ? (
+                                  <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-black text-[10px]">
+                                    🎖️ #4
+                                  </span>
+                                ) : row.rank === 5 ? (
+                                  <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-black text-[10px]">
+                                    🎖️ #5
+                                  </span>
+                                ) : (
+                                  `#${row.rank}`
+                                )}
+                              </td>
                               <td className="p-3 font-semibold text-slate-900 dark:text-zinc-100">
                                 {row.displayName}
                                 {row.attemptedInLiveWindow && (
@@ -10435,7 +10651,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                               <td className="p-3 text-center font-mono font-bold text-emerald-600">{row.percentile}%ile</td>
                               <td className="p-3 text-center font-mono">{row.accuracy}%</td>
                               <td className="p-3 text-right font-mono text-slate-500">{row.timeTakenSeconds ? `${Math.round(row.timeTakenSeconds / 60)}m` : '—'}</td>
-                              <td className="p-3 text-right text-slate-400 text-[11px]">{new Date(row.submittedAt).toLocaleString()}</td>
+                              <td className="p-3 text-right text-slate-400 text-[11px]">{new Date(row.submittedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST</td>
                             </tr>
                           ))
                         )}
@@ -10450,14 +10666,29 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             {adminTab === 'attempts' && (
               <div className="space-y-6 animate-in fade-in">
                 {/* Search & Filters */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#121318] p-5 rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-sm">
-                  <input
-                    type="text"
-                    value={attemptSearch}
-                    onChange={(e) => setAttemptSearch(e.target.value)}
-                    placeholder="Search attempts by student name or test code..."
-                    className="flex-1 max-w-md px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs"
-                  />
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#121318] p-5 rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-1">
+                    <input
+                      type="text"
+                      value={attemptSearch}
+                      onChange={(e) => setAttemptSearch(e.target.value)}
+                      placeholder="Search attempts by student name or test code..."
+                      className="flex-1 max-w-md px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs"
+                    />
+
+                    {/* Test Code Filter */}
+                    <select
+                      value={attemptCodeFilter}
+                      onChange={(e) => setAttemptCodeFilter(e.target.value)}
+                      className="px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs font-bold text-slate-700 dark:text-zinc-300"
+                    >
+                      <option value="All">All Tests</option>
+                      {Array.from(new Set(allAttempts.map(a => a.testCode || a.code || a.testId))).filter(Boolean).map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+
                   <div className="flex items-center gap-2">
                     {['All', 'JEE Mains', 'JEE Advanced'].map((ex) => (
                       <button
@@ -10475,54 +10706,80 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
                 {/* Attempts Table */}
                 <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] overflow-hidden shadow-sm">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-500 uppercase font-bold text-[10px]">
-                      <tr>
-                        <th className="p-4">Student Name</th>
-                        <th className="p-4">Test Code</th>
-                        <th className="p-4">Marks Scored</th>
-                        <th className="p-4">Percentage</th>
-                        <th className="p-4">Accuracy</th>
-                        <th className="p-4">Predicted AIR</th>
-                        <th className="p-4">Submission Time</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-zinc-800">
-                      {filteredAttempts.length === 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-50 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-500 uppercase font-bold text-[10px]">
                         <tr>
-                          <td colSpan="7" className="p-12 text-center text-slate-400">
-                            No test attempt records found.
-                          </td>
+                          <th className="p-3.5">Student Name</th>
+                          <th className="p-3.5">Gmail / Contact</th>
+                          <th className="p-3.5">Test Code</th>
+                          <th className="p-3.5 text-center">Attempt #</th>
+                          <th className="p-3.5 text-center">Marks Scored</th>
+                          <th className="p-3.5 text-center">Percentage</th>
+                          <th className="p-3.5 text-center">Accuracy</th>
+                          <th className="p-3.5 text-center">Predicted AIR</th>
+                          <th className="p-3.5 text-right">Submission Time (IST)</th>
                         </tr>
-                      ) : (
-                        filteredAttempts.map((att, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-zinc-800/40">
-                            <td className="p-4 font-bold text-slate-900 dark:text-zinc-100">
-                              {att.userName || att.name || 'Student Aspirant'}
-                            </td>
-                            <td className="p-4 font-bold text-indigo-600">
-                              {att.testCode || att.testId}
-                            </td>
-                            <td className="p-4 font-mono font-bold">
-                              {att.totalMarksScored} / {att.totalMaxMarks}
-                            </td>
-                            <td className="p-4 font-mono">
-                              {att.percentage}%
-                            </td>
-                            <td className="p-4 font-mono">
-                              {att.accuracy}%
-                            </td>
-                            <td className="p-4 font-bold text-emerald-600">
-                              {att.predictedAirDisplay || 'Qualified'}
-                            </td>
-                            <td className="p-4 text-slate-400 font-mono">
-                              {att.completedAt ? new Date(att.completedAt).toLocaleString() : 'Recent'}
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-zinc-800">
+                        {filteredAttempts.length === 0 ? (
+                          <tr>
+                            <td colSpan="9" className="p-12 text-center text-slate-400 italic">
+                              No test attempt records found matching criteria.
                             </td>
                           </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
+                        ) : (
+                          filteredAttempts.map((att, idx) => {
+                            const studentName = att.studentName || att.candidateName || att.userName || 'Student Aspirant';
+                            const contact = att.studentEmail || att.email || att.studentContact || att.contactNumber || '—';
+                            const testCode = att.testCode || att.code || (att.testId ? att.testId.replace('jee-mains-', '').replace('jee-advanced-', '').toUpperCase() : 'Test');
+                            const marks = Number(att.obtainedMarks ?? att.totalMarksScored ?? 0);
+                            const maxMarks = Number(att.totalMarks ?? att.totalMaxMarks ?? 300);
+
+                            // Calculate attempt #
+                            const userAttsThisTest = allAttempts
+                              .filter(x => ((x.userId || x.user_id) === (att.userId || att.user_id)) && ((x.testCode || x.code || x.testId) === (att.testCode || att.code || att.testId)))
+                              .sort((x, y) => new Date(x.submittedAt || x.completedAt).getTime() - new Date(y.submittedAt || y.completedAt).getTime());
+                            const attemptNum = Math.max(1, userAttsThisTest.findIndex(x => x.id === att.id) + 1);
+
+                            return (
+                              <tr key={att.id || idx} className="hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors">
+                                <td className="p-3.5 font-bold text-slate-900 dark:text-zinc-100">
+                                  {studentName}
+                                </td>
+                                <td className="p-3.5 text-slate-500 font-mono text-[11px]">
+                                  {contact}
+                                </td>
+                                <td className="p-3.5 font-bold text-indigo-600 dark:text-indigo-400">
+                                  {testCode}
+                                </td>
+                                <td className="p-3.5 text-center">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                                    {attemptNum} of 3
+                                  </span>
+                                </td>
+                                <td className="p-3.5 text-center font-mono font-bold">
+                                  {marks} / {maxMarks}
+                                </td>
+                                <td className="p-3.5 text-center font-mono">
+                                  {att.percentage}%
+                                </td>
+                                <td className="p-3.5 text-center font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+                                  {att.accuracy}%
+                                </td>
+                                <td className="p-3.5 text-center font-bold text-slate-700 dark:text-zinc-300">
+                                  {att.predictedAirDisplay || att.estimatedRankLabel || 'AIR Qualified'}
+                                </td>
+                                <td className="p-3.5 text-right text-slate-400 font-mono text-[11px]">
+                                  {new Date(att.submittedAt || att.completedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             )}
@@ -12861,15 +13118,15 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 {/* Unlocked Content */}
                 {!leaderboardData?.locked && (
                   <>
-                    {/* 1. TOP 3 CROWNED PODIUM */}
+                    {/* 1. TOP 5 PERFORMERS SHOWCASE */}
                     {leaderboardData?.entries && leaderboardData.entries.length > 0 && (
                       <div className="space-y-4">
                         <div className="text-center space-y-1">
                           <span className="px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wider uppercase bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300">
-                            Top 3 Performers
+                            Top 5 Performers Showcase
                           </span>
                           <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-zinc-50">
-                            Crowned Toppers Podium
+                            Crowned Toppers &amp; Top 5 Leaders
                           </h3>
                         </div>
 
@@ -12967,6 +13224,58 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           )}
 
                         </div>
+
+                        {/* #4 & #5 Honor Cards (Top 5 Leaderboard Showcase) */}
+                        {(leaderboardData.entries[3] || leaderboardData.entries[4]) && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto pt-2">
+                            {leaderboardData.entries[3] && (
+                              <div className="rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-[#121318] p-4 shadow-sm flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-black text-sm flex items-center justify-center border border-indigo-200 dark:border-indigo-800">
+                                    🎖️ #4
+                                  </div>
+                                  <div>
+                                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-zinc-100 line-clamp-1">
+                                      {leaderboardData.entries[3].displayName}
+                                    </h4>
+                                    <p className="text-[10px] font-bold text-slate-400">Top 5 Performer</p>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-lg font-black font-mono text-slate-800 dark:text-zinc-200">
+                                    {leaderboardData.entries[3].marks} <span className="text-xs text-slate-400 font-normal">/ {leaderboardData.entries[3].maxMarks}</span>
+                                  </div>
+                                  <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+                                    {leaderboardData.entries[3].percentile}%ile · {leaderboardData.entries[3].accuracy}% Acc
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {leaderboardData.entries[4] && (
+                              <div className="rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-[#121318] p-4 shadow-sm flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-black text-sm flex items-center justify-center border border-indigo-200 dark:border-indigo-800">
+                                    🎖️ #5
+                                  </div>
+                                  <div>
+                                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-zinc-100 line-clamp-1">
+                                      {leaderboardData.entries[4].displayName}
+                                    </h4>
+                                    <p className="text-[10px] font-bold text-slate-400">Top 5 Performer</p>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-lg font-black font-mono text-slate-800 dark:text-zinc-200">
+                                    {leaderboardData.entries[4].marks} <span className="text-xs text-slate-400 font-normal">/ {leaderboardData.entries[4].maxMarks}</span>
+                                  </div>
+                                  <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+                                    {leaderboardData.entries[4].percentile}%ile · {leaderboardData.entries[4].accuracy}% Acc
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -13129,6 +13438,14 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                     ) : row.rank === 3 ? (
                                       <span className="px-2 py-0.5 rounded-full bg-amber-700 text-white font-black text-[10px]">
                                         🥉 #3
+                                      </span>
+                                    ) : row.rank === 4 ? (
+                                      <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800 font-black text-[10px]">
+                                        🎖️ #4
+                                      </span>
+                                    ) : row.rank === 5 ? (
+                                      <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800 font-black text-[10px]">
+                                        🎖️ #5
                                       </span>
                                     ) : (
                                       `#${row.rank}`

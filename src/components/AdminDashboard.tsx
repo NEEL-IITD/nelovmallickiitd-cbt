@@ -255,9 +255,18 @@ export const AdminDashboard: React.FC = () => {
   const handleExportStudentsCSV = () => {
     if (students.length === 0) return;
 
-    const headers = ['Full Name', 'Email', 'Contact Number', 'Auth Method', 'Target Exam', 'Role', 'Joined Date', 'Tests Attempted', 'Avg Score %', 'Lectures Completed', 'Bookmarks'];
+    const headers = ['Full Name', 'Email', 'Contact Number', 'Auth Method', 'Target Exam', 'Role', 'Joined Date', 'Unique Tests Given', 'Total Attempts', 'Tests Breakdown', 'Avg Score %', 'Lectures Completed', 'Bookmarks'];
     const rows = students.map((s) => {
-      const studentAttempts = allAttempts.filter((a) => a.userId === s.id);
+      const studentAttempts = allAttempts.filter((a) => (a.userId === s.id || a.user_id === s.id) || (s.email && (a.studentEmail === s.email || a.email === s.email)));
+      const uniqueTests = new Set(studentAttempts.map(a => a.testCode || a.code || a.testId)).size;
+
+      const attemptCountByTest: Record<string, number> = {};
+      studentAttempts.forEach(a => {
+        const code = a.testCode || a.code || (a.testId ? a.testId.replace('jee-mains-', '').replace('jee-advanced-', '').toUpperCase() : 'Test');
+        attemptCountByTest[code] = (attemptCountByTest[code] || 0) + 1;
+      });
+      const breakdown = Object.entries(attemptCountByTest).map(([c, count]) => `${c} (${count}/3)`).join('; ') || 'No tests yet';
+
       const studentLectures = allLectures.filter((l) => l.user_id === s.id && l.completed);
       const studentBookmarks = allBookmarks.filter((b) => b.user_id === s.id);
       const avgScore = studentAttempts.length > 0
@@ -272,7 +281,9 @@ export const AdminDashboard: React.FC = () => {
         `"${s.target_exam || 'JEE Advanced'}"`,
         `"${s.role || 'student'}"`,
         `"${s.created_at ? new Date(s.created_at).toLocaleDateString() : ''}"`,
+        uniqueTests,
         studentAttempts.length,
+        `"${breakdown}"`,
         `${avgScore}%`,
         studentLectures.length,
         studentBookmarks.length
@@ -824,18 +835,27 @@ export const AdminDashboard: React.FC = () => {
                       <th className="py-3.5 px-4">Contact Number</th>
                       <th className="py-3.5 px-4">Auth Method</th>
                       <th className="py-3.5 px-4">Target</th>
-                      <th className="py-3.5 px-4 text-center">Attempts</th>
+                      <th className="py-3.5 px-4 text-center">Unique Tests</th>
+                      <th className="py-3.5 px-4 text-center">Total Attempts</th>
+                      <th className="py-3.5 px-4">Tests Breakdown</th>
                       <th className="py-3.5 px-4 text-center">Avg %</th>
-                      <th className="py-3.5 px-4 text-center">Lectures</th>
-                      <th className="py-3.5 px-4 text-center">Bookmarks</th>
                       <th className="py-3.5 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60">
                     {filteredStudents.map((s) => {
-                      const sAttempts = allAttempts.filter((a) => a.userId === s.id);
-                      const sLectures = allLectures.filter((l) => l.user_id === s.id && l.completed);
-                      const sBookmarks = allBookmarks.filter((b) => b.user_id === s.id);
+                      const sAttempts = allAttempts.filter((a) => (a.userId === s.id || a.user_id === s.id) || (s.email && (a.studentEmail === s.email || a.email === s.email)));
+                      const uniqueCount = new Set(sAttempts.map(a => a.testCode || a.code || a.testId)).size;
+                      const testCountMap: Record<string, number> = {};
+                      sAttempts.forEach(a => {
+                        const code = a.testCode || a.code || (a.testId ? a.testId.replace('jee-mains-', '').replace('jee-advanced-', '').toUpperCase() : 'Test');
+                        testCountMap[code] = (testCountMap[code] || 0) + 1;
+                      });
+                      const breakdownBadges = Object.entries(testCountMap).map(([tCode, count]) => ({
+                        code: tCode,
+                        label: `${tCode} (${count}/3)`
+                      }));
+
                       const avgPct = sAttempts.length > 0
                         ? Math.round(sAttempts.reduce((acc, a) => acc + (a.percentage || 0), 0) / sAttempts.length)
                         : 0;
@@ -901,9 +921,36 @@ export const AdminDashboard: React.FC = () => {
                             <span className="font-bold text-slate-700 dark:text-zinc-300">{s.target_exam || 'JEE Advanced'}</span>
                           </td>
 
-                          {/* Attempts */}
-                          <td className="py-3.5 px-4 text-center font-bold text-slate-800 dark:text-zinc-200">
-                            {sAttempts.length}
+                          {/* Unique Tests */}
+                          <td className="py-3.5 px-4 text-center font-bold font-mono">
+                            <span className={`px-2 py-0.5 rounded-full text-xs ${uniqueCount > 0 ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800' : 'text-slate-400'}`}>
+                              {uniqueCount} {uniqueCount === 1 ? 'Test' : 'Tests'}
+                            </span>
+                          </td>
+
+                          {/* Total Attempts */}
+                          <td className="py-3.5 px-4 text-center font-bold font-mono">
+                            <span className={`px-2 py-0.5 rounded-full text-xs ${sAttempts.length > 0 ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'text-slate-400'}`}>
+                              {sAttempts.length}
+                            </span>
+                          </td>
+
+                          {/* Tests Breakdown Badges */}
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-center gap-1.5 flex-wrap max-w-xs">
+                              {breakdownBadges.length === 0 ? (
+                                <span className="text-[10px] text-slate-400 italic">No tests yet</span>
+                              ) : (
+                                breakdownBadges.map((b, bIdx) => (
+                                  <span
+                                    key={bIdx}
+                                    className="px-2 py-0.5 rounded-md text-[10px] font-bold font-mono bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700"
+                                  >
+                                    {b.label}
+                                  </span>
+                                ))
+                              )}
+                            </div>
                           </td>
 
                           {/* Avg Score */}
@@ -911,16 +958,6 @@ export const AdminDashboard: React.FC = () => {
                             <span className={`font-extrabold ${avgPct >= 60 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-700 dark:text-zinc-300'}`}>
                               {sAttempts.length > 0 ? `${avgPct}%` : '—'}
                             </span>
-                          </td>
-
-                          {/* Lectures */}
-                          <td className="py-3.5 px-4 text-center font-bold text-slate-800 dark:text-zinc-200">
-                            {sLectures.length}
-                          </td>
-
-                          {/* Bookmarks */}
-                          <td className="py-3.5 px-4 text-center font-bold text-slate-800 dark:text-zinc-200">
-                            {sBookmarks.length}
                           </td>
 
                           {/* Action Button */}
@@ -999,44 +1036,57 @@ export const AdminDashboard: React.FC = () => {
                       <th className="py-3.5 px-4">Student</th>
                       <th className="py-3.5 px-4">Contact / Gmail</th>
                       <th className="py-3.5 px-4">Test Code</th>
+                      <th className="py-3.5 px-4 text-center">Attempt #</th>
                       <th className="py-3.5 px-4 text-center">Score</th>
                       <th className="py-3.5 px-4 text-center">Percentage</th>
                       <th className="py-3.5 px-4 text-center">Accuracy</th>
                       <th className="py-3.5 px-4 text-center">Predicted AIR</th>
-                      <th className="py-3.5 px-4 text-right">Submitted At</th>
+                      <th className="py-3.5 px-4 text-right">Submitted At (IST)</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60">
-                    {filteredAttempts.map((a, idx) => (
-                      <tr key={a.id || idx} className="hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors">
-                        <td className="py-3 px-4 font-bold text-slate-900 dark:text-zinc-100">
-                          {a.studentName || 'Student Aspirant'}
-                        </td>
-                        <td className="py-3 px-4 text-slate-500 dark:text-zinc-400">
-                          {a.studentContact || a.studentEmail || 'Direct'}
-                        </td>
-                        <td className="py-3 px-4 font-bold text-indigo-600 dark:text-indigo-400">
-                          {a.testCode || a.code}
-                        </td>
-                        <td className="py-3 px-4 text-center font-mono font-bold text-slate-800 dark:text-zinc-200">
-                          {a.obtainedMarks || 0} / {a.totalMarks || 180}
-                        </td>
-                        <td className="py-3 px-4 text-center font-extrabold text-emerald-600 dark:text-emerald-400">
-                          {a.percentage || 0}%
-                        </td>
-                        <td className="py-3 px-4 text-center font-bold text-slate-700 dark:text-zinc-300">
-                          {a.accuracy || 0}%
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                            {a.estimatedRankLabel || 'AIR Qualified'}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-right text-slate-400 text-[11px]">
-                          {a.submittedAt ? new Date(a.submittedAt).toLocaleString() : 'Recent'}
-                        </td>
-                      </tr>
-                    ))}
+                    {filteredAttempts.map((a, idx) => {
+                      const userAttsThisTest = allAttempts
+                        .filter(x => ((x.userId || x.user_id) === (a.userId || a.user_id)) && ((x.testCode || x.code || x.testId) === (a.testCode || a.code || a.testId)))
+                        .sort((x, y) => new Date(x.submittedAt || x.completedAt).getTime() - new Date(y.submittedAt || y.completedAt).getTime());
+                      const attemptNum = Math.max(1, userAttsThisTest.findIndex(x => x.id === a.id) + 1);
+
+                      return (
+                        <tr key={a.id || idx} className="hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors">
+                          <td className="py-3 px-4 font-bold text-slate-900 dark:text-zinc-100">
+                            {a.studentName || 'Student Aspirant'}
+                          </td>
+                          <td className="py-3 px-4 text-slate-500 dark:text-zinc-400 font-mono text-[11px]">
+                            {a.studentContact || a.studentEmail || 'Direct'}
+                          </td>
+                          <td className="py-3 px-4 font-bold text-indigo-600 dark:text-indigo-400">
+                            {a.testCode || a.code}
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                              {attemptNum} of 3
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-center font-mono font-bold text-slate-800 dark:text-zinc-200">
+                            {a.obtainedMarks || 0} / {a.totalMarks || 300}
+                          </td>
+                          <td className="py-3 px-4 text-center font-extrabold text-emerald-600 dark:text-emerald-400">
+                            {a.percentage || 0}%
+                          </td>
+                          <td className="py-3 px-4 text-center font-bold text-slate-700 dark:text-zinc-300">
+                            {a.accuracy || 0}%
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                              {a.estimatedRankLabel || a.predictedAirDisplay || 'AIR Qualified'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-right text-slate-400 text-[11px] font-mono">
+                            {a.submittedAt ? new Date(a.submittedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) + ' IST' : 'Recent'}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -1307,6 +1357,44 @@ export const AdminDashboard: React.FC = () => {
                 )}
               </div>
 
+              {/* Top 5 Performers Showcase in Admin */}
+              {adminLeaderboardData?.entries && adminLeaderboardData.entries.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-1">
+                  {adminLeaderboardData.entries.slice(0, 5).map((entry, idx) => (
+                    <div
+                      key={entry.rank}
+                      className={`p-3.5 rounded-2xl border ${
+                        idx === 0
+                          ? 'border-amber-400 bg-amber-50/60 dark:bg-amber-950/20 ring-2 ring-amber-400/20'
+                          : idx === 1
+                          ? 'border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/40'
+                          : idx === 2
+                          ? 'border-amber-700/40 bg-amber-50/40 dark:bg-amber-950/10'
+                          : 'border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/30 dark:bg-indigo-950/10'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between pb-1">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                          {idx === 0 ? '👑 Rank 1' : idx === 1 ? '🥈 Rank 2' : idx === 2 ? '🥉 Rank 3' : `🎖️ Rank ${idx + 1}`}
+                        </span>
+                        <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                          {entry.percentile}%ile
+                        </span>
+                      </div>
+                      <p className="font-extrabold text-xs text-slate-900 dark:text-zinc-100 truncate">
+                        {entry.displayName}
+                      </p>
+                      <div className="flex items-center justify-between text-[11px] pt-1">
+                        <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                          {entry.marks} / {entry.maxMarks} Mks
+                        </span>
+                        <span className="text-slate-400">{entry.accuracy}% Acc</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-50 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-500 uppercase font-bold text-[10px]">
@@ -1332,7 +1420,31 @@ export const AdminDashboard: React.FC = () => {
                     ) : (
                       (adminLeaderboardData?.entries || []).map((row) => (
                         <tr key={row.rank + row.displayName} className="hover:bg-slate-50 dark:hover:bg-zinc-900/40">
-                          <td className="p-3 font-mono font-bold">#{row.rank}</td>
+                          <td className="p-3 font-mono font-bold">
+                            {row.rank === 1 ? (
+                              <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white font-black text-[10px]">
+                                👑 #1
+                              </span>
+                            ) : row.rank === 2 ? (
+                              <span className="px-2 py-0.5 rounded-full bg-slate-300 dark:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-black text-[10px]">
+                                🥈 #2
+                              </span>
+                            ) : row.rank === 3 ? (
+                              <span className="px-2 py-0.5 rounded-full bg-amber-700 text-white font-black text-[10px]">
+                                🥉 #3
+                              </span>
+                            ) : row.rank === 4 ? (
+                              <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-black text-[10px]">
+                                🎖️ #4
+                              </span>
+                            ) : row.rank === 5 ? (
+                              <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-black text-[10px]">
+                                🎖️ #5
+                              </span>
+                            ) : (
+                              `#${row.rank}`
+                            )}
+                          </td>
                           <td className="p-3 font-semibold text-slate-900 dark:text-zinc-100">
                             {row.displayName}
                             {row.attemptedInLiveWindow && (

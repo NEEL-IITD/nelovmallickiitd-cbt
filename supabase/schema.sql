@@ -762,45 +762,56 @@ END;
 $window_trigger$;
 
 DROP TRIGGER IF EXISTS trg_check_test_attempt_window ON public.test_attempts;
-CREATE TRIGGER trg_check_test_attempt_window
-  BEFORE INSERT ON public.test_attempts
-  FOR EACH ROW
-  EXECUTE FUNCTION public.check_test_attempt_window_start();
-
+DROP FUNCTION IF EXISTS public.check_test_attempt_window_start();
+DROP FUNCTION IF EXISTS public.check_test_attempt_window();
 
 -- 4. RPC 1 — public.get_test_leaderboard(p_test_id text)
+-- Features: Top 5 focus, LEFT JOIN profiles, alias matching, 1st official attempt only, admin override
 CREATE OR REPLACE FUNCTION public.get_test_leaderboard(p_test_id TEXT)
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
-AS $leaderboard$
+SET search_path = ''
+AS $$
 DECLARE
   v_cfg RECORD;
   v_is_admin BOOLEAN;
-  v_total_participants INT;
-  v_avg_marks NUMERIC;
-  v_high_marks NUMERIC;
+  v_total_participants INT := 0;
+  v_avg_marks NUMERIC := 0;
+  v_high_marks NUMERIC := 0;
+  v_top_5 JSONB := '[]'::jsonb;
   v_entries JSONB := '[]'::jsonb;
   v_topper JSONB := NULL;
   v_my_standing JSONB := NULL;
   v_my_attempt_submitted BOOLEAN := FALSE;
   v_current_uid UUID;
+  v_canonical_id TEXT;
+  v_alias_id TEXT;
 BEGIN
   v_current_uid := auth.uid();
   v_is_admin := public.is_admin();
+
+  -- Normalize test ID (e.g., ptm-01 -> jee-mains-ptm-01, pta-04 -> jee-advanced-pta-04)
+  v_canonical_id := LOWER(TRIM(p_test_id));
+  IF v_canonical_id ~ '^(jee-mains-)?ptm[-_ ]?0*([0-9]+)' THEN
+    v_canonical_id := 'jee-mains-ptm-' || LPAD(SUBSTRING(v_canonical_id FROM '[0-9]+'), 2, '0');
+  ELSIF v_canonical_id ~ '^(jee-advanced-)?pta[-_ ]?0*([0-9]+)' THEN
+    v_canonical_id := 'jee-advanced-pta-' || LPAD(SUBSTRING(v_canonical_id FROM '[0-9]+'), 2, '0');
+  END IF;
+  v_alias_id := REPLACE(REPLACE(v_canonical_id, 'jee-mains-', ''), 'jee-advanced-', '');
 
   -- Get test schedule configuration
   SELECT test_id, is_scheduled_window, starts_at, ends_at, lock_leaderboard_until_end
   INTO v_cfg
   FROM public.test_configs
-  WHERE test_id = p_test_id;
+  WHERE test_id = v_canonical_id OR test_id = p_test_id;
 
   -- Check if current user has submitted an attempt
   IF v_current_uid IS NOT NULL THEN
     SELECT EXISTS (
       SELECT 1 FROM public.test_attempts
-      WHERE test_id = p_test_id AND user_id = v_current_uid
+      WHERE (test_id = v_canonical_id OR test_id = v_alias_id OR test_id = p_test_id)
+        AND user_id = v_current_uid
     ) INTO v_my_attempt_submitted;
   END IF;
 
@@ -812,27 +823,29 @@ BEGIN
      AND NOW() < v_cfg.ends_at 
      AND NOT v_is_admin THEN
 
-    -- Count total unique participants who submitted their 1st attempt so far
     SELECT COUNT(DISTINCT a.user_id)
     INTO v_total_participants
     FROM public.test_attempts a
-    JOIN public.profiles p ON p.id = a.user_id
-    WHERE a.test_id = p_test_id
+    LEFT JOIN public.profiles p ON p.id = a.user_id
+    WHERE (a.test_id = v_canonical_id OR a.test_id = v_alias_id OR a.test_id = p_test_id)
       AND (p.role IS NULL OR p.role <> 'admin')
-      AND (p.email IS NULL OR LOWER(p.email) NOT IN ('mallicknelov@gmail.com', 'nelovmallick@gmail.com'));
+      AND (p.email IS NULL OR LOWER(p.email) NOT IN ('mallicknelov@gmail.com', 'nelovmallick@gmail.com', 'nelovmallick@iitd.ac.in'));
 
     RETURN jsonb_build_object(
       'locked', TRUE,
       'unlocks_at', v_cfg.ends_at,
       'total_participants', COALESCE(v_total_participants, 0),
       'my_attempt_submitted', v_my_attempt_submitted,
+      'top_5', '[]'::jsonb,
       'entries', '[]'::jsonb,
+      'all_entries', '[]'::jsonb,
       'my_standing', NULL,
       'topper', NULL
     );
   END IF;
 
-  -- Compute official 1st-attempt summary stats
+  -- 1st official attempt rankings
+  -- LEFT JOIN ensures student attempts are never dropped even if profiles sync is delayed
   WITH first_attempts AS (
     SELECT DISTINCT ON (a.user_id)
       a.id,
@@ -847,10 +860,10 @@ BEGIN
       COALESCE(NULLIF(TRIM(p.full_name), ''), 'JEE Aspirant') AS display_name,
       (v_current_uid IS NOT NULL AND a.user_id = v_current_uid) AS is_current_user
     FROM public.test_attempts a
-    JOIN public.profiles p ON p.id = a.user_id
-    WHERE a.test_id = p_test_id
+    LEFT JOIN public.profiles p ON p.id = a.user_id
+    WHERE (a.test_id = v_canonical_id OR a.test_id = v_alias_id OR a.test_id = p_test_id)
       AND (p.role IS NULL OR p.role <> 'admin')
-      AND (p.email IS NULL OR LOWER(p.email) NOT IN ('mallicknelov@gmail.com', 'nelovmallick@gmail.com'))
+      AND (p.email IS NULL OR LOWER(p.email) NOT IN ('mallicknelov@gmail.com', 'nelovmallick@gmail.com', 'nelovmallick@iitd.ac.in'))
     ORDER BY a.user_id, a.submitted_at ASC, a.id ASC
   ),
   ranked AS (
@@ -872,71 +885,17 @@ BEGIN
   INTO v_total_participants, v_avg_marks, v_high_marks
   FROM ranked;
 
-  -- Build Top 100 Entries JSON
-  WITH first_attempts AS (
-    SELECT DISTINCT ON (a.user_id)
-      a.id,
-      a.user_id,
-      a.obtained_marks,
-      a.total_marks,
-      a.percentage,
-      a.accuracy,
-      COALESCE(a.time_taken_seconds, 0) AS time_taken_seconds,
-      a.submitted_at,
-      a.attempted_in_live_window,
-      COALESCE(NULLIF(TRIM(p.full_name), ''), 'JEE Aspirant') AS display_name,
-      (v_current_uid IS NOT NULL AND a.user_id = v_current_uid) AS is_current_user
-    FROM public.test_attempts a
-    JOIN public.profiles p ON p.id = a.user_id
-    WHERE a.test_id = p_test_id
-      AND (p.role IS NULL OR p.role <> 'admin')
-      AND (p.email IS NULL OR LOWER(p.email) NOT IN ('mallicknelov@gmail.com', 'nelovmallick@gmail.com'))
-    ORDER BY a.user_id, a.submitted_at ASC, a.id ASC
-  ),
-  ranked AS (
+  -- Build Top 5 Entries JSON (Strictly LIMIT 5)
+  WITH top5_source AS (
     SELECT
       f.*,
-      COUNT(*) OVER () AS total_students,
       RANK() OVER (ORDER BY f.obtained_marks DESC, f.accuracy DESC, f.time_taken_seconds ASC, f.submitted_at ASC) AS computed_rank,
       ROUND(
         (COUNT(*) OVER (ORDER BY f.obtained_marks ASC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)::NUMERIC / 
          NULLIF(COUNT(*) OVER (), 0)::NUMERIC) * 100, 
         2
       ) AS computed_percentile
-    FROM first_attempts f
-  )
-  SELECT 
-    COALESCE(
-      jsonb_agg(
-        jsonb_build_object(
-          'rank', r.computed_rank,
-          'display_name', r.display_name,
-          'marks', r.obtained_marks,
-          'max_marks', r.total_marks,
-          'percentage', ROUND(r.percentage, 2),
-          'percentile', r.computed_percentile,
-          'accuracy', ROUND(r.accuracy, 1),
-          'time_taken_seconds', r.time_taken_seconds,
-          'submitted_at', r.submitted_at,
-          'attempted_in_live_window', r.attempted_in_live_window,
-          'is_current_user', r.is_current_user
-        ) ORDER BY r.computed_rank ASC, r.time_taken_seconds ASC
-      ), 
-      '[]'::jsonb
-    )
-  INTO v_entries
-  FROM (
-    SELECT * FROM ranked ORDER BY computed_rank ASC, time_taken_seconds ASC LIMIT 100
-  ) r;
-
-  -- Extract Topper (Rank #1)
-  IF jsonb_array_length(v_entries) > 0 THEN
-    v_topper := v_entries->0;
-  END IF;
-
-  -- Extract Current User Standing
-  IF v_current_uid IS NOT NULL THEN
-    WITH first_attempts AS (
+    FROM (
       SELECT DISTINCT ON (a.user_id)
         a.id,
         a.user_id,
@@ -948,25 +907,135 @@ BEGIN
         a.submitted_at,
         a.attempted_in_live_window,
         COALESCE(NULLIF(TRIM(p.full_name), ''), 'JEE Aspirant') AS display_name,
-        (a.user_id = v_current_uid) AS is_current_user
+        (v_current_uid IS NOT NULL AND a.user_id = v_current_uid) AS is_current_user
       FROM public.test_attempts a
-      JOIN public.profiles p ON p.id = a.user_id
-      WHERE a.test_id = p_test_id
+      LEFT JOIN public.profiles p ON p.id = a.user_id
+      WHERE (a.test_id = v_canonical_id OR a.test_id = v_alias_id OR a.test_id = p_test_id)
         AND (p.role IS NULL OR p.role <> 'admin')
-        AND (p.email IS NULL OR LOWER(p.email) NOT IN ('mallicknelov@gmail.com', 'nelovmallick@gmail.com'))
+        AND (p.email IS NULL OR LOWER(p.email) NOT IN ('mallicknelov@gmail.com', 'nelovmallick@gmail.com', 'nelovmallick@iitd.ac.in'))
       ORDER BY a.user_id, a.submitted_at ASC, a.id ASC
+    ) f
+  ),
+  top5_limited AS (
+    SELECT * FROM top5_source
+    WHERE computed_rank <= 5
+    ORDER BY computed_rank ASC, time_taken_seconds ASC
+    LIMIT 5
+  )
+  SELECT COALESCE(
+    jsonb_agg(
+      jsonb_build_object(
+        'rank', r.computed_rank,
+        'display_name', r.display_name,
+        'marks', r.obtained_marks,
+        'max_marks', r.total_marks,
+        'percentage', ROUND(r.percentage, 2),
+        'percentile', r.computed_percentile,
+        'accuracy', ROUND(r.accuracy, 1),
+        'time_taken_seconds', r.time_taken_seconds,
+        'submitted_at', r.submitted_at,
+        'attempted_in_live_window', r.attempted_in_live_window,
+        'is_current_user', r.is_current_user
+      ) ORDER BY r.computed_rank ASC, r.time_taken_seconds ASC
     ),
-    ranked AS (
+    '[]'::jsonb
+  )
+  INTO v_top_5
+  FROM top5_limited r;
+
+  -- Build All Ranked Entries (Up to 100 for audit / CSV export)
+  WITH all_source AS (
+    SELECT
+      f.*,
+      RANK() OVER (ORDER BY f.obtained_marks DESC, f.accuracy DESC, f.time_taken_seconds ASC, f.submitted_at ASC) AS computed_rank,
+      ROUND(
+        (COUNT(*) OVER (ORDER BY f.obtained_marks ASC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)::NUMERIC / 
+         NULLIF(COUNT(*) OVER (), 0)::NUMERIC) * 100, 
+        2
+      ) AS computed_percentile
+    FROM (
+      SELECT DISTINCT ON (a.user_id)
+        a.id,
+        a.user_id,
+        a.obtained_marks,
+        a.total_marks,
+        a.percentage,
+        a.accuracy,
+        COALESCE(a.time_taken_seconds, 0) AS time_taken_seconds,
+        a.submitted_at,
+        a.attempted_in_live_window,
+        COALESCE(NULLIF(TRIM(p.full_name), ''), 'JEE Aspirant') AS display_name,
+        (v_current_uid IS NOT NULL AND a.user_id = v_current_uid) AS is_current_user
+      FROM public.test_attempts a
+      LEFT JOIN public.profiles p ON p.id = a.user_id
+      WHERE (a.test_id = v_canonical_id OR a.test_id = v_alias_id OR a.test_id = p_test_id)
+        AND (p.role IS NULL OR p.role <> 'admin')
+        AND (p.email IS NULL OR LOWER(p.email) NOT IN ('mallicknelov@gmail.com', 'nelovmallick@gmail.com', 'nelovmallick@iitd.ac.in'))
+      ORDER BY a.user_id, a.submitted_at ASC, a.id ASC
+    ) f
+  ),
+  all_limited AS (
+    SELECT * FROM all_source
+    ORDER BY computed_rank ASC, time_taken_seconds ASC
+    LIMIT 100
+  )
+  SELECT COALESCE(
+    jsonb_agg(
+      jsonb_build_object(
+        'rank', r.computed_rank,
+        'display_name', r.display_name,
+        'marks', r.obtained_marks,
+        'max_marks', r.total_marks,
+        'percentage', ROUND(r.percentage, 2),
+        'percentile', r.computed_percentile,
+        'accuracy', ROUND(r.accuracy, 1),
+        'time_taken_seconds', r.time_taken_seconds,
+        'submitted_at', r.submitted_at,
+        'attempted_in_live_window', r.attempted_in_live_window,
+        'is_current_user', r.is_current_user
+      ) ORDER BY r.computed_rank ASC, r.time_taken_seconds ASC
+    ),
+    '[]'::jsonb
+  )
+  INTO v_entries
+  FROM all_limited r;
+
+  -- Topper
+  IF jsonb_array_length(v_top_5) > 0 THEN
+    v_topper := v_top_5->0;
+  END IF;
+
+  -- Current User Standing (if logged in, computed from full rank list)
+  IF v_current_uid IS NOT NULL THEN
+    WITH my_rank_source AS (
       SELECT
         f.*,
-        COUNT(*) OVER () AS total_students,
         RANK() OVER (ORDER BY f.obtained_marks DESC, f.accuracy DESC, f.time_taken_seconds ASC, f.submitted_at ASC) AS computed_rank,
         ROUND(
           (COUNT(*) OVER (ORDER BY f.obtained_marks ASC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)::NUMERIC / 
            NULLIF(COUNT(*) OVER (), 0)::NUMERIC) * 100, 
           2
         ) AS computed_percentile
-      FROM first_attempts f
+      FROM (
+        SELECT DISTINCT ON (a.user_id)
+          a.id,
+          a.user_id,
+          a.obtained_marks,
+          a.total_marks,
+          a.percentage,
+          a.accuracy,
+          COALESCE(a.time_taken_seconds, 0) AS time_taken_seconds,
+          a.submitted_at,
+          a.attempted_in_live_window,
+          COALESCE(NULLIF(TRIM(p.full_name), ''), 'JEE Aspirant') AS display_name,
+          TRUE AS is_current_user
+        FROM public.test_attempts a
+        LEFT JOIN public.profiles p ON p.id = a.user_id
+        WHERE (a.test_id = v_canonical_id OR a.test_id = v_alias_id OR a.test_id = p_test_id)
+          AND (p.role IS NULL OR p.role <> 'admin')
+          AND (p.email IS NULL OR LOWER(p.email) NOT IN ('mallicknelov@gmail.com', 'nelovmallick@gmail.com', 'nelovmallick@iitd.ac.in'))
+        ORDER BY a.user_id, a.submitted_at ASC, a.id ASC
+      ) f
     )
     SELECT jsonb_build_object(
       'rank', r.computed_rank,
@@ -982,22 +1051,26 @@ BEGIN
       'is_current_user', TRUE
     )
     INTO v_my_standing
-    FROM ranked r
-    WHERE r.user_id = v_current_uid;
+    FROM my_rank_source r
+    WHERE r.user_id = v_current_uid
+    LIMIT 1;
   END IF;
 
   RETURN jsonb_build_object(
     'locked', FALSE,
-    'unlocks_at', v_cfg.ends_at,
+    'unlocks_at', NULL,
     'total_participants', COALESCE(v_total_participants, 0),
     'average_marks', COALESCE(v_avg_marks, 0),
     'highest_marks', COALESCE(v_high_marks, 0),
+    'top_5', v_top_5,
+    'entries', v_entries,
+    'all_entries', v_entries,
     'topper', v_topper,
     'my_standing', v_my_standing,
-    'entries', v_entries
+    'my_attempt_submitted', (v_my_standing IS NOT NULL)
   );
 END;
-$leaderboard$;
+$$;
 
 
 -- 5. RPC 2 — public.get_test_toppers_summary()

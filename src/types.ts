@@ -56,9 +56,11 @@ export interface LeaderboardResult {
   averageMarks: number;
   highestMarks: number;
   topper: LeaderboardEntry | null;
+  top5?: LeaderboardEntry[];
   myStanding: LeaderboardEntry | null;
   entries: LeaderboardEntry[];
   myAttemptSubmitted?: boolean;
+  error?: string | null;
 }
 
 export interface TopperSummaryItem {

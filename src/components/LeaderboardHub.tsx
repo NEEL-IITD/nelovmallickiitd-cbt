@@ -426,6 +426,58 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                       )}
 
                     </div>
+
+                    {/* #4 & #5 Honor Cards (Top 5 Leaderboard Showcase) */}
+                    {(leaderboardData.entries[3] || leaderboardData.entries[4]) && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto pt-2">
+                        {leaderboardData.entries[3] && (
+                          <div className="rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-[#121318] p-4 shadow-sm flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-black text-sm flex items-center justify-center border border-indigo-200 dark:border-indigo-800">
+                                🎖️ #4
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-extrabold text-slate-900 dark:text-zinc-100 line-clamp-1">
+                                  {leaderboardData.entries[3].displayName}
+                                </h4>
+                                <p className="text-[10px] font-bold text-slate-400">Top 5 Performer</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-lg font-black font-mono text-slate-800 dark:text-zinc-200">
+                                {leaderboardData.entries[3].marks} <span className="text-xs text-slate-400 font-normal">/ {leaderboardData.entries[3].maxMarks}</span>
+                              </div>
+                              <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+                                {leaderboardData.entries[3].percentile}%ile · {leaderboardData.entries[3].accuracy}% Acc
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {leaderboardData.entries[4] && (
+                          <div className="rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-[#121318] p-4 shadow-sm flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-black text-sm flex items-center justify-center border border-indigo-200 dark:border-indigo-800">
+                                🎖️ #5
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-extrabold text-slate-900 dark:text-zinc-100 line-clamp-1">
+                                  {leaderboardData.entries[4].displayName}
+                                </h4>
+                                <p className="text-[10px] font-bold text-slate-400">Top 5 Performer</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-lg font-black font-mono text-slate-800 dark:text-zinc-200">
+                                {leaderboardData.entries[4].marks} <span className="text-xs text-slate-400 font-normal">/ {leaderboardData.entries[4].maxMarks}</span>
+                              </div>
+                              <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+                                {leaderboardData.entries[4].percentile}%ile · {leaderboardData.entries[4].accuracy}% Acc
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -586,6 +638,14 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                                 ) : row.rank === 3 ? (
                                   <span className="px-2 py-0.5 rounded-full bg-amber-700 text-white font-black text-[10px]">
                                     🥉 #3
+                                  </span>
+                                ) : row.rank === 4 ? (
+                                  <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800 font-black text-[10px]">
+                                    🎖️ #4
+                                  </span>
+                                ) : row.rank === 5 ? (
+                                  <span className="px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800 font-black text-[10px]">
+                                    🎖️ #5
                                   </span>
                                 ) : (
                                   `#${row.rank}`
