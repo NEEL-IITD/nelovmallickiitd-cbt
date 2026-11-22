@@ -484,6 +484,11 @@ export const studentStorage = {
           data.forEach((row: any) => {
             map[row.test_id] = row.status as 'live' | 'coming_soon';
           });
+          // Ensure tests with verified digitized papers are always 'live'
+          map['jee-mains-ptm-01'] = 'live';
+          map['jee-advanced-pta-04'] = 'live';
+          map['jee-advanced-pta-05'] = 'live';
+          map['jee-advanced-pta-06'] = 'live';
           return map;
         }
       } catch (e) {}

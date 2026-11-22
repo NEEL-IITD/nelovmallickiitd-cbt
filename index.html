@@ -13384,27 +13384,19 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         setPreviewTab(initialTab);
       };
 
+      const isTestReady = (id) => {
+        return id === 'jee-mains-ptm-01' || id.includes('pta-04') || id.includes('pta-05') || id.includes('pta-06') || testConfigs[id] === 'live';
+      };
+
       const handleAction = (item) => {
-        const isLive = testConfigs[item.id] === 'live';
-        const started = hasStarted(item.startIso);
+        const ready = isTestReady(item.id);
 
         if (!currentUser) {
           openAuth('login', item.hashRoute, `Sign in or create a free account to attempt ${item.code}.`);
           return;
         }
 
-        // Admin bypass
-        if (isAdmin) {
-          if (handleSelectTest) {
-            handleSelectTest(item.id);
-          } else {
-            window.location.hash = item.hashRoute;
-          }
-          return;
-        }
-
-        // For student: check start time
-        if (isLive && started) {
+        if (ready) {
           if (handleSelectTest) {
             handleSelectTest(item.id);
           } else {
@@ -13740,12 +13732,6 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                 ✓ Attempted ({attempts}/3)
                               </span>
                             )}
-
-                            {isAdmin && (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">
-                                ⚡ Admin Bypass
-                              </span>
-                            )}
                           </div>
 
                           {/* Live Countdown Pill */}
@@ -13774,17 +13760,15 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           type="button"
                           onClick={() => handleAction(item)}
                           className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
-                            !isCurrentlyLocked || isAdmin
+                            isTestReady(item.id)
                               ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/20'
                               : 'bg-slate-200/80 dark:bg-zinc-800/80 text-slate-400 dark:text-zinc-500 cursor-not-allowed'
                           }`}
                         >
-                          {isAdmin ? (
-                            <span>⚡ Admin Start →</span>
-                          ) : !isCurrentlyLocked ? (
+                          {isTestReady(item.id) ? (
                             <span>Attempt {item.code} →</span>
                           ) : (
-                            <span>🔒 Locked</span>
+                            <span>Paper Uploading Soon</span>
                           )}
                         </button>
                       </div>
@@ -13885,12 +13869,12 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                 type="button"
                                 onClick={() => handleAction(item)}
                                 className={`px-3 py-1 rounded-lg font-bold text-xs whitespace-nowrap transition-all ${
-                                  !isCurrentlyLocked || isAdmin
+                                  isTestReady(item.id)
                                     ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs'
                                     : 'bg-slate-200 dark:bg-zinc-800 text-slate-400 dark:text-zinc-500 cursor-not-allowed'
                                 }`}
                               >
-                                {isAdmin ? '⚡ Admin' : (!isCurrentlyLocked ? 'Attempt →' : '🔒 Locked')}
+                                {isTestReady(item.id) ? 'Attempt →' : 'Soon'}
                               </button>
                             </div>
                           </td>
@@ -14249,15 +14233,15 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 {/* Modal Footer with Status & Action */}
                 <div className="p-6 bg-slate-50 dark:bg-zinc-900/80 border-t border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div>
-                    {!hasStarted(previewItem.startIso) && !isAdmin ? (
-                      <div className="flex items-center gap-2 text-xs font-semibold text-amber-700 dark:text-amber-300">
-                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                        <span>Locked until {previewItem.dateStr}, 10:00 AM IST ({formatCountdown(previewItem.startIso) ? `Starts in ${formatCountdown(previewItem.startIso)}` : 'Upcoming'})</span>
-                      </div>
-                    ) : (
+                    {isTestReady(previewItem.id) ? (
                       <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                         <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                        <span>{isAdmin ? 'Admin Bypass Enabled · Ready to Attempt' : 'Test is Live · 100% Free Forever'}</span>
+                        <span>Question Paper Live &amp; Ready · 100% Free Forever</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-xs font-semibold text-amber-700 dark:text-amber-300">
+                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                        <span>Scheduled for {previewItem.dateStr} · Paper Uploading Soon</span>
                       </div>
                     )}
                   </div>
@@ -14271,15 +14255,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       Close Preview
                     </button>
 
-                    {!hasStarted(previewItem.startIso) && !isAdmin ? (
-                      <button
-                        type="button"
-                        disabled
-                        className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-200 dark:bg-zinc-800 text-slate-400 dark:text-zinc-500 cursor-not-allowed border border-slate-300 dark:border-zinc-700"
-                      >
-                        🔒 Locked until 10:00 AM IST
-                      </button>
-                    ) : (
+                    {isTestReady(previewItem.id) ? (
                       <button
                         type="button"
                         onClick={() => {
@@ -14293,7 +14269,17 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         }}
                         className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/25 transition-all flex items-center justify-center gap-1.5"
                       >
-                        <span>{isAdmin ? '⚡ Admin Start' : 'Start Test Now'} →</span>
+                        <span>Start Test Now →</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          alert(`${previewItem.code} question paper is currently being digitized and verified. Please attempt PTM 01, PTA 04, PTA 05, or PTA 06 in the meantime!`);
+                        }}
+                        className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors"
+                      >
+                        Paper Uploading Soon
                       </button>
                     )}
                   </div>
@@ -14366,7 +14352,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       useEffect(() => {
         if (window.studentStorage?.getTestConfigs) {
           window.studentStorage.getTestConfigs().then(cfg => {
-            if (cfg) setTestConfigs(cfg);
+            if (cfg) setTestConfigs({ ...cfg, 'jee-mains-ptm-01': 'live', 'jee-advanced-pta-04': 'live', 'jee-advanced-pta-05': 'live', 'jee-advanced-pta-06': 'live' });
           });
         }
         if (window.studentStorage?.getTestConfigsDetails) {
@@ -14382,7 +14368,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         const handleConfigChange = () => {
           if (window.studentStorage?.getTestConfigs) {
             window.studentStorage.getTestConfigs().then(cfg => {
-              if (cfg) setTestConfigs(cfg);
+              if (cfg) setTestConfigs({ ...cfg, 'jee-mains-ptm-01': 'live', 'jee-advanced-pta-04': 'live', 'jee-advanced-pta-05': 'live', 'jee-advanced-pta-06': 'live' });
             });
           }
         };
@@ -14548,29 +14534,86 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         const hash = window.location.hash.toLowerCase();
         const path = window.location.pathname.toLowerCase();
         const activeUser = window.authService?.getCurrentUser() || null;
+        const isHashEmpty = !hash || hash === '#' || hash === '#/' || hash === '';
+
+        // Priority 1: CBT Test Routes (PTA 04-06, PTM 01-20)
+        if (hash.includes('pta-04') || hash.includes('pta04')) {
+          if (!activeUser) {
+            openAuth('login', '#/test/jee-advanced/pta-04', 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.');
+            setView('home');
+            return;
+          }
+          if (activeTestId === 'jee-advanced-pta-04' && (view === 'instructions' || view === 'exam' || view === 'result')) {
+            return;
+          }
+          handleSelectTest('jee-advanced-pta-04', activeUser);
+          return;
+        }
+
+        if (hash.includes('pta-05') || hash.includes('pta05')) {
+          if (!activeUser) {
+            openAuth('login', '#/test/jee-advanced/pta-05', 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.');
+            setView('home');
+            return;
+          }
+          if (activeTestId === 'jee-advanced-pta-05' && (view === 'instructions' || view === 'exam' || view === 'result')) {
+            return;
+          }
+          handleSelectTest('jee-advanced-pta-05', activeUser);
+          return;
+        }
+
+        if (hash.includes('pta-06') || hash.includes('pta06')) {
+          if (!activeUser) {
+            openAuth('login', '#/test/jee-advanced/pta-06', 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.');
+            setView('home');
+            return;
+          }
+          if (activeTestId === 'jee-advanced-pta-06' && (view === 'instructions' || view === 'exam' || view === 'result')) {
+            return;
+          }
+          handleSelectTest('jee-advanced-pta-06', activeUser);
+          return;
+        }
+
+        const ptmMatch = hash.match(/ptm-?(\d+)/);
+        if (ptmMatch) {
+          const ptmNum = String(parseInt(ptmMatch[1], 10)).padStart(2, '0');
+          const ptmId = `jee-mains-ptm-${ptmNum}`;
+          if (!activeUser) {
+            openAuth('login', `#/test/jee-mains/ptm-${ptmNum}`, `Sign in or create a free account to attempt PTM ${ptmNum}.`);
+            setView('home');
+            return;
+          }
+          if (activeTestId === ptmId && (view === 'instructions' || view === 'exam' || view === 'result')) {
+            return;
+          }
+          handleSelectTest(ptmId, activeUser);
+          return;
+        }
 
         // Public Legal Routes (100% Free Public Access, No Login Required)
-        if (hash === '#/privacy-policy' || hash === '#privacy-policy' || path === '/privacy-policy') {
+        if (hash === '#/privacy-policy' || hash === '#privacy-policy' || (isHashEmpty && path === '/privacy-policy')) {
           setView('privacy-policy');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
-        if (hash === '#/terms' || hash === '#terms' || path === '/terms') {
+        if (hash === '#/terms' || hash === '#terms' || (isHashEmpty && path === '/terms')) {
           setView('terms');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
-        if (hash === '#/disclaimer' || hash === '#disclaimer' || path === '/disclaimer') {
+        if (hash === '#/disclaimer' || hash === '#disclaimer' || (isHashEmpty && path === '/disclaimer')) {
           setView('disclaimer');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
-        if (hash === '#/copyright' || hash === '#copyright' || path === '/copyright') {
+        if (hash === '#/copyright' || hash === '#copyright' || (isHashEmpty && path === '/copyright')) {
           setView('copyright');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
-        if (hash === '#/account' || hash === '#account' || path === '/account') {
+        if (hash === '#/account' || hash === '#account' || (isHashEmpty && path === '/account')) {
           if (!activeUser) {
             openAuth('login', '#/account', 'Sign in to access your Account & Privacy settings.');
             setView('home');
@@ -14696,7 +14739,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return;
         }
 
-        if (hash === '#/schedule' || hash === '#schedule' || path === '/schedule') {
+        if (hash === '#/schedule' || hash === '#schedule' || (isHashEmpty && path === '/schedule')) {
           setView('schedule');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
@@ -14730,61 +14773,6 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             openAuth('signup', '#/');
             setView('home');
           }
-          return;
-        }
-
-        if (hash.includes('pta-04') || hash.includes('pta04')) {
-          if (!activeUser) {
-            openAuth('login', '#/test/jee-advanced/pta-04', 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.');
-            setView('home');
-            return;
-          }
-          if (activeTestId === 'jee-advanced-pta-04' && (view === 'instructions' || view === 'exam' || view === 'result')) {
-            return;
-          }
-          handleSelectTest('jee-advanced-pta-04', activeUser);
-          return;
-        }
-
-        if (hash.includes('pta-05') || hash.includes('pta05')) {
-          if (!activeUser) {
-            openAuth('login', '#/test/jee-advanced/pta-05', 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.');
-            setView('home');
-            return;
-          }
-          if (activeTestId === 'jee-advanced-pta-05' && (view === 'instructions' || view === 'exam' || view === 'result')) {
-            return;
-          }
-          handleSelectTest('jee-advanced-pta-05', activeUser);
-          return;
-        }
-
-        if (hash.includes('pta-06') || hash.includes('pta06')) {
-          if (!activeUser) {
-            openAuth('login', '#/test/jee-advanced/pta-06', 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.');
-            setView('home');
-            return;
-          }
-          if (activeTestId === 'jee-advanced-pta-06' && (view === 'instructions' || view === 'exam' || view === 'result')) {
-            return;
-          }
-          handleSelectTest('jee-advanced-pta-06', activeUser);
-          return;
-        }
-
-        const ptmMatch = hash.match(/ptm-?(\d+)/);
-        if (ptmMatch) {
-          const ptmNum = String(parseInt(ptmMatch[1], 10)).padStart(2, '0');
-          const ptmId = `jee-mains-ptm-${ptmNum}`;
-          if (!activeUser) {
-            openAuth('login', `#/test/jee-mains/ptm-${ptmNum}`, `Sign in or create a free account to attempt PTM ${ptmNum}.`);
-            setView('home');
-            return;
-          }
-          if (activeTestId === ptmId && (view === 'instructions' || view === 'exam' || view === 'result')) {
-            return;
-          }
-          handleSelectTest(ptmId, activeUser);
           return;
         }
 
@@ -14880,36 +14868,18 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         else if (testId.includes('pta-05') || testId.includes('pta05')) canonicalId = 'jee-advanced-pta-05';
         else if (testId.includes('pta-06') || testId.includes('pta06')) canonicalId = 'jee-advanced-pta-06';
 
-        // Check if test is coming soon
+        // Check if test is ready / live
         const all = window.allTests || [];
         const meta = window.getTestById ? window.getTestById(canonicalId) : all.find(t => t.id === canonicalId);
-        // Check Scheduled Mock Window start-time guard
-        const sched = detailedConfigs[canonicalId];
-        const paperObj = window.getTestPaper ? window.getTestPaper(canonicalId) : (canonicalId === 'jee-mains-ptm-01' ? window.ptm01Data : null);
-        const schedStart = (paperObj && paperObj.scheduledStartTime) || (sched && sched.startsAt);
-        if (schedStart) {
-          const startTime = new Date(schedStart).getTime();
-          const isAdmin = user.email && ['mallicknelov@gmail.com', 'nelovmallick@gmail.com'].includes(user.email.toLowerCase()) || user.role === 'admin';
-          if (startTime > Date.now() && !isAdmin) {
-            setNoticeModal({
-              title: `⏰ Scheduled Mock Window — ${meta ? meta.code : 'Test'}`,
-              message: `This official mock test window opens on ${formatIST(schedStart)}. Submissions will be unlocked for all candidates as soon as the test begins. You can review the syllabus and instructions on the Schedule page!`,
-              activeCategory: meta ? meta.examCategory : 'jee-mains',
-              isScheduled: true,
-              startsAt: schedStart
-            });
-            setView('schedule');
-            window.location.hash = '#/schedule';
-            return;
-          }
-        }
 
-        const configuredStatus = testConfigs[canonicalId] || (meta ? meta.status : 'live');
-        if (configuredStatus === 'coming_soon') {
+        const isVerifiedLive = canonicalId === 'jee-mains-ptm-01' || canonicalId.includes('pta-04') || canonicalId.includes('pta-05') || canonicalId.includes('pta-06');
+        const configuredStatus = isVerifiedLive ? 'live' : (testConfigs[canonicalId] || (meta ? meta.status : 'coming_soon'));
+
+        if (!isVerifiedLive && configuredStatus === 'coming_soon') {
           setNoticeModal({
-            title: `${meta ? meta.title : 'Mock Paper'} — Coming Soon`,
-            message: `This paper is currently being digitized and verified with step-by-step KaTeX solutions. In the meantime, please attempt the live papers JEE Advanced PTA 04 and PTA 05!`,
-            activeCategory: meta ? meta.examCategory : 'jee-advanced'
+            title: `${meta ? meta.title : 'Mock Paper'} — Paper Uploading Soon`,
+            message: `This paper is currently being digitized and verified with step-by-step KaTeX solutions. In the meantime, please attempt the live papers PTM 01, PTA 04, PTA 05, and PTA 06!`,
+            activeCategory: meta ? meta.examCategory : 'jee-mains'
           });
           return;
         }
@@ -14918,7 +14888,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         const targetHash = canonicalId.startsWith('jee-mains-')
           ? `#/test/jee-mains/${canonicalId.replace('jee-mains-', '')}`
           : `#/test/jee-advanced/${canonicalId.replace('jee-advanced-', '')}`;
-        if (window.location.hash !== targetHash) {
+        if (window.history && window.history.replaceState && window.location.pathname !== '/' && window.location.pathname !== '') {
+          window.history.replaceState(null, '', '/' + targetHash);
+        } else if (window.location.hash !== targetHash) {
           window.location.hash = targetHash;
         }
 

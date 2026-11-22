@@ -3,7 +3,7 @@
 // Curated by Nelov Mallick (IIT Delhi) · 100% Free Forever
 // ==============================================================================
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { JEE_MAINS_2027_SCHEDULE, FINAL_REVISION_CARD, ScheduleTestItem } from '../data/scheduleData';
 import { Tilt3DCard } from './ui/Tilt3DCard';
 import { useAuth } from '../context/AuthContext';
@@ -20,21 +20,12 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
   onNavigate = (hash) => { window.location.hash = hash; },
   onSelectTest
 }) => {
-  const { user, isAdmin, openAuthModal } = useAuth();
+  const { user, openAuthModal } = useAuth();
 
   // Filter & Layout States
   const [selectedPhase, setSelectedPhase] = useState<number | 'all'>('all');
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const [copiedToast, setCopiedToast] = useState(false);
-
-  // Live real-time clock for real-time countdown & auto-unlock
-  const [now, setNow] = useState<number>(Date.now());
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(Date.now());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   // Modal state for Preview Details (Syllabus + Instructions)
   const [previewItem, setPreviewItem] = useState<ScheduleTestItem | null>(null);
@@ -46,6 +37,8 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     jeeMainsTests.forEach((t: TestMetadata) => {
       map[t.id] = t.status;
     });
+    // PTM 01 has 75 questions verified and is permanently live
+    map['jee-mains-ptm-01'] = 'live';
     return map;
   }, []);
 
@@ -55,30 +48,17 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     return JEE_MAINS_2027_SCHEDULE.filter((t) => t.phase === selectedPhase);
   }, [selectedPhase]);
 
-  // Check if test is currently within its live window
+  // Check if test is currently within its live window (for display tag only)
   const isInsideWindow = (startIso: string, endIso: string) => {
+    const now = Date.now();
     const start = new Date(startIso).getTime();
     const end = new Date(endIso).getTime();
     return now >= start && now <= end;
   };
 
-  // Check if test start time has arrived
-  const hasStarted = (startIso: string) => {
-    return now >= new Date(startIso).getTime();
-  };
-
-  // Calculate live countdown string
-  const formatCountdown = (startIso: string) => {
-    const diff = new Date(startIso).getTime() - now;
-    if (diff <= 0) return null;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    if (days > 0) {
-      return `${days}d ${hours}h ${minutes}m ${seconds}s`;
-    }
-    return `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+  // Check if test has questions and is ready to attempt
+  const isTestReady = (testId: string) => {
+    return testId === 'jee-mains-ptm-01' || liveStatusMap[testId] === 'live';
   };
 
   // Get student attempt count for this test
@@ -106,33 +86,21 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
   };
 
   const handleAction = (item: ScheduleTestItem) => {
-    const isLive = liveStatusMap[item.id] === 'live';
-    const started = hasStarted(item.startIso);
+    const ready = isTestReady(item.id);
 
     if (!user) {
       openAuthModal('login', item.hashRoute, `Sign in or create a free account to attempt ${item.code}.`);
       return;
     }
 
-    // Admin bypass: can enter regardless of scheduled start
-    if (isAdmin) {
-      if (onSelectTest) {
-        onSelectTest(item.id);
-      } else {
-        onNavigate(item.hashRoute);
-      }
-      return;
-    }
-
-    // For students: check if scheduled window has unlocked
-    if (isLive && started) {
+    if (ready) {
       if (onSelectTest) {
         onSelectTest(item.id);
       } else {
         onNavigate(item.hashRoute);
       }
     } else {
-      // Locked before start time: open preview details with countdown
+      // Placeholder test notice: open preview so students can review syllabus
       openPreview(item, 'syllabus');
     }
   };
@@ -372,12 +340,9 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
         {viewMode === 'cards' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {filteredSchedule.map((item) => {
-              const isLive = liveStatusMap[item.id] === 'live';
+              const ready = isTestReady(item.id);
               const inWindow = isInsideWindow(item.startIso, item.endIso);
-              const started = hasStarted(item.startIso);
               const attempts = getAttemptCount(item.id);
-              const countdown = formatCountdown(item.startIso);
-              const isCurrentlyLocked = !started && !isAdmin;
 
               return (
                 <Tilt3DCard
@@ -412,7 +377,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                       </span>
                     </div>
 
-                    {/* Date and Window Box */}
+                    {/* Date and Window Box (Display Only) */}
                     <div className="space-y-2 mb-5 p-3.5 rounded-2xl bg-slate-100/70 dark:bg-zinc-800/50 border border-slate-200/70 dark:border-zinc-700/50 text-xs">
                       <div className="flex items-center gap-2.5 text-slate-700 dark:text-zinc-300 font-medium">
                         <svg className="w-4 h-4 text-indigo-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -424,51 +389,34 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                         <svg className="w-4 h-4 text-indigo-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span><strong>Window:</strong> {item.windowStr}</span>
+                        <span><strong>Target Window:</strong> {item.windowStr}</span>
                       </div>
                     </div>
 
-                    {/* Status Badge + Live Countdown */}
-                    <div className="space-y-2.5 mb-5">
-                      <div className="flex flex-wrap items-center gap-2">
-                        {inWindow ? (
+                    {/* Status Badge */}
+                    <div className="flex flex-wrap items-center gap-2 mb-5">
+                      {ready ? (
+                        inWindow ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
                             LIVE WINDOW NOW
                           </span>
-                        ) : isLive && started ? (
+                        ) : (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/30">
                             <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
                             Open Anytime
                           </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                            Scheduled / Upcoming
-                          </span>
-                        )}
+                        )
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-300 dark:border-zinc-700">
+                          Scheduled · Paper Uploading Soon
+                        </span>
+                      )}
 
-                        {attempts > 0 && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">
-                            ✓ Attempted ({attempts}/3)
-                          </span>
-                        )}
-
-                        {isAdmin && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">
-                            ⚡ Admin Bypass
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Live Ticking Countdown Pill before start time */}
-                      {countdown && (
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 text-xs font-mono font-bold text-amber-800 dark:text-amber-300">
-                          <svg className="w-3.5 h-3.5 animate-spin text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span>Starts in {countdown}</span>
-                        </div>
+                      {attempts > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                          ✓ Attempted ({attempts}/3)
+                        </span>
                       )}
                     </div>
                   </div>
@@ -483,23 +431,23 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                       Preview Details
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() => handleAction(item)}
-                      className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
-                        !isCurrentlyLocked || isAdmin
-                          ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/20'
-                          : 'bg-slate-200/80 dark:bg-zinc-800/80 text-slate-400 dark:text-zinc-500 cursor-not-allowed'
-                      }`}
-                    >
-                      {isAdmin ? (
-                        <span>⚡ Admin Start →</span>
-                      ) : !isCurrentlyLocked ? (
+                    {ready ? (
+                      <button
+                        type="button"
+                        onClick={() => handleAction(item)}
+                        className="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/20 transition-all"
+                      >
                         <span>Attempt {item.code} →</span>
-                      ) : (
-                        <span>🔒 Locked</span>
-                      )}
-                    </button>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleAction(item)}
+                        className="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 bg-slate-100 dark:bg-zinc-800/80 text-slate-500 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200 dark:border-zinc-700 transition-all"
+                      >
+                        <span>Paper Uploading Soon</span>
+                      </button>
+                    )}
                   </div>
                 </Tilt3DCard>
               );
@@ -517,20 +465,17 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                   <th className="py-3.5 px-4">Test Code</th>
                   <th className="py-3.5 px-4">Phase</th>
                   <th className="py-3.5 px-4">Date</th>
-                  <th className="py-3.5 px-4">Live Window (IST)</th>
+                  <th className="py-3.5 px-4">Target Window (IST)</th>
                   <th className="py-3.5 px-4">Event Tag</th>
-                  <th className="py-3.5 px-4">Status & Countdown</th>
-                  <th className="py-3.5 px-4 text-right no-print">Actions</th>
+                  <th className="py-3.5 px-4">Status & Access</th>
+                  <th className="py-3.5 px-4 text-right no-print">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60 font-medium">
                 {filteredSchedule.map((item) => {
-                  const isLive = liveStatusMap[item.id] === 'live';
+                  const ready = isTestReady(item.id);
                   const inWindow = isInsideWindow(item.startIso, item.endIso);
-                  const started = hasStarted(item.startIso);
                   const attempts = getAttemptCount(item.id);
-                  const countdown = formatCountdown(item.startIso);
-                  const isCurrentlyLocked = !started && !isAdmin;
 
                   return (
                     <tr
@@ -565,17 +510,19 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          {inWindow ? (
-                            <span className="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-                              ● Live Window
-                            </span>
-                          ) : isLive && started ? (
-                            <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/30">
-                              ● Open Anytime
-                            </span>
+                          {ready ? (
+                            inWindow ? (
+                              <span className="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                                ● Live Window
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/30">
+                                ● Open Anytime
+                              </span>
+                            )
                           ) : (
-                            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
-                              {countdown ? `Starts in ${countdown}` : 'Scheduled'}
+                            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-200 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400">
+                              Uploading Soon
                             </span>
                           )}
                           {attempts > 0 && (
@@ -594,17 +541,23 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                           >
                             Details
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => handleAction(item)}
-                            className={`px-3 py-1 rounded-lg font-bold text-xs whitespace-nowrap transition-all ${
-                              !isCurrentlyLocked || isAdmin
-                                ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs'
-                                : 'bg-slate-200 dark:bg-zinc-800 text-slate-400 dark:text-zinc-500 cursor-not-allowed'
-                            }`}
-                          >
-                            {isAdmin ? '⚡ Admin' : (!isCurrentlyLocked ? 'Attempt →' : '🔒 Locked')}
-                          </button>
+                          {ready ? (
+                            <button
+                              type="button"
+                              onClick={() => handleAction(item)}
+                              className="px-3 py-1 rounded-lg font-bold text-xs whitespace-nowrap transition-all bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
+                            >
+                              Attempt →
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleAction(item)}
+                              className="px-3 py-1 rounded-lg font-semibold text-xs whitespace-nowrap transition-all bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700 hover:bg-slate-200 dark:hover:bg-zinc-700"
+                            >
+                              Soon
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -802,7 +755,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                           </li>
                           <li className="flex items-start gap-2.5">
                             <span className="text-emerald-500 font-bold mt-0.5">•</span>
-                            <span><strong>Purification & Practical Organic Chemistry (POC):</strong> Simple, fractional, vacuum, and steam distillation principles; Thin Layer Chromatography ($R_f$ factor); quantitative Kjeldahl's method for nitrogen.</span>
+                            <span><strong>Purification & Practical Organic Chemistry (POC):</strong> Simple, fractional, vacuum, and steam distillation principles; Thin Layer Chromatography (Rf factor); quantitative Kjeldahl's method for nitrogen.</span>
                           </li>
                         </>
                       )}
@@ -963,15 +916,15 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
             {/* Modal Footer with Status & Action */}
             <div className="p-6 bg-slate-50 dark:bg-zinc-900/80 border-t border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
-                {!hasStarted(previewItem.startIso) && !isAdmin ? (
-                  <div className="flex items-center gap-2 text-xs font-semibold text-amber-700 dark:text-amber-300">
-                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                    <span>Locked until {previewItem.dateStr}, 10:00 AM IST ({formatCountdown(previewItem.startIso) ? `Starts in ${formatCountdown(previewItem.startIso)}` : 'Upcoming'})</span>
-                  </div>
-                ) : (
+                {isTestReady(previewItem.id) ? (
                   <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                    <span>{isAdmin ? 'Admin Bypass Enabled · Ready to Attempt' : 'Test is Live · 100% Free Forever'}</span>
+                    <span>Question Paper Live &amp; Ready · 100% Free Forever</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-xs font-semibold text-amber-700 dark:text-amber-300">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                    <span>Scheduled for {previewItem.dateStr} · Paper Uploading Soon</span>
                   </div>
                 )}
               </div>
@@ -985,15 +938,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                   Close Preview
                 </button>
 
-                {!hasStarted(previewItem.startIso) && !isAdmin ? (
-                  <button
-                    type="button"
-                    disabled
-                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-200 dark:bg-zinc-800 text-slate-400 dark:text-zinc-500 cursor-not-allowed border border-slate-300 dark:border-zinc-700"
-                  >
-                    🔒 Locked until 10:00 AM IST
-                  </button>
-                ) : (
+                {isTestReady(previewItem.id) ? (
                   <button
                     type="button"
                     onClick={() => {
@@ -1007,7 +952,17 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                     }}
                     className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/25 transition-all flex items-center justify-center gap-1.5"
                   >
-                    <span>{isAdmin ? '⚡ Admin Start' : 'Start Test Now'} →</span>
+                    <span>Start Test Now →</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      alert(`${previewItem.code} question paper is currently being digitized and verified. Please attempt PTM 01, PTA 04, PTA 05, or PTA 06 in the meantime!`);
+                    }}
+                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors"
+                  >
+                    Paper Uploading Soon
                   </button>
                 )}
               </div>

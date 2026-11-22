@@ -939,6 +939,11 @@
           if (!error && data) {
             const map = {};
             data.forEach(r => { map[r.test_id] = r.status; });
+            // Ensure tests with verified digitized papers are always 'live'
+            map['jee-mains-ptm-01'] = 'live';
+            map['jee-advanced-pta-04'] = 'live';
+            map['jee-advanced-pta-05'] = 'live';
+            map['jee-advanced-pta-06'] = 'live';
             return map;
           }
         } catch (e) {}
