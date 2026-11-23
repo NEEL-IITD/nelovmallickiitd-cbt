@@ -41,6 +41,7 @@ export interface TestAttemptRecord {
   responses?: Record<string, any>;
   timePerQuestion?: Record<string, number>;
   mistakeTags?: Record<string, string>;
+  submissionTrigger?: string;
   timeTakenSeconds?: number;
   timeSpentTotal?: number;
   obtainedMarks?: number;
@@ -173,7 +174,10 @@ export const studentStorage = {
           subject_breakdown: attemptRecord.subjectStats || {},
           responses: attemptRecord.responses || {},
           time_per_question: attemptRecord.timePerQuestion || {},
-          mistake_tags: attemptRecord.mistakeTags || {},
+          mistake_tags: {
+            ...(attemptRecord.mistakeTags || {}),
+            submission_trigger: attemptRecord.submissionTrigger || 'manual'
+          },
           submitted_at: attemptRecord.completedAt || new Date().toISOString()
         });
 

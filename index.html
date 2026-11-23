@@ -6691,6 +6691,21 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
     }
 
 
+    // Central Strict Attempt Evaluation Helper (Never treats numerical 0 or option index 0 as unattempted)
+    function isQuestionAttempted(ans) {
+      if (ans === undefined || ans === null) return false;
+      if (typeof ans === 'string') {
+        return ans.trim() !== '';
+      }
+      if (Array.isArray(ans)) {
+        return ans.length > 0;
+      }
+      if (typeof ans === 'number') {
+        return !isNaN(ans);
+      }
+      return false;
+    }
+
     // Adaptive Scoring Engine: supports JEE Mains (+4 / -1) and JEE Advanced (multi-correct partials) with Time & Format Analytics
     function evaluatePaper(testPaper, responses, questionTimes = {}) {
       const isJeeMains = testPaper.examType === 'JEE Mains' || testPaper.examCategory === 'jee-mains';
@@ -6723,12 +6738,18 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       let unattemptedTime = 0, unattemptedTimeCount = 0;
 
       const questionBreakdown = testPaper.questions.map((q) => {
-        const studentResp = responses[q.id];
+        let studentResp = responses ? responses[q.id] : undefined;
+        if (studentResp === undefined && responses && responses[String(q.id)] !== undefined) {
+          studentResp = responses[String(q.id)];
+        }
+        if (studentResp === undefined && responses && typeof q.id === 'string' && !isNaN(Number(q.id))) {
+          studentResp = responses[Number(q.id)];
+        }
         const marking = q.marking || {};
         const pos = marking.positive !== undefined ? marking.positive : (isJeeMains ? 4 : (q.type === 'multiple_correct' ? 4 : 3));
         const neg = marking.negative !== undefined ? marking.negative : (isJeeMains ? 1 : (q.type === 'multiple_correct' ? 2 : 1));
         const correctAns = q.answer;
-        const qTime = questionTimes[q.id] || 0;
+        const qTime = (questionTimes && (questionTimes[q.id] || questionTimes[String(q.id)])) || 0;
         totalTimeSpent += qTime;
 
         const subj = q.subject || 'Mathematics';
@@ -6745,12 +6766,10 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         questionTypeStats[typeKey].total++;
         questionTypeStats[typeKey].max += pos;
 
-        // Check if unattempted
-        const isUnattempted = studentResp === undefined || studentResp === null ||
-          (typeof studentResp === 'string' && studentResp.trim() === '') ||
-          (Array.isArray(studentResp) && studentResp.length === 0);
+        // Check if attempted using strict helper
+        const isAttempted = isQuestionAttempted(studentResp);
 
-        if (isUnattempted) {
+        if (!isAttempted) {
           unattemptedCount++;
           unattemptedTime += qTime;
           unattemptedTimeCount++;
@@ -8796,6 +8815,23 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const lecturesCompleted = window.studentStorage?.getTotalLecturesCompleted?.(currentUser.id) || 0;
 
       const handleReviewAttempt = (attempt) => {
+        let qBreakdown = attempt.questionBreakdown || [];
+        if ((!qBreakdown || qBreakdown.length === 0) && attempt.responses) {
+          try {
+            const paper = (window.getTestById ? window.getTestById(attempt.testId) : null) ||
+              (attempt.testId?.includes('ptm01') || attempt.testId?.includes('ptm-01') ? window.ptm01Data : null) ||
+              (attempt.testId?.includes('pta06') || attempt.testId?.includes('pta-06') ? window.pta06Data : null) ||
+              (attempt.testId?.includes('pta05') || attempt.testId?.includes('pta-05') ? window.pta05Data : null) ||
+              window.pta04Data;
+            if (paper && typeof evaluatePaper === 'function') {
+              const reEval = evaluatePaper(paper, attempt.responses, attempt.timePerQuestion || {});
+              qBreakdown = reEval.questionBreakdown;
+            }
+          } catch (e) {
+            console.warn("Could not re-evaluate past attempt questionBreakdown:", e);
+          }
+        }
+
         const evalData = {
           totalMarksScored: attempt.totalMarksScored,
           totalMaxMarks: attempt.totalMaxMarks,
@@ -8806,6 +8842,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           unattemptedCount: attempt.unattemptedCount,
           percentage: attempt.percentage,
           accuracy: attempt.accuracy,
+          submissionTrigger: attempt.submissionTrigger || attempt.mistakeTags?.submission_trigger || 'manual',
           subjectStats: attempt.subjectStats || {
             Mathematics: { scored: 0, max: 60, attempted: 0, correct: 0, partial: 0, incorrect: 0, timeSpent: 0 },
             Physics: { scored: 0, max: 60, attempted: 0, correct: 0, partial: 0, incorrect: 0, timeSpent: 0 },
@@ -8836,7 +8873,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               { name: 'Top 500 (Gen-1 CS/Elec)', targetPercent: 75, achieved: attempt.percentage >= 75 },
             ]
           },
-          questionBreakdown: attempt.questionBreakdown || []
+          questionBreakdown: qBreakdown
         };
         setEvaluationData(evalData);
         setView('result');
@@ -14642,6 +14679,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [statuses, setStatuses] = useState({});
       const [timeLeft, setTimeLeft] = useState(180 * 60);
       const [showSubmitModal, setShowSubmitModal] = useState(false);
+      const [isSubmitting, setIsSubmitting] = useState(false);
+      const [submitTrigger, setSubmitTrigger] = useState(null);
+      const [timeToast, setTimeToast] = useState(null);
       const [evaluationData, setEvaluationData] = useState(null);
       const [reviewSubjectFilter, setReviewSubjectFilter] = useState('all');
       const [reviewStatusFilter, setReviewStatusFilter] = useState('all');
@@ -14649,6 +14689,17 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [mobilePaletteOpen, setMobilePaletteOpen] = useState(false);
       const [faqOpenIdx, setFaqOpenIdx] = useState(null);
       const [noticeModal, setNoticeModal] = useState(null);
+
+      // CBT Operational Refs for Drift-Proof Wall-Clock Timer & Atomic State Tracking
+      const answersRef = useRef({});
+      const statusesRef = useRef({});
+      const questionTimesRef = useRef({});
+      const hasSubmittedRef = useRef(false);
+      const timerIntervalRef = useRef(null);
+      const examEndTimeRef = useRef(null);
+      const timeLeftRef = useRef(180 * 60);
+      const notifiedTenMinRef = useRef(false);
+      const notifiedOneMinRef = useRef(false);
 
       // Registries
       const mainsList = window.jeeMainsTests || [];
@@ -14955,47 +15006,125 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const currentQuestionsRef = useRef(currentQuestions);
       useEffect(() => { currentQuestionsRef.current = currentQuestions; }, [currentQuestions]);
 
-      // Timer Effect in Exam Mode with Per-Question Time Accumulation
-      useEffect(() => {
-        if (view !== 'exam') return;
-
-        const timer = setInterval(() => {
-          setTimeLeft((prev) => {
-            if (prev <= 1) {
-              clearInterval(timer);
-              handleSubmitExam();
-              return 0;
-            }
-            return prev - 1;
-          });
-
-          setQuestionTimes((prev) => {
-            const qs = currentQuestionsRef.current;
-            const idx = currentQIndexRef.current;
-            const q = qs && qs[idx];
-            if (!q) return prev;
-            return { ...prev, [q.id]: (prev[q.id] || 0) + 1 };
-          });
-        }, 1000);
-
-        return () => clearInterval(timer);
-      }, [view, currentPaper]);
-
-      // Auto-save session scoped to user
-      useEffect(() => {
-        if (view === 'exam' && currentPaper && currentUser) {
-          const sessionData = {
+      // Synchronize Live Answers & Statuses to Operational Refs and Local Draft
+      const syncSessionDraft = (newAnswers, newStatuses) => {
+        if (!currentUser || !activeTestId) return;
+        try {
+          const draft = {
             candidateName: currentUser.name,
             activeTestId,
-            responses,
-            statuses,
-            currentQIndex,
-            timeLeft,
-            questionTimes
+            responses: newAnswers || answersRef.current,
+            statuses: newStatuses || statusesRef.current,
+            currentQIndex: currentQIndexRef.current,
+            timeLeft: timeLeftRef.current,
+            examEndTime: examEndTimeRef.current,
+            questionTimes: questionTimesRef.current
           };
-          window.studentStorage.saveSession(currentUser.id, activeTestId, sessionData);
+          window.studentStorage?.saveSession(currentUser.id, activeTestId, draft);
+        } catch (e) {
+          console.warn("Failed to sync session draft:", e);
         }
-      }, [responses, statuses, currentQIndex, timeLeft, view, activeTestId, currentUser, questionTimes]);
+      };
+
+      // Drift-Proof Wall-Clock Timer & Auto-Submit Engine (Verified on 500ms intervals + tab events)
+      useEffect(() => {
+        if (view !== 'exam') {
+          if (timerIntervalRef.current) {
+            clearInterval(timerIntervalRef.current);
+            timerIntervalRef.current = null;
+          }
+          return;
+        }
+
+        if (!examEndTimeRef.current) {
+          const totalSecs = (currentPaper?.durationMinutes || 180) * 60;
+          examEndTimeRef.current = Date.now() + totalSecs * 1000;
+        }
+
+        const updateTimer = () => {
+          if (hasSubmittedRef.current) return;
+          const now = Date.now();
+          const msLeft = examEndTimeRef.current - now;
+          const secLeft = Math.max(0, Math.round(msLeft / 1000));
+          timeLeftRef.current = secLeft;
+          setTimeLeft(secLeft);
+
+          // Notifications: 10m and 1m warnings
+          if (secLeft <= 600 && secLeft > 60 && !notifiedTenMinRef.current) {
+            notifiedTenMinRef.current = true;
+            setTimeToast({
+              id: Date.now(),
+              type: 'warning',
+              message: '⏳ 10 Minutes Remaining! Please review your answers and prepare for submission.'
+            });
+            setTimeout(() => setTimeToast(null), 8000);
+          } else if (secLeft <= 60 && secLeft > 0 && !notifiedOneMinRef.current) {
+            notifiedOneMinRef.current = true;
+            setTimeToast({
+              id: Date.now(),
+              type: 'danger',
+              message: '🚨 1 Minute Remaining! Exam will automatically freeze and submit at 00:00:00.'
+            });
+            setTimeout(() => setTimeToast(null), 8000);
+          }
+
+          // Automatic Submit on 3-Hour Timer Expiry (00:00:00)
+          if (secLeft <= 0) {
+            if (!hasSubmittedRef.current) {
+              submitExam('timeout');
+            }
+          }
+        };
+
+        // Immediate check
+        updateTimer();
+
+        timerIntervalRef.current = setInterval(updateTimer, 500);
+
+        // Per-question time accumulation (every 1s)
+        const qTimeInterval = setInterval(() => {
+          if (hasSubmittedRef.current || view !== 'exam') return;
+          const qs = currentQuestionsRef.current;
+          const idx = currentQIndexRef.current;
+          const q = qs && qs[idx];
+          if (!q) return;
+          questionTimesRef.current = {
+            ...questionTimesRef.current,
+            [q.id]: (questionTimesRef.current[q.id] || 0) + 1
+          };
+          setQuestionTimes(questionTimesRef.current);
+        }, 1000);
+
+        const handleVisibilityOrFocus = () => {
+          updateTimer();
+        };
+        document.addEventListener('visibilitychange', handleVisibilityOrFocus);
+        window.addEventListener('focus', handleVisibilityOrFocus);
+
+        return () => {
+          if (timerIntervalRef.current) {
+            clearInterval(timerIntervalRef.current);
+            timerIntervalRef.current = null;
+          }
+          clearInterval(qTimeInterval);
+          document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
+          window.removeEventListener('focus', handleVisibilityOrFocus);
+        };
+      }, [view, currentPaper]);
+
+      // Rehydrate Evaluation Data on reload or view change
+      useEffect(() => {
+        if (view === 'result' && !evaluationData && activeTestId) {
+          try {
+            const cached = sessionStorage.getItem('nelov_eval_' + activeTestId);
+            if (cached) {
+              setEvaluationData(JSON.parse(cached));
+            }
+          } catch (e) {
+            console.warn("Failed to restore evaluationData from sessionStorage:", e);
+          }
+        }
+      }, [view, evaluationData, activeTestId]);
 
       // Switch question subject tabs automatically
       useEffect(() => {
@@ -15048,22 +15177,56 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           window.location.hash = targetHash;
         }
 
+        answersRef.current = {};
+        statusesRef.current = {};
+        questionTimesRef.current = {};
+        hasSubmittedRef.current = false;
+        setIsSubmitting(false);
+        setSubmitTrigger(null);
+        notifiedTenMinRef.current = false;
+        notifiedOneMinRef.current = false;
+
+        const durationMinutes = meta?.durationMinutes || (canonicalId.startsWith('jee-mains-') ? 180 : 180);
+        const totalDurationSec = durationMinutes * 60;
+
         // Check for saved session scoped strictly to this user
         const saved = window.studentStorage.getSession(user.id, canonicalId);
         if (saved && saved.responses) {
+          answersRef.current = { ...saved.responses };
+          statusesRef.current = { ...(saved.statuses || {}) };
+          questionTimesRef.current = { ...(saved.questionTimes || {}) };
           setResponses(saved.responses);
           setStatuses(saved.statuses || {});
           setCurrentQIndex(saved.currentQIndex || 0);
-          setTimeLeft(saved.timeLeft || 180 * 60);
           setQuestionTimes(saved.questionTimes || {});
+
+          if (saved.examEndTime && saved.examEndTime > Date.now()) {
+            examEndTimeRef.current = saved.examEndTime;
+            const remaining = Math.max(0, Math.round((saved.examEndTime - Date.now()) / 1000));
+            timeLeftRef.current = remaining;
+            setTimeLeft(remaining);
+          } else if (saved.timeLeft && saved.timeLeft > 0) {
+            examEndTimeRef.current = Date.now() + saved.timeLeft * 1000;
+            timeLeftRef.current = saved.timeLeft;
+            setTimeLeft(saved.timeLeft);
+          } else {
+            examEndTimeRef.current = Date.now() + totalDurationSec * 1000;
+            timeLeftRef.current = totalDurationSec;
+            setTimeLeft(totalDurationSec);
+          }
         } else {
+          answersRef.current = {};
+          statusesRef.current = {};
+          questionTimesRef.current = {};
           setResponses({});
           setStatuses({});
           setQuestionTimes({});
           setReviewSubjectFilter('all');
           setReviewStatusFilter('all');
           setCurrentQIndex(0);
-          setTimeLeft(180 * 60);
+          examEndTimeRef.current = Date.now() + totalDurationSec * 1000;
+          timeLeftRef.current = totalDurationSec;
+          setTimeLeft(totalDurationSec);
         }
         setView('instructions');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -15074,149 +15237,220 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           alert('Please check the declaration box to proceed.');
           return;
         }
-        setStatuses((prev) => {
-          const next = { ...prev };
-          if (!next[1]) next[1] = 'not_answered';
-          return next;
-        });
+        hasSubmittedRef.current = false;
+        setIsSubmitting(false);
+        setSubmitTrigger(null);
+
+        const durationSec = (currentPaper?.durationMinutes || 180) * 60;
+        if (!examEndTimeRef.current || examEndTimeRef.current <= Date.now()) {
+          examEndTimeRef.current = Date.now() + durationSec * 1000;
+          timeLeftRef.current = durationSec;
+          setTimeLeft(durationSec);
+        }
+
+        const q1 = currentQuestions[0];
+        const q1Id = q1 ? q1.id : 1;
+        if (!statusesRef.current[q1Id]) {
+          statusesRef.current[q1Id] = 'not_answered';
+          setStatuses((prev) => ({ ...prev, [q1Id]: 'not_answered' }));
+        }
+
         setView('exam');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        syncSessionDraft(answersRef.current, statusesRef.current);
       };
 
-      // Answering handlers
+      // Answering handlers (Committed immediately to answersRef & statusesRef to prevent answer drop)
       const handleOptionSelect = (optId) => {
         if (!currentQuestion) return;
         const qId = currentQuestion.id;
 
+        let nextAns;
         if (currentQuestion.type === 'single_correct' || currentQuestion.type === 'matching_list') {
-          setResponses((prev) => ({ ...prev, [qId]: optId }));
+          nextAns = optId;
         } else if (currentQuestion.type === 'multiple_correct') {
-          setResponses((prev) => {
-            const currentList = Array.isArray(prev[qId]) ? [...prev[qId]] : [];
-            const idx = currentList.indexOf(optId);
-            if (idx > -1) {
-              currentList.splice(idx, 1);
-            } else {
-              currentList.push(optId);
-            }
-            return { ...prev, [qId]: currentList.sort() };
-          });
+          const currentList = Array.isArray(answersRef.current[qId]) ? [...answersRef.current[qId]] : [];
+          const idx = currentList.indexOf(optId);
+          if (idx > -1) {
+            currentList.splice(idx, 1);
+          } else {
+            currentList.push(optId);
+          }
+          nextAns = currentList.sort();
         }
+
+        answersRef.current[qId] = nextAns;
+        setResponses((prev) => ({ ...prev, [qId]: nextAns }));
+
+        const currStat = statusesRef.current[qId];
+        const nextStat = (currStat === 'marked' || currStat === 'marked_answered') ? 'marked_answered' : 'answered';
+        statusesRef.current[qId] = nextStat;
+        setStatuses((prev) => ({ ...prev, [qId]: nextStat }));
+
+        syncSessionDraft(answersRef.current, statusesRef.current);
       };
 
       const handleNumericalInput = (val) => {
         if (!currentQuestion) return;
         const qId = currentQuestion.id;
+        answersRef.current[qId] = val;
         setResponses((prev) => ({ ...prev, [qId]: val }));
+
+        const hasAnswer = isQuestionAttempted(val);
+        const currStat = statusesRef.current[qId];
+        let nextStat;
+        if (currStat === 'marked' || currStat === 'marked_answered') {
+          nextStat = hasAnswer ? 'marked_answered' : 'marked';
+        } else {
+          nextStat = hasAnswer ? 'answered' : 'not_answered';
+        }
+        statusesRef.current[qId] = nextStat;
+        setStatuses((prev) => ({ ...prev, [qId]: nextStat }));
+
+        syncSessionDraft(answersRef.current, statusesRef.current);
       };
 
       const handleKeypadPress = (char) => {
         if (!currentQuestion) return;
         const qId = currentQuestion.id;
-        const currentVal = String(responses[qId] || '');
+        const prevVal = (answersRef.current[qId] !== undefined && answersRef.current[qId] !== null)
+          ? String(answersRef.current[qId])
+          : '';
+
+        let nextVal = prevVal;
         if (char === 'clear') {
-          setResponses((prev) => ({ ...prev, [qId]: '' }));
+          nextVal = '';
         } else if (char === 'backspace') {
-          setResponses((prev) => ({ ...prev, [qId]: currentVal.slice(0, -1) }));
+          nextVal = prevVal.slice(0, -1);
         } else {
-          if (char === '.' && currentVal.includes('.')) return;
-          if (char === '-' && currentVal.length > 0) return;
-          setResponses((prev) => ({ ...prev, [qId]: currentVal + char }));
+          if (char === '.' && prevVal.includes('.')) return;
+          if (char === '-' && prevVal.length > 0) return;
+          nextVal = prevVal + char;
         }
+
+        handleNumericalInput(nextVal);
       };
 
       // Palette Actions
       const handleSaveAndNext = () => {
         if (!currentQuestion) return;
         const qId = currentQuestion.id;
-        const resp = responses[qId];
-        const hasAnswer = resp !== undefined && resp !== null &&
-          ((typeof resp === 'string' && resp.trim() !== '') || (Array.isArray(resp) && resp.length > 0));
+        const resp = answersRef.current[qId];
+        const hasAnswer = isQuestionAttempted(resp);
 
-        setStatuses((prev) => ({
-          ...prev,
-          [qId]: hasAnswer ? 'answered' : 'not_answered'
-        }));
+        const currStat = statusesRef.current[qId];
+        let nextStat;
+        if (currStat === 'marked' || currStat === 'marked_answered') {
+          nextStat = hasAnswer ? 'marked_answered' : 'marked';
+        } else {
+          nextStat = hasAnswer ? 'answered' : 'not_answered';
+        }
+        statusesRef.current[qId] = nextStat;
+        setStatuses((prev) => ({ ...prev, [qId]: nextStat }));
 
         if (currentQIndex < currentQuestions.length - 1) {
           const nextIdx = currentQIndex + 1;
           setCurrentQIndex(nextIdx);
           const nextQ = currentQuestions[nextIdx];
-          setStatuses((prev) => {
-            if (!prev[nextQ.id]) {
-              return { ...prev, [nextQ.id]: 'not_answered' };
-            }
-            return prev;
-          });
+          if (!statusesRef.current[nextQ.id]) {
+            statusesRef.current[nextQ.id] = 'not_answered';
+            setStatuses((prev) => ({ ...prev, [nextQ.id]: 'not_answered' }));
+          }
         }
+        syncSessionDraft(answersRef.current, statusesRef.current);
       };
 
       const handleMarkForReviewAndNext = () => {
         if (!currentQuestion) return;
         const qId = currentQuestion.id;
-        const resp = responses[qId];
-        const hasAnswer = resp !== undefined && resp !== null &&
-          ((typeof resp === 'string' && resp.trim() !== '') || (Array.isArray(resp) && resp.length > 0));
+        const resp = answersRef.current[qId];
+        const hasAnswer = isQuestionAttempted(resp);
 
-        setStatuses((prev) => ({
-          ...prev,
-          [qId]: hasAnswer ? 'marked_answered' : 'marked'
-        }));
+        const nextStat = hasAnswer ? 'marked_answered' : 'marked';
+        statusesRef.current[qId] = nextStat;
+        setStatuses((prev) => ({ ...prev, [qId]: nextStat }));
 
         if (currentQIndex < currentQuestions.length - 1) {
           const nextIdx = currentQIndex + 1;
           setCurrentQIndex(nextIdx);
           const nextQ = currentQuestions[nextIdx];
-          setStatuses((prev) => {
-            if (!prev[nextQ.id]) {
-              return { ...prev, [nextQ.id]: 'not_answered' };
-            }
-            return prev;
-          });
+          if (!statusesRef.current[nextQ.id]) {
+            statusesRef.current[nextQ.id] = 'not_answered';
+            setStatuses((prev) => ({ ...prev, [nextQ.id]: 'not_answered' }));
+          }
         }
+        syncSessionDraft(answersRef.current, statusesRef.current);
       };
 
       const handleClearResponse = () => {
         if (!currentQuestion) return;
         const qId = currentQuestion.id;
+        delete answersRef.current[qId];
         setResponses((prev) => {
           const next = { ...prev };
           delete next[qId];
           return next;
         });
-        setStatuses((prev) => ({
-          ...prev,
-          [qId]: 'not_answered'
-        }));
+
+        const currStat = statusesRef.current[qId];
+        const nextStat = (currStat === 'marked' || currStat === 'marked_answered') ? 'marked' : 'not_answered';
+        statusesRef.current[qId] = nextStat;
+        setStatuses((prev) => ({ ...prev, [qId]: nextStat }));
+
+        syncSessionDraft(answersRef.current, statusesRef.current);
       };
 
       const handleJumpToQuestion = (targetIdx) => {
         const targetQ = currentQuestions[targetIdx];
         if (!targetQ) return;
         setCurrentQIndex(targetIdx);
-        setStatuses((prev) => {
-          if (!prev[targetQ.id]) {
-            return { ...prev, [targetQ.id]: 'not_answered' };
-          }
-          return prev;
-        });
+        if (!statusesRef.current[targetQ.id]) {
+          statusesRef.current[targetQ.id] = 'not_answered';
+          setStatuses((prev) => ({ ...prev, [targetQ.id]: 'not_answered' }));
+        }
         setMobilePaletteOpen(false);
+        syncSessionDraft(answersRef.current, statusesRef.current);
       };
 
-      const handleSubmitExam = () => {
-        if (!currentPaper || !currentUser) return;
-        const evalResults = evaluatePaper(currentPaper, responses, questionTimes);
-        setEvaluationData(evalResults);
+      // Unified Robust Submit Function (Supports Manual Submit & 3-Hour Auto-Submit)
+      const submitExam = async (trigger = 'manual') => {
+        if (hasSubmittedRef.current) return;
+        hasSubmittedRef.current = true;
+        setIsSubmitting(true);
+        setSubmitTrigger(trigger);
         setShowSubmitModal(false);
-        setView('result');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+          document.activeElement.blur();
+        }
+
+        const paperToEval = currentPaper || (window.getTestById ? window.getTestById(activeTestId) : null) || window.pta04Data;
+        const finalAnswers = { ...answersRef.current };
+        const finalTimes = { ...questionTimesRef.current };
+        const durationSec = (paperToEval?.durationMinutes || 180) * 60;
+        const remainingSec = Math.max(0, timeLeftRef.current);
+        const timeTaken = Math.max(1, durationSec - remainingSec);
+
+        const evalResults = evaluatePaper(paperToEval, finalAnswers, finalTimes);
+        evalResults.submissionTrigger = trigger;
+        evalResults.testId = activeTestId;
+        evalResults.completedAt = new Date().toISOString();
+
+        try {
+          sessionStorage.setItem('nelov_eval_' + activeTestId, JSON.stringify(evalResults));
+        } catch (e) {
+          console.warn("Could not cache evalResults to sessionStorage", e);
+        }
+
+        const user = currentUser || window.authService?.getCurrentUser();
+        const candidateUser = user || { id: 'anon_' + Date.now(), name: candidateName || 'Aspirant', email: '' };
 
         const attemptRecord = {
-          id: 'att_' + Date.now().toString(36),
+          id: 'att_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5),
           testId: activeTestId,
-          testCode: currentPaper.code,
-          testTitle: currentPaper.title,
-          examType: currentPaper.examType,
+          testCode: paperToEval.code || 'PTM',
+          testTitle: paperToEval.title,
+          examType: paperToEval.examType || (paperToEval.examCategory === 'jee-advanced' ? 'JEE Advanced' : 'JEE Mains'),
           totalMarksScored: evalResults.totalMarksScored,
           totalMaxMarks: evalResults.totalMaxMarks,
           percentage: evalResults.percentage,
@@ -15228,18 +15462,41 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           unattemptedCount: evalResults.unattemptedCount,
           predictedAirDisplay: evalResults.rankPrediction ? evalResults.rankPrediction.predictedAirDisplay : 'N/A',
           tierLabel: evalResults.rankPrediction ? evalResults.rankPrediction.tierLabel : 'N/A',
-          timeTakenSeconds: 180 * 60 - timeLeft,
-          completedAt: new Date().toISOString(),
+          timeTakenSeconds: timeTaken,
+          completedAt: evalResults.completedAt,
           subjectStats: evalResults.subjectStats,
           timeAnalysis: evalResults.timeAnalysis,
           rankPrediction: evalResults.rankPrediction,
-          questionBreakdown: evalResults.questionBreakdown
+          questionBreakdown: evalResults.questionBreakdown,
+          responses: finalAnswers,
+          submissionTrigger: trigger
         };
-        window.studentStorage.saveAttempt(currentUser.id, attemptRecord);
-        window.studentStorage.clearSession(currentUser.id, activeTestId);
+
+        if (window.studentStorage?.saveAttempt) {
+          try {
+            await window.studentStorage.saveAttempt(candidateUser.id, attemptRecord);
+          } catch (err) {
+            console.error("Error saving attempt:", err);
+          }
+        }
+
+        if (window.studentStorage?.clearSession) {
+          try {
+            window.studentStorage.clearSession(candidateUser.id, activeTestId);
+          } catch (e) {}
+        }
+
+        setEvaluationData(evalResults);
+        setIsSubmitting(false);
+        setView('result');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       };
 
-      // Palette Count Calculations
+      const handleSubmitExam = () => {
+        submitExam('manual');
+      };
+
+      // Palette Count Calculations (Always in sync with answersRef & statuses)
       const paletteCounts = useMemo(() => {
         let answered = 0;
         let notAnswered = 0;
@@ -15249,15 +15506,23 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
         currentQuestions.forEach((q) => {
           const s = statuses[q.id];
-          if (s === 'answered') answered++;
-          else if (s === 'marked_answered') markedAnswered++;
-          else if (s === 'marked') marked++;
-          else if (s === 'not_answered') notAnswered++;
-          else notVisited++;
+          const hasAns = isQuestionAttempted(responses[q.id]);
+
+          if (s === 'marked_answered' || (s === 'marked' && hasAns)) {
+            markedAnswered++;
+          } else if (s === 'marked') {
+            marked++;
+          } else if (s === 'answered' || hasAns) {
+            answered++;
+          } else if (s === 'not_answered') {
+            notAnswered++;
+          } else {
+            notVisited++;
+          }
         });
 
         return { answered, notAnswered, notVisited, marked, markedAnswered };
-      }, [currentQuestions, statuses]);
+      }, [currentQuestions, statuses, responses]);
 
       const subjectQuestions = useMemo(() => {
         return currentQuestions.filter((q) => q.subject === activeSubject);
@@ -15315,11 +15580,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
                 {/* Countdown Timer & Actions */}
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border font-mono font-bold text-sm sm:text-base shadow-sm ${
-                    timeLeft < 900
-                      ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-300 dark:border-rose-800 text-rose-600 dark:text-rose-400 animate-pulse'
-                      : timeLeft < 1800
-                      ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-400'
+                  <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border font-mono font-bold text-sm sm:text-base shadow-sm transition-all duration-300 ${
+                    timeLeft < 300
+                      ? 'bg-rose-50 dark:bg-rose-950/80 border-rose-400 dark:border-rose-700 text-rose-600 dark:text-rose-300 animate-pulse ring-2 ring-rose-500/30'
+                      : timeLeft < 900
+                      ? 'bg-amber-50 dark:bg-amber-950/80 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300'
                       : 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300'
                   }`}>
                     <svg className="w-4 h-4 text-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -15382,6 +15647,24 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 })}
               </div>
             </header>
+
+            {/* Non-Blocking Time Warning Toast Banner */}
+            {timeToast && (
+              <div className={`px-4 py-2.5 text-center text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all z-30 ${
+                timeToast.type === 'danger'
+                  ? 'bg-rose-600 text-white animate-pulse'
+                  : 'bg-amber-500 text-slate-950'
+              }`}>
+                <span>{timeToast.message}</span>
+                <button
+                  type="button"
+                  onClick={() => setTimeToast(null)}
+                  className="ml-3 text-xs opacity-80 hover:opacity-100 underline font-semibold"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
 
             {/* Main Exam Area: 2 Columns on Desktop */}
             <div className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -15603,7 +15886,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         <div className="relative">
                           <input
                             type="text"
-                            value={currentAns || ''}
+                            value={currentAns !== undefined && currentAns !== null ? currentAns : ''}
                             onChange={(e) => handleNumericalInput(e.target.value)}
                             placeholder="e.g. 135 or -2.5"
                             className="w-full text-center text-2xl font-mono font-bold py-3.5 px-4 rounded-2xl border-2 border-indigo-600 bg-white dark:bg-zinc-900 text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 shadow-inner"
@@ -15795,44 +16078,117 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       Submit Your Examination?
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-zinc-400">
-                      Review your attempt status below. Once submitted, you cannot change your responses.
+                      Review your live attempt summary below. You can finish early anytime. Once submitted, your score and detailed solutions will be generated.
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 flex justify-between items-center">
-                      <span className="text-slate-500">Total Questions:</span>
-                      <span className="font-extrabold text-slate-900 dark:text-zinc-100">{currentQuestions.length}</span>
+                  {/* 4 Official Accurate Categories */}
+                  <div className="grid grid-cols-2 gap-2.5 text-xs">
+                    <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-emerald-500" />
+                        <span className="font-bold text-emerald-800 dark:text-emerald-300">Answered:</span>
+                      </div>
+                      <span className="text-base font-black text-emerald-700 dark:text-emerald-300 font-mono">
+                        {paletteCounts.answered}
+                      </span>
                     </div>
-                    <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 flex justify-between items-center font-bold">
-                      <span>Answered:</span>
-                      <span>{paletteCounts.answered + paletteCounts.markedAnswered}</span>
+
+                    <div className="p-3.5 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/80 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-purple-600" />
+                        <span className="font-bold text-purple-800 dark:text-purple-300">Ans &amp; Marked:</span>
+                      </div>
+                      <span className="text-base font-black text-purple-700 dark:text-purple-300 font-mono">
+                        {paletteCounts.markedAnswered}
+                      </span>
                     </div>
-                    <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400 flex justify-between items-center font-bold">
-                      <span>Marked for Review:</span>
-                      <span>{paletteCounts.marked}</span>
+
+                    <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/80 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-rose-500" />
+                        <span className="font-bold text-rose-800 dark:text-rose-300">Not Answered:</span>
+                      </div>
+                      <span className="text-base font-black text-rose-700 dark:text-rose-300 font-mono">
+                        {paletteCounts.notAnswered + paletteCounts.marked}
+                      </span>
                     </div>
-                    <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 flex justify-between items-center font-bold">
-                      <span>Not Answered:</span>
-                      <span>{paletteCounts.notAnswered + paletteCounts.notVisited}</span>
+
+                    <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-slate-400" />
+                        <span className="font-bold text-slate-700 dark:text-zinc-300">Not Visited:</span>
+                      </div>
+                      <span className="text-base font-black text-slate-800 dark:text-zinc-200 font-mono">
+                        {paletteCounts.notVisited}
+                      </span>
+                    </div>
+
+                    <div className="col-span-2 p-2.5 rounded-xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/60 dark:border-zinc-800 text-[11px] text-slate-600 dark:text-zinc-400 flex items-center justify-between">
+                      <span>Total Questions: <strong>{currentQuestions.length}</strong></span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold">
+                        Evaluated Count: {paletteCounts.answered + paletteCounts.markedAnswered}
+                      </span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3 pt-2">
                     <button
                       type="button"
+                      disabled={isSubmitting}
                       onClick={() => setShowSubmitModal(false)}
-                      className="w-1/2 py-3 rounded-xl border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors"
+                      className="w-1/2 py-3 rounded-xl border border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
                     >
-                      Return to Test
+                      Resume Exam
                     </button>
                     <button
                       type="button"
-                      onClick={handleSubmitExam}
-                      className="w-1/2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/30 transition-all hover:scale-105 active:scale-95"
+                      disabled={isSubmitting}
+                      onClick={() => submitExam('manual')}
+                      className="w-1/2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs shadow-md shadow-emerald-600/30 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
                     >
-                      Confirm & Submit
+                      {isSubmitting ? (
+                        <>
+                          <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                          </svg>
+                          <span>Submitting...</span>
+                        </>
+                      ) : (
+                        <span>Confirm &amp; Submit Test</span>
+                      )}
                     </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TIME'S UP / SUBMITTING OVERLAY */}
+            {isSubmitting && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+                <div className="w-full max-w-md rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-8 text-center space-y-4 shadow-2xl">
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-lg ${
+                    submitTrigger === 'timeout'
+                      ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 animate-pulse'
+                      : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600'
+                  }`}>
+                    {submitTrigger === 'timeout' ? '⏰' : '✓'}
+                  </div>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                    {submitTrigger === 'timeout' ? "Time's Up!" : "Submitting Your Examination..."}
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-zinc-300 leading-relaxed">
+                    {submitTrigger === 'timeout'
+                      ? "The 3-hour exam countdown has expired. Auto-submitting your examination and evaluating your score..."
+                      : "Grading your responses, calculating percentile ranking, and generating your detailed diagnostic scorecard..."}
+                  </p>
+                  <div className="flex items-center justify-center gap-2 pt-2 text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    <span>Calculating score &amp; KaTeX breakdown...</span>
                   </div>
                 </div>
               </div>
@@ -16051,9 +16407,20 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 >
                   ← Back to Test Series Home
                 </button>
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                    ✓ Official CBT Evaluation Complete
+                <div className="flex flex-wrap items-center gap-2">
+                  {ev.submissionTrigger === 'timeout' ? (
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700 flex items-center gap-1.5 shadow-xs">
+                      <span>⏰</span>
+                      <span>Auto-Submitted (Time Expired)</span>
+                    </span>
+                  ) : (
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5 shadow-xs">
+                      <span>✓</span>
+                      <span>Submitted Manually</span>
+                    </span>
+                  )}
+                  <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+                    Official CBT Evaluation Complete
                   </span>
                 </div>
               </div>
@@ -16064,9 +16431,16 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
                   <div className="space-y-2">
-                    <span className="px-3 py-1 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider text-indigo-100">
-                      {currentPaper ? currentPaper.examType : 'JEE'} Diagnostic Scorecard
-                    </span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="px-3 py-1 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider text-indigo-100">
+                        {currentPaper ? currentPaper.examType : 'JEE'} Diagnostic Scorecard
+                      </span>
+                      {ev.submissionTrigger === 'timeout' && (
+                        <span className="px-3 py-1 rounded-full bg-rose-500/30 text-xs font-bold text-rose-200 border border-rose-400/40">
+                          Auto-Submitted on Timer Expiry
+                        </span>
+                      )}
+                    </div>
                     <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
                       {candidateName}
                     </h1>
@@ -16424,9 +16798,12 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                               <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Options:</p>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                                 {qObj.options.map((opt) => {
-                                  const isSelected = Array.isArray(item.studentResp)
-                                    ? item.studentResp.map(s => String(s).toUpperCase()).includes(opt.id.toUpperCase())
-                                    : String(item.studentResp).trim().toUpperCase() === opt.id.toUpperCase();
+                                  const isStudentAttempted = isQuestionAttempted(item.studentResp);
+                                  const isSelected = isStudentAttempted && (
+                                    Array.isArray(item.studentResp)
+                                      ? item.studentResp.map(s => String(s).toUpperCase()).includes(opt.id.toUpperCase())
+                                      : String(item.studentResp).trim().toUpperCase() === opt.id.toUpperCase()
+                                  );
 
                                   const isCorrectOpt = Array.isArray(item.correctAns)
                                     ? item.correctAns.map(c => String(c).toUpperCase()).includes(opt.id.toUpperCase())
@@ -16472,7 +16849,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                               <span className={`font-mono font-bold ${
                                 isCorr ? 'text-emerald-600 dark:text-emerald-400' : isPart ? 'text-amber-600 dark:text-amber-400' : isInc ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400'
                               }`}>
-                                {item.studentResp ? (Array.isArray(item.studentResp) ? item.studentResp.join(', ') : String(item.studentResp)) : 'Not Answered'}
+                                {isQuestionAttempted(item.studentResp) ? (Array.isArray(item.studentResp) ? item.studentResp.join(', ') : String(item.studentResp)) : 'Not Answered'}
                               </span>
                             </div>
 

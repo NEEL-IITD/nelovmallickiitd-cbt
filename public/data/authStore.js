@@ -650,35 +650,48 @@
         localStorage.setItem(`nelov_${userId}_attempts`, JSON.stringify(attempts));
       } catch (e) {}
 
-      // 2. Cloud sync to Supabase public.test_attempts
+      // 2. Cloud sync to Supabase public.test_attempts with retry
       if (window.authService.isCloudConnected() && supabaseClient) {
-        try {
-          const timeSec = attemptRecord.timeTakenSeconds || (attemptRecord.timeSpentTotal ? Math.round(attemptRecord.timeSpentTotal) : 0);
-          const { data, error } = await supabaseClient.from('test_attempts').insert({
-            id: attemptUuid,
-            user_id: userId,
-            test_id: canonicalTestId,
-            exam_type: attemptRecord.examType || (canonicalTestId.includes('mains') ? 'JEE Mains' : 'JEE Advanced'),
-            code: attemptRecord.testCode || (canonicalTestId.includes('ptm') ? canonicalTestId.replace('jee-mains-', '').toUpperCase() : canonicalTestId.replace('jee-advanced-', '').toUpperCase()),
-            obtained_marks: Number(attemptRecord.totalMarksScored ?? attemptRecord.obtainedMarks ?? 0),
-            total_marks: Number(attemptRecord.totalMaxMarks ?? attemptRecord.totalMarks ?? 300),
-            percentage: Number(attemptRecord.percentage ?? 0),
-            accuracy: Number(attemptRecord.accuracy ?? 0),
-            time_taken_seconds: timeSec,
-            estimated_rank_label: attemptRecord.predictedAirDisplay || 'AIR Qualified',
-            subject_breakdown: attemptRecord.subjectStats || {},
-            responses: attemptRecord.responses || {},
-            time_per_question: attemptRecord.timePerQuestion || {},
-            mistake_tags: attemptRecord.mistakeTags || {},
-            submitted_at: attemptRecord.completedAt || new Date().toISOString()
-          });
-          if (error) {
-            console.error('[Supabase] Failed to sync test attempt to cloud:', error.message, error.details);
-          } else {
-            console.log('[Supabase] Successfully saved test attempt to cloud:', attemptUuid);
+        const timeSec = attemptRecord.timeTakenSeconds || (attemptRecord.timeSpentTotal ? Math.round(attemptRecord.timeSpentTotal) : 0);
+        const payload = {
+          id: attemptUuid,
+          user_id: userId,
+          test_id: canonicalTestId,
+          exam_type: attemptRecord.examType || (canonicalTestId.includes('mains') ? 'JEE Mains' : 'JEE Advanced'),
+          code: attemptRecord.testCode || (canonicalTestId.includes('ptm') ? canonicalTestId.replace('jee-mains-', '').toUpperCase() : canonicalTestId.replace('jee-advanced-', '').toUpperCase()),
+          obtained_marks: Number(attemptRecord.totalMarksScored ?? attemptRecord.obtainedMarks ?? 0),
+          total_marks: Number(attemptRecord.totalMaxMarks ?? attemptRecord.totalMarks ?? 300),
+          percentage: Number(attemptRecord.percentage ?? 0),
+          accuracy: Number(attemptRecord.accuracy ?? 0),
+          time_taken_seconds: timeSec,
+          estimated_rank_label: attemptRecord.predictedAirDisplay || 'AIR Qualified',
+          subject_breakdown: attemptRecord.subjectStats || {},
+          responses: attemptRecord.responses || {},
+          time_per_question: attemptRecord.timePerQuestion || {},
+          mistake_tags: {
+            ...(attemptRecord.mistakeTags || {}),
+            submission_trigger: attemptRecord.submissionTrigger || 'manual'
+          },
+          submitted_at: attemptRecord.completedAt || new Date().toISOString()
+        };
+
+        let savedCloud = false;
+        for (let tryIdx = 0; tryIdx < 3; tryIdx++) {
+          try {
+            const { data, error } = await supabaseClient.from('test_attempts').insert(payload);
+            if (error) {
+              console.warn(`[Supabase] saveAttempt try ${tryIdx + 1} warning:`, error.message);
+            } else {
+              savedCloud = true;
+              console.log('[Supabase] Successfully saved test attempt to cloud:', attemptUuid);
+              break;
+            }
+          } catch (err) {
+            console.warn(`[Supabase] saveAttempt try ${tryIdx + 1} exception:`, err);
           }
-        } catch (err) {
-          console.warn('[Supabase] Failed to sync attempt:', err);
+          if (!savedCloud && tryIdx < 2) {
+            await new Promise(r => setTimeout(r, 600));
+          }
         }
       }
     },
