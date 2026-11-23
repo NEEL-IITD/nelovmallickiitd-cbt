@@ -1,99 +1,97 @@
 import os
-from PIL import Image
+from PIL import Image, ImageChops
 
-pages_dir = r"C:\Users\dasri\.gemini\antigravity\scratch\nelovmallickiitd-web\temp_ptm01_pages"
-out_dir = r"C:\Users\dasri\.gemini\antigravity\scratch\nelovmallickiitd-web\public\assets\tests\jee-main-2027\ptm-01"
-os.makedirs(out_dir, exist_ok=True)
+def trim(im, border_bg=255, padding=12):
+    bg = Image.new(im.mode, im.size, (border_bg, border_bg, border_bg) if im.mode == 'RGB' else border_bg)
+    diff = ImageChops.difference(im, bg)
+    bbox = diff.getbbox()
+    if bbox:
+        w, h = im.size
+        l = max(0, bbox[0] - padding)
+        t = max(0, bbox[1] - padding)
+        r = min(w, bbox[2] + padding)
+        b = min(h, bbox[3] + padding)
+        return im.crop((l, t, r, b))
+    return im
 
-# Page size is 1414 x 2126. Let's crop diagrams with appropriate bounding boxes.
-# Each box is (left, top, right, bottom)
+os.makedirs('public/images/ptm02', exist_ok=True)
+os.makedirs('dist/images/ptm02', exist_ok=True)
+
 crops = {
-    # Page 1: Q1 graph (rho vs P)
-    "q01_graph.png": ("page_01.png", (400, 750, 1050, 1150)),
+    # Page 2: Q3 Spherical shell
+    'q03.png': ('page_2.png', (450, 800, 950, 1220)),
     
-    # Page 2: Q2 elliptical cycle
-    "q02_diagram.png": ("page_02.png", (450, 260, 1050, 600)),
+    # Page 3: Q8 Wall Rod-1 Rod-2 Wall
+    'q08.png': ('page_3.png', (400, 1440, 1000, 1730)),
     
-    # Page 2: Q5 T-P graph AB
-    "q05_diagram.png": ("page_02.png", (450, 1400, 1050, 1680)),
+    # Page 5: Q13 Blocks Config I and II
+    'q13.png': ('page_5.png', (180, 520, 1280, 870)),
     
-    # Page 3: Q8 P-V straight line 37 deg
-    "q08_diagram.png": ("page_03.png", (380, 850, 1020, 1150)),
+    # Page 6: Q15 Slabs arrangement (a) and (b)
+    'q15.png': ('page_6.png', (120, 530, 1300, 1020)),
     
-    # Page 3: Q9 cycle ABCA
-    "q09_cycle.png": ("page_03.png", (460, 1420, 950, 1780)),
+    # Page 6: Q16 Furnace wall graph T vs X
+    'q16.png': ('page_6.png', (460, 1370, 950, 1780)),
     
-    # Page 4: Q9 options A, B, C, D
-    "q09_options.png": ("page_04.png", (150, 180, 1250, 730)),
+    # Page 7: Q18 Rods AB, CD, CF, DE junction
+    'q18.png': ('page_7.png', (460, 1310, 950, 1760)),
     
-    # Page 6: Q21 P-V graph isothermal/adiabatic
-    "q21_graph.png": ("page_06.png", (450, 1370, 950, 1750)),
+    # Page 9: Q23 Copper & Steel cylindrical bar
+    'q23.png': ('page_9.png', (320, 780, 1120, 1070)),
     
-    # Page 7: Q26 aromatic structures (6 structures)
-    "q26_structures.png": ("page_07.png", (180, 520, 1250, 1550)),
+    # Page 10: Q25 Table containers C1, C2, C3
+    'q25.png': ('page_10.png', (350, 370, 1060, 720)),
     
-    # Page 8: Q27 skeletal monobromination
-    "q27_reaction.png": ("page_08.png", (180, 260, 1300, 480)),
+    # Page 10: Q27 Most acidic hydrogen structures
+    'q27.png': ('page_10.png', (160, 1240, 1260, 1780)),
+    'q27_optA.png': ('page_10.png', (160, 1240, 680, 1500)),
+    'q27_optB.png': ('page_10.png', (720, 1240, 1260, 1500)),
+    'q27_optC.png': ('page_10.png', (160, 1510, 680, 1780)),
+    'q27_optD.png': ('page_10.png', (720, 1510, 1260, 1780)),
     
-    # Page 8: Q29 reaction scheme
-    "q29_reaction.png": ("page_08.png", (180, 780, 1250, 930)),
+    # Page 11: Q31 1,4-cyclohexanediol conformers
+    'q31.png': ('page_11.png', (160, 1160, 1260, 1680)),
+    'q31_optA.png': ('page_11.png', (160, 1160, 680, 1420)),
+    'q31_optB.png': ('page_11.png', (720, 1160, 1260, 1420)),
+    'q31_optC.png': ('page_11.png', (160, 1430, 680, 1680)),
+    'q31_optD.png': ('page_11.png', (720, 1430, 1260, 1680)),
     
-    # Page 8: Q31 options
-    "q31_options.png": ("page_08.png", (180, 1350, 1250, 1750)),
+    # Page 12: Q33 Fischer projections P, Q, R
+    'q33.png': ('page_12.png', (160, 430, 1260, 760)),
     
-    # Page 9: Q32 alkene stability options
-    "q32_options.png": ("page_09.png", (180, 200, 1320, 1150)),
+    # Page 12: Q34 Carbocation structures (I) and (II)
+    'q34.png': ('page_12.png', (160, 900, 520, 1240)),
     
-    # Page 9: Q33 reaction and options
-    "q33_reaction.png": ("page_09.png", (180, 1180, 1250, 1780)),
+    # Page 13: Q39 Radicals (P), (Q), (R)
+    'q39.png': ('page_13.png', (160, 1200, 1260, 1480)),
     
-    # Page 10: Q35 reactant and options
-    "q35_reaction.png": ("page_10.png", (180, 650, 1250, 1680)),
-    
-    # Page 12: Q39 structures A to E
-    "q39_structures.png": ("page_12.png", (180, 180, 1280, 850)),
-    
-    # Page 12: Q41 diene reaction and options
-    "q41_reaction.png": ("page_12.png", (180, 1350, 1250, 1880)),
-    
-    # Page 13: Q42 alkyne-diene reaction
-    "q42_reaction.png": ("page_13.png", (100, 240, 1320, 570)),
-    
-    # Page 14: Q46 Wurtz/Fittig reaction
-    "q46_reaction.png": ("page_14.png", (120, 950, 1320, 1250)),
-    
-    # Page 14: Q47 TLC chromatogram
-    "q47_chromatogram.png": ("page_14.png", (380, 1380, 1050, 1730)),
-    
-    # Page 15: Q49 12 substituted benzene rings
-    "q49_structures.png": ("page_15.png", (180, 470, 1300, 1280)),
-    
-    # Page 15: Q50 Friedel-Crafts reaction
-    "q50_reaction.png": ("page_15.png", (250, 1350, 1150, 1600)),
+    # Page 14: Q44 Resonance structures A, B, C, D
+    'q44.png': ('page_14.png', (160, 900, 1260, 1440)),
+    'q44_optA.png': ('page_14.png', (160, 900, 680, 1160)),
+    'q44_optB.png': ('page_14.png', (720, 900, 1260, 1160)),
+    'q44_optC.png': ('page_14.png', (160, 1170, 680, 1440)),
+    'q44_optD.png': ('page_14.png', (720, 1170, 1260, 1440)),
 }
 
-for filename, (page_name, bbox) in crops.items():
-    page_img_path = os.path.join(pages_dir, page_name)
-    im = Image.open(page_img_path)
-    cropped = im.crop(bbox)
+for name, (page_file, box) in crops.items():
+    page_path = os.path.join('temp_pages', page_file)
+    im = Image.open(page_path)
+    cropped = im.crop(box)
+    trimmed = trim(cropped)
     
-    # Optional autocrop white margins around the crop
-    # Convert to grayscale to check bounding box
-    gray = cropped.convert("L")
-    # Invert so black text is high value
-    inv = gray.point(lambda p: 255 if p < 240 else 0)
-    actual_bbox = inv.getbbox()
-    if actual_bbox:
-        # Add a 10px padding
-        pad = 12
-        left = max(0, actual_bbox[0] - pad)
-        top = max(0, actual_bbox[1] - pad)
-        right = min(cropped.width, actual_bbox[2] + pad)
-        bottom = min(cropped.height, actual_bbox[3] + pad)
-        cropped = cropped.crop((left, top, right, bottom))
-    
-    target_path = os.path.join(out_dir, filename)
-    cropped.save(target_path, "PNG")
-    print(f"Saved {filename} ({cropped.width}x{cropped.height})")
+    # Ensure RGB / clean white background
+    if trimmed.mode in ('RGBA', 'LA'):
+        bg = Image.new('RGB', trimmed.size, (255, 255, 255))
+        bg.paste(trimmed, mask=trimmed.split()[-1])
+        trimmed = bg
+    elif trimmed.mode != 'RGB':
+        trimmed = trimmed.convert('RGB')
+        
+    out_public = os.path.join('public', 'images', 'ptm02', name)
+    out_dist = os.path.join('dist', 'images', 'ptm02', name)
+    trimmed.save(out_public, 'PNG', optimize=True)
+    trimmed.save(out_dist, 'PNG', optimize=True)
+    size = os.path.getsize(out_public)
+    print(f"Extracted {name}: {trimmed.size[0]}x{trimmed.size[1]} ({size} bytes)")
 
-print("All diagrams cropped successfully!")
+print("\nAll diagrams successfully extracted and trimmed!")

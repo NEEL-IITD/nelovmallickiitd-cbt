@@ -3,7 +3,7 @@
 // Curated by Nelov Mallick (IIT Delhi) · 100% Free Forever
 // ==============================================================================
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { JEE_MAINS_2027_SCHEDULE, FINAL_REVISION_CARD, ScheduleTestItem } from '../data/scheduleData';
 import { Tilt3DCard } from './ui/Tilt3DCard';
 import { useAuth } from '../context/AuthContext';
@@ -27,6 +27,17 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const [copiedToast, setCopiedToast] = useState(false);
 
+  // Live ticking clock for real-time countdown & auto-unlock
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const isAdmin = user && user.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+
   // Modal state for Preview Details (Syllabus + Instructions)
   const [previewItem, setPreviewItem] = useState<ScheduleTestItem | null>(null);
   const [previewTab, setPreviewTab] = useState<'syllabus' | 'instructions'>('syllabus');
@@ -37,8 +48,9 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     jeeMainsTests.forEach((t: TestMetadata) => {
       map[t.id] = t.status;
     });
-    // PTM 01 has 75 questions verified and is permanently live
+    // PTM 01 and PTM 02 have 75 questions verified and are live
     map['jee-mains-ptm-01'] = 'live';
+    map['jee-mains-ptm-02'] = 'live';
     return map;
   }, []);
 
@@ -50,15 +62,35 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
 
   // Check if test is currently within its live window (for display tag only)
   const isInsideWindow = (startIso: string, endIso: string) => {
-    const now = Date.now();
     const start = new Date(startIso).getTime();
     const end = new Date(endIso).getTime();
     return now >= start && now <= end;
   };
 
+  // Check if test has started
+  const hasStarted = (startIso: string) => {
+    if (!startIso) return true;
+    return now >= new Date(startIso).getTime();
+  };
+
+  // Live countdown formatter
+  const formatCountdown = (startIso: string) => {
+    if (!startIso) return null;
+    const diff = new Date(startIso).getTime() - now;
+    if (diff <= 0) return null;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    if (days > 0) {
+      return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+    return `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+  };
+
   // Check if test has questions and is ready to attempt
   const isTestReady = (testId: string) => {
-    return testId === 'jee-mains-ptm-01' || liveStatusMap[testId] === 'live';
+    return testId === 'jee-mains-ptm-01' || testId === 'jee-mains-ptm-02' || liveStatusMap[testId] === 'live';
   };
 
   // Get student attempt count for this test
@@ -342,7 +374,10 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
             {filteredSchedule.map((item) => {
               const ready = isTestReady(item.id);
               const inWindow = isInsideWindow(item.startIso, item.endIso);
+              const started = hasStarted(item.startIso);
               const attempts = getAttemptCount(item.id);
+              const countdown = formatCountdown(item.startIso);
+              const hasSyllabus = !!(item.syllabus && (item.syllabus.physics?.length || item.syllabus.chemistry?.length || item.syllabus.mathematics?.length));
 
               return (
                 <Tilt3DCard
@@ -393,30 +428,45 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                       </div>
                     </div>
 
-                    {/* Status Badge */}
-                    <div className="flex flex-wrap items-center gap-2 mb-5">
-                      {ready ? (
-                        inWindow ? (
+                    {/* Status Badge + Live Countdown */}
+                    <div className="space-y-2.5 mb-5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {inWindow ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
                             LIVE WINDOW NOW
                           </span>
-                        ) : (
+                        ) : ready && started ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/30">
                             <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
                             Open Anytime
                           </span>
-                        )
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-300 dark:border-zinc-700">
-                          Scheduled · Paper Uploading Soon
-                        </span>
-                      )}
+                        ) : countdown ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                            Scheduled / Upcoming
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-200 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-300 dark:border-zinc-700">
+                            Scheduled · Paper Uploading Soon
+                          </span>
+                        )}
 
-                      {attempts > 0 && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">
-                          ✓ Attempted ({attempts}/3)
-                        </span>
+                        {attempts > 0 && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                            ✓ Attempted ({attempts}/3)
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Live Ticking Countdown Pill */}
+                      {countdown && !started && (
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 text-xs font-mono font-bold text-amber-800 dark:text-amber-300">
+                          <svg className="w-3.5 h-3.5 animate-spin text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span>Starts in {countdown}</span>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -424,13 +474,23 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                   {/* Card Bottom CTAs */}
                   <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-zinc-800/80">
                     <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => openPreview(item, 'syllabus')}
-                        className="flex-1 py-2 px-3 rounded-xl font-bold text-xs bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200/80 dark:border-zinc-700/80 transition-all text-center"
-                      >
-                        Preview Details
-                      </button>
+                      {hasSyllabus ? (
+                        <button
+                          type="button"
+                          onClick={() => openPreview(item, 'syllabus')}
+                          className="flex-1 py-2 px-3 rounded-xl font-bold text-xs bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 transition-all text-center flex items-center justify-center gap-1 shadow-xs"
+                        >
+                          <span>📘 View Syllabus</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => openPreview(item, 'instructions')}
+                          className="flex-1 py-2 px-3 rounded-xl font-bold text-xs bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200/80 dark:border-zinc-700/80 transition-all text-center"
+                        >
+                          Details
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => {
@@ -444,18 +504,40 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                     </div>
 
                     {ready ? (
-                      <button
-                        type="button"
-                        onClick={() => handleAction(item)}
-                        className="w-full py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/20 transition-all"
-                      >
-                        <span>Attempt {item.code} →</span>
-                      </button>
+                      started ? (
+                        <button
+                          type="button"
+                          onClick={() => handleAction(item)}
+                          className="w-full py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/20 transition-all"
+                        >
+                          <span>Attempt {item.code} →</span>
+                        </button>
+                      ) : isAdmin ? (
+                        <button
+                          type="button"
+                          onClick={() => handleAction(item)}
+                          className="w-full py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white shadow-md hover:shadow-amber-500/20 transition-all"
+                          title="Admin Preview: Authorized only for mallicknelov@gmail.com"
+                        >
+                          <span>Admin Preview {item.code} →</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled
+                          className="w-full py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 bg-slate-200 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-300 dark:border-zinc-700 cursor-not-allowed"
+                        >
+                          <svg className="w-3.5 h-3.5 animate-spin text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span>Goes Live in {countdown || '00:00:00'}</span>
+                        </button>
+                      )
                     ) : (
                       <button
                         type="button"
-                        onClick={() => handleAction(item)}
-                        className="w-full py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 bg-slate-100 dark:bg-zinc-800/80 text-slate-500 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200 dark:border-zinc-700 transition-all"
+                        disabled
+                        className="w-full py-2.5 px-3 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 bg-slate-100 dark:bg-zinc-800/80 text-slate-400 dark:text-zinc-500 border border-slate-200 dark:border-zinc-700 cursor-not-allowed"
                       >
                         <span>Paper Uploading Soon</span>
                       </button>
@@ -487,7 +569,10 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                 {filteredSchedule.map((item) => {
                   const ready = isTestReady(item.id);
                   const inWindow = isInsideWindow(item.startIso, item.endIso);
+                  const started = hasStarted(item.startIso);
                   const attempts = getAttemptCount(item.id);
+                  const countdown = formatCountdown(item.startIso);
+                  const hasSyllabus = !!(item.syllabus && (item.syllabus.physics?.length || item.syllabus.chemistry?.length || item.syllabus.mathematics?.length));
 
                   return (
                     <tr
@@ -527,9 +612,13 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                               <span className="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                                 ● Live Window
                               </span>
-                            ) : (
+                            ) : started ? (
                               <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/30">
                                 ● Open Anytime
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                                {countdown ? `Starts in ${countdown}` : 'Scheduled'}
                               </span>
                             )
                           ) : (
@@ -546,13 +635,23 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                       </td>
                       <td className="py-3 px-4 text-right no-print">
                         <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => openPreview(item, 'syllabus')}
-                            className="px-2.5 py-1 rounded-lg font-bold text-xs bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200/80 dark:border-zinc-700/80 transition-all"
-                          >
-                            Details
-                          </button>
+                          {hasSyllabus ? (
+                            <button
+                              type="button"
+                              onClick={() => openPreview(item, 'syllabus')}
+                              className="px-2.5 py-1 rounded-lg font-bold text-xs whitespace-nowrap bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 transition-all shadow-xs"
+                            >
+                              📘 View Syllabus
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => openPreview(item, 'instructions')}
+                              className="px-2.5 py-1 rounded-lg font-bold text-xs bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200/80 dark:border-zinc-700/80 transition-all"
+                            >
+                              Details
+                            </button>
+                          )}
                           <button
                             type="button"
                             onClick={() => {
@@ -564,18 +663,37 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                             🏆 Leaderboard
                           </button>
                           {ready ? (
-                            <button
-                              type="button"
-                              onClick={() => handleAction(item)}
-                              className="px-3 py-1 rounded-lg font-bold text-xs whitespace-nowrap transition-all bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
-                            >
-                              Attempt →
-                            </button>
+                            started ? (
+                              <button
+                                type="button"
+                                onClick={() => handleAction(item)}
+                                className="px-3 py-1 rounded-lg font-bold text-xs whitespace-nowrap transition-all bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
+                              >
+                                Attempt →
+                              </button>
+                            ) : isAdmin ? (
+                              <button
+                                type="button"
+                                onClick={() => handleAction(item)}
+                                className="px-3 py-1 rounded-lg font-bold text-xs whitespace-nowrap transition-all bg-amber-600 hover:bg-amber-700 text-white shadow-xs"
+                                title="Admin Preview: Authorized only for mallicknelov@gmail.com"
+                              >
+                                Admin Preview →
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                disabled
+                                className="px-3 py-1 rounded-lg font-bold text-xs whitespace-nowrap transition-all bg-slate-200 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-300 dark:border-zinc-700 cursor-not-allowed"
+                              >
+                                {countdown ? `Starts in ${countdown}` : 'Soon'}
+                              </button>
+                            )
                           ) : (
                             <button
                               type="button"
-                              onClick={() => handleAction(item)}
-                              className="px-3 py-1 rounded-lg font-semibold text-xs whitespace-nowrap transition-all bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700 hover:bg-slate-200 dark:hover:bg-zinc-700"
+                              disabled
+                              className="px-3 py-1 rounded-lg font-semibold text-xs whitespace-nowrap transition-all bg-slate-100 dark:bg-zinc-800 text-slate-400 dark:text-zinc-500 border border-slate-200 dark:border-zinc-700 cursor-not-allowed"
                             >
                               Soon
                             </button>
@@ -713,7 +831,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                           Physics Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-sky-800/80 dark:text-sky-400">
-                          Thermodynamics & Kinetic Theory Focus
+                          {previewItem.code === 'PTM 02' ? 'Thermal Physics & Heat Transfer Focus' : (previewItem.code === 'PTM 01' ? 'Thermodynamics & Kinetic Theory Focus' : 'Standard JEE Mains Pattern')}
                         </p>
                       </div>
                     </div>
@@ -727,16 +845,9 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                           </li>
                         ))
                       ) : (
-                        <>
-                          <li className="flex items-start gap-2.5">
-                            <span className="text-sky-500 font-bold mt-0.5">•</span>
-                            <span><strong>Kinetic Theory of Gases (KTG):</strong> Degrees of freedom, Maxwell-Boltzmann velocity distribution, RMS speed, average speed, most probable speed, mean free path, and relaxation time.</span>
-                          </li>
-                          <li className="flex items-start gap-2.5">
-                            <span className="text-sky-500 font-bold mt-0.5">•</span>
-                            <span><strong>Thermodynamics:</strong> Zeroth and First Law, work done in isobaric, isothermal, adiabatic, isochoric, and cyclic processes; indicator diagrams (P-V, T-S); Carnot engine efficiency; adiabatic bulk modulus.</span>
-                          </li>
-                        </>
+                        <li className="flex items-start gap-2.5 text-slate-500 dark:text-zinc-400 italic">
+                          <span>Detailed Physics syllabus for {previewItem.code} will be published prior to the scheduled test window.</span>
+                        </li>
                       )}
                     </ul>
                   </div>
@@ -752,7 +863,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                           Chemistry Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-emerald-800/80 dark:text-emerald-400">
-                          Organic Chemistry Foundations & Hydrocarbons
+                          {previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern')}
                         </p>
                       </div>
                     </div>
@@ -766,20 +877,9 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                           </li>
                         ))
                       ) : (
-                        <>
-                          <li className="flex items-start gap-2.5">
-                            <span className="text-emerald-500 font-bold mt-0.5">•</span>
-                            <span><strong>Hydrocarbons:</strong> Alkanes, alkenes, alkynes; free-radical halogenation; oxymercuration-demercuration; conjugated dienes; Wurtz and Wurtz-Fittig reactions.</span>
-                          </li>
-                          <li className="flex items-start gap-2.5">
-                            <span className="text-emerald-500 font-bold mt-0.5">•</span>
-                            <span><strong>General Organic Chemistry (GOC):</strong> Aromaticity and Hückel&apos;s Rule (4n+2 π electrons), relative acidic strength (pKa comparisons), dipole moments in substituted alkanes and halides.</span>
-                          </li>
-                          <li className="flex items-start gap-2.5">
-                            <span className="text-emerald-500 font-bold mt-0.5">•</span>
-                            <span><strong>Purification & Practical Organic Chemistry (POC):</strong> Simple, fractional, vacuum, and steam distillation principles; Thin Layer Chromatography (Rf factor); quantitative Kjeldahl's method for nitrogen.</span>
-                          </li>
-                        </>
+                        <li className="flex items-start gap-2.5 text-slate-500 dark:text-zinc-400 italic">
+                          <span>Detailed Chemistry syllabus for {previewItem.code} will be published prior to the scheduled test window.</span>
+                        </li>
                       )}
                     </ul>
                   </div>
@@ -795,7 +895,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                           Mathematics Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-amber-800/80 dark:text-amber-400">
-                          Trigonometry & Functional Relations
+                          {previewItem.code === 'PTM 02' ? 'Quadratic Equations, Inequalities & Sequences Focus' : (previewItem.code === 'PTM 01' ? 'Trigonometry & Functional Relations' : 'Standard JEE Mains Pattern')}
                         </p>
                       </div>
                     </div>
@@ -809,20 +909,9 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                           </li>
                         ))
                       ) : (
-                        <>
-                          <li className="flex items-start gap-2.5">
-                            <span className="text-amber-500 font-bold mt-0.5">•</span>
-                            <span><strong>Trigonometric Ratios & Identities:</strong> Compound angles, multiple & submultiple angle formulas, transformation product-to-sum, summation of cosine and sine series.</span>
-                          </li>
-                          <li className="flex items-start gap-2.5">
-                            <span className="text-amber-500 font-bold mt-0.5">•</span>
-                            <span><strong>Trigonometric Functions & Properties:</strong> Domain, range, periodicity, greatest integer function [sin x] combinations, graphs of reciprocal and inverse functions.</span>
-                          </li>
-                          <li className="flex items-start gap-2.5">
-                            <span className="text-amber-500 font-bold mt-0.5">•</span>
-                            <span><strong>Trigonometric Equations:</strong> General solution families, counting number of roots in bounded intervals [0, 2π] or [-π, π], and simultaneous systems.</span>
-                          </li>
-                        </>
+                        <li className="flex items-start gap-2.5 text-slate-500 dark:text-zinc-400 italic">
+                          <span>Detailed Mathematics syllabus for {previewItem.code} will be published prior to the scheduled test window.</span>
+                        </li>
                       )}
                     </ul>
                   </div>

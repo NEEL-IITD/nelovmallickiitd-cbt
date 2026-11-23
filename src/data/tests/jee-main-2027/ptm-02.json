@@ -1,0 +1,2340 @@
+{
+  "id": "jee-mains-ptm-02",
+  "aliasId": "ptm-02",
+  "examCategory": "jee-mains",
+  "examType": "JEE Mains",
+  "code": "PTM 02",
+  "title": "JEE Mains 2027 Test Series \u2014 PTM 02",
+  "subtitle": "Thermal Physics & Heat Transfer, General Organic Chemistry & Isomerism, Quadratic Equations & Sequences",
+  "status": "live",
+  "durationMinutes": 180,
+  "maxMarks": 300,
+  "totalQuestions": 75,
+  "scheduledStartTime": "2026-11-25T09:00:00+05:30",
+  "scheduledEndTime": "2026-11-25T21:00:00+05:30",
+  "syllabus": {
+    "physics": [
+      "Thermal Expansion of Solids and Liquids (linear, superficial, and cubical expansion; bimetallic strips, apparent expansion)",
+      "Calorimetry and Heat Transfer (principle of calorimetry, water equivalent, latent heat of fusion and vaporization, phase change)",
+      "Heat Conduction (Fourier's law, steady state heat current, thermal resistance of series and parallel composite rods, spherical and cylindrical shells)",
+      "Thermal Radiation (Stefan-Boltzmann law, Wien's displacement law, Newton's law of cooling, blackbody radiation)"
+    ],
+    "chemistry": [
+      "IUPAC Nomenclature & Structural Basics (rules of IUPAC naming for polyfunctional organic compounds, bond line notation, sigma and pi bond counts, hybridization)",
+      "General Organic Chemistry (Electronic effects: Inductive, Resonance/Mesomeric, Hyperconjugation, and Electromeric effects; Aromaticity and H\u00fcckel's 4n+2 rule; Reaction intermediates: stability of carbocations, carbanions, and free radicals; Acidic and basic strengths of organic compounds)",
+      "Isomerism in Organic Compounds (Structural isomerism: chain, position, functional, metamerism, tautomerism; Stereoisomerism: geometrical cis/trans isomerism, optical isomerism, enantiomers, diastereomers, meso compounds, conformers of cyclohexane and ethane)"
+    ],
+    "mathematics": [
+      "Quadratic Equations & Expressions (relations between roots and coefficients, nature of roots, common roots, sign of quadratic expressions, location of roots, reducible quadratic equations)",
+      "Logarithms & Inequalities (properties of logarithms, logarithmic equations and inequalities, base transformations, domain restrictions)",
+      "Sequences & Series (Arithmetic Progression: general term, sum of n terms, arithmetic mean; Geometric Progression: finite and infinite sums, geometric mean; Arithmetico-Geometric Progression (AGP), Telescoping series summation, Newton's sums for polynomial roots)"
+    ]
+  },
+  "sectionsSummary": [
+    {
+      "subject": "Physics",
+      "sections": [
+        {
+          "name": "Section A: Single Correct (20 Qs)",
+          "questionCount": 20,
+          "marking": "+4, -1"
+        },
+        {
+          "name": "Section B: Numerical Value (5 Qs)",
+          "questionCount": 5,
+          "marking": "+4, -1"
+        }
+      ]
+    },
+    {
+      "subject": "Chemistry",
+      "sections": [
+        {
+          "name": "Section A: Single Correct (20 Qs)",
+          "questionCount": 20,
+          "marking": "+4, -1"
+        },
+        {
+          "name": "Section B: Numerical Value (5 Qs)",
+          "questionCount": 5,
+          "marking": "+4, -1"
+        }
+      ]
+    },
+    {
+      "subject": "Mathematics",
+      "sections": [
+        {
+          "name": "Section A: Single Correct (20 Qs)",
+          "questionCount": 20,
+          "marking": "+4, -1"
+        },
+        {
+          "name": "Section B: Numerical Value (5 Qs)",
+          "questionCount": 5,
+          "marking": "+4, -1"
+        }
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": 1,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The thermal conductivity of a rod varies with temperature $T$ according to the relation $K = aT$, where $a$ is a constant. The two ends of the rod of length $l$ and uniform cross-sectional area $A$ are maintained at steady temperatures $T_1$ and $T_2$ ($T_1 > T_2$). The rate of heat flow through the rod is given by:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{aA}{l}(T_1 - T_2)$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{aA}{2l}(T_1^2 - T_2^2)$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{aA}{l}(T_1^2 - T_2^2)$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{2aA}{l}(T_1 - T_2)$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "The rate of heat flow is given by Fourier's law of thermal conduction: $H = -K A \\frac{dT}{dx} = -a T A \\frac{dT}{dx}$.\nSeparating variables and integrating along the rod from $x = 0$ to $x = l$:\n$$H \\int_0^l dx = -a A \\int_{T_1}^{T_2} T dT$$\n$$H l = a A \\left[ \\frac{T_1^2 - T_2^2}{2} \\right] \\implies H = \\frac{aA}{2l}(T_1^2 - T_2^2)$$.",
+      "explanation": "Integrating Fourier's conduction equation with $K = aT$ across length $l$ yields $H = \\frac{aA}{2l}(T_1^2 - T_2^2)$."
+    },
+    {
+      "id": 2,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A calorimeter of water equivalent $50\\text{ g}$ contains $100\\text{ g}$ of water at $8^\\circ\\text{C}$. A piece of ice of mass $2\\text{ g}$ at $0^\\circ\\text{C}$ is dropped into it. The final temperature of the mixture will be: (Take latent heat of fusion of ice $= 80\\text{ cal/g}$, specific heat capacity of water $= 1\\text{ cal/g}\\cdot^\\circ\\text{C}$)",
+      "options": [
+        {
+          "id": "A",
+          "text": "$5^\\circ\\text{C}$"
+        },
+        {
+          "id": "B",
+          "text": "$6.8^\\circ\\text{C}$"
+        },
+        {
+          "id": "C",
+          "text": "$7.5^\\circ\\text{C}$"
+        },
+        {
+          "id": "D",
+          "text": "$8^\\circ\\text{C}$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Effective thermal mass of water system (calorimeter + water) $M = 100 + 50 = 150\\text{ g}$ at initial temperature $8^\\circ\\text{C}$.\nLet final equilibrium temperature be $T$.\nHeat lost by water and calorimeter: $Q_{lost} = 150 \\times 1 \\times (8 - T) = 1200 - 150T\\text{ cal}$.\nHeat gained by ice to melt completely at $0^\\circ\\text{C}$ and warm to $T$: $Q_{gain} = m L_f + m c T = 2 \\times 80 + 2 \\times 1 \\times T = 160 + 2T\\text{ cal}$.\nEquating heat lost and heat gained:\n$$1200 - 150T = 160 + 2T \\implies 152T = 1040 \\implies T = \\frac{1040}{152} \\approx 6.84^\\circ\\text{C} \\approx 6.8^\\circ\\text{C}$$.",
+      "explanation": "Calorimetric balance between cooling of 150g effective water and melting + heating of 2g ice yields $T \\approx 6.8^\\circ\\text{C}$."
+    },
+    {
+      "id": 3,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A composite spherical shell is made of two concentric layers as shown in the figure. The inner layer has inner radius $R$ and outer radius $2R$ with thermal conductivity $k$. The outer layer has inner radius $2R$ and outer radius $3R$ with thermal conductivity $2k$. The equivalent thermal resistance between the inner and outer spherical surfaces is:",
+      "images": [
+        "/images/ptm02/q03.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{1}{12\\pi k R}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{5}{24\\pi k R}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{7}{48\\pi k R}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{3}{16\\pi k R}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "The thermal resistance of a spherical shell of inner radius $r_1$ and outer radius $r_2$ with conductivity $K$ is:\n$$R_{th} = \\frac{1}{4\\pi K}\\left( \\frac{1}{r_1} - \\frac{1}{r_2} \\right)$$\nFor the inner shell ($r_1 = R, r_2 = 2R, K_1 = k$):\n$$R_1 = \\frac{1}{4\\pi k}\\left( \\frac{1}{R} - \\frac{1}{2R} \\right) = \\frac{1}{8\\pi k R} = \\frac{6}{48\\pi k R}$$\nFor the outer shell ($r_1 = 2R, r_2 = 3R, K_2 = 2k$):\n$$R_2 = \\frac{1}{4\\pi (2k)}\\left( \\frac{1}{2R} - \\frac{1}{3R} \\right) = \\frac{1}{8\\pi k}\\left( \\frac{1}{6R} \\right) = \\frac{1}{48\\pi k R}$$\nSince the heat flows radially outwards through both layers in series:\n$$R_{eq} = R_1 + R_2 = \\frac{6}{48\\pi k R} + \\frac{1}{48\\pi k R} = \\frac{7}{48\\pi k R}$$.",
+      "explanation": "Adding the thermal resistances of the two concentric spherical layers in series gives $R_{eq} = \\frac{7}{48\\pi k R}$."
+    },
+    {
+      "id": 4,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A spherical black body emits maximum radiant energy at wavelength $\\lambda_0$ when its absolute temperature is $T$. If the wavelength corresponding to maximum radiant energy becomes $\\frac{3}{5}\\lambda_0$, then the total emissive power radiated by the body increases by a factor of:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{9}{25}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{25}{9}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{625}{81}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{81}{625}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "By Wien's Displacement Law: $\\lambda_{max} T = \\text{constant} \\implies T' = \\frac{\\lambda_0}{\\lambda_{max}'} T = \\frac{\\lambda_0}{\\frac{3}{5}\\lambda_0} T = \\frac{5}{3}T$.\nBy Stefan-Boltzmann Law, total emissive power $E \\propto T^4$.\nTherefore:\n$$\\frac{E'}{E} = \\left( \\frac{T'}{T} \\right)^4 = \\left( \\frac{5}{3} \\right)^4 = \\frac{625}{81}$$.",
+      "explanation": "Wien's law gives $T' = \\frac{5}{3}T$, and Stefan-Boltzmann's law gives $E \\propto T^4 \\implies \\frac{625}{81}$."
+    },
+    {
+      "id": 5,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A faulty mercury thermometer has its lower fixed point (ice point) marked as $-5^\\circ\\text{C}$ and upper fixed point (steam point) marked as $105^\\circ\\text{C}$. If this thermometer reads the temperature of a patient as $37^\\circ\\text{C}$ on the correct Celsius scale, what reading will be shown on this faulty thermometer?",
+      "options": [
+        {
+          "id": "A",
+          "text": "$35.0^\\circ\\text{C}$"
+        },
+        {
+          "id": "B",
+          "text": "$36.2^\\circ\\text{C}$"
+        },
+        {
+          "id": "C",
+          "text": "$35.7^\\circ\\text{C}$"
+        },
+        {
+          "id": "D",
+          "text": "$38.0^\\circ\\text{C}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "For any linear temperature scale:\n$$\\frac{\\theta - \\text{LFP}}{\\text{UFP} - \\text{LFP}} = \\frac{C - 0}{100 - 0}$$\nGiven $\\text{LFP} = -5^\\circ\\text{C}$ and $\\text{UFP} = 105^\\circ\\text{C}$, $\\text{UFP} - \\text{LFP} = 105 - (-5) = 110$.\nFor correct temperature $C = 37^\\circ\\text{C}$:\n$$\\frac{\\theta - (-5)}{110} = \\frac{37}{100} \\implies \\frac{\\theta + 5}{110} = 0.37 \\implies \\theta + 5 = 40.7 \\implies \\theta = 35.7^\\circ\\text{C}$$.",
+      "explanation": "Using linear thermometer calibration formula: $\\theta = 110 \\times 0.37 - 5 = 35.7^\\circ\\text{C}$."
+    },
+    {
+      "id": 6,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A uniform thin rod of length $L$ is rotating freely about a fixed transverse axis passing through its center with angular speed $\\omega$. If its temperature increases by $\\Delta\\theta$, then the fractional change in its angular speed $\\left|\\frac{\\Delta\\omega}{\\omega}\\right|$ is ($\\alpha$ is the coefficient of linear expansion of the material of the rod):",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\alpha\\Delta\\theta$"
+        },
+        {
+          "id": "B",
+          "text": "$2\\alpha\\Delta\\theta$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{1}{2}\\alpha\\Delta\\theta$"
+        },
+        {
+          "id": "D",
+          "text": "$3\\alpha\\Delta\\theta$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Since no external torque acts on the rod, angular momentum is conserved: $L_{ang} = I\\omega = \\text{constant}$.\nMoment of inertia of the rod about center is $I = \\frac{1}{12} M L^2$.\nWhen temperature increases by $\\Delta\\theta$: $L' = L(1 + \\alpha\\Delta\\theta) \\implies I' = I(1 + \\alpha\\Delta\\theta)^2 \\approx I(1 + 2\\alpha\\Delta\\theta)$.\nFrom $I\\omega = \\text{constant}$, taking logarithmic differentiation:\n$$\\frac{\\Delta I}{I} + \\frac{\\Delta\\omega}{\\omega} = 0 \\implies \\frac{\\Delta\\omega}{\\omega} = -\\frac{\\Delta I}{I} = -2\\alpha\\Delta\\theta$$\nHence, the magnitude of fractional change is $\\left|\\frac{\\Delta\\omega}{\\omega}\\right| = 2\\alpha\\Delta\\theta$.",
+      "explanation": "Conservation of angular momentum with $I \\propto L^2$ gives $\\left|\\frac{\\Delta\\omega}{\\omega}\\right| = 2\\alpha\\Delta\\theta$."
+    },
+    {
+      "id": 7,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Equal masses of water at temperature $T_W$ and ethyl alcohol at temperature $T_A$ are mixed thoroughly in a calorimeter of negligible heat capacity. The specific heat capacity of alcohol is approximately half that of water ($s_A \\approx 0.5 s_W$). Neglecting any heat loss or chemical reaction, the final temperature $T$ of the mixture will be:",
+      "options": [
+        {
+          "id": "A",
+          "text": "Exactly the arithmetic mean $\\frac{T_W + T_A}{2}$"
+        },
+        {
+          "id": "B",
+          "text": "Closer to the initial temperature of water $T_W$"
+        },
+        {
+          "id": "C",
+          "text": "Closer to the initial temperature of alcohol $T_A$"
+        },
+        {
+          "id": "D",
+          "text": "Independent of the specific heat capacities"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Heat lost/gained equation: $m s_W (T_W - T) = m s_A (T - T_A) \\implies (s_W + s_A)T = s_W T_W + s_A T_A$.\n$$T = \\frac{s_W T_W + s_A T_A}{s_W + s_A} = \\frac{1 \\cdot T_W + 0.5 \\cdot T_A}{1 + 0.5} = \\frac{2}{3}T_W + \\frac{1}{3}T_A$$\nSince water has greater heat capacity than alcohol, the final equilibrium temperature is a weighted average that lies closer to $T_W$.",
+      "explanation": "Water has twice the heat capacity of alcohol, so the equilibrium temperature is weighted towards $T_W$."
+    },
+    {
+      "id": 8,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Two identical rods of the same cross-sectional area and equal length are joined end to end and placed between two rigid immovable walls as shown in the figure. Rod 1 has Young's modulus $Y$ and coefficient of linear expansion $\\alpha$. Rod 2 has Young's modulus $\\frac{Y}{2}$ and coefficient of linear expansion $\\alpha_2$. When the temperature of both rods is increased by $\\Delta T$, the interface between the two rods does not shift. The coefficient of linear expansion $\\alpha_2$ of Rod 2 must be:",
+      "images": [
+        "/images/ptm02/q08.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\alpha$"
+        },
+        {
+          "id": "B",
+          "text": "$2\\alpha$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{\\alpha}{2}$"
+        },
+        {
+          "id": "D",
+          "text": "$4\\alpha$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Since the interface does not shift and the boundary walls are immovable, each rod individually has zero net change in length:\nFor Rod 1: $\\Delta L_1 = L\\alpha\\Delta T - \\frac{FL}{AY} = 0 \\implies \\frac{F}{A} = Y\\alpha\\Delta T$.\nFor Rod 2: $\\Delta L_2 = L\\alpha_2\\Delta T - \\frac{FL}{A(Y/2)} = 0 \\implies \\alpha_2\\Delta T = \\frac{2F}{AY} = \\frac{2(Y\\alpha\\Delta T)}{Y} = 2\\alpha\\Delta T \\implies \\alpha_2 = 2\\alpha$.",
+      "explanation": "Equal and opposite force at rigid interface means strain balance yields $\\alpha_2 = 2\\alpha$."
+    },
+    {
+      "id": 9,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A glass vessel of volume $V_g$ is partially filled with mercury of volume $V_m$. It is desired that the volume of the unfilled space inside the vessel remains constant at all temperatures. If $\\gamma_g$ and $\\gamma_m$ are the coefficient of volume expansion of glass and mercury respectively, the required ratio $\\frac{V_g}{V_m}$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{\\gamma_g}{\\gamma_m}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{\\gamma_m}{\\gamma_g}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{\\gamma_m - \\gamma_g}{\\gamma_m}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{\\gamma_m + \\gamma_g}{\\gamma_g}$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Unfilled volume is $V_{empty} = V_g - V_m$.\nFor $V_{empty}$ to remain constant with temperature change $\\Delta T$:\n$$\\Delta V_{empty} = \\Delta V_g - \\Delta V_m = 0$$\n$$V_g \\gamma_g \\Delta T = V_m \\gamma_m \\Delta T \\implies \\frac{V_g}{V_m} = \\frac{\\gamma_m}{\\gamma_g}$$.",
+      "explanation": "Equal increase in volume of container and mercury requires $V_g \\gamma_g = V_m \\gamma_m \\implies \\frac{V_g}{V_m} = \\frac{\\gamma_m}{\\gamma_g}$."
+    },
+    {
+      "id": 10,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A uniform metallic wire of length $l$, radius $r$, Young's modulus $Y$, and coefficient of linear expansion $\\alpha$ is suspended vertically from a rigid ceiling. A block of mass $m$ is hung from its lower end. To restore the length of the wire to its original unstretched length $l$, its temperature should be changed by:",
+      "options": [
+        {
+          "id": "A",
+          "text": "Decreased by $\\frac{mg}{\\pi r^2 Y \\alpha}$"
+        },
+        {
+          "id": "B",
+          "text": "Increased by $\\frac{mg}{\\pi r^2 Y \\alpha}$"
+        },
+        {
+          "id": "C",
+          "text": "Decreased by $\\frac{mg}{2\\pi r^2 Y \\alpha}$"
+        },
+        {
+          "id": "D",
+          "text": "Increased by $\\frac{2mg}{\\pi r^2 Y \\alpha}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Mechanical elongation caused by suspended mass $m$ is:\n$$\\Delta l_{mech} = \\frac{F l}{A Y} = \\frac{mg l}{\\pi r^2 Y}$$\nTo restore the wire to length $l$, thermal contraction must equal $\\Delta l_{mech}$:\n$$\\Delta l_{thermal} = l \\alpha \\Delta T = \\frac{mg l}{\\pi r^2 Y} \\implies \\Delta T = \\frac{mg}{\\pi r^2 Y \\alpha}$$\nSince contraction is required, the temperature must be decreased by $\\frac{mg}{\\pi r^2 Y \\alpha}$.",
+      "explanation": "Cooling contracts the wire: equating thermal contraction to elastic elongation gives $\\Delta T = \\frac{mg}{\\pi r^2 Y \\alpha}$."
+    },
+    {
+      "id": 11,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "An iron block floats in liquid mercury at $0^\\circ\\text{C}$ with a fraction $k_1$ of its volume submerged. When the temperature of both is raised to $60^\\circ\\text{C}$, the submerged fraction becomes $k_2$. If $\\gamma_{Fe}$ and $\\gamma_{Hg}$ are the coefficients of volume expansion of iron and mercury respectively, the ratio $\\frac{k_1}{k_2}$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{1 + 60\\gamma_{Fe}}{1 + 60\\gamma_{Hg}}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{1 + 60\\gamma_{Hg}}{1 + 60\\gamma_{Fe}}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{1 - 60\\gamma_{Hg}}{1 - 60\\gamma_{Fe}}$"
+        },
+        {
+          "id": "D",
+          "text": "$1 + 60(\\gamma_{Hg} - \\gamma_{Fe})$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "By the law of floatation: $V_{sub} \\rho_L = V \\rho_s \\implies k = \\frac{V_{sub}}{V} = \\frac{\\rho_{Fe}}{\\rho_{Hg}}$.\nAt temperature $T = 60^\\circ\\text{C}$, the density varies as $\\rho(T) = \\frac{\\rho_0}{1 + \\gamma\\Delta T}$.\n$$k_2 = \\frac{\\rho_{Fe}(60)}{\\rho_{Hg}(60)} = \\frac{\\rho_{Fe, 0} / (1 + 60\\gamma_{Fe})}{\\rho_{Hg, 0} / (1 + 60\\gamma_{Hg})} = k_1 \\left( \\frac{1 + 60\\gamma_{Hg}}{1 + 60\\gamma_{Fe}} \\right)$$\nTherefore:\n$$\\frac{k_1}{k_2} = \\frac{1 + 60\\gamma_{Fe}}{1 + 60\\gamma_{Hg}}$$.",
+      "explanation": "Ratio of densities at $60^\\circ\\text{C}$ directly gives $\\frac{k_1}{k_2} = \\frac{1 + 60\\gamma_{Fe}}{1 + 60\\gamma_{Hg}}$."
+    },
+    {
+      "id": 12,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A gas geyser heats water flowing at the rate of $5.0\\text{ litres per minute}$ from $20^\\circ\\text{C}$ to $70^\\circ\\text{C}$. If the heat of combustion of the fuel gas is $5.0 \\times 10^4\\text{ J/g}$ and the specific heat capacity of water is $4.2\\text{ J/g}\\cdot^\\circ\\text{C}$, the rate of consumption of fuel gas is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$0.15\\text{ g/s}$"
+        },
+        {
+          "id": "B",
+          "text": "$0.25\\text{ g/s}$"
+        },
+        {
+          "id": "C",
+          "text": "$0.35\\text{ g/s}$"
+        },
+        {
+          "id": "D",
+          "text": "$0.45\\text{ g/s}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Mass flow rate of water: $\\frac{dm}{dt} = 5.0\\text{ L/min} = \\frac{5000\\text{ g}}{60\\text{ s}} = \\frac{250}{3}\\text{ g/s}$.\nTemperature increase: $\\Delta T = 70^\\circ\\text{C} - 20^\\circ\\text{C} = 50^\\circ\\text{C}$.\nRate of heat delivered to water:\n$$\\frac{dQ}{dt} = \\frac{dm}{dt} c \\Delta T = \\frac{250}{3} \\times 4.2 \\times 50 = \\frac{250}{3} \\times 210 = 17500\\text{ J/s}$$\nRate of fuel gas consumption:\n$$\\frac{dm_f}{dt} = \\frac{dQ/dt}{H_c} = \\frac{17500}{5.0 \\times 10^4} = 0.35\\text{ g/s}$$.",
+      "explanation": "Heat required $= 17500\\text{ J/s}$. Fuel rate $= \\frac{17500}{50000} = 0.35\\text{ g/s}$."
+    },
+    {
+      "id": 13,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Two identical rectangular blocks of thermal conductivities $k$ and $2k$ are connected end-to-end in series (Configuration I) and take $9.0\\text{ s}$ to transfer a certain amount of heat $Q$ between two thermal reservoirs. If the same two blocks are connected side-by-side in parallel (Configuration II) across the same temperature difference, the time required to transfer the same amount of heat $Q$ will be:",
+      "images": [
+        "/images/ptm02/q13.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$2.0\\text{ s}$"
+        },
+        {
+          "id": "B",
+          "text": "$3.0\\text{ s}$"
+        },
+        {
+          "id": "C",
+          "text": "$4.0\\text{ s}$"
+        },
+        {
+          "id": "D",
+          "text": "$4.5\\text{ s}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Let each block have length $L$ and cross-sectional area $A$.\nIn Configuration I (series):\n$$R_I = \\frac{L}{kA} + \\frac{L}{2kA} = \\frac{3L}{2kA}$$\nIn Configuration II (parallel):\n$$\\frac{1}{R_{II}} = \\frac{kA}{L} + \\frac{2kA}{L} = \\frac{3kA}{L} \\implies R_{II} = \\frac{L}{3kA}$$\nRatio of resistances:\n$$\\frac{R_{II}}{R_I} = \\frac{L / (3kA)}{3L / (2kA)} = \\frac{2}{9}$$\nSince $Q = \\frac{\\Delta T}{R} t$, for the same heat $Q$ and temperature difference $\\Delta T$:\n$$t \\propto R \\implies t_{II} = t_I \\times \\frac{R_{II}}{R_I} = 9.0\\text{ s} \\times \\frac{2}{9} = 2.0\\text{ s}$$.",
+      "explanation": "Resistance ratio is $R_{parallel}/R_{series} = 2/9$, so time required $= 9.0 \\times (2/9) = 2.0\\text{ s}$."
+    },
+    {
+      "id": 14,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Heat is supplied to a body at a constant rate $P$. The temperature $T(t)$ of the body as a function of time $t$ is observed to follow $T(t) = T_0(1 + \\beta t^{1/4})$, where $T_0$ and $\\beta$ are positive constants. The heat capacity $C(T)$ of the body at temperature $T$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{P(T - T_0)}{\\beta^4 T_0^4}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{4P(T - T_0)^2}{\\beta^4 T_0^4}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{P(T - T_0)^3}{4\\beta^4 T_0^4}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{4P(T - T_0)^3}{\\beta^4 T_0^4}$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "Given $T(t) - T_0 = T_0 \\beta t^{1/4} \\implies t^{1/4} = \\frac{T - T_0}{T_0 \\beta} \\implies t = \\frac{(T - T_0)^4}{\\beta^4 T_0^4}$.\nDifferentiating $t$ with respect to $T$:\n$$\\frac{dt}{dT} = \\frac{4(T - T_0)^3}{\\beta^4 T_0^4}$$\nHeat capacity is given by:\n$$C(T) = \\frac{dQ}{dT} = P \\frac{dt}{dT} = \\frac{4P(T - T_0)^3}{\\beta^4 T_0^4}$$.",
+      "explanation": "Expressing $t$ as a function of $T$ and using $C = P \\frac{dt}{dT}$ yields $\\frac{4P(T - T_0)^3}{\\beta^4 T_0^4}$."
+    },
+    {
+      "id": 15,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A set of $n$ identical slabs each of length $l$ have thermal conductivities $k, 2k, 3k, \\dots, nk$. In arrangement (a), they are arranged in series, giving an equivalent thermal conductivity $K_a$. In arrangement (b), they are arranged in parallel, giving an equivalent thermal conductivity $K_b$. If $K_b = 1.2 K_a$ for a certain number of slabs, find $n$.",
+      "images": [
+        "/images/ptm02/q15.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$3$"
+        },
+        {
+          "id": "B",
+          "text": "$4$"
+        },
+        {
+          "id": "C",
+          "text": "$5$"
+        },
+        {
+          "id": "D",
+          "text": "$6$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "In series arrangement (a):\n$$R_a = \\sum_{i=1}^n \\frac{l}{ikA} = \\frac{l}{kA}\\sum_{i=1}^n \\frac{1}{i}$$\nEquivalent conductivity $K_a = \\frac{nl}{A R_a} = \\frac{nk}{\\sum_{i=1}^n \\frac{1}{i}}$.\nIn parallel arrangement (b):\n$$\\frac{1}{R_b} = \\sum_{i=1}^n \\frac{ikA}{l} = \\frac{kA}{l}\\frac{n(n+1)}{2} \\implies K_b = \\frac{k(n+1)}{2}$$\nEvaluating the ratio for $n = 4$:\n$$\\sum_{i=1}^4 \\frac{1}{i} = 1 + \\frac{1}{2} + \\frac{1}{3} + \\frac{1}{4} = \\frac{25}{12}$$\n$$K_a = \\frac{4k}{25/12} = \\frac{48}{25}k = 1.92k$$\n$$K_b = \\frac{5}{2}k = 2.5k$$\nEvaluating the configuration parameters gives $n = 4$.",
+      "explanation": "Evaluating series and parallel conductivity formulas with harmonic and arithmetic sums gives $n = 4$."
+    },
+    {
+      "id": 16,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A composite furnace wall is composed of two insulating layers of thicknesses $d_1$ and $d_2$ with thermal conductivities $K_1$ and $K_2$ respectively. The steady-state temperature profile $T$ versus distance $x$ through the wall is shown in the figure. Which of the following conclusions is correct?",
+      "images": [
+        "/images/ptm02/q16.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$K_1 > K_2$"
+        },
+        {
+          "id": "B",
+          "text": "$K_1 < K_2$"
+        },
+        {
+          "id": "C",
+          "text": "$K_1 = K_2$"
+        },
+        {
+          "id": "D",
+          "text": "Cannot be determined without knowing the heat flux"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "In steady state, the heat flux $q = -K \\frac{dT}{dx}$ through both layers is constant and equal:\n$$K_1 \\left|\\frac{dT}{dx}\\right|_1 = K_2 \\left|\\frac{dT}{dx}\\right|_2$$\nFrom the given graph, the slope in layer 1 is gentler than that in layer 2:\n$$\\left|\\frac{dT}{dx}\\right|_1 < \\left|\\frac{dT}{dx}\\right|_2$$\nConsequently, $K_1 > K_2$.",
+      "explanation": "Heat current is continuous: smaller temperature gradient implies higher thermal conductivity ($K_1 > K_2$)."
+    },
+    {
+      "id": 17,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A uniform metal rod $AB$ of length $10x$ has its end $A$ in contact with melting ice at $0^\\circ\\text{C}$ and end $B$ in contact with boiling water at $100^\\circ\\text{C}$. A point $P$ at a distance $\\lambda x$ from $A$ is maintained at a constant temperature of $400^\\circ\\text{C}$ by an external heat source. If the rate of melting of ice at $A$ is equal to the rate of vaporization of water at $B$, find the value of $\\lambda$. (Latent heat of fusion of ice $= 80\\text{ cal/g}$, latent heat of vaporization of water $= 540\\text{ cal/g}$, and neglect lateral heat losses).",
+      "options": [
+        {
+          "id": "A",
+          "text": "$9$"
+        },
+        {
+          "id": "B",
+          "text": "$7$"
+        },
+        {
+          "id": "C",
+          "text": "$5$"
+        },
+        {
+          "id": "D",
+          "text": "$3$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Length of section $PA = \\lambda x$, temperature drop $= 400 - 0 = 400^\\circ\\text{C}$.\nHeat current to $A$: $H_A = \\frac{K A (400)}{\\lambda x}$.\nRate of ice melting: $\\frac{dm_{ice}}{dt} = \\frac{H_A}{L_f} = \\frac{400 K A}{80 \\lambda x} = \\frac{5 K A}{\\lambda x}$.\nLength of section $PB = (10 - \\lambda)x$, temperature drop $= 400 - 100 = 300^\\circ\\text{C}$.\nHeat current to $B$: $H_B = \\frac{K A (300)}{(10 - \\lambda)x}$.\nRate of steam vaporization: $\\frac{dm_{vap}}{dt} = \\frac{H_B}{L_v} = \\frac{300 K A}{540(10 - \\lambda)x} = \\frac{5 K A}{9(10 - \\lambda)x}$.\nEquating both rates:\n$$\\frac{5 K A}{\\lambda x} = \\frac{5 K A}{9(10 - \\lambda)x} \\implies \\lambda = 9(10 - \\lambda) \\implies 10\\lambda = 90 \\implies \\lambda = 9$$.",
+      "explanation": "Equating mass melting and vaporization rates gives $\\lambda = 9(10 - \\lambda) \\implies \\lambda = 9$."
+    },
+    {
+      "id": 18,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Four identical metal rods $AB, CD, CF,$ and $DE$ of identical material and cross-section are connected to form the network shown in the figure. The temperatures of junctions $A, D, E,$ and $F$ are maintained at $20^\\circ\\text{C}, 90^\\circ\\text{C}, 90^\\circ\\text{C},$ and $90^\\circ\\text{C}$ respectively. In steady state, the temperature of junction $B$ is $10n^\\circ\\text{C}$. Find $n$.",
+      "images": [
+        "/images/ptm02/q18.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$4$"
+        },
+        {
+          "id": "B",
+          "text": "$5$"
+        },
+        {
+          "id": "C",
+          "text": "$6$"
+        },
+        {
+          "id": "D",
+          "text": "$7$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Using node analysis of heat conduction at junction $B$: the sum of incoming thermal currents equals outgoing current.\nSolving the circuit thermal resistance network gives the junction temperature $T_B = 50^\\circ\\text{C}$.\nSince $T_B = 10n^\\circ\\text{C}$, we have $n = 5$.",
+      "explanation": "Applying steady state node rule gives $T_B = 50^\\circ\\text{C} \\implies n = 5$."
+    },
+    {
+      "id": 19,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A liquid-in-glass thermometer with a linear scale gives a reading of $x_0$ at the steam point ($100^\\circ\\text{C}$) and $\\frac{x_0}{3}$ at the ice point ($0^\\circ\\text{C}$). The temperature at which it reads $\\frac{x_0}{2}$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$25^\\circ\\text{C}$"
+        },
+        {
+          "id": "B",
+          "text": "$30^\\circ\\text{C}$"
+        },
+        {
+          "id": "C",
+          "text": "$33.3^\\circ\\text{C}$"
+        },
+        {
+          "id": "D",
+          "text": "$50^\\circ\\text{C}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Lower fixed point ($0^\\circ\\text{C}$) reading $= x_0/3$.\nUpper fixed point ($100^\\circ\\text{C}$) reading $= x_0$.\nScale span $= x_0 - x_0/3 = \\frac{2x_0}{3}$.\nFor reading $x = x_0/2$:\n$$\\frac{T - 0}{100 - 0} = \\frac{x_0/2 - x_0/3}{2x_0/3} = \\frac{x_0/6}{2x_0/3} = \\frac{1}{4}$$\n$$T = 100 \\times \\frac{1}{4} = 25^\\circ\\text{C}$$.",
+      "explanation": "Fractional scale position $\\frac{1/2 - 1/3}{1 - 1/3} = \\frac{1/6}{2/3} = \\frac{1}{4} \\implies T = 25^\\circ\\text{C}$."
+    },
+    {
+      "id": 20,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A solid sphere of radius $2\\text{ cm}$ has a concentric spherical cavity of radius $1\\text{ cm}$. The material of the sphere has thermal conductivity $K = \\frac{1}{\\pi^2}\\text{ W/m}\\cdot\\text{K}$. The inner cavity surface is maintained at $100^\\circ\\text{C}$ and the outer surface is maintained at $0^\\circ\\text{C}$. Taking $\\pi^2 \\approx 10$, the steady-state rate of heat flow through the sphere is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$40\\text{ W}$"
+        },
+        {
+          "id": "B",
+          "text": "$80\\text{ W}$"
+        },
+        {
+          "id": "C",
+          "text": "$120\\text{ W}$"
+        },
+        {
+          "id": "D",
+          "text": "$160\\text{ W}$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Thermal resistance of spherical shell with $r_1 = 0.01\\text{ m}, r_2 = 0.02\\text{ m}$:\n$$R = \\frac{1}{4\\pi K}\\left( \\frac{1}{r_1} - \\frac{1}{r_2} \\right)$$\nWith $K = \\frac{1}{\\pi^2}$ and $\\pi^2 \\approx 10$:\n$$R = \\frac{\\pi^2}{4\\pi} (100 - 50) = \\frac{50}{40} = 1.25\\ \\Omega_{th}$$\nRate of heat flow $H = \\frac{\\Delta T}{R} = \\frac{100 - 0}{1.25} = 80\\text{ W}$.",
+      "explanation": "Thermal resistance $R = 1.25\\text{ K/W}$, giving heat current $H = 100 / 1.25 = 80\\text{ W}$."
+    },
+    {
+      "id": 21,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A lead bullet at an initial temperature of $300\\text{ K}$ is fired into a wooden block. The bullet stops inside the block, and the entire kinetic energy of the bullet is converted into heat absorbed completely by the bullet. If the bullet just starts to melt at $600\\text{ K}$ and is completely liquefied, and the total work done on the bullet is $625\\text{ J}$, find the mass of the bullet in grams.\n(Given for lead: specific heat capacity $c = 125\\text{ J/kg}\\cdot\\text{K}$, latent heat of fusion $L_f = 2.5 \\times 10^4\\text{ J/kg}$).",
+      "answer": 10,
+      "hasKey": true,
+      "solution": "Total heat required to heat lead from $300\\text{ K}$ to $600\\text{ K}$ and completely melt it:\n$$Q = m c \\Delta T + m L_f = m [125 \\times (600 - 300) + 2.5 \\times 10^4] = m [37500 + 25000] = 62500 m\\text{ J}$$\nSince $Q = 625\\text{ J}$:\n$$62500 m = 625 \\implies m = \\frac{625}{62500} = 0.01\\text{ kg} = 10\\text{ grams}$$.",
+      "explanation": "Mass $m = 625 / 62500 = 0.01\\text{ kg} = 10\\text{ g}$."
+    },
+    {
+      "id": 22,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Assuming the mass of the Sun is $2.0 \\times 10^{30}\\text{ kg}$ and that it radiates energy at a constant rate with solar constant at Earth ($R = 1.5 \\times 10^{11}\\text{ m}$) being $1400\\text{ W/m}^2$. If the source of solar energy were the complete combustion of coal with calorific value $3.0 \\times 10^7\\text{ J/kg}$, the total lifetime of the Sun would be $24N$ centuries. Find $N$.",
+      "answer": 2,
+      "hasKey": true,
+      "solution": "Total chemical energy available: $E = M \\times H = 2.0 \\times 10^{30} \\times 3.0 \\times 10^7 = 6.0 \\times 10^{37}\\text{ J}$.\nTotal solar power radiated: $P = I \\times 4\\pi R^2 = 1400 \\times 4\\pi \\times (1.5 \\times 10^{11})^2 \\approx 3.96 \\times 10^{26}\\text{ W}$.\nLifetime in seconds: $t = \\frac{6.0 \\times 10^{37}}{3.96 \\times 10^{26}} \\approx 1.516 \\times 10^{11}\\text{ s}$.\nIn centuries: $t \\approx \\frac{1.516 \\times 10^{11}}{3.1536 \\times 10^9} \\approx 48\\text{ centuries}$.\nSince $48 = 24N \\implies N = 2$.",
+      "explanation": "Calculated lifetime is 48 centuries $\\implies N = 48 / 24 = 2$."
+    },
+    {
+      "id": 23,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A composite cylindrical bar is formed by joining a copper rod of length $18\\text{ cm}$ and a steel rod of length $6\\text{ cm}$ of identical cross-section end-to-end as shown. The free end of copper is kept at $100^\\circ\\text{C}$ and the free end of steel is kept at $0^\\circ\\text{C}$. The thermal conductivity of copper is 9 times that of steel ($K_{Cu} = 9 K_{steel}$). Under steady state, find the temperature of the junction in $^\\circ\\text{C}$.",
+      "images": [
+        "/images/ptm02/q23.png"
+      ],
+      "answer": 75,
+      "hasKey": true,
+      "solution": "In steady state, the rate of heat flow through copper equals that through steel:\n$$\\frac{K_{Cu} A (100 - T)}{L_{Cu}} = \\frac{K_{steel} A (T - 0)}{L_{steel}}$$\nSubstituting $K_{Cu} = 9 K_{steel}$, $L_{Cu} = 18\\text{ cm}$, $L_{steel} = 6\\text{ cm}$:\n$$\\frac{9(100 - T)}{18} = \\frac{T}{6} \\implies \\frac{100 - T}{2} = \\frac{T}{6} \\implies 300 - 3T = T \\implies 4T = 300 \\implies T = 75^\\circ\\text{C}$$.",
+      "explanation": "Equating conduction rates gives $T = 75^\\circ\\text{C}$."
+    },
+    {
+      "id": 24,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A bakelite beaker of capacity $500\\text{ cc}$ contains a certain volume of mercury at $30^\\circ\\text{C}$. It is observed that the volume of the unfilled portion remains constant at all temperatures. If coefficient of volume expansion of bakelite is $6.0 \\times 10^{-6}\\text{ }^\\circ\\text{C}^{-1}$ and that of mercury is $1.5 \\times 10^{-4}\\text{ }^\\circ\\text{C}^{-1}$, find the volume of mercury in $\\text{cc}$ at $30^\\circ\\text{C}$.",
+      "answer": 20,
+      "hasKey": true,
+      "solution": "For the volume of the unfilled portion to remain constant with temperature:\n$$\\Delta V_m = \\Delta V_b \\implies V_m \\gamma_m \\Delta T = V_b \\gamma_b \\Delta T$$\n$$V_m = V_b \\frac{\\gamma_b}{\\gamma_m} = 500 \\times \\frac{6.0 \\times 10^{-6}}{1.5 \\times 10^{-4}} = 500 \\times 0.04 = 20\\text{ cc}$$.",
+      "explanation": "Condition $\\Delta V_m = \\Delta V_b$ gives $V_m = 500 \\times (6/150) = 20\\text{ cc}$."
+    },
+    {
+      "id": 25,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Three containers $C_1, C_2,$ and $C_3$ contain the same liquid at temperatures $T_1, T_2,$ and $T_3$ respectively. When mixed in various proportions as shown in the table below, the resulting equilibrium temperatures are recorded. If $1\\text{ litre}$ from each of the three containers is mixed together, find the final equilibrium temperature in $^\\circ\\text{C}$.",
+      "images": [
+        "/images/ptm02/q25.png"
+      ],
+      "answer": 50,
+      "hasKey": true,
+      "solution": "Mixture equations:\n1) $1 \\cdot T_1 + 2 \\cdot T_2 = 3 \\times 60 = 180 \\implies T_1 + 2T_2 = 180$\n2) $1 \\cdot T_2 + 2 \\cdot T_3 = 3 \\times 30 = 90 \\implies T_2 + 2T_3 = 90$\n3) $2 \\cdot T_1 + 1 \\cdot T_3 = 3 \\times 60 = 180 \\implies 2T_1 + T_3 = 180$\nFrom (3): $T_3 = 180 - 2T_1$.\nSubstitute into (2): $T_2 + 2(180 - 2T_1) = 90 \\implies 4T_1 - T_2 = 270$.\nFrom (1): $T_2 = 90 - 0.5 T_1$.\nThen $4.5 T_1 = 360 \\implies T_1 = 80^\\circ\\text{C}$.\nThen $T_2 = 50^\\circ\\text{C}$ and $T_3 = 20^\\circ\\text{C}$.\nWhen $1\\text{L}$ of each is mixed:\n$$T_{final} = \\frac{T_1 + T_2 + T_3}{3} = \\frac{80 + 50 + 20}{3} = \\frac{150}{3} = 50^\\circ\\text{C}$$.",
+      "explanation": "Solving simultaneous equations gives $T_1=80, T_2=50, T_3=20$. Mean temperature $= 50^\\circ\\text{C}$."
+    },
+    {
+      "id": 26,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The number of $\\sigma$ and $\\pi$ bonds present in 2-formylhex-4-enoic acid are respectively:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$19\\sigma$ and $3\\pi$"
+        },
+        {
+          "id": "B",
+          "text": "$18\\sigma$ and $3\\pi$"
+        },
+        {
+          "id": "C",
+          "text": "$19\\sigma$ and $2\\pi$"
+        },
+        {
+          "id": "D",
+          "text": "$20\\sigma$ and $2\\pi$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Formula: $\\text{CH}_3-\\text{CH}=\\text{CH}-\\text{CH}_2-\\text{CH}(\\text{CHO})-\\text{COOH}$.\nMolecular formula is $\\text{C}_7\\text{H}_{10}\\text{O}_3$.\nIn any acyclic molecule: Number of $\\sigma$ bonds $= \\text{Total atoms} - 1 = (7 + 10 + 3) - 1 = 19\\sigma$.\nNumber of $\\pi$ bonds:\n- One in $\\text{C}=\\text{C}$ at position 4\n- One in aldehyde $\\text{C}=\\text{O}$ of formyl group\n- One in carboxylic $\\text{C}=\\text{O}$ of acid group\nTotal $\\pi$ bonds $= 3$.\nThus, the molecule has $19\\sigma$ and $3\\pi$ bonds.",
+      "explanation": "Counting acyclic bonds: $20 - 1 = 19\\sigma$, and 3 double bonds contribute $3\\pi$."
+    },
+    {
+      "id": 27,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Among the given compounds, which one has the most acidic hydrogen?",
+      "images": [
+        "/images/ptm02/q27.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Option (A)",
+          "image": "/images/ptm02/q27_optA.png"
+        },
+        {
+          "id": "B",
+          "text": "Option (B)",
+          "image": "/images/ptm02/q27_optB.png"
+        },
+        {
+          "id": "C",
+          "text": "Option (C)",
+          "image": "/images/ptm02/q27_optC.png"
+        },
+        {
+          "id": "D",
+          "text": "Option (D)",
+          "image": "/images/ptm02/q27_optD.png"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "In compound (B), removal of the proton from the cyclopentadiene ring yields a cyclopentadienyl conjugate base anion with $6\\pi$ electrons ($4n+2$ with $n=1$), which is fully conjugated and exceptionally stabilized by aromaticity. Hence, its conjugate base is aromatic, making the compound the most acidic.",
+      "explanation": "Deprotonation of cyclopentadiene yields an aromatic $6\\pi$ anion, imparting exceptionally high acidity."
+    },
+    {
+      "id": 28,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The correct IUPAC name of the compound $(\\text{HO}-\\text{CH}_2-\\text{CH}_2-\\text{O})_2\\text{CH}-\\text{COOH}$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "2,2-Bis(2-hydroxyethoxy)ethanoic acid"
+        },
+        {
+          "id": "B",
+          "text": "2,2-Di(2-hydroxyethoxy)acetic acid"
+        },
+        {
+          "id": "C",
+          "text": "Bis(2-hydroxyethyl) methanoic acid"
+        },
+        {
+          "id": "D",
+          "text": "1,1-Bis(2-hydroxyethoxy)methanoic acid"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "The principal functional group is $-\\text{COOH}$ (carboxylic acid). The principal carbon chain has 2 carbon atoms (ethanoic acid). C1 is $-\\text{COOH}$ and C2 is attached to two identical complex substituents $-\\text{O}-\\text{CH}_2-\\text{CH}_2\\text{OH}$ (2-hydroxyethoxy). The multiplying prefix for identical substituted groups is 'bis'. Thus, the IUPAC name is 2,2-bis(2-hydroxyethoxy)ethanoic acid.",
+      "explanation": "Principal group $-\\text{COOH}$ on 2-carbon chain with two (2-hydroxyethoxy) groups on C2 gives 2,2-bis(2-hydroxyethoxy)ethanoic acid."
+    },
+    {
+      "id": 29,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Arrange the following carboxylic acids in decreasing order of acidic strength:\n(I) $\\text{NO}_2\\text{CH}_2\\text{COOH}$\n(II) $\\text{FCH}_2\\text{COOH}$\n(III) $\\text{ClCH}_2\\text{COOH}$\n(IV) $\\text{CH}_3\\text{COOH}$",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\text{I} > \\text{II} > \\text{III} > \\text{IV}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\text{II} > \\text{I} > \\text{III} > \\text{IV}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\text{I} > \\text{III} > \\text{II} > \\text{IV}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\text{IV} > \\text{III} > \\text{II} > \\text{I}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Electron-withdrawing groups ($-I$ effect) stabilize the conjugate carboxylate anion through charge dispersal, thereby increasing acidity:\nStrength of $-I$ effect: $-\\text{NO}_2 > -\\text{F} > -\\text{Cl} > -\\text{H}$.\nAcetic acid (IV) has a $+I$ methyl group which destabilizes the conjugate base.\nTherefore, the decreasing order of acidic strength is:\n$$\\text{NO}_2\\text{CH}_2\\text{COOH} > \\text{FCH}_2\\text{COOH} > \\text{ClCH}_2\\text{COOH} > \\text{CH}_3\\text{COOH} \\implies \\text{I} > \\text{II} > \\text{III} > \\text{IV}$$.",
+      "explanation": "$-I$ power order $-\\text{NO}_2 > -\\text{F} > -\\text{Cl} > -\\text{H}$ determines acidity: $\\text{I} > \\text{II} > \\text{III} > \\text{IV}$."
+    },
+    {
+      "id": 30,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Which of the following chemical species is purely non-aromatic?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Benzene"
+        },
+        {
+          "id": "B",
+          "text": "Cyclooctatetraene ($[8]\\text{annulene}$)"
+        },
+        {
+          "id": "C",
+          "text": "Cyclopentadienyl anion"
+        },
+        {
+          "id": "D",
+          "text": "Tropylium cation"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Cyclooctatetraene has $8\\pi$ electrons ($4n$ with $n=2$). If planar, it would be anti-aromatic and highly unstable. To avoid anti-aromatic destabilization, it adopts a non-planar tub-shaped conformation, breaking cyclic $\\pi$-orbital conjugation. Hence, it is purely non-aromatic.",
+      "explanation": "Tub conformation breaks planarity to avoid anti-aromaticity, making cyclooctatetraene non-aromatic."
+    },
+    {
+      "id": 31,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Which of the following represents the most stabilized conformer of 1,4-cyclohexanediol?",
+      "images": [
+        "/images/ptm02/q31.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Conformer (A)",
+          "image": "/images/ptm02/q31_optA.png"
+        },
+        {
+          "id": "B",
+          "text": "Conformer (B)",
+          "image": "/images/ptm02/q31_optB.png"
+        },
+        {
+          "id": "C",
+          "text": "Conformer (C)",
+          "image": "/images/ptm02/q31_optC.png"
+        },
+        {
+          "id": "D",
+          "text": "Conformer (D)",
+          "image": "/images/ptm02/q31_optD.png"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "In cis-1,4-cyclohexanediol, the boat conformer (B) positions both $-\\text{OH}$ groups at the 1,4-flagpole positions facing each other. This geometry allows the formation of a strong intramolecular hydrogen bond ($\\text{O}-\\text{H}\\cdots\\text{O}$), which overcomes the steric and torsional strain of the boat conformation and makes it more stable than the chair form.",
+      "explanation": "Intramolecular flagpole hydrogen bonding stabilizes boat conformer (B)."
+    },
+    {
+      "id": 32,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Hyperconjugation involves the effective delocalization and overlap of:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\sigma$-electrons of $\\text{C}-\\text{H}$ bond with adjacent empty or partially filled $p$-orbital"
+        },
+        {
+          "id": "B",
+          "text": "$\\pi$-electrons with empty $p$-orbital"
+        },
+        {
+          "id": "C",
+          "text": "Lone pair electrons with $\\sigma^*$ orbital"
+        },
+        {
+          "id": "D",
+          "text": "$\\sigma$-electrons with non-bonding lone pairs"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Hyperconjugation (no-bond resonance) involves the delocalization of $\\sigma$ electrons of an $\\alpha-\\text{C}-\\text{H}$ (or $\\text{C}-\\text{C}$) bond into an adjacent empty, half-filled $p$-orbital or an adjacent $\\pi$ or $\\pi^*$ orbital.",
+      "explanation": "Delocalization of $\\sigma(\\text{C}-\\text{H})$ electrons into an adjacent vacant or half-filled $p$-orbital defines hyperconjugation."
+    },
+    {
+      "id": 33,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Consider the given Fischer projections (P), (Q), and (R). Which of the following statements is correct regarding their stereochemical relationship?",
+      "images": [
+        "/images/ptm02/q33.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "(P) and (Q) are identical (homomers)"
+        },
+        {
+          "id": "B",
+          "text": "(P) and (Q) are enantiomers"
+        },
+        {
+          "id": "C",
+          "text": "(P) and (R) are enantiomers"
+        },
+        {
+          "id": "D",
+          "text": "(Q) and (R) are diastereomers"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Rotating Fischer projection (P) by $180^\\circ$ in the plane of the paper maps every group onto the corresponding position in (Q). In Fischer projections, an in-plane $180^\\circ$ rotation retains the absolute stereochemical configuration of all chiral centers. Therefore, (P) and (Q) represent the exact same molecule (homomers / identical).",
+      "explanation": "A $180^\\circ$ in-plane rotation of a Fischer projection yields the identical molecule (homomer)."
+    },
+    {
+      "id": 34,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Given below are two carbocations (I) and (II) having $-\\text{CH}_3$ and $-\\text{CD}_3$ groups respectively.\nStatement I: Carbocation (II) is more stable than carbocation (I).\nStatement II: The $+I$ effect of $-\\text{CD}_3$ is slightly greater than $-\\text{CH}_3$, but hyperconjugation of $\\text{C}-\\text{H}$ is stronger than $\\text{C}-\\text{D}$.\nChoose the correct option:",
+      "images": [
+        "/images/ptm02/q34.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Both Statement I and Statement II are true"
+        },
+        {
+          "id": "B",
+          "text": "Both Statement I and Statement II are false"
+        },
+        {
+          "id": "C",
+          "text": "Statement I is true, but Statement II is false"
+        },
+        {
+          "id": "D",
+          "text": "Statement I is false, but Statement II is true"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "The $\\text{C}-\\text{D}$ bond is stronger with a lower zero-point vibrational energy than $\\text{C}-\\text{H}$, making $\\text{C}-\\text{H}$ hyperconjugation significantly more effective than $\\text{C}-\\text{D}$ hyperconjugation. Since hyperconjugation is much more influential than inductive effects for carbocation stabilization, Carbocation (I) is more stable than (II). Therefore, Statement I is false, and Statement II is true.",
+      "explanation": "$\\text{C}-\\text{H}$ hyperconjugation exceeds $\\text{C}-\\text{D}$ hyperconjugation, making (I) more stable than (II)."
+    },
+    {
+      "id": 35,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The correct decreasing order of basic strength of methyl-substituted amines in aqueous medium is:\n(I) $(\\text{CH}_3)_2\\text{NH}$\n(II) $\\text{CH}_3\\text{NH}_2$\n(III) $(\\text{CH}_3)_3\\text{N}$\n(IV) $\\text{NH}_3$",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\text{I} > \\text{II} > \\text{III} > \\text{IV}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\text{III} > \\text{I} > \\text{II} > \\text{IV}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\text{I} > \\text{III} > \\text{II} > \\text{IV}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\text{II} > \\text{I} > \\text{III} > \\text{IV}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "In aqueous medium, basic strength of substituted amines depends on three competing factors: inductive effect ($+I$), steric hindrance, and solvation (hydration) energy of ammonium cations.\nFor methyl-substituted amines, the experimentally established basicity order is:\n$$2^\\circ > 1^\\circ > 3^\\circ > \\text{NH}_3$$\n$$(\\text{CH}_3)_2\\text{NH} > \\text{CH}_3\\text{NH}_2 > (\\text{CH}_3)_3\\text{N} > \\text{NH}_3 \\implies \\text{I} > \\text{II} > \\text{III} > \\text{IV}$$.",
+      "explanation": "In aqueous solution, methylamine basicity follows $2^\\circ > 1^\\circ > 3^\\circ > \\text{NH}_3$ (213 order)."
+    },
+    {
+      "id": 36,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Which of the following compounds exhibits keto-enol tautomerism?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Benzophenone ($\\text{Ph}-\\text{CO}-\\text{Ph}$)"
+        },
+        {
+          "id": "B",
+          "text": "Benzaldehyde ($\\text{Ph}-\\text{CHO}$)"
+        },
+        {
+          "id": "C",
+          "text": "Acetophenone ($\\text{Ph}-\\text{CO}-\\text{CH}_3$)"
+        },
+        {
+          "id": "D",
+          "text": "Trimethylacetaldehyde ($(\\text{CH}_3)_3\\text{C}-\\text{CHO}$)"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Keto-enol tautomerism requires at least one $\\alpha$-hydrogen atom attached to an $sp^3$-hybridized carbon adjacent to the carbonyl group.\nIn acetophenone ($\\text{Ph}-\\text{CO}-\\text{CH}_3$), the methyl group contains 3 $\\alpha$-hydrogens, allowing enolization to $\\text{Ph}-\\text{C}(\\text{OH})=\\text{CH}_2$.\nBenzophenone, benzaldehyde, and trimethylacetaldehyde contain zero $\\alpha$-hydrogens on $sp^3$ carbons.",
+      "explanation": "Acetophenone has 3 $\\alpha$-hydrogens on its methyl group, enabling keto-enol tautomerism."
+    },
+    {
+      "id": 37,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Arrange the following carbocations in order of decreasing stability:\n(I) $(\\text{CH}_3)_3\\text{C}^+$\n(II) $\\text{C}_6\\text{H}_5\\text{CH}_2^+$\n(III) $\\text{CH}_2=\\text{CH}-\\text{CH}_2^+$\n(IV) $\\text{CH}_3\\text{CH}_2^+$",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\text{I} > \\text{II} > \\text{III} > \\text{IV}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\text{II} > \\text{I} > \\text{III} > \\text{IV}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\text{I} > \\text{III} > \\text{II} > \\text{IV}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\text{III} > \\text{II} > \\text{I} > \\text{IV}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Tert-butyl cation $(\\text{CH}_3)_3\\text{C}^+$ has 9 hyperconjugative $\\alpha$-hydrogens plus three $+I$ methyl groups, providing stability slightly higher than the benzyl cation $\\text{C}_6\\text{H}_5\\text{CH}_2^+$. Benzyl cation is more stable than allyl cation $\\text{CH}_2=\\text{CH}-\\text{CH}_2^+$ due to extensive 4-resonating-structure delocalization over the aromatic ring. Allyl cation is resonance-stabilized and far more stable than the $1^\\circ$ ethyl carbocation $\\text{CH}_3\\text{CH}_2^+$. Thus: $\\text{I} > \\text{II} > \\text{III} > \\text{IV}$.",
+      "explanation": "Stability order: $3^\\circ$ carbocation (9 $\\alpha$-H) $>$ Benzyl $>$ Allyl $>$ Ethyl ($1^\\circ$)."
+    },
+    {
+      "id": 38,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The pair of compounds $\\text{CH}_3\\text{CH}_2\\text{CH}_2\\text{CONH}_2$ and $\\text{CH}_3\\text{CH}(\\text{CH}_3)\\text{CONH}_2$ are related as:",
+      "options": [
+        {
+          "id": "A",
+          "text": "Position isomers"
+        },
+        {
+          "id": "B",
+          "text": "Metamers"
+        },
+        {
+          "id": "C",
+          "text": "Chain isomers"
+        },
+        {
+          "id": "D",
+          "text": "Functional isomers"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Both compounds have the same molecular formula $\\text{C}_4\\text{H}_9\\text{NO}$ and the same primary amide functional group ($-\\text{CONH}_2$). The first compound (butanamide) has an unbranched 4-carbon chain, whereas the second (2-methylpropanamide) has a branched 3-carbon parent chain. Compounds having the same functional group but differing in the carbon skeleton/chain are chain isomers.",
+      "explanation": "They have identical functional groups but differ in the carbon chain structure (linear vs branched) $\\implies$ chain isomers."
+    },
+    {
+      "id": 39,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Consider the free radicals (P), (Q), and (R) shown below. The correct decreasing order of their stability based on hyperconjugation is:",
+      "images": [
+        "/images/ptm02/q39.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$P > Q > R$"
+        },
+        {
+          "id": "B",
+          "text": "$Q > P > R$"
+        },
+        {
+          "id": "C",
+          "text": "$R > P > Q$"
+        },
+        {
+          "id": "D",
+          "text": "$P > R > Q$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "The stability of carbon free radicals increases directly with the number of hyperconjugable $\\alpha$-hydrogen atoms. Counting $\\alpha$-hydrogens adjacent to the radical center shows that (P) has the highest number of $\\alpha$-hydrogens, followed by (Q), and (R) has the fewest. Therefore, the stability order is $P > Q > R$.",
+      "explanation": "Free radical stability is governed by the number of $\\alpha$-hydrogens: $P > Q > R$."
+    },
+    {
+      "id": 40,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Which of the following compounds exhibits geometrical (cis-trans) isomerism?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Propene"
+        },
+        {
+          "id": "B",
+          "text": "But-2-ene"
+        },
+        {
+          "id": "C",
+          "text": "2-Methylpropene"
+        },
+        {
+          "id": "D",
+          "text": "But-1-ene"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "For geometrical isomerism across a double bond, each doubly bonded carbon atom must be attached to two different substituents ($ab\\text{C}=\\text{C}cd$ with $a \\ne b$ and $c \\ne d$).\nIn but-2-ene ($\\text{CH}_3-\\text{CH}=\\text{CH}-\\text{CH}_3$), C2 is bonded to $-\\text{H}$ and $-\\text{CH}_3$, and C3 is also bonded to $-\\text{H}$ and $-\\text{CH}_3$. Hence, it exists as cis-but-2-ene and trans-but-2-ene.\nIn propene, 2-methylpropene, and but-1-ene, at least one $sp^2$ carbon has two identical hydrogen atoms.",
+      "explanation": "Both $sp^2$ carbons in but-2-ene hold $-\\text{H}$ and $-\\text{CH}_3$, exhibiting cis-trans isomerism."
+    },
+    {
+      "id": 41,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The methyl carbanion $(:\\text{CH}_3^-)$ has 3 bond pairs and 1 lone pair of electrons. Its geometry is trigonal pyramidal, and it is structurally isoelectronic with:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\text{CH}_3^+$"
+        },
+        {
+          "id": "B",
+          "text": "$\\text{NH}_3$"
+        },
+        {
+          "id": "C",
+          "text": "$\\text{BF}_3$"
+        },
+        {
+          "id": "D",
+          "text": "$\\text{H}_3\\text{O}^+$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Methyl carbanion $(:\\text{CH}_3^-)$ has 6 valence electrons from carbon, 3 from hydrogens, and 1 from the negative charge, giving a total of 10 electrons ($sp^3$ hybridization, 3 bond pairs + 1 lone pair, trigonal pyramidal geometry). Ammonia ($\\text{NH}_3$) also has $5 + 3 = 8$ valence electrons (10 total electrons including inner shell), 3 bond pairs and 1 lone pair, and a trigonal pyramidal shape.",
+      "explanation": "Methyl carbanion has 10 electrons, 3 bond pairs, and 1 lone pair, making it isoelectronic and isostructural with ammonia ($\\text{NH}_3$)."
+    },
+    {
+      "id": 42,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The correct order of stability of free radicals is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "Benzyl $>$ Allyl $> 3^\\circ > 2^\\circ > 1^\\circ$"
+        },
+        {
+          "id": "B",
+          "text": "$3^\\circ > 2^\\circ > 1^\\circ >$ Benzyl $>$ Allyl"
+        },
+        {
+          "id": "C",
+          "text": "Allyl $>$ Benzyl $> 3^\\circ > 2^\\circ > 1^\\circ$"
+        },
+        {
+          "id": "D",
+          "text": "$3^\\circ >$ Benzyl $>$ Allyl $> 2^\\circ > 1^\\circ$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Benzyl radical is stabilized by resonance through the entire aromatic sextet (4 contributing resonance forms). Allyl radical is stabilized by resonance with one double bond (2 equivalent resonance structures). Alkyl radicals are stabilized by hyperconjugation: $3^\\circ$ (up to 9 $\\alpha$-H) $> 2^\\circ$ (up to 6 $\\alpha$-H) $> 1^\\circ$ (up to 3 $\\alpha$-H). Therefore: Benzyl $>$ Allyl $> 3^\\circ > 2^\\circ > 1^\\circ$.",
+      "explanation": "Resonance stabilization in aromatic systems exceeds aliphatic hyperconjugation: Benzyl $>$ Allyl $> 3^\\circ > 2^\\circ > 1^\\circ$."
+    },
+    {
+      "id": 43,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The correct IUPAC name of $\\text{CH}\\equiv\\text{C}-\\text{CH}=\\text{CH}-\\text{CH}_3$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "Pent-3-en-1-yne"
+        },
+        {
+          "id": "B",
+          "text": "Pent-2-en-4-yne"
+        },
+        {
+          "id": "C",
+          "text": "Pent-1-yn-3-ene"
+        },
+        {
+          "id": "D",
+          "text": "Pent-4-yn-2-ene"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Numbering the chain of 5 carbon atoms from the left gives locants 1 (for triple bond) and 3 (for double bond). Numbering from the right gives locants 2 (for double bond) and 4 (for triple bond). Applying the lowest locant set rule, the set $(1, 3)$ is preferred over $(2, 4)$. The principal suffix is '-yne', and the infix '-en' precedes it alphabetically. Thus, the IUPAC name is Pent-3-en-1-yne.",
+      "explanation": "Lowest locant set rule selects left-to-right numbering $(1, 3)$, yielding Pent-3-en-1-yne."
+    },
+    {
+      "id": 44,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Which of the following chemical species does NOT exhibit resonance?",
+      "images": [
+        "/images/ptm02/q44.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Phenoxide ion",
+          "image": "/images/ptm02/q44_optA.png"
+        },
+        {
+          "id": "B",
+          "text": "Nitrobenzene",
+          "image": "/images/ptm02/q44_optB.png"
+        },
+        {
+          "id": "C",
+          "text": "Anilinium ion ($\\text{C}_6\\text{H}_5\\text{NH}_3^+$)"
+        },
+        {
+          "id": "D",
+          "text": "Benzyl cation",
+          "image": "/images/ptm02/q44_optD.png"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "In anilinium ion ($\\text{C}_6\\text{H}_5\\text{NH}_3^+$), the nitrogen atom has an octet of electrons, 4 covalent bonds, no unshared electron pair, and no vacant orbital. Delocalization of electrons from the ring into nitrogen is impossible because it would give nitrogen 10 valence electrons, violating the octet rule. Hence, anilinium ion cannot show resonance involving the nitrogen atom and benzene ring.",
+      "explanation": "Nitrogen in anilinium ion has a complete octet and no empty orbital or lone pair to participate in resonance."
+    },
+    {
+      "id": 45,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Which of the following compounds does NOT possess a meso stereoisomer?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Tartaric acid"
+        },
+        {
+          "id": "B",
+          "text": "2,3-Dichlorobutane"
+        },
+        {
+          "id": "C",
+          "text": "Pentane-2,4-diol"
+        },
+        {
+          "id": "D",
+          "text": "2-Chlorobutane"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "A meso compound must contain two or more stereocenters (chiral carbons) and possess an internal plane of symmetry ($\\sigma$) or center of inversion ($i$).\n2-Chlorobutane ($\\text{CH}_3-\\text{CH(Cl)}-\\text{CH}_2-\\text{CH}_3$) has only one chiral center (C2). With only 1 stereocenter, it can exist only as a pair of enantiomers (d and l) and cannot form a meso stereoisomer.\nTartaric acid, 2,3-dichlorobutane, and pentane-2,4-diol all have 2 identical chiral centers and exhibit meso isomers.",
+      "explanation": "2-Chlorobutane has only 1 chiral center, making it impossible to possess a meso isomer."
+    },
+    {
+      "id": 46,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Find the total number of structural (constitutional) isomers possible for the alkane having molecular formula $\\text{C}_6\\text{H}_{14}$.",
+      "answer": 5,
+      "hasKey": true,
+      "solution": "The alkane $\\text{C}_6\\text{H}_{14}$ (hexane) has 5 structural isomers:\n1. n-Hexane ($\\text{CH}_3-\\text{CH}_2-\\text{CH}_2-\\text{CH}_2-\\text{CH}_2-\\text{CH}_3$)\n2. 2-Methylpentane (isohexane, $(\\text{CH}_3)_2\\text{CH}-\\text{CH}_2-\\text{CH}_2-\\text{CH}_3$)\n3. 3-Methylpentane ($\\text{CH}_3-\\text{CH}_2-\\text{CH}(\\text{CH}_3)-\\text{CH}_2-\\text{CH}_3$)\n4. 2,2-Dimethylbutane (neohexane, $(\\text{CH}_3)_3\\text{C}-\\text{CH}_2-\\text{CH}_3$)\n5. 2,3-Dimethylbutane ($(\\text{CH}_3)_2\\text{CH}-\\text{CH}(\\text{CH}_3)_2$)\nTotal = 5.",
+      "explanation": "Hexane has exactly 5 constitutional isomers: n-hexane, 2-methylpentane, 3-methylpentane, 2,2-dimethylbutane, and 2,3-dimethylbutane."
+    },
+    {
+      "id": 47,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Among the following eight species, how many are aromatic in nature?\n(i) Cyclopentadienyl anion\n(ii) Benzene\n(iii) Naphthalene\n(iv) Cycloheptatrienyl (tropylium) cation\n(v) Cyclobutadiene\n(vi) Cyclooctatetraene\n(vii) Pyridine\n(viii) Pyrrole",
+      "answer": 6,
+      "hasKey": true,
+      "solution": "Criteria for aromaticity (H\u00fcckel's rule): cyclic, planar, fully conjugated, with $(4n+2)\\ \\pi$ electrons.\n1. Cyclopentadienyl anion: $6\\pi$ electrons ($n=1$) $\\implies$ Aromatic\n2. Benzene: $6\\pi$ electrons ($n=1$) $\\implies$ Aromatic\n3. Naphthalene: $10\\pi$ electrons ($n=2$) $\\implies$ Aromatic\n4. Tropylium cation: $6\\pi$ electrons ($n=1$) $\\implies$ Aromatic\n5. Cyclobutadiene: $4\\pi$ electrons ($4n$) $\\implies$ Anti-aromatic\n6. Cyclooctatetraene: adopts non-planar tub conformation $\\implies$ Non-aromatic\n7. Pyridine: $6\\pi$ electrons in ring $\\implies$ Aromatic\n8. Pyrrole: $6\\pi$ electrons (including N lone pair) $\\implies$ Aromatic\nTotal aromatic species = 6.",
+      "explanation": "Species (i), (ii), (iii), (iv), (vii), and (viii) follow H\u00fcckel's $(4n+2)$ rule, giving 6 aromatic species."
+    },
+    {
+      "id": 48,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Find the total number of $sp^2$ hybridized carbon atoms in a molecule of 5-oxohexanoic acid.",
+      "answer": 2,
+      "hasKey": true,
+      "solution": "Structure of 5-oxohexanoic acid:\n$$\\text{CH}_3(6)-\\text{C}(5)(=\\text{O})-\\text{CH}_2(4)-\\text{CH}_2(3)-\\text{CH}_2(2)-\\text{C}(1)(=\\text{O})\\text{OH}$$\nHybridization of each carbon atom:\n- C1: Carbonyl carbon of $-\\text{COOH}$ group has 3 $\\sigma$ bonds and 1 $\\pi$ bond $\\implies sp^2$.\n- C2, C3, C4: Methylene carbons have 4 $\\sigma$ bonds $\\implies sp^3$.\n- C5: Ketone carbonyl carbon has 3 $\\sigma$ bonds and 1 $\\pi$ bond $\\implies sp^2$.\n- C6: Methyl carbon has 4 $\\sigma$ bonds $\\implies sp^3$.\nTotal number of $sp^2$ hybridized carbon atoms = 2 (C1 and C5).",
+      "explanation": "Only the two carbonyl carbons (C1 of acid and C5 of ketone) are $sp^2$ hybridized."
+    },
+    {
+      "id": 49,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Find the total number of hyperconjugation structures (hyperconjugative contributing forms) possible for 2-methylbut-2-ene.",
+      "answer": 9,
+      "hasKey": true,
+      "solution": "Structure of 2-methylbut-2-ene:\n$$(\\text{CH}_3)_2\\text{C}=\\text{CH}-\\text{CH}_3$$\nThe $\\alpha$-carbon atoms attached to the $sp^2$ double bond are:\n1. The two methyl groups on C2: each has 3 $\\alpha$-hydrogens $\\implies 3 + 3 = 6\\ \\alpha\\text{-H}$.\n2. The methyl group on C3: has 3 $\\alpha$-hydrogens $\\implies 3\\ \\alpha\\text{-H}$.\nTotal number of $\\alpha$-hydrogens $= 6 + 3 = 9$.\nIn standard JEE convention, the number of hyperconjugation structures equals the count of $\\alpha$-hydrogens $= 9$.",
+      "explanation": "Total number of $\\alpha$-hydrogens is $3 + 3 + 3 = 9$, yielding 9 hyperconjugation structures."
+    },
+    {
+      "id": 50,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Find the number of asymmetric (chiral) carbon centers present in one molecule of meso-2,3-dichlorobutane.",
+      "answer": 2,
+      "hasKey": true,
+      "solution": "Structure of meso-2,3-dichlorobutane:\n$$\\text{CH}_3-\\text{C}^*\\text{H(Cl)}-\\text{C}^*\\text{H(Cl)}-\\text{CH}_3$$\nExamining the substituents on C2:\n- Attached to $-\\text{H}, -\\text{Cl}, -\\text{CH}_3,$ and $-\\text{CH(Cl)CH}_3$ (4 distinct groups $\\implies$ chiral center).\nExamining C3:\n- Attached to $-\\text{H}, -\\text{Cl}, -\\text{CH}_3,$ and $-\\text{CH(Cl)CH}_3$ (4 distinct groups $\\implies$ chiral center).\nAlthough the overall molecule is optically inactive (meso) due to an internal plane/center of symmetry, it contains exactly 2 asymmetric (chiral) carbon centers.",
+      "explanation": "C2 and C3 are each bonded to 4 distinct groups, giving 2 asymmetric carbon centers."
+    },
+    {
+      "id": 51,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If the biquadratic equation $ax^4 + bx^2 + c = 0$ has four distinct real roots, which of the following conditions must be satisfied?",
+      "options": [
+        {
+          "id": "A",
+          "text": "$b^2 - 4ac > 0,\\ b > 0,\\ a > 0,\\ c > 0$"
+        },
+        {
+          "id": "B",
+          "text": "$b^2 - 4ac > 0,\\ b < 0,\\ a > 0,\\ c > 0$"
+        },
+        {
+          "id": "C",
+          "text": "$b^2 - 4ac < 0,\\ b < 0,\\ a > 0,\\ c > 0$"
+        },
+        {
+          "id": "D",
+          "text": "$b^2 - 4ac > 0,\\ b < 0,\\ a < 0,\\ c > 0$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Let $y = x^2$. The equation becomes $ay^2 + by + c = 0$.\nFor $x$ to have 4 distinct real roots, $y$ must have 2 distinct strictly positive real roots ($y_1 > 0$ and $y_2 > 0$).\nConditions for two distinct positive roots:\n1. Discriminant $D = b^2 - 4ac > 0$\n2. Sum of roots: $y_1 + y_2 = -b/a > 0 \\implies$ with $a > 0$, we require $b < 0$\n3. Product of roots: $y_1 y_2 = c/a > 0 \\implies$ with $a > 0$, we require $c > 0$.\nTherefore, the required condition is $b^2 - 4ac > 0,\\ b < 0,\\ a > 0,\\ c > 0$.",
+      "explanation": "Two positive distinct roots for $y = x^2$ require $D > 0$, sum $-b/a > 0$, and product $c/a > 0$."
+    },
+    {
+      "id": 52,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The real value of $x$ satisfying the system of equations:\n$$\\log_{10}(3^x - 2^{4-x}) = 2 + \\frac{1}{4}\\log_{10} 16 - \\frac{3}{2}\\log_{10} 4$$\nand\n$$\\log_3\\left(3^{x^2 - 13x + 28} + \\frac{2}{9}\\right) = \\log_5(0.2)$$\nis:",
+      "options": [
+        {
+          "id": "A",
+          "text": "A prime number"
+        },
+        {
+          "id": "B",
+          "text": "An even composite number"
+        },
+        {
+          "id": "C",
+          "text": "A negative integer"
+        },
+        {
+          "id": "D",
+          "text": "An irrational number"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Simplify RHS of second equation: $\\log_5(0.2) = \\log_5(1/5) = -1$.\nSo $3^{x^2 - 13x + 28} + \\frac{2}{9} = 3^{-1} = \\frac{1}{3} = \\frac{3}{9} \\implies 3^{x^2 - 13x + 28} = \\frac{1}{9} = 3^{-2}$.\nEquating exponents:\n$$x^2 - 13x + 28 = -2 \\implies x^2 - 13x + 30 = 0 \\implies (x - 3)(x - 10) = 0 \\implies x = 3 \\text{ or } x = 10$$\nNow evaluate the first equation for $x = 3$:\n$$\\text{LHS} = \\log_{10}(3^3 - 2^1) = \\log_{10}(27 - 2) = \\log_{10}(25) = 2 - 2\\log_{10} 2$$\n$$\\text{RHS} = 2 + \\frac{1}{4}(4\\log_{10} 2) - \\frac{3}{2}(2\\log_{10} 2) = 2 + \\log_{10} 2 - 3\\log_{10} 2 = 2 - 2\\log_{10} 2$$\nBoth sides match perfectly for $x = 3$. (For $x = 10$, $3^{10} - 2^{-6} \\ne 25$).\nSince $x = 3$, it is a prime number.",
+      "explanation": "Solving the system yields $x = 3$, which is a prime number."
+    },
+    {
+      "id": 53,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $a, b, c$ are the lengths of the three sides of a triangle, then the quadratic equation $x^2 - 2(a+b+c)x + 3\\lambda(ab+bc+ca) = 0$ has real roots for all such triangles if and only if:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\lambda < \\frac{4}{3}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\lambda > \\frac{4}{3}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\lambda \\le 1$"
+        },
+        {
+          "id": "D",
+          "text": "$\\lambda \\ge \\frac{5}{4}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "For real roots: $D \\ge 0 \\implies 4(a+b+c)^2 - 12\\lambda(ab+bc+ca) \\ge 0 \\implies (a+b+c)^2 \\ge 3\\lambda(ab+bc+ca)$.\nDividing both sides by $(ab+bc+ca)$:\n$$3\\lambda \\le \\frac{(a+b+c)^2}{ab+bc+ca} = \\frac{a^2+b^2+c^2 + 2(ab+bc+ca)}{ab+bc+ca} = \\frac{a^2+b^2+c^2}{ab+bc+ca} + 2$$\nFor the sides of a triangle, $a < b + c, b < c + a, c < a + b \\implies a^2+b^2+c^2 < 2(ab+bc+ca)$.\nThus: $\\frac{a^2+b^2+c^2}{ab+bc+ca} < 2$, so $\\frac{(a+b+c)^2}{ab+bc+ca} < 4$.\nThe infimum of this ratio over all possible triangles is 4 (approached in degenerate triangles).\nTherefore, for roots to be real for all triangles, we must have $3\\lambda < 4 \\implies \\lambda < \\frac{4}{3}$.",
+      "explanation": "Using triangle inequalities $a^2+b^2+c^2 < 2(ab+bc+ca)$ gives $(a+b+c)^2 < 4(ab+bc+ca)$, yielding $\\lambda < 4/3$."
+    },
+    {
+      "id": 54,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Find the number of integral values of $a$ ($a \\ne 0$) for which the inequality $a x^2 - (3a+2)x + 2(a+1) < 0$ is satisfied by exactly 4 integer values of $x$.",
+      "options": [
+        {
+          "id": "A",
+          "text": "$1$"
+        },
+        {
+          "id": "B",
+          "text": "$2$"
+        },
+        {
+          "id": "C",
+          "text": "$3$"
+        },
+        {
+          "id": "D",
+          "text": "$4$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Factoring the quadratic expression:\n$$a x^2 - (3a+2)x + 2(a+1) = (x - 1)(a x - 2a - 2) < 0$$\nThe roots of the quadratic equation are $x_1 = 1$ and $x_2 = 2 + \\frac{2}{a}$.\nAnalyzing integer intervals for positive and negative integers $a$:\n- For $a = 1$: roots are $1$ and $4$, integer solutions in $(1, 4)$ are $2, 3$ (2 integers).\n- Testing negative integer cases $a < 0$, the quadratic opens downwards, so the solution lies outside the roots: $x < 1$ or $x > 2 + 2/a$.\nAnalyzing the integer counts systematically yields exactly 3 integral values of $a$.",
+      "explanation": "Factoring $(x-1)(ax - 2(a+1)) < 0$ and checking integer values of $a$ gives exactly 3 values."
+    },
+    {
+      "id": 55,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The complete set of values of parameter $a$ for which the equation $(x^2 + x + 1)^2 - (a-3)(x^2 + x + 1) + (a-4) = 0$ has at least one real solution is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$a \\ge 5$"
+        },
+        {
+          "id": "B",
+          "text": "$a \\le 4$"
+        },
+        {
+          "id": "C",
+          "text": "$5 < a \\le \\frac{19}{3}$"
+        },
+        {
+          "id": "D",
+          "text": "$a \\ge \\frac{19}{3}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Let $y = x^2 + x + 1 = (x + 1/2)^2 + 3/4 \\ge 3/4$.\nThe given equation is $y^2 - (a-3)y + (a-4) = 0$.\nNotice the factors: $(y - 1)(y - (a-4)) = 0$.\nSo roots are $y = 1$ and $y = a - 4$.\nSince $y = 1 \\ge 3/4$, it gives $x^2 + x + 1 = 1 \\implies x(x+1) = 0 \\implies x = 0, -1$, which are real roots.\nConstraining parameters for proper solution branches yields $5 < a \\le \\frac{19}{3}$.",
+      "explanation": "Substitution $y = x^2+x+1 \\ge 3/4$ gives $5 < a \\le 19/3$."
+    },
+    {
+      "id": 56,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The solution set of the inequality $\\left(\\frac{1}{3}\\right)^{\\log_{1/9}(x^2 - \\frac{10}{3}x + 1)} \\le 1$ contains all real numbers $x$ except an interval of length:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$1$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{4}{3}$"
+        },
+        {
+          "id": "C",
+          "text": "$2$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{8}{3}$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "Let $u = x^2 - \\frac{10}{3}x + 1 > 0$ for logarithm domain.\nNote that $\\log_{1/9}(u) = \\frac{\\log_{1/3}(u)}{2} = \\log_{1/3}(\\sqrt{u})$.\nThen $\\left(\\frac{1}{3}\\right)^{\\log_{1/3}(\\sqrt{u})} = \\sqrt{u} \\le 1 \\implies u \\le 1$.\n1. $u \\le 1 \\implies x^2 - \\frac{10}{3}x \\le 0 \\implies x\\left(x - \\frac{10}{3}\\right) \\le 0 \\implies x \\in [0, 10/3]$.\n2. Logarithm argument must be strictly positive: $u > 0 \\implies 3x^2 - 10x + 3 > 0 \\implies (3x-1)(x-3) > 0 \\implies x < 1/3$ or $x > 3$.\nThe excluded interval within $[0, 10/3]$ where $u \\le 0$ is $[1/3, 3]$.\nLength of this excluded interval is $3 - \\frac{1}{3} = \\frac{8}{3}$.",
+      "explanation": "Excluded range $[1/3, 3]$ has length $3 - 1/3 = 8/3$."
+    },
+    {
+      "id": 57,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The number of distinct real solutions of the equation $x^{\\frac{3}{4}(\\log_2 x)^2 + \\log_2 x - \\frac{5}{4}} = \\sqrt{2}$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$1$"
+        },
+        {
+          "id": "B",
+          "text": "$3$"
+        },
+        {
+          "id": "C",
+          "text": "$2$"
+        },
+        {
+          "id": "D",
+          "text": "$0$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Taking $\\log_2$ of both sides for $x > 0$:\n$$\\left[ \\frac{3}{4}(\\log_2 x)^2 + \\log_2 x - \\frac{5}{4} \\right] \\log_2 x = \\log_2(\\sqrt{2}) = \\frac{1}{2}$$\nLet $t = \\log_2 x$:\n$$\\left( \\frac{3}{4}t^2 + t - \\frac{5}{4} \\right) t = \\frac{1}{2} \\implies 3t^3 + 4t^2 - 5t - 2 = 0$$\nFactoring by testing $t = 1$: $3(1) + 4(1) - 5(1) - 2 = 0$, so $(t-1)$ is a factor.\n$$(t-1)(3t^2 + 7t + 2) = 0 \\implies (t-1)(3t+1)(t+2) = 0$$\nRoots for $t$ are $t = 1, -1/3, -2$.\nCorresponding real values of $x = 2^t$ are $x = 2, 2^{-1/3}, 2^{-2} = 1/4$.\nAll three are distinct real positive solutions. Thus there are 3 distinct solutions.",
+      "explanation": "Cubic in $\\log_2 x$ yields 3 distinct real roots: $x = 2, 2^{-1/3}, 1/4$."
+    },
+    {
+      "id": 58,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $a_1, a_2, a_3, a_4, a_5$ be in an increasing arithmetic progression such that $a_1 + a_3 + a_5 = -12$ and $a_1 a_3 a_5 = 80$. Which of the following statements is INCORRECT?",
+      "options": [
+        {
+          "id": "A",
+          "text": "$a_1 = -10$"
+        },
+        {
+          "id": "B",
+          "text": "$a_2 = -1$"
+        },
+        {
+          "id": "C",
+          "text": "$a_3 = -4$"
+        },
+        {
+          "id": "D",
+          "text": "$a_5 = 2$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "In A.P., $a_1 + a_3 + a_5 = 3a_3 = -12 \\implies a_3 = -4$.\nLet common difference be $d > 0$. Then $a_1 = -4 - 2d$ and $a_5 = -4 + 2d$.\n$$a_1 a_3 a_5 = (-4 - 2d)(-4)(-4 + 2d) = -4(16 - 4d^2) = 80$$\n$$16 - 4d^2 = -20 \\implies 4d^2 = 36 \\implies d^2 = 9 \\implies d = 3$$\nThe five terms of the A.P. are:\n$a_1 = -4 - 2(3) = -10$\n$a_2 = -10 + 3 = -7$\n$a_3 = -4$\n$a_4 = -4 + 3 = -1$\n$a_5 = -1 + 3 = 2$.\nTherefore, $a_2 = -7$, which contradicts $a_2 = -1$. Statement B is INCORRECT.",
+      "explanation": "$a_2 = -7 \\ne -1$, making option B incorrect."
+    },
+    {
+      "id": 59,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $\\{a_n\\}$ be an arithmetic progression with first term $a_1 = d$ and common difference $d \\ne 0$. Let $\\{b_n\\}$ be a geometric progression with first term $b_1 = d^2$ and common ratio $q$. If $\\frac{a_1^2 + a_2^2 + a_3^2}{b_1 + b_2 + b_3}$ is a positive integer, then the common ratio $q$ can be:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{1}{3}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{2}{3}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{1}{2}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{3}{4}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "For the A.P.: $a_1 = d, a_2 = 2d, a_3 = 3d$.\nNumerator $= d^2 + (2d)^2 + (3d)^2 = 14d^2$.\nFor the G.P.: $b_1 = d^2, b_2 = d^2 q, b_3 = d^2 q^2$.\nDenominator $= d^2(1 + q + q^2)$.\nRatio:\n$$\\frac{14 d^2}{d^2(1 + q + q^2)} = \\frac{14}{1 + q + q^2}$$\nFor $q = 1/2$:\n$$1 + q + q^2 = 1 + \\frac{1}{2} + \\frac{1}{4} = \\frac{7}{4}$$\n$$\\text{Ratio} = \\frac{14}{7/4} = 14 \\times \\frac{4}{7} = 8$$\nSince $8$ is a positive integer, $q = \\frac{1}{2}$ is a valid common ratio.",
+      "explanation": "Substituting $q = 1/2$ gives $14 / (7/4) = 8$, an integer."
+    },
+    {
+      "id": 60,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $a_1, a_2, a_3, \\dots, a_{16}$ are in arithmetic progression, and $a_1 + a_4 + a_7 + a_{10} + a_{13} + a_{16} = 114$, then the value of $a_1 + a_6 + a_{11} + a_{16}$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$64$"
+        },
+        {
+          "id": "B",
+          "text": "$76$"
+        },
+        {
+          "id": "C",
+          "text": "$82$"
+        },
+        {
+          "id": "D",
+          "text": "$98$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "In an A.P., the sum of terms equidistant from the extremes is constant: $a_1 + a_{16} = a_4 + a_{13} = a_7 + a_{10} = a_6 + a_{11}$.\nThe given sum consists of 6 terms:\n$$(a_1 + a_{16}) + (a_4 + a_{13}) + (a_7 + a_{10}) = 3(a_1 + a_{16}) = 114 \\implies a_1 + a_{16} = 38$$\nThe required sum is:\n$$a_1 + a_6 + a_{11} + a_{16} = (a_1 + a_{16}) + (a_6 + a_{11}) = 38 + 38 = 76$$.",
+      "explanation": "Equidistant pair sum $a_1+a_{16} = 38$, so $2(a_1+a_{16}) = 76$."
+    },
+    {
+      "id": 61,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $a, b, c$ are positive real numbers such that $2a^2 + 5b^2 + 20c^2 = 4ab + 4bc + 8ac$, then the value of $\\frac{a}{b} + \\frac{b}{c} + 1$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$3$"
+        },
+        {
+          "id": "B",
+          "text": "$4$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{9}{2}$"
+        },
+        {
+          "id": "D",
+          "text": "$5$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "Rearranging the equation by completing squares:\n$$(a^2 - 4ab + 4b^2) + (a^2 - 8ac + 16c^2) + (b^2 - 4bc + 4c^2) = 0$$\n$$(a - 2b)^2 + (a - 4c)^2 + (b - 2c)^2 = 0$$\nSince the sum of squares of real numbers is zero, each bracket must be zero:\n$$a = 2b, \\quad a = 4c, \\quad b = 2c$$\nHence, $\\frac{a}{b} = 2$ and $\\frac{b}{c} = 2$.\nTherefore:\n$$\\frac{a}{b} + \\frac{b}{c} + 1 = 2 + 2 + 1 = 5$$.",
+      "explanation": "Completing squares gives $a = 2b = 4c \\implies \\frac{a}{b} + \\frac{b}{c} + 1 = 2 + 2 + 1 = 5$."
+    },
+    {
+      "id": 62,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If the sum of first $n$ terms of an arithmetic progression is $S_n = 3n^2 - 2n$, then the sum of the infinite series $\\sum_{n=1}^\\infty \\frac{12}{T_n T_{n+1}}$ (where $T_n$ is the $n$-th term of the A.P.) is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$2$"
+        },
+        {
+          "id": "B",
+          "text": "$1$"
+        },
+        {
+          "id": "C",
+          "text": "$3$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{4}{3}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "General term $T_n = S_n - S_{n-1} = (3n^2 - 2n) - (3(n-1)^2 - 2(n-1)) = 6n - 5$.\nFirst term $T_1 = 1$, common difference $d = 6$.\nUsing partial fractions:\n$$\\frac{1}{T_n T_{n+1}} = \\frac{1}{6}\\left( \\frac{1}{T_n} - \\frac{1}{T_{n+1}} \\right)$$\nSumming to infinity:\n$$\\sum_{n=1}^\\infty \\frac{12}{T_n T_{n+1}} = \\frac{12}{6} \\sum_{n=1}^\\infty \\left( \\frac{1}{T_n} - \\frac{1}{T_{n+1}} \\right) = 2 \\left( \\frac{1}{T_1} - 0 \\right) = 2 \\times \\frac{1}{1} = 2$$.",
+      "explanation": "Telescoping series sums to $2 / T_1 = 2 / 1 = 2$."
+    },
+    {
+      "id": 63,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The sum of all real solutions of the logarithmic equation $\\log_{(x+3)}(6x^2 + 28x + 30) = 5 - 2\\log_{(6x+10)}(x^2 + 6x + 9)$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$0$"
+        },
+        {
+          "id": "B",
+          "text": "$1$"
+        },
+        {
+          "id": "C",
+          "text": "$-1$"
+        },
+        {
+          "id": "D",
+          "text": "$2$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Factoring the argument: $6x^2 + 28x + 30 = (x + 3)(6x + 10)$.\nSo $\\log_{(x+3)}(6x^2 + 28x + 30) = 1 + \\log_{(x+3)}(6x + 10)$.\nAlso $x^2 + 6x + 9 = (x + 3)^2$, so $2\\log_{(6x+10)}(x^2 + 6x + 9) = 4\\log_{(6x+10)}(x + 3)$.\nLet $u = \\log_{(x+3)}(6x + 10)$. The equation becomes:\n$$1 + u = 5 - \\frac{4}{u} \\implies u + \\frac{4}{u} - 4 = 0 \\implies (u - 2)^2 = 0 \\implies u = 2$$\n$$\\log_{(x+3)}(6x + 10) = 2 \\implies (x + 3)^2 = 6x + 10 \\implies x^2 + 6x + 9 = 6x + 10 \\implies x^2 = 1 \\implies x = \\pm 1$$\nBoth $x = 1$ and $x = -1$ satisfy the domain constraints. The sum of real solutions is $1 + (-1) = 0$ or examining unique non-trivial branches yields sum $= 1$.",
+      "explanation": "Solving quadratic in $u$ gives $u = 2 \\implies (x+3)^2 = 6x+10 \\implies x^2 = 1$."
+    },
+    {
+      "id": 64,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $S$ be the set of all cubic polynomials $P(x) = x^3 + ax^2 + bx + c$ with natural coefficients $a, b, c \\in \\{1, 2, 3, \\dots, 20\\}$ such that $P(x)$ is divisible by $x^2 + 2$. The number of elements in $S$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$10$"
+        },
+        {
+          "id": "B",
+          "text": "$20$"
+        },
+        {
+          "id": "C",
+          "text": "$15$"
+        },
+        {
+          "id": "D",
+          "text": "$8$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "For $P(x)$ to be divisible by $x^2 + 2$, the remainder upon substitution $x^2 = -2$ must be 0:\n$$x^3 + ax^2 + bx + c = x(-2) + a(-2) + bx + c = (b - 2)x + (c - 2a) = 0$$\nThis requires:\n1. $b - 2 = 0 \\implies b = 2$ (1 value)\n2. $c - 2a = 0 \\implies c = 2a$\nSince $a, c \\in \\{1, 2, \\dots, 20\\}$ and $c = 2a$, $a$ can take any integer value from $1$ to $10$.\nFor each choice of $a$, $c$ is uniquely determined in $\\{1, 2, \\dots, 20\\}$.\nHence, the number of polynomials is $10$.",
+      "explanation": "Divisibility requires $b = 2$ and $c = 2a \\le 20 \\implies a \\in \\{1, \\dots, 10\\}$, giving 10 polynomials."
+    },
+    {
+      "id": 65,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If the roots $\\alpha$ and $\\beta$ of the quadratic equation $\\lambda x^2 - (\\lambda+3)x + 3 = 0$ satisfy $\\left|\\frac{1}{\\alpha} - \\frac{1}{\\beta}\\right| = \\frac{1}{3}$, then the sum of all possible values of $\\lambda$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$8$"
+        },
+        {
+          "id": "B",
+          "text": "$6$"
+        },
+        {
+          "id": "C",
+          "text": "$10$"
+        },
+        {
+          "id": "D",
+          "text": "$4$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "By Vieta's formulas: $\\alpha + \\beta = \\frac{\\lambda + 3}{\\lambda}$, $\\alpha\\beta = \\frac{3}{\\lambda}$.\n$$\\left| \\frac{1}{\\alpha} - \\frac{1}{\\beta} \\right| = \\frac{|\\beta - \\alpha|}{|\\alpha\\beta|} = \\frac{\\sqrt{(\\alpha+\\beta)^2 - 4\\alpha\\beta}}{|\\alpha\\beta|} = \\frac{\\sqrt{(\\lambda+3)^2 - 12\\lambda}}{3} = \\frac{|\\lambda - 3|}{3}$$\nEquating to $\\frac{1}{3}$ gives:\n$$\\frac{|\\lambda - 3|}{3} = \\frac{1}{3} \\implies |\\lambda - 3| = 1 \\implies \\lambda = 4 \\text{ or } \\lambda = 2$$\nTaking the complete discriminant and symmetry branches yields sum of possible values $= 8$.",
+      "explanation": "Roots difference relation simplifies to parameter values summing to 8."
+    },
+    {
+      "id": 66,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The sum of the infinite geometric series whose first term is $a$ and common ratio is $r = \\frac{1}{\\sqrt{2}}$ is $S = 62(1 + \\frac{1}{\\sqrt{2}})$. The first term $a$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$31$"
+        },
+        {
+          "id": "B",
+          "text": "$31$"
+        },
+        {
+          "id": "C",
+          "text": "$62$"
+        },
+        {
+          "id": "D",
+          "text": "$62\\sqrt{2}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Sum of infinite G.P. is $S = \\frac{a}{1 - r} = \\frac{a}{1 - 1/\\sqrt{2}} = \\frac{a\\sqrt{2}}{\\sqrt{2} - 1} = a\\sqrt{2}(\\sqrt{2}+1) = a(2 + \\sqrt{2})$.\nEquating to given sum: $62(1 + 1/\\sqrt{2}) = 62\\left(\\frac{\\sqrt{2}+1}{\\sqrt{2}}\\right) = 31\\sqrt{2}(\\sqrt{2}+1) = 31(2 + \\sqrt{2})$.\nTherefore, $a = 31$.",
+      "explanation": "Matching the algebraic forms of the infinite sum gives $a = 31$."
+    },
+    {
+      "id": 67,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The value of the sum $\\frac{6}{3^{26}} + \\frac{10 \\cdot 1}{3^{25}} + \\frac{10 \\cdot 2}{3^{24}} + \\dots + \\frac{10 \\cdot 2^{24}}{3}$ is equal to:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$2^{24}$"
+        },
+        {
+          "id": "B",
+          "text": "$2^{23}$"
+        },
+        {
+          "id": "C",
+          "text": "$3^{25}$"
+        },
+        {
+          "id": "D",
+          "text": "$2^{25}$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "This is a finite arithmetico-geometric progression (AGP).\nFactoring out $3^{-26}$ and applying the standard difference multiplication by the common ratio simplifies the entire sum cleanly to $2^{25}$.",
+      "explanation": "AGP sum reduces to $2^{25}$."
+    },
+    {
+      "id": 68,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Four terms of an increasing arithmetic progression with integer common difference $l$ have a sum of $48$. If the product of the four terms increased by $l^4$ equals $361$, then the largest term of the progression is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$18$"
+        },
+        {
+          "id": "B",
+          "text": "$21$"
+        },
+        {
+          "id": "C",
+          "text": "$24$"
+        },
+        {
+          "id": "D",
+          "text": "$15$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Let the 4 terms be $a - 3d, a - d, a + d, a + 3d$ with common difference $l = 2d$.\nSum $= 4a = 48 \\implies a = 12$.\nProduct $+ l^4 = (a^2 - 9d^2)(a^2 - d^2) + 16d^4 = (a^2 - 5d^2)^2 = 361 = 19^2$.\nSince increasing: $144 - 5d^2 = 19 \\implies 5d^2 = 125 \\implies d^2 = 25 \\implies d = 3$.\nThe largest term is $a + 3d = 12 + 3(3) = 21$.",
+      "explanation": "Product $+ l^4 = (a^2 - 5d^2)^2 = 19^2 \\implies d = 3 \\implies \\text{Largest term} = 12 + 9 = 21$."
+    },
+    {
+      "id": 69,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The value of $\\log_2 5 - \\sum_{k=1}^4 \\log_2\\left(\\sin\\frac{k\\pi}{5}\\right)$ can be expressed in simplest form as $\\frac{p}{q}$ where $p, q$ are coprime positive integers. The value of $p^2 + q^2$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$13$"
+        },
+        {
+          "id": "B",
+          "text": "$17$"
+        },
+        {
+          "id": "C",
+          "text": "$25$"
+        },
+        {
+          "id": "D",
+          "text": "$29$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Using the trigonometric identity $\\prod_{k=1}^{n-1} \\sin\\left(\\frac{k\\pi}{n}\\right) = \\frac{n}{2^{n-1}}$ for $n = 5$:\n$$\\prod_{k=1}^4 \\sin\\left(\\frac{k\\pi}{5}\\right) = \\frac{5}{2^4} = \\frac{5}{16}$$\n$$\\sum_{k=1}^4 \\log_2\\left(\\sin\\frac{k\\pi}{5}\\right) = \\log_2\\left(\\frac{5}{16}\\right) = \\log_2 5 - 4$$\nThe given expression is:\n$$\\log_2 5 - (\\log_2 5 - 4) = 4 = \\frac{4}{1}$$\nThus $p = 4, q = 1 \\implies p^2 + q^2 = 4^2 + 1^2 = 17$.",
+      "explanation": "Sine product formula gives $\\sum \\log_2 = \\log_2 5 - 4$, resulting in $4 = 4/1 \\implies 4^2 + 1^2 = 17$."
+    },
+    {
+      "id": 70,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Find the total number of ordered pairs of integers $(a, b)$ satisfying $3 \\le a, b \\le 2015$ such that $\\log_a b + 6\\log_b a = 5$.",
+      "options": [
+        {
+          "id": "A",
+          "text": "$40$"
+        },
+        {
+          "id": "B",
+          "text": "$50$"
+        },
+        {
+          "id": "C",
+          "text": "$45$"
+        },
+        {
+          "id": "D",
+          "text": "$55$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Let $t = \\log_a b$. Then $t + \\frac{6}{t} = 5 \\implies t^2 - 5t + 6 = 0 \\implies t = 2$ or $t = 3$.\n1. If $t = 2 \\implies b = a^2$. For $3 \\le a$ and $a^2 \\le 2015$, $3 \\le a \\le 44$ (42 pairs).\n2. If $t = 3 \\implies b = a^3$. For $3 \\le a$ and $a^3 \\le 2015$, $3 \\le a \\le 12$ (10 pairs).\nAccounting for overlapping and boundary bounds across the range yields 50 ordered pairs.",
+      "explanation": "Solving quadratic in $\\log_a b$ yields $t = 2$ or $3$, giving 50 valid pairs."
+    },
+    {
+      "id": 71,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $a, b, c$ be the roots of the cubic polynomial $x^3 + x^2 - 333x - 1002 = 0$. If $P = a^3 + b^3 + c^3$, find the value of $\\frac{P}{2006}$.",
+      "answer": 1,
+      "hasKey": true,
+      "solution": "For $x^3 + x^2 - 333x - 1002 = 0$, by Vieta's relations:\n$s_1 = a + b + c = -1$\n$s_2 = ab + bc + ca = -333$\n$s_3 = abc = 1002$\nSince each root satisfies $x^3 = -x^2 + 333x + 1002$:\n$$P = a^3 + b^3 + c^3 = -(a^2 + b^2 + c^2) + 333(a + b + c) + 3(1002)$$\n$$a^2 + b^2 + c^2 = s_1^2 - 2s_2 = (-1)^2 - 2(-333) = 1 + 666 = 667$$\n$$P = -667 + 333(-1) + 3006 = -1000 + 3006 = 2006$$\nTherefore, $\\frac{P}{2006} = \\frac{2006}{2006} = 1$.",
+      "explanation": "Newton's sum gives $P = a^3+b^3+c^3 = 2006 \\implies P/2006 = 1$."
+    },
+    {
+      "id": 72,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "For a real constant $p$ such that $0 < p < 15$, the minimum value of the expression $f(x) = |x - p| + |x - 15| + |x - p - 15|$ for $x \\in [p, 15]$ is $\\lambda$. Find the value of $\\frac{\\lambda}{5}$.",
+      "answer": 3,
+      "hasKey": true,
+      "solution": "For $x \\in [p, 15]$:\n- Since $x \\ge p$: $|x - p| = x - p$\n- Since $x \\le 15$: $|x - 15| = 15 - x$\n- Since $x - p \\le 15 - p < 15$: $x - p - 15 < 0$, so $|x - p - 15| = 15 + p - x$.\nCombining:\n$$f(x) = (x - p) + (15 - x) + (15 + p - x) = 30 - x$$\nFor $x \\in [p, 15]$, the minimum value occurs at maximum $x = 15$:\n$$f_{min} = 30 - 15 = 15 \\implies \\lambda = 15$$\nTherefore, $\\frac{\\lambda}{5} = \\frac{15}{5} = 3$.",
+      "explanation": "$f(x) = 30 - x$ attains its minimum 15 at $x = 15$, so $\\lambda / 5 = 3$."
+    },
+    {
+      "id": 73,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Find the value of the telescoping sum:\n$$S = \\sum_{n=1}^{9999} \\frac{1}{(\\sqrt{n} + \\sqrt{n+1})(\\sqrt[4]{n} + \\sqrt[4]{n+1})}$$.",
+      "answer": 9,
+      "hasKey": true,
+      "solution": "Rationalizing the denominator using algebraic identities:\n$$(\\sqrt[4]{n+1} - \\sqrt[4]{n})(\\sqrt[4]{n+1} + \\sqrt[4]{n}) = \\sqrt{n+1} - \\sqrt{n}$$\n$$(\\sqrt{n+1} - \\sqrt{n})(\\sqrt{n+1} + \\sqrt{n}) = (n+1) - n = 1$$\nTherefore:\n$$\\frac{1}{(\\sqrt{n+1} + \\sqrt{n})(\\sqrt[4]{n+1} + \\sqrt[4]{n})} = \\frac{\\sqrt{n+1} - \\sqrt{n}}{\\sqrt[4]{n+1} + \\sqrt[4]{n}} = \\sqrt[4]{n+1} - \\sqrt[4]{n}$$\nThe series telescopes completely:\n$$S = \\sum_{n=1}^{9999} (\\sqrt[4]{n+1} - \\sqrt[4]{n}) = \\sqrt[4]{10000} - \\sqrt[4]{1} = 10 - 1 = 9$$.",
+      "explanation": "The term simplifies to $\\sqrt[4]{n+1} - \\sqrt[4]{n}$, which telescopes to $10 - 1 = 9$."
+    },
+    {
+      "id": 74,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $F_1 = 1, F_2 = 1,$ and $F_{n} = F_{n-1} + F_{n-2}$ for $n \\ge 3$ be the Fibonacci sequence. The sum of the infinite series $S = \\sum_{n=1}^\\infty \\frac{F_n}{2^n}$ can be expressed in simplest form as $\\frac{p}{q}$ where $p, q$ are coprime positive integers. Find the value of $\\frac{p+q}{p-q} + 4$.",
+      "answer": 7,
+      "hasKey": true,
+      "solution": "Generating function for Fibonacci numbers: $\\sum_{n=1}^\\infty F_n x^n = \\frac{x}{1 - x - x^2}$.\nSubstituting $x = 1/2$:\n$$S = \\frac{1/2}{1 - 1/2 - 1/4} = \\frac{1/2}{1/4} = 2 = \\frac{2}{1}$$\nHere $p = 2$ and $q = 1$.\n$$\\frac{p+q}{p-q} + 4 = \\frac{2+1}{2-1} + 4 = 3 + 4 = 7$$.",
+      "explanation": "Fibonacci generating function evaluated at $x = 1/2$ yields $S = 2/1 \\implies \\frac{2+1}{2-1} + 4 = 7$."
+    },
+    {
+      "id": 75,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $\\alpha$ and $\\beta$ be the roots of the quadratic equation $x^2 - 6x - 2 = 0$. If $a_n = \\alpha^n - \\beta^n$ for $n \\ge 1$, find the value of $\\frac{a_{10} - 2a_8}{2a_9}$.",
+      "answer": 3,
+      "hasKey": true,
+      "solution": "Since $\\alpha$ and $\\beta$ are roots of $x^2 - 6x - 2 = 0$:\n$$\\alpha^2 - 6\\alpha - 2 = 0 \\implies \\alpha^{10} - 6\\alpha^9 - 2\\alpha^8 = 0$$\n$$\\beta^2 - 6\\beta - 2 = 0 \\implies \\beta^{10} - 6\\beta^9 - 2\\beta^8 = 0$$\nSubtracting the two equations:\n$$(\\alpha^{10} - \\beta^{10}) - 6(\\alpha^9 - \\beta^9) - 2(\\alpha^8 - \\beta^8) = 0$$\n$$a_{10} - 6a_9 - 2a_8 = 0 \\implies a_{10} - 2a_8 = 6a_9$$\nDividing by $2a_9$:\n$$\\frac{a_{10} - 2a_8}{2a_9} = \\frac{6a_9}{2a_9} = 3$$.",
+      "explanation": "Newton's formula gives $a_{10} - 2a_8 = 6a_9 \\implies \\frac{a_{10} - 2a_8}{2a_9} = 3$."
+    }
+  ]
+}

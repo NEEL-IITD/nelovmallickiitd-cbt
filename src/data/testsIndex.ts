@@ -3,6 +3,7 @@ import { pta04Data } from './jee-advanced/pta04';
 import { pta05Data } from './jee-advanced/pta05';
 import { pta06Data } from './jee-advanced/pta06';
 import { jeeMainsPtm01Data } from './jee-mains/ptm01';
+import { jeeMainsPtm02Data } from './jee-mains/ptm02';
 
 export const jeeMainsTests: TestMetadata[] = [
   {
@@ -31,8 +32,8 @@ export const jeeMainsTests: TestMetadata[] = [
     "examType": "JEE Mains",
     "code": "PTM 02",
     "title": "JEE Mains 2027 Test Series — PTM 02",
-    "subtitle": "Full Syllabus Comprehensive Mock Examination",
-    "status": "coming_soon",
+    "subtitle": "Thermal Physics & Heat Transfer, GOC & Isomerism, Quadratic Equations & Sequences",
+    "status": "live",
     "durationMinutes": 180,
     "totalMarks": 300,
     "totalQuestions": 75,
@@ -41,8 +42,8 @@ export const jeeMainsTests: TestMetadata[] = [
       "Chemistry (25 Qs)",
       "Mathematics (25 Qs)"
     ],
-    "description": "Standard NTA JEE Mains CBT pattern: 20 Single Correct MCQs (+4, -1) and 5 Numerical Value questions (+4, -1) per subject.",
-    "isLive": false,
+    "description": "Standard NTA JEE Mains CBT pattern: 20 Single Correct MCQs (+4, -1) and 5 Numerical Value questions (+4, -1) per subject. Thermal Properties & Conduction, GOC & Isomerism, Quadratic Equations & Progressions.",
+    "isLive": true,
     "isFree": true
   },
   {
@@ -581,6 +582,9 @@ export function getTestById(id: string): TestMetadata | undefined {
 export function getLiveTestPaper(id: string): TestPaper | undefined {
   if (id === 'jee-mains-ptm-01' || id === 'ptm-01' || id === 'ptm01') {
     return jeeMainsPtm01Data;
+  }
+  if (id === 'jee-mains-ptm-02' || id === 'ptm-02' || id === 'ptm02') {
+    return jeeMainsPtm02Data;
   }
   if (id === 'jee-advanced-pta-04' || id === 'pta-04' || id === 'pta04') {
     return pta04Data;
