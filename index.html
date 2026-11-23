@@ -6655,22 +6655,20 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             </button>
           </div>
 
-          {/* 1st Attempt vs Practice Attempt Notice */}
-          {!isFirstAttempt && (
-            <div className="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex items-center gap-2.5 text-xs text-amber-800 dark:text-amber-200 font-medium">
-              <span className="text-base">âš–ï¸ </span>
-              <p>
-                <strong>Practice Attempt #{attemptCount}:</strong> To preserve strict examination integrity and mirror NTA ranking standards, official All-India ranks and percentiles are locked to your 1st Attempt. This attempt is recorded for your personal diagnosis.
-              </p>
-            </div>
-          )}
+          {/* Best Score Ranking Notice */}
+          <div className="p-3.5 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 flex items-center gap-2.5 text-xs text-indigo-900 dark:text-indigo-200 font-medium">
+            <span className="text-base">🏆</span>
+            <p>
+              <strong>Ranked by Highest Marks:</strong> Your best score (highest marks) across attempts automatically determines your official All-India rank and percentile.
+            </p>
+          </div>
 
           {/* 4 Standing Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800">
               <p className="text-[11px] font-bold text-slate-400 uppercase">Your All-India Rank</p>
               <p className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 pt-1">
-                {myStanding?.rank ? `#${myStanding.rank}` : (isFirstAttempt ? '#1' : 'Rank Locked')}
+                {myStanding?.rank ? `#${myStanding.rank}` : '#1'}
               </p>
               <p className="text-[10px] text-slate-400">of {leaderboardData?.totalParticipants || 1} candidates</p>
             </div>
@@ -8505,7 +8503,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                               <span>Live Leaderboard</span>
                               <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-amber-500 text-white">Toppers</span>
                             </div>
-                            <p className="text-[11px] text-amber-600/80 dark:text-amber-400/80 font-normal">Official 1st-attempt ranks & percentiles</p>
+                            <p className="text-[11px] text-amber-600/80 dark:text-amber-400/80 font-normal">Official ranks & percentiles (Highest Marks)</p>
                           </div>
                         </div>
                         <span className="text-amber-600 dark:text-amber-400">→</span>
@@ -11011,7 +11009,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       </span>
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
-                      Real-time 1st-attempt official rankings, marks, percentiles, accuracy, and pacing for any paper. Accessible even while test windows are locked.
+                      Real-time official rankings (ranked by highest marks), percentiles, accuracy, and pacing for any paper. Accessible even while test windows are locked.
                     </p>
                   </div>
 
@@ -13191,10 +13189,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
     }
 
     // ==============================================================================
-    // COMPONENT: LeaderboardView (Supabase Live 1st-Attempt All-India Leaderboard)
+    // COMPONENT: LeaderboardView (Supabase Live All-India Leaderboard - Ranked by Highest Marks)
     // ==============================================================================
     function LeaderboardView({ currentUser, setView, openAuth, initialTestId = 'jee-advanced-pta-04', handleSelectTest, testConfigs = {}, detailedConfigs = {} }) {
-      const [activeTab, setActiveTab] = useState('jee-advanced'); // 'jee-advanced' | 'jee-mains' | 'overall'
+      const isJeeMainsId = (id) => (id || '').startsWith('jee-mains-') || (id || '').toLowerCase().includes('ptm');
+      const [activeTab, setActiveTab] = useState(() => isJeeMainsId(initialTestId) ? 'jee-mains' : 'jee-advanced');
       const [selectedTestId, setSelectedTestId] = useState(initialTestId);
       const [searchQuery, setSearchQuery] = useState('');
       const [loading, setLoading] = useState(true);
@@ -13203,6 +13202,17 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [overallLeaderboard, setOverallLeaderboard] = useState([]);
 
       const unlockCountdown = useCountdown(leaderboardData?.locked ? leaderboardData.unlocksAt : null);
+
+      useEffect(() => {
+        if (initialTestId) {
+          setSelectedTestId(initialTestId);
+          if (isJeeMainsId(initialTestId)) {
+            setActiveTab('jee-mains');
+          } else if (initialTestId.startsWith('jee-advanced-') || initialTestId.toLowerCase().includes('pta')) {
+            setActiveTab('jee-advanced');
+          }
+        }
+      }, [initialTestId]);
 
       useEffect(() => {
         if (window.studentStorage?.getTestToppersSummary) {
@@ -13269,6 +13279,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       });
 
       const currentTestList = activeTab === 'jee-advanced' ? ptaTests : ptmTests;
+      const currentTestObj = currentTestList.find((t) => t.testId === selectedTestId);
+      const selectedTestCode = currentTestObj?.code || selectedTestId.split('-').pop()?.toUpperCase() || 'this paper';
 
       const filteredEntries = (leaderboardData?.entries || []).filter(entry =>
         (entry.displayName || '').toLowerCase().includes(searchQuery.toLowerCase())
@@ -13327,12 +13339,12 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               </div>
             </div>
 
-            {/* Anti-Cheat & 1st-Attempt Fairness Notice */}
+            {/* Anti-Cheat & Highest Marks Fairness Notice */}
             <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/60 flex items-start sm:items-center justify-between gap-3 text-xs text-indigo-900 dark:text-indigo-200">
               <div className="flex items-center gap-2.5">
                 <span className="text-base">⚖️</span>
                 <p>
-                  <strong>1st-Attempt-Only Official Rankings:</strong> Ranks, marks, and percentiles are locked to each student's official 1st attempt. Re-attempts (2nd &amp; 3rd) serve strictly for self-practice and never alter leaderboard standings.
+                  <strong>Ranked by Highest Marks:</strong> Ranks, marks, and percentiles reflect each student's best score (highest marks) across attempts. Re-attempts allow you to improve your All-India standing while maintaining fair 3-attempt limits.
                 </p>
               </div>
               <span className="shrink-0 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-600 text-white">
@@ -13646,7 +13658,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           </div>
                           <div>
                             <h4 className="text-base font-extrabold text-slate-900 dark:text-zinc-50">
-                              Your Official 1st-Attempt Standing
+                              Your Official Best-Attempt Standing
                             </h4>
                             <p className="text-xs text-slate-500">
                               Benchmarked against {leaderboardData?.totalParticipants || 0} active JEE aspirants
@@ -13706,7 +13718,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       ) : (
                         <div className="p-6 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/60 dark:border-indigo-800/40 text-center space-y-3">
                           <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300">
-                            You haven't attempted this paper yet. Submit your 1st attempt to benchmark your standing on the official All-India Leaderboard!
+                            You haven't attempted this paper yet. Submit your attempt to benchmark your standing on the official All-India Leaderboard!
                           </p>
                           <div>
                             <button
@@ -13770,8 +13782,31 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                               </tr>
                             ) : filteredEntries.length === 0 ? (
                               <tr>
-                                <td colSpan={6} className="p-12 text-center text-slate-400 italic">
-                                  No official test attempts recorded for this paper yet. Be the first to claim Rank #1!
+                                <td colSpan={6} className="p-12 text-center">
+                                  <div className="max-w-md mx-auto space-y-3">
+                                    <span className="text-3xl block">🏆</span>
+                                    <h4 className="text-base font-extrabold text-slate-900 dark:text-zinc-100">
+                                      No student attempts recorded for {selectedTestCode} yet — be the first to top this paper!
+                                    </h4>
+                                    <p className="text-xs text-slate-500 dark:text-zinc-400">
+                                      Take the test under real examination conditions, benchmark your percentile, and claim Rank #1 on the All-India Leaderboard.
+                                    </p>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (!currentUser && openAuth) {
+                                          openAuth('login', `#/test/${activeTab}/${selectedTestId.split('-').pop()}`);
+                                        } else if (handleSelectTest) {
+                                          handleSelectTest(selectedTestId);
+                                        } else {
+                                          window.location.hash = `#/test/${activeTab}/${selectedTestId.split('-').pop()}`;
+                                        }
+                                      }}
+                                      className="mt-2 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/25 transition-all hover:scale-105"
+                                    >
+                                      <span>Attempt {selectedTestCode} →</span>
+                                    </button>
+                                  </div>
                                 </td>
                               </tr>
                             ) : (
@@ -13860,7 +13895,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         <span>👑 Overall CBT Champions (Multi-Test Aggregation)</span>
                       </h3>
                       <p className="text-xs text-slate-500">
-                        Ranked by Average Percentile across all official 1st attempts.
+                        Ranked by Average Percentile across each student's best attempt.
                       </p>
                     </div>
 
@@ -14419,19 +14454,31 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       </div>
 
                       {/* Card Bottom CTAs */}
-                      <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-zinc-800/80">
-                        <button
-                          type="button"
-                          onClick={() => openPreview(item, 'syllabus')}
-                          className="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200/80 dark:border-zinc-700/80 transition-all text-center"
-                        >
-                          Preview Details
-                        </button>
+                      <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-zinc-800/80">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => openPreview(item, 'syllabus')}
+                            className="flex-1 py-2 px-3 rounded-xl font-bold text-xs bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200/80 dark:border-zinc-700/80 transition-all text-center"
+                          >
+                            Preview Details
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              window.location.hash = `#/leaderboard/${item.id}`;
+                            }}
+                            className="flex-1 py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-300/80 dark:border-amber-700/60 transition-all shadow-xs"
+                            title="View Top 5 Leaderboard and Rankings for this test"
+                          >
+                            <span>🏆 Leaderboard</span>
+                          </button>
+                        </div>
 
                         <button
                           type="button"
                           onClick={() => handleAction(item)}
-                          className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                          className={`w-full py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
                             isTestReady(item.id)
                               ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/20'
                               : 'bg-slate-200/80 dark:bg-zinc-800/80 text-slate-400 dark:text-zinc-500 cursor-not-allowed'
@@ -14536,6 +14583,16 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                 className="px-2.5 py-1 rounded-lg font-bold text-xs bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200/80 dark:border-zinc-700/80 transition-all"
                               >
                                 Details
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  window.location.hash = `#/leaderboard/${item.id}`;
+                                }}
+                                className="px-2.5 py-1 rounded-lg font-bold text-xs whitespace-nowrap bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-300/80 dark:border-amber-700/60 transition-all shadow-xs"
+                                title="View Top 5 Leaderboard"
+                              >
+                                🏆 Leaderboard
                               </button>
                               <button
                                 type="button"
@@ -14892,7 +14949,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           </li>
                           <li className="flex items-start gap-2.5">
                             <span className="text-indigo-500 font-bold mt-0.5">5.</span>
-                            <span><strong>1st-Attempt Leaderboard:</strong> Only your first verified attempt is counted for the All-India Percentile and Rank Leaderboard, maintaining authentic calibration.</span>
+                            <span><strong>Ranked by Highest Marks:</strong> Your best score (highest marks) across attempts automatically counts on the Top 5 Leaderboard, giving you fair calibration as you improve.</span>
                           </li>
                         </ul>
                       </div>
@@ -14925,6 +14982,18 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 transition-colors"
                     >
                       Close Preview
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const item = previewItem;
+                        setPreviewItem(null);
+                        window.location.hash = `#/leaderboard/${item.id}`;
+                      }}
+                      className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300/80 dark:border-amber-700/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-colors flex items-center justify-center gap-1 shadow-xs"
+                    >
+                      <span>🏆 Leaderboard</span>
                     </button>
 
                     {isTestReady(previewItem.id) ? (
@@ -15228,8 +15297,19 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         const activeUser = window.authService?.getCurrentUser() || null;
         const isHashEmpty = !hash || hash === '#' || hash === '#/' || hash === '';
 
+        // Priority 0: Leaderboard Routes (100% Public Access - No Login Required)
+        if (hash === '#/leaderboard' || hash === '#leaderboard' || hash.startsWith('#/leaderboard/') || hash.startsWith('#leaderboard/')) {
+          const parts = hash.split('/');
+          if (parts.length > 2 && parts[2]) {
+            setActiveLeaderboardTestId(parts[2]);
+          }
+          setView('leaderboard');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+
         // Priority 1: CBT Test Routes (PTA 04-06, PTM 01-20)
-        if (hash.includes('pta-04') || hash.includes('pta04')) {
+        if (!hash.includes('leaderboard') && (hash.includes('pta-04') || hash.includes('pta04'))) {
           if (!activeUser) {
             openAuth('login', '#/test/jee-advanced/pta-04', 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.');
             setView('home');
@@ -15242,7 +15322,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return;
         }
 
-        if (hash.includes('pta-05') || hash.includes('pta05')) {
+        if (!hash.includes('leaderboard') && (hash.includes('pta-05') || hash.includes('pta05'))) {
           if (!activeUser) {
             openAuth('login', '#/test/jee-advanced/pta-05', 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.');
             setView('home');
@@ -15255,7 +15335,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return;
         }
 
-        if (hash.includes('pta-06') || hash.includes('pta06')) {
+        if (!hash.includes('leaderboard') && (hash.includes('pta-06') || hash.includes('pta06'))) {
           if (!activeUser) {
             openAuth('login', '#/test/jee-advanced/pta-06', 'Sign in or create a free account to attempt live PTA tests, view detailed solutions, and track your JEE rank.');
             setView('home');
@@ -15268,7 +15348,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return;
         }
 
-        const ptmMatch = hash.match(/ptm-?(\d+)/);
+        const ptmMatch = !hash.includes('leaderboard') ? hash.match(/ptm-?(\d+)/) : null;
         if (ptmMatch) {
           const ptmNum = String(parseInt(ptmMatch[1], 10)).padStart(2, '0');
           const ptmId = `jee-mains-ptm-${ptmNum}`;
@@ -18404,7 +18484,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         </span>
                       </div>
                       <p className="text-xs text-slate-500 dark:text-zinc-400">
-                        1st-attempt official rankings, exact marks, and official NTA percentiles mentored by Nelov Mallick (IIT Delhi).
+                        Official rankings (ranked by highest marks), exact scores, and authentic NTA percentiles mentored by Nelov Mallick (IIT Delhi).
                       </p>
                     </div>
                   </div>

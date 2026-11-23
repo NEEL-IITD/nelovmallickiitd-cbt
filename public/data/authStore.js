@@ -1573,26 +1573,58 @@
       const currentUser = window.authService?.getCurrentUser ? window.authService.getCurrentUser() : null;
       const currentUid = currentUser?.id;
 
+      const isAdminUser = a => {
+        const email = (a.userEmail || a.email || a.profiles?.email || a.candidateEmail || '').toLowerCase().trim();
+        const role = (a.role || a.profiles?.role || '').toLowerCase().trim();
+        return email === 'mallicknelov@gmail.com' || email === 'nelovmallick@gmail.com' || email === 'nelovmallick@iitd.ac.in' || role === 'admin';
+      };
+
+      const isCurrentAdmin =
+        (currentUser?.email || '').toLowerCase().trim() === 'mallicknelov@gmail.com' ||
+        (currentUser?.email || '').toLowerCase().trim() === 'nelovmallick@gmail.com' ||
+        currentUser?.role === 'admin';
+
       const norm = id => (id || '').toString().toLowerCase().replace(/[^a-z0-9]/g, '');
       const targetNorm = norm(testId);
 
-      const userAttemptsMap = {};
+      // Filter by testId, exclude Admin attempts, and pick BEST attempt per user (highest marks)
+      const userBestAttemptsMap = {};
       all
         .filter(a => {
+          if (isAdminUser(a)) return false;
           const tNorm = norm(a.testId);
           const cNorm = norm(a.testCode || a.code);
           return tNorm === targetNorm || cNorm === targetNorm || targetNorm.endsWith(cNorm) || (cNorm && targetNorm.includes(cNorm));
         })
-        .sort((a, b) => new Date(a.completedAt || a.submitted_at || a.submittedAt).getTime() - new Date(b.completedAt || b.submitted_at || b.submittedAt).getTime())
         .forEach(a => {
           const uId = a.userId || a.user_id;
-          if (uId && !userAttemptsMap[uId]) {
-            userAttemptsMap[uId] = a;
+          if (!uId) return;
+          const currentBest = userBestAttemptsMap[uId];
+          if (!currentBest) {
+            userBestAttemptsMap[uId] = a;
+          } else {
+            const scoreCurrent = Number(a.totalMarksScored ?? a.obtained_marks ?? a.obtainedMarks ?? 0);
+            const scoreBest = Number(currentBest.totalMarksScored ?? currentBest.obtained_marks ?? currentBest.obtainedMarks ?? 0);
+            if (scoreCurrent > scoreBest) {
+              userBestAttemptsMap[uId] = a;
+            } else if (scoreCurrent === scoreBest) {
+              const accCurrent = Number(a.accuracy ?? 0);
+              const accBest = Number(currentBest.accuracy ?? 0);
+              if (accCurrent > accBest) {
+                userBestAttemptsMap[uId] = a;
+              } else if (accCurrent === accBest) {
+                const timeCurrent = Number(a.timeTakenSeconds || a.time_taken_seconds || 999999);
+                const timeBest = Number(currentBest.timeTakenSeconds || currentBest.time_taken_seconds || 999999);
+                if (timeCurrent < timeBest) {
+                  userBestAttemptsMap[uId] = a;
+                }
+              }
+            }
           }
         });
 
-      const firstAttempts = Object.values(userAttemptsMap);
-      const totalParticipants = firstAttempts.length;
+      const bestAttempts = Object.values(userBestAttemptsMap);
+      const totalParticipants = bestAttempts.length;
 
       if (totalParticipants === 0) {
         return {
@@ -1609,7 +1641,7 @@
         };
       }
 
-      firstAttempts.sort((a, b) => {
+      bestAttempts.sort((a, b) => {
         const scoreA = Number(a.totalMarksScored ?? a.obtained_marks ?? a.obtainedMarks ?? 0);
         const scoreB = Number(b.totalMarksScored ?? b.obtained_marks ?? b.obtainedMarks ?? 0);
         if (scoreB !== scoreA) return scoreB - scoreA;
@@ -1619,13 +1651,13 @@
         return (a.timeTakenSeconds || a.time_taken_seconds || 0) - (b.timeTakenSeconds || b.time_taken_seconds || 0);
       });
 
-      const highestMarks = Number(firstAttempts[0]?.totalMarksScored ?? firstAttempts[0]?.obtained_marks ?? firstAttempts[0]?.obtainedMarks ?? 0);
-      const avgMarks = Math.round((firstAttempts.reduce((sum, a) => sum + Number(a.totalMarksScored ?? a.obtained_marks ?? a.obtainedMarks ?? 0), 0) / totalParticipants) * 10) / 10;
+      const highestMarks = Number(bestAttempts[0]?.totalMarksScored ?? bestAttempts[0]?.obtained_marks ?? bestAttempts[0]?.obtainedMarks ?? 0);
+      const avgMarks = Math.round((bestAttempts.reduce((sum, a) => sum + Number(a.totalMarksScored ?? a.obtained_marks ?? a.obtainedMarks ?? 0), 0) / totalParticipants) * 10) / 10;
 
-      const entries = firstAttempts.map((a, index) => {
+      const entries = bestAttempts.map((a, index) => {
         const rank = index + 1;
         const myScore = Number(a.totalMarksScored ?? a.obtained_marks ?? a.obtainedMarks ?? 0);
-        const countBelowOrEqual = firstAttempts.filter(other => Number(other.totalMarksScored ?? other.obtained_marks ?? other.obtainedMarks ?? 0) <= myScore).length;
+        const countBelowOrEqual = bestAttempts.filter(other => Number(other.totalMarksScored ?? other.obtained_marks ?? other.obtainedMarks ?? 0) <= myScore).length;
         const percentile = Math.round((countBelowOrEqual / totalParticipants) * 10000) / 100;
         const uId = a.userId || a.user_id;
 
@@ -1640,13 +1672,13 @@
           timeTakenSeconds: a.timeTakenSeconds || a.time_taken_seconds || 0,
           submittedAt: a.completedAt || a.submitted_at || a.submittedAt,
           attemptedInLiveWindow: !!(a.attemptedInLiveWindow || a.attempted_in_live_window),
-          isCurrentUser: currentUid === uId
+          isCurrentUser: !isCurrentAdmin && currentUid === uId
         };
       });
 
       const topper = entries[0] || null;
-      const myStanding = entries.find(e => e.isCurrentUser) || null;
-      const myAttemptSubmitted = !!firstAttempts.find(a => (a.userId || a.user_id) === currentUid);
+      const myStanding = isCurrentAdmin ? null : (entries.find(e => e.isCurrentUser) || null);
+      const myAttemptSubmitted = isCurrentAdmin ? false : !!bestAttempts.find(a => (a.userId || a.user_id) === currentUid);
 
       return {
         locked: false,

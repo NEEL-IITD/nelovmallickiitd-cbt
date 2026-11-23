@@ -1307,7 +1307,7 @@ export const AdminDashboard: React.FC = () => {
                   </span>
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
-                  Real-time 1st-attempt official rankings, marks, percentiles, accuracy, and pacing for any paper. Accessible even while test windows are locked.
+                  Real-time official rankings (ranked by highest marks), percentiles, accuracy, and pacing for any paper. Accessible even while test windows are locked.
                 </p>
               </div>
 

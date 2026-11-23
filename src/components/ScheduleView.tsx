@@ -422,20 +422,32 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                   </div>
 
                   {/* Card Bottom CTAs */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-zinc-800/80">
-                    <button
-                      type="button"
-                      onClick={() => openPreview(item, 'syllabus')}
-                      className="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200/80 dark:border-zinc-700/80 transition-all text-center"
-                    >
-                      Preview Details
-                    </button>
+                  <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-zinc-800/80">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => openPreview(item, 'syllabus')}
+                        className="flex-1 py-2 px-3 rounded-xl font-bold text-xs bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200/80 dark:border-zinc-700/80 transition-all text-center"
+                      >
+                        Preview Details
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          window.location.hash = `#/leaderboard/${item.id}`;
+                        }}
+                        className="flex-1 py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-300/80 dark:border-amber-700/60 transition-all shadow-xs"
+                        title="View Top 5 Leaderboard and Rankings for this test"
+                      >
+                        <span>🏆 Leaderboard</span>
+                      </button>
+                    </div>
 
                     {ready ? (
                       <button
                         type="button"
                         onClick={() => handleAction(item)}
-                        className="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/20 transition-all"
+                        className="w-full py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-indigo-500/20 transition-all"
                       >
                         <span>Attempt {item.code} →</span>
                       </button>
@@ -443,7 +455,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                       <button
                         type="button"
                         onClick={() => handleAction(item)}
-                        className="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 bg-slate-100 dark:bg-zinc-800/80 text-slate-500 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200 dark:border-zinc-700 transition-all"
+                        className="w-full py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 bg-slate-100 dark:bg-zinc-800/80 text-slate-500 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200 dark:border-zinc-700 transition-all"
                       >
                         <span>Paper Uploading Soon</span>
                       </button>
@@ -540,6 +552,16 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                             className="px-2.5 py-1 rounded-lg font-bold text-xs bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-200/80 dark:border-zinc-700/80 transition-all"
                           >
                             Details
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              window.location.hash = `#/leaderboard/${item.id}`;
+                            }}
+                            className="px-2.5 py-1 rounded-lg font-bold text-xs whitespace-nowrap bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-300/80 dark:border-amber-700/60 transition-all shadow-xs"
+                            title="View Top 5 Leaderboard"
+                          >
+                            🏆 Leaderboard
                           </button>
                           {ready ? (
                             <button
@@ -903,7 +925,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                       </li>
                       <li className="flex items-start gap-2.5">
                         <span className="text-indigo-500 font-bold mt-0.5">5.</span>
-                        <span><strong>1st-Attempt Leaderboard:</strong> Only your first verified attempt is counted for the All-India Percentile and Rank Leaderboard, maintaining authentic calibration.</span>
+                        <span><strong>Ranked by Highest Marks:</strong> Your best score (highest marks) across attempts automatically counts on the Top 5 Leaderboard, giving you fair calibration as you improve.</span>
                       </li>
                     </ul>
                   </div>
@@ -936,6 +958,18 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                   className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 transition-colors"
                 >
                   Close Preview
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const item = previewItem;
+                    setPreviewItem(null);
+                    window.location.hash = `#/leaderboard/${item.id}`;
+                  }}
+                  className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300/80 dark:border-amber-700/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-colors flex items-center justify-center gap-1 shadow-xs"
+                >
+                  <span>🏆 Leaderboard</span>
                 </button>
 
                 {isTestReady(previewItem.id) ? (

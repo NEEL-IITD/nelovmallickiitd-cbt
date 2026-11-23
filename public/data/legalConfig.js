@@ -6,7 +6,7 @@
 window.LEGAL_CONFIG = {
   OWNER_NAME: "Nelov Mallick",
   OWNER_TITLE: "Academic Director & Founder (IIT Delhi Alumnus)",
-  CONTACT_EMAIL: "YOUR_CONTACT_EMAIL@gmail.com",
+  CONTACT_EMAIL: "mallicknelov@gmail.com",
   POLICY_VERSION: "2026-11",
   LAST_UPDATED: "November 2026",
   EFFECTIVE_DATE: "November 21, 2026",
@@ -20,7 +20,7 @@ window.LEGAL_CONFIG = {
   INSTAGRAM_LABEL: "2K+ Aspirants · Instagram Community",
   COPYRIGHT_NOTICE: "© 2026 Nelov Mallick. All rights reserved.",
   GRIEVANCE_OFFICER: "Nelov Mallick",
-  GRIEVANCE_EMAIL: "YOUR_CONTACT_EMAIL@gmail.com",
+  GRIEVANCE_EMAIL: "mallicknelov@gmail.com",
   TAKEDOWN_TIMEFRAME: "48–72 Hours",
   TEST_ATTEMPT_LIMIT: 3,
 };

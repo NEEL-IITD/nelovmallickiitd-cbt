@@ -18,10 +18,26 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
 }) => {
   const { isAuthenticated, openAuthModal } = useAuth();
 
+  const isJeeMainsId = (id: string) => (id || '').startsWith('jee-mains-') || (id || '').toLowerCase().includes('ptm');
+
   // Tab State
-  const [activeTab, setActiveTab] = useState<'jee-advanced' | 'jee-mains' | 'overall'>('jee-advanced');
+  const [activeTab, setActiveTab] = useState<'jee-advanced' | 'jee-mains' | 'overall'>(() => {
+    return isJeeMainsId(initialTestId) ? 'jee-mains' : 'jee-advanced';
+  });
   const [selectedTestId, setSelectedTestId] = useState<string>(initialTestId);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Sync when initialTestId changes (e.g. from hash navigation or prop change)
+  useEffect(() => {
+    if (initialTestId) {
+      setSelectedTestId(initialTestId);
+      if (isJeeMainsId(initialTestId)) {
+        setActiveTab('jee-mains');
+      } else if (initialTestId.startsWith('jee-advanced-') || initialTestId.toLowerCase().includes('pta')) {
+        setActiveTab('jee-advanced');
+      }
+    }
+  }, [initialTestId]);
 
   // Data States
   const [loading, setLoading] = useState<boolean>(true);
@@ -105,6 +121,8 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
   });
 
   const currentTestList = activeTab === 'jee-advanced' ? ptaTests : ptmTests;
+  const currentTestObj = currentTestList.find((t) => t.testId === selectedTestId);
+  const selectedTestCode = currentTestObj?.code || selectedTestId.split('-').pop()?.toUpperCase() || 'this paper';
 
   // Filter entries by search query
   const filteredEntries = (leaderboardData?.entries || []).filter((entry) =>
@@ -169,7 +187,7 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
           <div className="flex items-center gap-2.5">
             <span className="text-base">⚖️</span>
             <p>
-              <strong>1st-Attempt-Only Official Rankings:</strong> Ranks, marks, and percentiles are locked to each student's official 1st attempt. Re-attempts (2nd &amp; 3rd) serve strictly for self-practice and never alter leaderboard standings.
+              <strong>Ranked by Highest Marks:</strong> Ranks, marks, and percentiles reflect each student's best score (highest marks) across attempts. Re-attempts allow you to improve your All-India standing while maintaining fair 3-attempt limits.
             </p>
           </div>
           <span className="shrink-0 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-600 text-white">
@@ -490,7 +508,7 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                       </div>
                       <div>
                         <h4 className="text-base font-extrabold text-slate-900 dark:text-zinc-50">
-                          Your Official 1st-Attempt Standing
+                          Your Official Best-Attempt Standing
                         </h4>
                         <p className="text-xs text-slate-500">
                           Benchmarked against {leaderboardData?.totalParticipants || 0} active JEE aspirants
@@ -612,8 +630,31 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                           </tr>
                         ) : filteredEntries.length === 0 ? (
                           <tr>
-                            <td colSpan={6} className="p-12 text-center text-slate-400 italic">
-                              No official test attempts recorded for this paper yet. Be the first to claim Rank #1!
+                            <td colSpan={6} className="p-12 text-center">
+                              <div className="max-w-md mx-auto space-y-3">
+                                <span className="text-3xl block">🏆</span>
+                                <h4 className="text-base font-extrabold text-slate-900 dark:text-zinc-100">
+                                  No student attempts recorded for {selectedTestCode} yet — be the first to top this paper!
+                                </h4>
+                                <p className="text-xs text-slate-500 dark:text-zinc-400">
+                                  Take the test under real examination conditions, benchmark your percentile, and claim Rank #1 on the All-India Leaderboard.
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (!isAuthenticated) {
+                                      openAuthModal('login', `#/test/${activeTab}/${selectedTestId.split('-').pop()}`);
+                                    } else if (onSelectTest) {
+                                      onSelectTest(selectedTestId);
+                                    } else {
+                                      window.location.hash = `#/test/${activeTab}/${selectedTestId.split('-').pop()}`;
+                                    }
+                                  }}
+                                  className="mt-2 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/25 transition-all hover:scale-105"
+                                >
+                                  <span>Attempt {selectedTestCode} →</span>
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ) : (
@@ -703,7 +744,7 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                     <span>👑</span> Overall Platform Champions
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Aggregated across all official 1st attempts. Ranked by Average Percentile &amp; Participation.
+                    Aggregated across each student's best attempt. Ranked by Average Percentile &amp; Participation.
                   </p>
                 </div>
 

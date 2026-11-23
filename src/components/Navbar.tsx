@@ -221,7 +221,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           Toppers
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 dark:text-zinc-400">1st-attempt official ranks &amp; percentiles</p>
+                      <p className="text-[11px] text-slate-500 dark:text-zinc-400">Official ranks &amp; percentiles (Highest Marks)</p>
                     </div>
                     <span className="text-amber-500">→</span>
                   </button>
