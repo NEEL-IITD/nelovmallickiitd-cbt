@@ -426,7 +426,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         user,
         isAuthenticated: !!user,
-        isAdmin: user?.role === 'admin' || isAdminEmail(user?.email),
+        isAdmin: !isLoading && !!user && (user?.role === 'admin' || isAdminEmail(user?.email)) && user?.email?.trim().toLowerCase() === 'mallicknelov@gmail.com',
         isLoading,
         isCloudConnected: authService.isCloudConnected(),
         logIn,
@@ -526,13 +526,13 @@ interface AdminRouteProps {
 }
 
 export const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
-  const { isAuthenticated, isAdmin, isLoading, openAuthModal } = useAuth();
+  const { isAuthenticated, isAdmin, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      openAuthModal('login', '#/admin', 'Admin login required to access the platform management portal.');
+    if (!isLoading && (!isAuthenticated || !isAdmin)) {
+      window.location.hash = '#/';
     }
-  }, [isLoading, isAuthenticated, openAuthModal]);
+  }, [isLoading, isAuthenticated, isAdmin]);
 
   if (isLoading) {
     return (
@@ -542,93 +542,8 @@ export const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     );
   }
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center space-y-4">
-        <div className="w-16 h-16 rounded-3xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center text-3xl">
-          🛡️
-        </div>
-        <h2 className="text-2xl font-extrabold text-slate-900 dark:text-zinc-50">
-          Admin Authentication Required
-        </h2>
-        <p className="max-w-md text-sm text-slate-600 dark:text-zinc-400">
-          Please log into your administrator account to access the private management dashboard.
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <button
-            onClick={() => openAuthModal('login', '#/admin')}
-            className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-md shadow-indigo-600/30 hover:bg-indigo-700 transition-all"
-          >
-            Sign In to Admin Portal
-          </button>
-          <button
-            onClick={() => {
-              const adminUser = {
-                id: 'admin_nelov_01',
-                name: 'Nelov Mallick (IIT Delhi)',
-                email: 'nelovmallick@gmail.com',
-                contactNumber: '+91 98765 43210',
-                authMethod: 'gmail' as const,
-                targetExam: 'JEE Advanced' as const,
-                role: 'admin' as const,
-                createdAt: new Date().toISOString()
-              };
-              localStorage.setItem('nelov_active_session', JSON.stringify(adminUser));
-              window.location.reload();
-            }}
-            className="px-6 py-3 rounded-xl bg-amber-600 text-white font-bold text-xs shadow-md shadow-amber-600/30 hover:bg-amber-700 transition-all"
-          >
-            ⚡ Direct Admin Access (Academic Director)
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center space-y-4">
-        <div className="w-16 h-16 rounded-3xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 flex items-center justify-center text-3xl text-rose-600">
-          🚫
-        </div>
-        <div className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300">
-          403 · Access Denied
-        </div>
-        <h2 className="text-2xl font-extrabold text-slate-900 dark:text-zinc-50">
-          Administrator Access Only
-        </h2>
-        <p className="max-w-md text-sm text-slate-600 dark:text-zinc-400">
-          This portal is reserved for authorized platform administrators. If you believe this is an error, please contact Nelov Mallick.
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <a
-            href="#/"
-            className="px-6 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all"
-          >
-            Return to Platform Homepage
-          </a>
-          <button
-            onClick={() => {
-              const adminUser = {
-                id: 'admin_nelov_01',
-                name: 'Nelov Mallick (IIT Delhi)',
-                email: 'nelovmallick@gmail.com',
-                contactNumber: '+91 98765 43210',
-                authMethod: 'gmail' as const,
-                targetExam: 'JEE Advanced' as const,
-                role: 'admin' as const,
-                createdAt: new Date().toISOString()
-              };
-              localStorage.setItem('nelov_active_session', JSON.stringify(adminUser));
-              window.location.reload();
-            }}
-            className="px-6 py-2.5 rounded-xl bg-amber-600 text-white font-bold text-xs shadow-md shadow-amber-600/30 hover:bg-amber-700 transition-all"
-          >
-            ⚡ Switch to Admin Mode (Nelov Mallick)
-          </button>
-        </div>
-      </div>
-    );
+  if (!isAuthenticated || !isAdmin) {
+    return null;
   }
 
   return <>{children}</>;

@@ -370,14 +370,7 @@ SECURITY DEFINER
 SET search_path = ''
 AS $$
   SELECT (
-    LOWER(COALESCE(auth.jwt()->>'email', '')) IN ('mallicknelov@gmail.com', 'nelovmallick@gmail.com', 'nelovmallick@iitd.ac.in')
-    OR
-    EXISTS (
-      SELECT 1
-      FROM public.profiles
-      WHERE id = auth.uid()
-        AND role = 'admin'
-    )
+    LOWER(COALESCE(auth.jwt()->>'email', '')) = 'mallicknelov@gmail.com'
   );
 $$;
 
@@ -401,14 +394,37 @@ CREATE POLICY "profiles_select_policy"
     OR public.is_admin()
   );
 
+-- Trigger: Prevent unauthorized role escalation to 'admin'
+CREATE OR REPLACE FUNCTION public.trg_protect_profile_role()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+  IF NEW.role = 'admin' THEN
+    IF LOWER(COALESCE(NEW.email, '')) <> 'mallicknelov@gmail.com' THEN
+      NEW.role := 'student';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_protect_profile_role_before_write ON public.profiles;
+CREATE TRIGGER trg_protect_profile_role_before_write
+  BEFORE INSERT OR UPDATE ON public.profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION public.trg_protect_profile_role();
+
 -- Users can insert their own profile on signup/self-healing sync; Admins can insert any profile
 DROP POLICY IF EXISTS "profiles_insert_policy" ON public.profiles;
 CREATE POLICY "profiles_insert_policy"
   ON public.profiles
   FOR INSERT
   WITH CHECK (
-    auth.uid() = id
-    OR public.is_admin()
+    (auth.uid() = id AND (role IS NULL OR role = 'student' OR LOWER(COALESCE(email, '')) = 'mallicknelov@gmail.com'))
+    OR (SELECT public.is_admin())
   );
 
 -- Users can update their own profile; Admins can update any profile
@@ -418,11 +434,11 @@ CREATE POLICY "profiles_update_policy"
   FOR UPDATE
   USING (
     auth.uid() = id
-    OR public.is_admin()
+    OR (SELECT public.is_admin())
   )
   WITH CHECK (
-    auth.uid() = id
-    OR public.is_admin()
+    (SELECT public.is_admin())
+    OR (auth.uid() = id AND (role = 'student' OR LOWER(COALESCE(email, '')) = 'mallicknelov@gmail.com'))
   );
 
 -- ------------------------------------------------------------------------------
@@ -1271,9 +1287,104 @@ GRANT EXECUTE ON FUNCTION public.get_test_leaderboard(TEXT) TO anon, authenticat
 GRANT EXECUTE ON FUNCTION public.get_test_toppers_summary() TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.get_overall_leaderboard() TO anon, authenticated;
 
+-- ==============================================================================
+-- 14. Vault Chapterwise Exercises & Theory Notes Tables
+-- Mentored by Nelov Mallick (IIT Delhi) · 100% Free Forever
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.vault_exercises (
+  id TEXT PRIMARY KEY,
+  subject TEXT NOT NULL CHECK (subject IN ('physics', 'chemistry', 'mathematics')),
+  chapter_id TEXT NOT NULL,
+  chapter_name TEXT,
+  exercise_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  duration_minutes INT NOT NULL DEFAULT 60,
+  default_marking JSONB NOT NULL DEFAULT '{"correct": 4, "incorrect": -1, "unattempted": 0}'::jsonb,
+  questions JSONB NOT NULL DEFAULT '[]'::jsonb,
+  total_questions INT NOT NULL DEFAULT 0,
+  total_marks NUMERIC NOT NULL DEFAULT 0,
+  uploaded_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_vault_exercises_subject ON public.vault_exercises(subject);
+CREATE INDEX IF NOT EXISTS idx_vault_exercises_chapter ON public.vault_exercises(chapter_id);
+CREATE INDEX IF NOT EXISTS idx_vault_exercises_lookup ON public.vault_exercises(subject, chapter_id, exercise_id);
+CREATE INDEX IF NOT EXISTS idx_vault_exercises_updated ON public.vault_exercises(updated_at DESC);
+
+CREATE TABLE IF NOT EXISTS public.vault_theory_notes (
+  id TEXT PRIMARY KEY,
+  subject TEXT NOT NULL CHECK (subject IN ('physics', 'chemistry', 'mathematics')),
+  chapter_id TEXT NOT NULL,
+  chapter_name TEXT,
+  title TEXT NOT NULL,
+  pdf_url TEXT NOT NULL,
+  file_name TEXT,
+  file_size_bytes BIGINT DEFAULT 0,
+  uploaded_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_vault_theory_subject ON public.vault_theory_notes(subject);
+CREATE INDEX IF NOT EXISTS idx_vault_theory_chapter ON public.vault_theory_notes(chapter_id);
+CREATE INDEX IF NOT EXISTS idx_vault_theory_lookup ON public.vault_theory_notes(subject, chapter_id);
+
+ALTER TABLE public.vault_exercises ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vault_theory_notes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "vault_exercises_select_public"
+  ON public.vault_exercises FOR SELECT USING (true);
+
+CREATE POLICY "vault_exercises_admin_insert"
+  ON public.vault_exercises FOR INSERT WITH CHECK ((SELECT public.is_admin()));
+
+CREATE POLICY "vault_exercises_admin_update"
+  ON public.vault_exercises FOR UPDATE USING ((SELECT public.is_admin())) WITH CHECK ((SELECT public.is_admin()));
+
+CREATE POLICY "vault_exercises_admin_delete"
+  ON public.vault_exercises FOR DELETE USING ((SELECT public.is_admin()));
+
+CREATE POLICY "vault_theory_notes_select_public"
+  ON public.vault_theory_notes FOR SELECT USING (true);
+
+CREATE POLICY "vault_theory_notes_admin_insert"
+  ON public.vault_theory_notes FOR INSERT WITH CHECK ((SELECT public.is_admin()));
+
+CREATE POLICY "vault_theory_notes_admin_update"
+  ON public.vault_theory_notes FOR UPDATE USING ((SELECT public.is_admin())) WITH CHECK ((SELECT public.is_admin()));
+
+CREATE POLICY "vault_theory_notes_admin_delete"
+  ON public.vault_theory_notes FOR DELETE USING ((SELECT public.is_admin()));
+
+GRANT SELECT ON public.vault_exercises TO anon, authenticated;
+GRANT SELECT ON public.vault_theory_notes TO anon, authenticated;
 
 -- ==============================================================================
--- 14. How to elevate your account to Admin
--- Run the following command in Supabase SQL Editor with your email:
--- UPDATE public.profiles SET role = 'admin' WHERE email = 'your-email@example.com';
+-- 15. Supabase Storage (storage.objects) RLS Policies
+-- Public read access; Write operations restricted to Director mallicknelov@gmail.com
 -- ==============================================================================
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'storage' AND table_name = 'objects') THEN
+    ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+
+    DROP POLICY IF EXISTS "Public Select Storage Objects" ON storage.objects;
+    DROP POLICY IF EXISTS "Admin Insert Storage Objects" ON storage.objects;
+    DROP POLICY IF EXISTS "Admin Update Storage Objects" ON storage.objects;
+    DROP POLICY IF EXISTS "Admin Delete Storage Objects" ON storage.objects;
+
+    CREATE POLICY "Public Select Storage Objects"
+      ON storage.objects FOR SELECT USING (true);
+
+    CREATE POLICY "Admin Insert Storage Objects"
+      ON storage.objects FOR INSERT WITH CHECK ((SELECT public.is_admin()));
+
+    CREATE POLICY "Admin Update Storage Objects"
+      ON storage.objects FOR UPDATE USING ((SELECT public.is_admin())) WITH CHECK ((SELECT public.is_admin()));
+
+    CREATE POLICY "Admin Delete Storage Objects"
+      ON storage.objects FOR DELETE USING ((SELECT public.is_admin()));
+  END IF;
+END $$;

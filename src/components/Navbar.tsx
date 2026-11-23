@@ -575,7 +575,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         <span className="inline-block px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold">
                           {user.targetExam || 'JEE Advanced'}
                         </span>
-                        {(user.role === 'admin' || isAdmin) && (
+                        {isAdmin && (
                           <span className="inline-block px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 text-[9px] font-bold">
                             🛡️ Admin
                           </span>
@@ -607,7 +607,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <span>👤</span> Account &amp; Privacy
                     </button>
 
-                    {(user.role === 'admin' || isAdmin) && (
+                    {isAdmin && (
                       <button
                         type="button"
                         onClick={() => navigateTo('#/admin')}
@@ -920,7 +920,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   >
                     <span>👤</span> Account &amp; Privacy
                   </button>
-                  {(user.role === 'admin' || isAdmin) && (
+                  {isAdmin && (
                     <button
                       type="button"
                       onClick={() => navigateTo('#/admin')}

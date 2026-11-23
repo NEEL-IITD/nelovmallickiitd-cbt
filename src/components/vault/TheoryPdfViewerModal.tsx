@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { vaultService } from '../../services/vaultService';
 import { VaultTheoryNote } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 
 interface TheoryPdfViewerModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ export const TheoryPdfViewerModal: React.FC<TheoryPdfViewerModalProps> = ({
   subject = 'physics',
   onOpenAdminUpload
 }) => {
+  const { isAdmin } = useAuth();
   if (!isOpen || !chapter) return null;
 
   const theoryData: VaultTheoryNote | null = useMemo(() => {
@@ -120,7 +122,7 @@ export const TheoryPdfViewerModal: React.FC<TheoryPdfViewerModalProps> = ({
                 </div>
               )}
 
-              {onOpenAdminUpload && (
+              {isAdmin && onOpenAdminUpload && (
                 <button
                   type="button"
                   onClick={() => onOpenAdminUpload(chapter)}

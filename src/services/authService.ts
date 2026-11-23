@@ -35,9 +35,7 @@ const SESSION_STORAGE_KEY = 'nelov_active_session';
 const REDIRECT_STORAGE_KEY = 'nelov_auth_redirect';
 
 export const ADMIN_EMAILS = [
-  'mallicknelov@gmail.com',
-  'nelovmallick@gmail.com',
-  'nelovmallick@iitd.ac.in'
+  'mallicknelov@gmail.com'
 ];
 
 export function isAdminEmail(email?: string | null): boolean {
@@ -286,7 +284,7 @@ export const authService = {
     }
 
     const passwordHash = await hashPassword(password);
-    const role: UserRole = (users.length === 0 || isAdminEmail(hasEmail ? trimmedEmail : null)) ? 'admin' : 'student';
+    const role: UserRole = isAdminEmail(hasEmail ? trimmedEmail : null) ? 'admin' : 'student';
 
     const newUser: StoredUser = {
       id: 'usr_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
@@ -563,7 +561,7 @@ export const authService = {
   isAdmin(): boolean {
     const user = this.getCurrentUser();
     if (!user) return false;
-    return user.role === 'admin' || isAdminEmail(user.email);
+    return (user.role === 'admin' || isAdminEmail(user.email)) && user.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
   },
 
   /**

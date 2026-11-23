@@ -3679,6 +3679,10 @@ function PhysicsCbtTestShellModal({
 
 
 function VaultContentManagerView({ onLaunchTest, onClose }) {
+  const currentSessionUser = window.authService?.getCurrentUser ? window.authService.getCurrentUser() : null;
+  const isStrictAdmin = Boolean(currentSessionUser) && currentSessionUser.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+  if (!isStrictAdmin) return null;
+
   const [activeTab, setActiveTab] = useState('upload-json');
   const [subject, setSubject] = useState('physics');
   const [selectedChapterCode, setSelectedChapterCode] = useState('C8');
@@ -3824,6 +3828,10 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
   };
 
   const handleSaveExercise = async () => {
+    if (!isStrictAdmin) {
+      setSaveErrorMsg('Unauthorized: Only mallicknelov@gmail.com can save exercises.');
+      return;
+    }
     setSaveSuccessMsg('');
     setSaveErrorMsg('');
     const val = handleValidateJson();
@@ -3878,6 +3886,10 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
   };
 
   const handleSavePdf = async () => {
+    if (!isStrictAdmin) {
+      setPdfErrorMsg('Unauthorized: Only mallicknelov@gmail.com can save theory notes.');
+      return;
+    }
     setPdfSuccessMsg('');
     setPdfErrorMsg('');
     if (!pdfDataUrl) {
@@ -3909,6 +3921,10 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
   };
 
   const handleDeleteItem = (item) => {
+    if (!isStrictAdmin) {
+      alert('Unauthorized: Only mallicknelov@gmail.com can delete vault content.');
+      return;
+    }
     if (!confirm(`Are you sure you want to remove "${item.title || item.fileName}" from the Vault?`)) return;
     if (item.itemType === 'exercise') {
       window.vaultStorage?.deleteExercise(item.subject, item.chapterId, item.exerciseId);
@@ -4725,6 +4741,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
     // Supports 3 Sub-Topic Tabs for Maths C18 (Applications of Derivative)
     // ==============================================================================
     function Level3SubjectChapterDetailView({ subject = 'physics', chapterSlug, setView, currentUser }) {
+      const isStrictAdmin = Boolean(currentUser) && currentUser.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
       const [activeExerciseForTest, setActiveExerciseForTest] = useState(null);
       const [showTheoryModal, setShowTheoryModal] = useState(false);
       const [activeSubTopicIndex, setActiveSubTopicIndex] = useState(0);
@@ -4863,13 +4880,15 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             </nav>
 
             <div className="flex items-center gap-2.5">
-              <button
-                type="button"
-                onClick={() => setShowAdminUploadModal(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-bold hover:bg-indigo-100 shadow-sm transition-colors"
-              >
-                <span>⚡ Admin Uploader (JSON / PDF)</span>
-              </button>
+              {isStrictAdmin && (
+                <button
+                  type="button"
+                  onClick={() => setShowAdminUploadModal(true)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-bold hover:bg-indigo-100 shadow-sm transition-colors"
+                >
+                  <span>⚡ Admin Uploader (JSON / PDF)</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => { setView('subject-resources'); window.location.hash = `#/resources/${subject}`; }}
@@ -5121,10 +5140,10 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               exercise={activeExerciseForTest}
               subject={subject}
               studentName={currentUser?.name || 'Guest Aspirant'}
-              onOpenAdminUpload={() => {
+              onOpenAdminUpload={isStrictAdmin ? () => {
                 setActiveExerciseForTest(null);
                 setShowAdminUploadModal(true);
-              }}
+              } : undefined}
             />
           )}
 
@@ -5134,10 +5153,10 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             onClose={() => setShowTheoryModal(false)}
             chapter={chapter}
             subject={subject}
-            onOpenAdminUpload={() => {
+            onOpenAdminUpload={isStrictAdmin ? () => {
               setShowTheoryModal(false);
               setShowAdminUploadModal(true);
-            }}
+            } : undefined}
           />
 
           {/* Conceptual Study Deck Modal */}
@@ -5151,7 +5170,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           )}
 
           {/* Admin Vault Uploader Modal */}
-          {showAdminUploadModal && (
+          {isStrictAdmin && showAdminUploadModal && (
             <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
               <div className="bg-white dark:bg-[#121318] rounded-3xl border border-slate-200 dark:border-zinc-800 max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-zinc-800">
@@ -7205,44 +7224,6 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               </div>
             </div>
 
-            {/* Direct Admin Access Banner */}
-            {((authMode === 'login' && (email.toLowerCase().includes('mallick') || email.toLowerCase().includes('nelov'))) || redirectUrl === '#/admin' || (message && message.toLowerCase().includes('admin'))) && (
-              <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 space-y-2 text-center">
-                <div className="flex items-center justify-center gap-1.5 text-xs font-black text-amber-800 dark:text-amber-300">
-                  <span>🔐</span>
-                  <span>Academic Director Mode · Nelov Mallick</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const adminUser = {
-                      id: 'dd2eead0-660e-45c0-818d-70d416c3b134',
-                      name: 'Nelov Mallick',
-                      email: 'mallicknelov@gmail.com',
-                      contactNumber: '+91 98765 43210',
-                      authMethod: 'gmail',
-                      targetExam: 'Both',
-                      role: 'admin',
-                      acceptedTermsAt: '2026-11-20T00:00:00.000Z',
-                      acceptedTermsVersion: '2026-11',
-                      parentalConsentConfirmed: true,
-                      createdAt: new Date().toISOString()
-                    };
-                    if (window.authService && window.authService.setActiveSession) {
-                      window.authService.setActiveSession(adminUser);
-                    } else {
-                      localStorage.setItem('nelov_active_session', JSON.stringify(adminUser));
-                    }
-                    localStorage.setItem('consent_v2026_11_dd2eead0-660e-45c0-818d-70d416c3b134', '2026-11-20T00:00:00.000Z');
-                    onAuthSuccess(adminUser, redirectUrl || '#/admin');
-                  }}
-                  className="w-full py-2.5 px-4 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shadow-md shadow-amber-600/30 transition-all flex items-center justify-center gap-2"
-                >
-                  <span>⚡ One-Click Academic Director Sign In (mallicknelov@gmail.com)</span>
-                </button>
-              </div>
-            )}
-
             {/* Method Switcher Tabs (Gmail/Email vs Name & Contact Number) */}
             {(authMode === 'login' || authMode === 'signup') && (
               <div className="grid grid-cols-2 gap-1.5 p-1 rounded-2xl bg-slate-100 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 text-xs font-bold">
@@ -7841,6 +7822,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       userDropdownOpen,
       setUserDropdownOpen
     }) {
+      const isStrictAdmin = Boolean(currentUser) && currentUser.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
       const [activeDropdown, setActiveDropdown] = useState(null);
       const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
       const [mobileSectionOpen, setMobileSectionOpen] = useState('tests');
@@ -8402,7 +8384,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                             <span className="inline-block px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold">
                               {currentUser.targetExam || 'JEE Advanced'}
                             </span>
-                            {(currentUser.role === 'admin' || (window.authService && window.authService.isAdminEmail && window.authService.isAdminEmail(currentUser.email))) && (
+                            {isStrictAdmin && (
                               <span className="inline-block px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 text-[9px] font-bold">
                                 🛡️ Admin
                               </span>
@@ -8434,7 +8416,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           <span>👤</span> Account &amp; Privacy
                         </button>
 
-                        {(currentUser.role === 'admin' || (window.authService && window.authService.isAdminEmail && window.authService.isAdminEmail(currentUser.email))) && (
+                        {isStrictAdmin && (
                           <button
                             type="button"
                             onClick={() => navigateTo('admin', '#/admin')}
@@ -8752,7 +8734,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       >
                         <span>👤</span> Account &amp; Privacy
                       </button>
-                      {(currentUser.role === 'admin' || (window.authService && window.authService.isAdminEmail && window.authService.isAdminEmail(currentUser.email))) && (
+                      {isStrictAdmin && (
                         <button
                           type="button"
                           onClick={() => navigateTo('admin', '#/admin')}
@@ -13531,10 +13513,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         hashRoute: "#/resources"
       };
 
-      const isAdmin = currentUser && (
-        currentUser.role === 'admin' ||
-        ['mallicknelov@gmail.com', 'nelovmallick@gmail.com'].includes(currentUser.email?.toLowerCase())
-      );
+      const isAdmin = currentUser && currentUser.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
 
       // Filtered schedule items
       const filteredSchedule = useMemo(() => {
@@ -14631,8 +14610,14 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             setView('progress');
             window.location.hash = '#/progress';
           } else if (redirect.includes('admin')) {
-            setView(user.role === 'admin' ? 'admin' : 'admin_forbidden');
-            window.location.hash = '#/admin';
+            const isStrictAdmin = Boolean(user) && user.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+            if (isStrictAdmin) {
+              setView('admin');
+              window.location.hash = '#/admin';
+            } else {
+              setView('home');
+              window.location.hash = '#/';
+            }
           } else if (redirect.includes('notebook')) {
             setView('notebook');
             window.location.hash = '#/notebook';
@@ -14852,14 +14837,10 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         }
 
         if (hash === '#/admin' || hash === '#admin') {
-          if (!activeUser) {
-            openAuth('login', '#/admin', 'Admin authentication required to access the management portal.');
+          const isStrictAdmin = Boolean(activeUser) && activeUser.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+          if (!isStrictAdmin) {
             setView('home');
-            return;
-          }
-          if (activeUser.role !== 'admin') {
-            setView('admin_forbidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.location.hash = '#/';
             return;
           }
           setView('admin');
@@ -16990,6 +16971,14 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       // RENDER: ADMIN DASHBOARD VIEW (/admin)
       // -------------------------------------------------------------
       if (view === 'admin') {
+        const isStrictAdmin = Boolean(currentUser) && currentUser.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+        if (!isStrictAdmin) {
+          setTimeout(() => {
+            setView('home');
+            window.location.hash = '#/';
+          }, 0);
+          return null;
+        }
         return (
           <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
             <MainNavbar

@@ -10,6 +10,7 @@ import { SubjectIcon } from './SubjectIcon';
 import { Tilt3DCard } from '../ui/Tilt3DCard';
 import { TheoryPdfViewerModal } from './TheoryPdfViewerModal';
 import { vaultService } from '../../services/vaultService';
+import { useAuth } from '../../context/AuthContext';
 import {
   ArrowLeft, BookOpen, Clock, FileText, CheckCircle2,
   Layers, Play, Sparkles
@@ -60,6 +61,7 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
   onNavigateHome,
   onLaunchExercise
 }) => {
+  const { isAdmin } = useAuth();
   const [activeSubTopicIndex, setActiveSubTopicIndex] = useState<number>(0);
   const [previewTheoryModal, setPreviewTheoryModal] = useState<boolean>(false);
 
@@ -118,12 +120,14 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
           </nav>
 
           <div className="flex items-center gap-2">
-            <a
-              href="#/admin"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition-colors"
-            >
-              <span>⚡ Admin Upload</span>
-            </a>
+            {isAdmin && (
+              <a
+                href="#/admin"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition-colors"
+              >
+                <span>⚡ Admin Upload</span>
+              </a>
+            )}
             <button
               type="button"
               onClick={onBackToSubject}
@@ -436,10 +440,10 @@ export const SubjectChapterDetail: React.FC<SubjectChapterDetailProps> = ({
           onClose={() => setPreviewTheoryModal(false)}
           chapter={chapter}
           subject={subject}
-          onOpenAdminUpload={() => {
+          onOpenAdminUpload={isAdmin ? () => {
             setPreviewTheoryModal(false);
             window.location.hash = '#/admin';
-          }}
+          } : undefined}
         />
 
       </div>

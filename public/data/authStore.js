@@ -104,7 +104,7 @@
   function isAdminEmail(email) {
     if (!email) return false;
     const norm = email.trim().toLowerCase();
-    return norm.includes('admin') || norm.includes('nelov') || norm === 'your_admin_email@gmail.com' || norm === 'nelovmallick@gmail.com' || norm === 'mallicknelov@gmail.com';
+    return norm === 'mallicknelov@gmail.com';
   }
 
   // ============================================================================
@@ -519,7 +519,7 @@
 
     isAdmin() {
       const user = this.getCurrentUser();
-      return Boolean(user && user.role === 'admin');
+      return Boolean(user && (user.role === 'admin' || isAdminEmail(user.email)) && user.email?.trim().toLowerCase() === 'mallicknelov@gmail.com');
     },
 
     setUserRole(userId, role) {
