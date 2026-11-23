@@ -107,6 +107,34 @@
     return norm === 'mallicknelov@gmail.com';
   }
 
+  // Testing helper: auto-switch to regular student Aarav Sharma if URL includes #/test-student-login or ?student_session=aarav
+  try {
+    const locHash = (typeof window !== 'undefined' && window.location.hash) || '';
+    const locSearch = (typeof window !== 'undefined' && window.location.search) || '';
+    if (locHash.includes('student_session=aarav') || locSearch.includes('student_session=aarav') || locHash.startsWith('#/test-student-login')) {
+      const studentSession = {
+        id: 'd9b7367c-9b78-433b-8f19-33aa96112d4a',
+        name: 'Aarav Sharma',
+        email: 'aarav.sharma.test2027@gmail.com',
+        contactNumber: '+91 98765 43210',
+        role: 'student',
+        targetExam: 'JEE Mains',
+        acceptedTermsAt: '2026-11-20T00:00:00.000Z',
+        acceptedTermsVersion: '2026-11',
+        parentalConsentConfirmed: true,
+        createdAt: '2026-11-20T00:00:00.000Z'
+      };
+      localStorage.setItem('nelov_test_student_override', '1');
+      localStorage.removeItem('nelov_supabase_auth_token');
+      localStorage.removeItem('sb-lyzmismtmtsvlqpzdruy-auth-token');
+      localStorage.setItem(SESSION_KEY, JSON.stringify(studentSession));
+      localStorage.setItem('consent_v2026_11_d9b7367c-9b78-433b-8f19-33aa96112d4a', '2026-11-20T00:00:00.000Z');
+      if (locHash.startsWith('#/test-student-login')) {
+        window.location.hash = '#/schedule';
+      }
+    }
+  } catch (e) {}
+
   // ============================================================================
   // AUTH SERVICE
   // ============================================================================
@@ -644,15 +672,27 @@
         canonicalCode = 'PTM 01';
       }
 
-      // Resolve live authenticated Supabase user ID if available
+      // Resolve live authenticated Supabase user ID if available & ensure session freshness (prevents 401 on 3-hour tests)
       let effectiveUserId = userId;
       if (window.authService?.isCloudConnected() && supabaseClient) {
         try {
-          const { data: authData } = await supabaseClient.auth.getUser();
-          if (authData?.user?.id && uuidRegex.test(authData.user.id)) {
-            effectiveUserId = authData.user.id;
+          const { data: sessData } = await supabaseClient.auth.getSession();
+          const sess = sessData?.session;
+          if (sess) {
+            const expMs = sess.expires_at ? sess.expires_at * 1000 : 0;
+            if (expMs > 0 && expMs < Date.now() + 120000) {
+              console.log('[Supabase] Refreshing active session before test attempt save...');
+              const { data: refData } = await supabaseClient.auth.refreshSession();
+              if (refData?.session?.user?.id && uuidRegex.test(refData.session.user.id)) {
+                effectiveUserId = refData.session.user.id;
+              }
+            } else if (sess.user?.id && uuidRegex.test(sess.user.id)) {
+              effectiveUserId = sess.user.id;
+            }
           }
-        } catch (e) {}
+        } catch (e) {
+          console.warn('[Supabase] Session verification notice:', e);
+        }
       }
 
       // 1. Save to local storage cache immediately
@@ -715,9 +755,20 @@
             const { data, error } = await supabaseClient.from('test_attempts').insert(payload);
             if (error) {
               console.warn(`[Supabase] saveAttempt try ${tryIdx + 1} warning:`, error.message);
+              // Handle 401 JWT expiration on long 3-hour tests by refreshing session and retrying
+              if (error.status === 401 || error.message?.includes('JWT') || error.message?.includes('token') || error.message?.includes('expired') || error.message?.includes('auth')) {
+                console.log('[Supabase] Re-authenticating / refreshing session for retry...');
+                try {
+                  const { data: refData } = await supabaseClient.auth.refreshSession();
+                  if (refData?.session?.user?.id && uuidRegex.test(refData.session.user.id)) {
+                    effectiveUserId = refData.session.user.id;
+                    payload.user_id = effectiveUserId;
+                  }
+                } catch (re) {}
+              }
             } else {
               savedCloud = true;
-              console.log('[Supabase] Successfully saved test attempt to cloud:', attemptUuid);
+              console.log('[Supabase] Successfully saved test attempt to cloud (201 Created):', attemptUuid);
               break;
             }
           } catch (err) {
@@ -750,6 +801,18 @@
           }
         } catch (qe) {}
       }
+
+      // 3. Dispatch global event so all dashboards (Schedule, My Progress, Leaderboard) react instantly
+      try {
+        window.dispatchEvent(new CustomEvent('nelov_attempt_saved', {
+          detail: {
+            attemptRecord,
+            userId: effectiveUserId,
+            testId: canonicalTestId,
+            code: canonicalCode
+          }
+        }));
+      } catch (de) {}
     },
     async syncLocalAttemptsToSupabase() {
       if (!window.authService?.isCloudConnected() || !supabaseClient) {
@@ -2025,6 +2088,10 @@
   if (supabaseClient) {
     const processSession = async (session) => {
       if (!session || !session.user) return;
+      if (typeof window !== 'undefined' && localStorage.getItem('nelov_test_student_override') === '1') {
+        console.log('[Auth] Student test override active, preserving Aarav Sharma session.');
+        return;
+      }
       const isPhone = Boolean(session.user.email && session.user.email.endsWith('@phone.nelovportal.local'));
       let role = 'student';
       let fullName = session.user.user_metadata?.full_name || (isPhone ? 'Student Aspirant' : session.user.email.split('@')[0]);

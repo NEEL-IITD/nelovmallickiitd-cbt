@@ -148,15 +148,27 @@ export const studentStorage = {
       canonicalCode = 'PTM 01';
     }
 
-    // Resolve live authenticated Supabase user ID if available
+    // Resolve live authenticated Supabase user ID if available & ensure session freshness
     let effectiveUserId = userId;
     if (isSupabaseConfigured && supabase) {
       try {
-        const { data: authData } = await supabase.auth.getUser();
-        if (authData?.user?.id && uuidRegex.test(authData.user.id)) {
-          effectiveUserId = authData.user.id;
+        const { data: sessData } = await supabase.auth.getSession();
+        const sess = sessData?.session;
+        if (sess) {
+          const expMs = sess.expires_at ? sess.expires_at * 1000 : 0;
+          if (expMs > 0 && expMs < Date.now() + 120000) {
+            console.log('[Supabase] Refreshing active session before test attempt save...');
+            const { data: refData } = await supabase.auth.refreshSession();
+            if (refData?.session?.user?.id && uuidRegex.test(refData.session.user.id)) {
+              effectiveUserId = refData.session.user.id;
+            }
+          } else if (sess.user?.id && uuidRegex.test(sess.user.id)) {
+            effectiveUserId = sess.user.id;
+          }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn('[Supabase] Session check notice:', e);
+      }
     }
 
     // 1. Always update local storage cache immediately for zero latency
@@ -212,9 +224,36 @@ export const studentStorage = {
           submitted_at: attemptRecord.completedAt || new Date().toISOString()
         };
 
-        const { error } = await supabase.from('test_attempts').insert(payload);
-        if (error) {
-          console.error('[Supabase] Failed to sync test attempt to cloud:', error.message);
+        let savedCloud = false;
+        for (let tryIdx = 0; tryIdx < 3; tryIdx++) {
+          try {
+            const { error } = await supabase.from('test_attempts').insert(payload);
+            if (error) {
+              console.warn(`[Supabase] saveAttempt try ${tryIdx + 1} warning:`, error.message);
+              if ((error as any).status === 401 || error.message?.includes('JWT') || error.message?.includes('token') || error.message?.includes('expired') || error.message?.includes('auth')) {
+                console.log('[Supabase] Refreshing token on 401 during retry...');
+                try {
+                  const { data: refData } = await supabase.auth.refreshSession();
+                  if (refData?.session?.user?.id && uuidRegex.test(refData.session.user.id)) {
+                    effectiveUserId = refData.session.user.id;
+                    payload.user_id = effectiveUserId;
+                  }
+                } catch (re) {}
+              }
+            } else {
+              savedCloud = true;
+              console.log('[Supabase] Successfully saved test attempt to cloud (201 Created):', attemptUuid);
+              break;
+            }
+          } catch (err) {
+            console.warn(`[Supabase] saveAttempt try ${tryIdx + 1} exception:`, err);
+          }
+          if (!savedCloud && tryIdx < 2) {
+            await new Promise(r => setTimeout(r, 600));
+          }
+        }
+
+        if (!savedCloud) {
           try {
             const qKey = 'nelov_pending_sync_attempts';
             const rawQ = localStorage.getItem(qKey);
@@ -224,11 +263,9 @@ export const studentStorage = {
               localStorage.setItem(qKey, JSON.stringify(q));
             }
           } catch (qe) {}
-        } else {
-          console.log('[Supabase] Successfully saved test attempt to cloud:', attemptUuid);
         }
-      } catch (err) {
-        console.warn('[Supabase] Cloud sync error for attempt:', err);
+      } catch (cloudErr) {
+        console.error('[Supabase] Cloud sync error:', cloudErr);
       }
     } else {
       try {
@@ -240,6 +277,20 @@ export const studentStorage = {
           localStorage.setItem(qKey, JSON.stringify(q));
         }
       } catch (qe) {}
+    }
+
+    // 3. Dispatch global event so all dashboards react instantly
+    if (typeof window !== 'undefined') {
+      try {
+        window.dispatchEvent(new CustomEvent('nelov_attempt_saved', {
+          detail: {
+            attemptRecord,
+            userId: effectiveUserId,
+            testId: canonicalTestId,
+            code: canonicalCode
+          }
+        }));
+      } catch (de) {}
     }
   },
   async syncLocalAttemptsToSupabase(): Promise<{ synced: number; pending: number }> {

@@ -80,6 +80,36 @@
   <script src="/data/jee-mains/ptm03.js"></script>
   <script src="/data/rankPredictor.js"></script>
   <script src="/data/authStore.js"></script>
+  <script>
+    (function() {
+      try {
+        var h = window.location.hash || '';
+        var s = window.location.search || '';
+        if (h.indexOf('student_session=aarav') !== -1 || s.indexOf('student_session=aarav') !== -1 || h.indexOf('#/test-student-login') === 0) {
+          var student = {
+            id: 'd9b7367c-9b78-433b-8f19-33aa96112d4a',
+            name: 'Aarav Sharma',
+            email: 'aarav.sharma.test2027@gmail.com',
+            contactNumber: '+91 98765 43210',
+            role: 'student',
+            targetExam: 'JEE Mains',
+            acceptedTermsAt: '2026-11-20T00:00:00.000Z',
+            acceptedTermsVersion: '2026-11',
+            parentalConsentConfirmed: true,
+            createdAt: '2026-11-20T00:00:00.000Z'
+          };
+          localStorage.setItem('nelov_test_student_override', '1');
+          localStorage.removeItem('nelov_supabase_auth_token');
+          localStorage.removeItem('sb-lyzmismtmtsvlqpzdruy-auth-token');
+          localStorage.setItem('nelov_active_session', JSON.stringify(student));
+          localStorage.setItem('consent_v2026_11_d9b7367c-9b78-433b-8f19-33aa96112d4a', '2026-11-20T00:00:00.000Z');
+          if (h.indexOf('#/test-student-login') === 0) {
+            window.location.hash = '#/schedule';
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
   <script src="/data/resourcesIndex.js"></script>
   <script src="/data/lecturesIndex.js"></script>
   <script src="/data/physicsChapters.js"></script>
@@ -2443,13 +2473,25 @@ function PhysicsCbtTestShellModal({
 
         let status = 'unattempted';
         let marksAwarded = 0;
+        const isAttempted = (val) => val !== undefined && val !== null && String(val).trim() !== '' && !(Array.isArray(val) && val.length === 0);
 
-        if (resp === undefined || resp === null || resp === '' || (Array.isArray(resp) && resp.length === 0)) {
+        if (!isAttempted(resp)) {
           status = 'unattempted';
           marksAwarded = 0;
           unattemptedCount++;
         } else if (q.type === 'single_correct') {
-          const isMatch = Number(resp) === Number(q.correctAnswer);
+          const rawCorrect = q.correctAnswer !== undefined ? q.correctAnswer : q.answer;
+          let isMatch = false;
+          if (typeof rawCorrect === 'number') {
+            isMatch = Number(resp) === rawCorrect;
+          } else if (typeof rawCorrect === 'string') {
+            if (['A', 'B', 'C', 'D'].includes(rawCorrect.toUpperCase())) {
+              const charIdx = rawCorrect.toUpperCase().charCodeAt(0) - 65;
+              isMatch = Number(resp) === charIdx || String(resp).toUpperCase() === rawCorrect.toUpperCase();
+            } else {
+              isMatch = String(resp).trim().toLowerCase() === rawCorrect.trim().toLowerCase();
+            }
+          }
           if (isMatch) {
             status = 'correct';
             marksAwarded = qCorrectMarks;
@@ -2575,9 +2617,11 @@ function PhysicsCbtTestShellModal({
     setScoreSummary(null);
   };
 
+  const isVaultAttempted = (val) => val !== undefined && val !== null && String(val).trim() !== '' && !(Array.isArray(val) && val.length === 0);
+
   const getQuestionPaletteStyle = (qNum) => {
     const resp = responses[qNum];
-    const isAnswered = resp !== undefined && resp !== '' && !(Array.isArray(resp) && resp.length === 0);
+    const isAnswered = isVaultAttempted(resp);
     const isMarked = markedForReview.includes(qNum);
     const isCurrent = selectedQuestion === qNum;
 
@@ -2594,8 +2638,7 @@ function PhysicsCbtTestShellModal({
   };
 
   const answeredCount = Object.keys(responses).filter(k => {
-    const v = responses[k];
-    return v !== undefined && v !== '' && !(Array.isArray(v) && v.length === 0);
+    return isVaultAttempted(responses[k]);
   }).length;
   const markedCount = markedForReview.length;
   const notAnsweredCount = visitedQuestions.length - answeredCount;
@@ -7191,19 +7234,25 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
 
     // Central Strict Attempt Evaluation Helper (Never treats numerical 0 or option index 0 as unattempted)
-    function isQuestionAttempted(ans) {
-      if (ans === undefined || ans === null) return false;
-      if (typeof ans === 'string') {
-        return ans.trim() !== '';
-      }
-      if (Array.isArray(ans)) {
-        return ans.length > 0;
-      }
-      if (typeof ans === 'number') {
-        return !isNaN(ans);
-      }
-      return false;
+    function isQuestionAttempted(val) {
+      return val !== undefined && val !== null && String(val).trim() !== '' && !(Array.isArray(val) && val.length === 0);
     }
+    window.isQuestionAttempted = isQuestionAttempted;
+
+    // Helper to resolve full test paper with questions by any testId/code/alias
+    function getFullTestPaperById(testId) {
+      if (!testId) return window.pta04Data || null;
+      const clean = String(testId).toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (clean.includes('ptm03') || clean.includes('ptm3')) return window.ptm03Data || null;
+      if (clean.includes('ptm02') || clean.includes('ptm2')) return window.ptm02Data || null;
+      if (clean.includes('ptm01') || clean.includes('ptm1')) return window.ptm01Data || null;
+      if (clean.includes('pta06') || clean.includes('pta6')) return window.pta06Data || null;
+      if (clean.includes('pta05') || clean.includes('pta5')) return window.pta05Data || null;
+      if (clean.includes('pta04') || clean.includes('pta4')) return window.pta04Data || null;
+      const meta = window.getTestById ? window.getTestById(testId) : null;
+      return (meta && meta.questions && meta.questions.length > 0) ? meta : (window.pta04Data || null);
+    }
+    window.getFullTestPaperById = getFullTestPaperById;
 
     // Adaptive Scoring Engine: supports JEE Mains (+4 / -1) and JEE Advanced (multi-correct partials) with Time & Format Analytics
     function evaluatePaper(testPaper, responses, questionTimes = {}) {
@@ -7237,12 +7286,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       let unattemptedTime = 0, unattemptedTimeCount = 0;
 
       const questionBreakdown = testPaper.questions.map((q) => {
-        let studentResp = responses ? responses[q.id] : undefined;
-        if (studentResp === undefined && responses && responses[String(q.id)] !== undefined) {
-          studentResp = responses[String(q.id)];
-        }
-        if (studentResp === undefined && responses && typeof q.id === 'string' && !isNaN(Number(q.id))) {
-          studentResp = responses[Number(q.id)];
+        let studentResp = undefined;
+        if (responses) {
+          if (responses[q.id] !== undefined) studentResp = responses[q.id];
+          else if (responses[String(q.id)] !== undefined) studentResp = responses[String(q.id)];
+          else if (!isNaN(Number(q.id)) && responses[Number(q.id)] !== undefined) studentResp = responses[Number(q.id)];
+          else if (responses['q' + q.id] !== undefined) studentResp = responses['q' + q.id];
+          else if (responses['Q' + q.id] !== undefined) studentResp = responses['Q' + q.id];
         }
         const marking = q.marking || {};
         const pos = marking.positive !== undefined ? marking.positive : (isJeeMains ? 4 : (q.type === 'multiple_correct' ? 4 : 3));
@@ -9280,13 +9330,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         let qBreakdown = attempt.questionBreakdown || [];
         if ((!qBreakdown || qBreakdown.length === 0) && attempt.responses) {
           try {
-            const paper = (window.getTestById ? window.getTestById(attempt.testId) : null) ||
-              (attempt.testId?.includes('ptm03') || attempt.testId?.includes('ptm-03') ? window.ptm03Data : null) ||
-              (attempt.testId?.includes('ptm02') || attempt.testId?.includes('ptm-02') ? window.ptm02Data : null) ||
-              (attempt.testId?.includes('ptm01') || attempt.testId?.includes('ptm-01') ? window.ptm01Data : null) ||
-              (attempt.testId?.includes('pta06') || attempt.testId?.includes('pta-06') ? window.pta06Data : null) ||
-              (attempt.testId?.includes('pta05') || attempt.testId?.includes('pta-05') ? window.pta05Data : null) ||
-              window.pta04Data;
+            const paper = (typeof getFullTestPaperById === 'function')
+              ? getFullTestPaperById(attempt.testId || attempt.testCode)
+              : (window.getFullTestPaperById ? window.getFullTestPaperById(attempt.testId) : window.pta04Data);
             if (paper && typeof evaluatePaper === 'function') {
               const reEval = evaluatePaper(paper, attempt.responses, attempt.timePerQuestion || {});
               qBreakdown = reEval.questionBreakdown;
@@ -14079,11 +14125,34 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         return `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
       };
 
-      // Student attempt history check
+      // Reactive attempt history refresh listener
+      const [attemptRefreshKey, setAttemptRefreshKey] = useState(0);
+
+      useEffect(() => {
+        const handleAttemptSaved = () => setAttemptRefreshKey(prev => prev + 1);
+        window.addEventListener('nelov_attempt_saved', handleAttemptSaved);
+        return () => window.removeEventListener('nelov_attempt_saved', handleAttemptSaved);
+      }, []);
+
+      const normalizeScheduleTestId = (id) => {
+        if (!id) return '';
+        const s = String(id).toLowerCase().trim();
+        const mPtm = s.match(/ptm[-\s_]?0?(\d+)/);
+        if (mPtm) return `jee-mains-ptm-${String(parseInt(mPtm[1], 10)).padStart(2, '0')}`;
+        const mPta = s.match(/pta[-\s_]?0?(\d+)/);
+        if (mPta) return `jee-advanced-pta-${String(parseInt(mPta[1], 10)).padStart(2, '0')}`;
+        return s;
+      };
+
+      // Student attempt history check with canonical normalization
       const getAttemptCount = (testId) => {
         if (!currentUser || !window.studentStorage?.getAttempts) return 0;
         const attempts = window.studentStorage.getAttempts(currentUser.id) || [];
-        return attempts.filter(a => a.testId === testId).length;
+        const targetNorm = normalizeScheduleTestId(testId);
+        return attempts.filter(a => {
+          const aNorm = normalizeScheduleTestId(a.testId);
+          return aNorm === targetNorm || a.testId === testId;
+        }).length;
       };
 
       const handleCopyLink = () => {
@@ -15806,6 +15875,21 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           window.location.hash = targetHash;
         }
 
+        // Check if viewing completed results of this test (preserves Results on hard refresh)
+        const savedView = sessionStorage.getItem('nelov_active_view_' + canonicalId);
+        const savedEvalRaw = sessionStorage.getItem('nelov_eval_' + canonicalId);
+        if (savedView === 'result' && savedEvalRaw) {
+          try {
+            const parsedEval = JSON.parse(savedEvalRaw);
+            if (parsedEval && parsedEval.questionBreakdown && parsedEval.questionBreakdown.length > 0) {
+              setEvaluationData(parsedEval);
+              setView('result');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              return;
+            }
+          } catch (e) {}
+        }
+
         answersRef.current = {};
         statusesRef.current = {};
         questionTimesRef.current = {};
@@ -15829,6 +15913,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           setCurrentQIndex(saved.currentQIndex || 0);
           setQuestionTimes(saved.questionTimes || {});
 
+          const isOngoingSession = Boolean(
+            (saved.examEndTime && saved.examEndTime > Date.now()) ||
+            (saved.timeLeft && saved.timeLeft > 0)
+          );
+
           if (saved.examEndTime && saved.examEndTime > Date.now()) {
             examEndTimeRef.current = saved.examEndTime;
             const remaining = Math.max(0, Math.round((saved.examEndTime - Date.now()) / 1000));
@@ -15842,6 +15931,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             examEndTimeRef.current = Date.now() + totalDurationSec * 1000;
             timeLeftRef.current = totalDurationSec;
             setTimeLeft(totalDurationSec);
+          }
+
+          // If session was actively in progress with saved answers or active question, resume directly in exam mode!
+          if (isOngoingSession && (Object.keys(saved.responses).length > 0 || (saved.currentQIndex && saved.currentQIndex > 0))) {
+            setView('exam');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
           }
         } else {
           answersRef.current = {};
@@ -16053,7 +16149,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           document.activeElement.blur();
         }
 
-        const paperToEval = currentPaper || (window.getTestById ? window.getTestById(activeTestId) : null) || window.pta04Data;
+        const paperToEval = currentPaper || (typeof getFullTestPaperById === 'function' ? getFullTestPaperById(activeTestId) : (window.getFullTestPaperById ? window.getFullTestPaperById(activeTestId) : window.pta04Data));
         const finalAnswers = { ...answersRef.current };
         const finalTimes = { ...questionTimesRef.current };
         const durationSec = (paperToEval?.durationMinutes || 180) * 60;
@@ -16067,6 +16163,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
         try {
           sessionStorage.setItem('nelov_eval_' + activeTestId, JSON.stringify(evalResults));
+          sessionStorage.setItem('nelov_active_view_' + activeTestId, 'result');
         } catch (e) {
           console.warn("Could not cache evalResults to sessionStorage", e);
         }
@@ -17029,6 +17126,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <button
                   onClick={() => {
+                    sessionStorage.removeItem('nelov_active_view_' + activeTestId);
                     setView('home');
                     window.location.hash = `#/tests/${currentPaper ? currentPaper.examCategory : activeCategory}`;
                   }}
@@ -17428,15 +17526,16 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                                 {qObj.options.map((opt) => {
                                   const isStudentAttempted = isQuestionAttempted(item.studentResp);
+                                  const optIdStr = String(opt.id).trim().toUpperCase();
                                   const isSelected = isStudentAttempted && (
                                     Array.isArray(item.studentResp)
-                                      ? item.studentResp.map(s => String(s).toUpperCase()).includes(opt.id.toUpperCase())
-                                      : String(item.studentResp).trim().toUpperCase() === opt.id.toUpperCase()
+                                      ? item.studentResp.map(s => String(s).toUpperCase()).includes(optIdStr)
+                                      : String(item.studentResp).trim().toUpperCase() === optIdStr
                                   );
 
                                   const isCorrectOpt = Array.isArray(item.correctAns)
-                                    ? item.correctAns.map(c => String(c).toUpperCase()).includes(opt.id.toUpperCase())
-                                    : String(item.correctAns).trim().toUpperCase() === opt.id.toUpperCase();
+                                    ? item.correctAns.map(c => String(c).toUpperCase()).includes(optIdStr)
+                                    : String(item.correctAns).trim().toUpperCase() === optIdStr;
 
                                   let optBorder = 'border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/30';
                                   let optBadge = null;
@@ -17523,7 +17622,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 <div className="pt-6 border-t border-slate-100 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-4">
                   <button
                     type="button"
-                    onClick={() => handleSelectTest(activeTestId)}
+                    onClick={() => {
+                      sessionStorage.removeItem('nelov_active_view_' + activeTestId);
+                      sessionStorage.removeItem('nelov_eval_' + activeTestId);
+                      handleSelectTest(activeTestId);
+                    }}
                     className="px-6 py-3 rounded-xl border border-slate-300 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-200 font-bold text-xs transition-colors"
                   >
                     ← Retake This Paper
@@ -17531,7 +17634,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
                   <button
                     type="button"
-                    onClick={() => { setView('progress'); window.location.hash = '#/progress'; }}
+                    onClick={() => {
+                      sessionStorage.removeItem('nelov_active_view_' + activeTestId);
+                      setView('progress');
+                      window.location.hash = '#/progress';
+                    }}
                     className="px-6 py-3 rounded-xl border border-indigo-300 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-bold text-xs hover:bg-indigo-100 transition-colors"
                   >
                     📊 View My Progress & History

@@ -104,11 +104,34 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     return testId === 'jee-mains-ptm-01' || testId === 'jee-mains-ptm-02' || testId === 'jee-mains-ptm-03' || liveStatusMap[testId] === 'live';
   };
 
-  // Get student attempt count for this test
+  // Reactive attempt history refresh listener
+  const [attemptRefreshKey, setAttemptRefreshKey] = useState(0);
+
+  useEffect(() => {
+    const handleAttemptSaved = () => setAttemptRefreshKey((prev) => prev + 1);
+    window.addEventListener('nelov_attempt_saved', handleAttemptSaved);
+    return () => window.removeEventListener('nelov_attempt_saved', handleAttemptSaved);
+  }, []);
+
+  const normalizeTestId = (id: string) => {
+    if (!id) return '';
+    const s = String(id).toLowerCase().trim();
+    const mPtm = s.match(/ptm[-\s_]?0?(\d+)/);
+    if (mPtm) return `jee-mains-ptm-${String(parseInt(mPtm[1], 10)).padStart(2, '0')}`;
+    const mPta = s.match(/pta[-\s_]?0?(\d+)/);
+    if (mPta) return `jee-advanced-pta-${String(parseInt(mPta[1], 10)).padStart(2, '0')}`;
+    return s;
+  };
+
+  // Get student attempt count for this test with canonical normalization
   const getAttemptCount = (testId: string) => {
-    if (!user) return 0;
+    if (!user || attemptRefreshKey < 0) return 0;
     const history = studentStorage.getAttempts(user.id);
-    return history.filter((a) => a.testId === testId).length;
+    const targetNorm = normalizeTestId(testId);
+    return history.filter((a) => {
+      const aNorm = normalizeTestId(a.testId);
+      return aNorm === targetNorm || a.testId === testId;
+    }).length;
   };
 
   const handleCopyLink = () => {

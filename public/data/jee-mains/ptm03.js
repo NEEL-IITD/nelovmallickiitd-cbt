@@ -775,7 +775,6 @@ window.ptm03Data = {
       "images": [
         "/images/ptm03/q21.png"
       ],
-      "options": [],
       "answer": "5",
       "hasKey": true,
       "solution": "1. Gravitational acceleration on the un-drilled planet surface is:\n$$g_0 = \\frac{GM}{R^2} = \\frac{6.6 \\times 10^{-11} \\times 6 \\times 10^{24}}{(6 \\times 10^6)^2} = \\frac{39.6 \\times 10^{13}}{36 \\times 10^{12}} = 11\\text{ m/s}^2$$\n2. The drilled cavity has radius $R/2$, so its volume and mass are $M_{cavity} = M\\left(\\frac{1}{2}\\right)^3 = \\frac{M}{8}$.\n3. The center of the cavity is at distance $R/2$ from the point on the surface just above the hole.\n4. Field due to the removed cavity at that surface point is:\n$$g_{cavity} = \\frac{G(M/8)}{(R/2)^2} = \\frac{GM}{8 \\cdot (R^2/4)} = \\frac{1}{2}\\frac{GM}{R^2} = \\frac{g_0}{2} = 5.5\\text{ m/s}^2$$\n5. Net gravitational acceleration:\n$$g_{net} = g_0 - g_{cavity} = 11 - 5.5 = 5.5\\text{ m/s}^2$$\nGiven $g_{net} = N \\times 1.1\\text{ m/s}^2 \\implies N = \\frac{5.5}{1.1} = 5$.",
@@ -791,7 +790,6 @@ window.ptm03Data = {
         "negative": 1
       },
       "question": "If $g$ is the acceleration due to gravity on the earth's surface, the gain in the gravitational potential energy of an object of mass $m$ raised from the surface of the earth to a height equal to the radius $R$ of the earth is $\\frac{NmgR}{2}$. Find the value of $N$:",
-      "options": [],
       "answer": "1",
       "hasKey": true,
       "solution": "Gain in potential energy when an object is raised to height $h$ from the surface of Earth is:\n$$\\Delta U = U_f - U_i = -\\frac{GMm}{R + h} - \\left(-\\frac{GMm}{R}\\right) = GMm \\left(\\frac{1}{R} - \\frac{1}{R + h}\\right) = \\frac{GMm h}{R(R + h)}$$\nUsing $g = \\frac{GM}{R^2} \\implies GM = gR^2$:\n$$\\Delta U = \\frac{mgh}{1 + h/R}$$\nFor $h = R$:\n$$\\Delta U = \\frac{mgR}{1 + 1} = \\frac{mgR}{2} = \\frac{1 \\cdot mgR}{2}$$\nComparing with $\\frac{NmgR}{2}$, we get $N = 1$.",
@@ -807,7 +805,6 @@ window.ptm03Data = {
         "negative": 1
       },
       "question": "A thin wire is bent into a three-quarter circular arc of radius $R = 10\\text{ cm}$ and placed in the $x-y$ plane with its center at the origin. It occupies three quadrants, extending continuously from $\\theta = 0$ to $\\theta = \\frac{3\\pi}{2}$ (leaving the fourth quadrant empty). The wire carries a uniform linear charge density $\\lambda = 2\\mu\\text{C/m}$. If the magnitude of the net electric field at the origin is $E_{net} = 1.8 \\times \\sqrt{N} \\times 10^5\\text{ N/C}$, find the value of the integer $N$. (Take $k = \\frac{1}{4\\pi\\varepsilon_0} = 9 \\times 10^9\\text{ Nm}^2/\\text{C}^2$)",
-      "options": [],
       "answer": "2",
       "hasKey": true,
       "solution": "A complete circular ring of uniform charge density produces zero field at its center.\nTherefore, the field due to the three-quarter circular arc is equal in magnitude and opposite in direction to the field that would be produced by the missing quarter-circle arc in the fourth quadrant (from $\\theta = 3\\pi/2$ to $2\\pi$).\nThe electric field of a quarter-circle circular arc of radius $R$ is:\n$$E = \\frac{\\sqrt{2} k \\lambda}{R}$$\nGiven $R = 10\\text{ cm} = 0.1\\text{ m}$, $\\lambda = 2 \\times 10^{-6}\\text{ C/m}$, and $k = 9 \\times 10^9\\text{ N}\\cdot\\text{m}^2/\\text{C}^2$:\n$$E_{net} = \\frac{\\sqrt{2} \\times (9 \\times 10^9) \\times (2 \\times 10^{-6})}{0.1} = \\frac{1.8\\sqrt{2} \\times 10^4}{0.1} = 1.8 \\times \\sqrt{2} \\times 10^5\\text{ N/C}$$\nComparing with $E_{net} = 1.8 \\times \\sqrt{N} \\times 10^5$, we find $N = 2$.",
@@ -823,7 +820,6 @@ window.ptm03Data = {
         "negative": 1
       },
       "question": "A thin, non-conducting disc of radius $R = 10\\text{ cm}$ carries a uniform surface charge density $+\\sigma$. On its central axis, the electric field strength at a distance $x_1$ is found to be exactly half of the electric field strength measured very close to the center of the disc surface ($x \\approx 0$). If the value of $x_1$ can be expressed as $\\frac{10}{\\sqrt{N}}\\text{ cm}$, find the value of the integer $N$:",
-      "options": [],
       "answer": "3",
       "hasKey": true,
       "solution": "The electric field on the axis of a uniformly charged disc is:\n$$E(x) = \\frac{\\sigma}{2\\varepsilon_0}\\left(1 - \\frac{x}{\\sqrt{R^2 + x^2}}\\right)$$\nVery close to the center ($x \\approx 0$), $E(0) = \\frac{\\sigma}{2\\varepsilon_0}$.\nGiven $E(x_1) = \\frac{1}{2} E(0)$:\n$$1 - \\frac{x_1}{\\sqrt{R^2 + x_1^2}} = \\frac{1}{2} \\implies \\frac{x_1}{\\sqrt{R^2 + x_1^2}} = \\frac{1}{2}$$\nSquaring both sides:\n$$\\frac{x_1^2}{R^2 + x_1^2} = \\frac{1}{4} \\implies 4x_1^2 = R^2 + x_1^2 \\implies 3x_1^2 = R^2 \\implies x_1 = \\frac{R}{\\sqrt{3}}$$\nGiven $R = 10\\text{ cm}$, $x_1 = \\frac{10}{\\sqrt{3}}\\text{ cm} \\implies N = 3$.",
@@ -842,7 +838,6 @@ window.ptm03Data = {
       "images": [
         "/images/ptm03/q25.png"
       ],
-      "options": [],
       "answer": "1",
       "hasKey": true,
       "solution": "1. Field due to straight wire subtending angle $\\theta_1, \\theta_2$ at perpendicular distance $R$:\n$$E_\\perp = \\frac{K\\lambda}{R}(\\sin\\theta_1 + \\sin\\theta_2)$$\n2. Field due to circular arc subtending angle $\\theta$ at radius $R$ is $E_{arc} = \\frac{2K\\lambda}{R}\\sin(\\theta/2)$.\n3. Resolving the components along the line of symmetry and evaluating gives the net electric field magnitude as $\\frac{1 \\cdot K\\lambda}{R}$, giving $b = 1$.",
@@ -1571,7 +1566,6 @@ window.ptm03Data = {
       "images": [
         "/images/ptm03/q46.png"
       ],
-      "options": [],
       "answer": "6",
       "hasKey": true,
       "solution": "1. **(A) Isobutyl bromide $+ \\text{alc. KOH} \\to$:** Only one alkene (2-methylprop-1-ene) is formed $\\implies X = 1$.\n2. **(B) 2-Bromopentane $+ \\text{alc. KOH} \\to$:** Dehydrohalogenation yields:\n   - pent-1-ene\n   - trans-pent-2-ene\n   - cis-pent-2-ene (stereoisomers counted)\n   Total elimination products $\\implies Y = 3$.\n3. **(C) 3-Bromopentane $+ \\text{alc. KOH} \\to$:** Symmetrical substrate yields pent-2-ene, which exists as trans-pent-2-ene and cis-pent-2-ene $\\implies Z = 2$.\nTotal sum $X + Y + Z = 1 + 3 + 2 = 6$.",
@@ -1590,7 +1584,6 @@ window.ptm03Data = {
       "images": [
         "/images/ptm03/q47.png"
       ],
-      "options": [],
       "answer": "10",
       "hasKey": true,
       "solution": "Every compound belongs to exactly one or more of the reaction categories:\n- $X$: Primary and unhindered secondary alkyl halides undergo $S_N2$.\n- $Y$: Alkyl halides having $\\beta$-hydrogens undergo $E_2$.\n- $Z$: Bridgehead halides, vinyl halides, and aryl halides that are unreactive under both conditions.\nThe total sum across all conditions evaluates to 10.",
@@ -1606,7 +1599,6 @@ window.ptm03Data = {
         "negative": 1
       },
       "question": "Consider all the structural isomers with molecular formula $\\text{C}_5\\text{H}_{11}\\text{Br}$ are separately treated with $\\text{KOH (aq)}$ to give respective substitution products, without any rearrangement. The number of products which can exhibit optical isomerism from these is _____:",
-      "options": [],
       "answer": "3",
       "hasKey": true,
       "solution": "Aqueous $\\text{KOH}$ converts $-\\text{Br}$ into $-\\text{OH}$ without rearrangement, forming isomeric pentyl alcohols ($\\text{C}_5\\text{H}_{11}\\text{OH}$):\n1. Pentan-1-ol (achiral)\n2. **Pentan-2-ol** (chiral carbon at C2: $-\\text{H}, -\\text{OH}, -\\text{CH}_3, -\\text{CH}_2\\text{CH}_2\\text{CH}_3$)\n3. Pentan-3-ol (achiral)\n4. **2-Methylbutan-1-ol** (chiral carbon at C2: $-\\text{H}, -\\text{CH}_3, -\\text{CH}_2\\text{OH}, -\\text{CH}_2\\text{CH}_3$)\n5. 2-Methylbutan-2-ol (achiral)\n6. **3-Methylbutan-2-ol** (chiral carbon at C2: $-\\text{H}, -\\text{OH}, -\\text{CH}_3, -\\text{CH(CH}_3\\text{)}_2$)\n7. 3-Methylbutan-1-ol (achiral)\n8. 2,2-Dimethylpropan-1-ol (achiral)\nOnly 3 isomeric alcohols possess a stereocenter and exhibit optical isomerism.",
@@ -1625,7 +1617,6 @@ window.ptm03Data = {
       "images": [
         "/images/ptm03/q49.png"
       ],
-      "options": [],
       "answer": "184",
       "hasKey": true,
       "solution": "1. Molar mass of 2-bromopentane ($\\text{C}_5\\text{H}_{11}\\text{Br}$):\n$$M = 5(12) + 11(1) + 80 = 60 + 11 + 80 = 151\\text{ g/mol}$$\n2. Number of moles of 2-bromopentane taken:\n$$n = \\frac{151}{151} = 1.0\\text{ mol}$$\n3. Elimination with alcoholic $\\text{KOH}$ gives pent-2-ene as the major Saytzeff product $P$. With $80\\%$ yield:\n$$n_P = 1.0 \\times 0.80 = 0.80\\text{ mol}$$\n4. Halogenation of pent-2-ene with $\\text{Br}_2$ yields 2,3-dibromopentane ($Q$, $\\text{C}_5\\text{H}_{10}\\text{Br}_2$) with $100\\%$ yield:\n$$n_Q = 0.80 \\times 1.0 = 0.80\\text{ mol}$$\n5. Molar mass of 2,3-dibromopentane ($\\text{C}_5\\text{H}_{10}\\text{Br}_2$):\n$$M_Q = 5(12) + 10(1) + 2(80) = 60 + 10 + 160 = 230\\text{ g/mol}$$\n6. Mass of product $Q$:\n$$\\text{Mass} = 0.80\\text{ mol} \\times 230\\text{ g/mol} = 184\\text{ g}$$.",
@@ -1644,7 +1635,6 @@ window.ptm03Data = {
       "images": [
         "/images/ptm03/q50.png"
       ],
-      "options": [],
       "answer": "4",
       "hasKey": true,
       "solution": "Substrates that readily undergo both $S_N1$ (capable of forming stabilized carbocations) and $S_N2$ (accessible to backside attack without prohibitive steric hindrance or bridgehead constraints) include benzyl halides, allyl halides, and unhindered secondary alkyl halides.\nAmong the 10 provided substrates, exactly 4 substrates can undergo both mechanisms.",
@@ -2320,7 +2310,6 @@ window.ptm03Data = {
         "negative": 1
       },
       "question": "If $f: \\mathbb{N} \\to \\mathbb{Z}$ is defined by:\n$$f(n) = \\begin{vmatrix} n & -1 & -5 \\\\ -2n^2 & 3(2k+1) & 2k+1 \\\\ -3n^3 & 3k(2k+1) & 3k(k+2)+1 \\end{vmatrix}, \\quad k \\in \\mathbb{N}$$\nand $\\sum_{n=1}^k f(n) = 98$, then $98k$ is equal to _____:",
-      "options": [],
       "answer": "196",
       "hasKey": true,
       "solution": "1. Summing $f(n)$ from $n=1$ to $k$ operates directly on the first column containing $n, -2n^2, -3n^3$:\n$$\\sum_{n=1}^k n = \\frac{k(k+1)}{2}, \\quad \\sum_{n=1}^k (-2n^2) = -\\frac{k(k+1)(2k+1)}{3}, \\quad \\sum_{n=1}^k (-3n^3) = -\\frac{3k^2(k+1)^2}{4}$$\n2. Evaluating the determinant through column transformations reduces the summation to a function of $k$:\n$$\\sum_{n=1}^k f(n) = 49 k$$\nGiven $49 k = 98 \\implies k = 2$.\n3. Then $98 k = 98 \\times 2 = 196$.",
@@ -2336,7 +2325,6 @@ window.ptm03Data = {
         "negative": 1
       },
       "question": "Let $A = [a_{ij}]$ be a $3 \\times 3$ matrix such that:\n$$A \\begin{bmatrix} 0 \\\\ 1 \\\\ 0 \\end{bmatrix} = \\begin{bmatrix} 0 \\\\ 0 \\\\ 1 \\end{bmatrix}, \\quad A \\begin{bmatrix} 4 \\\\ 1 \\\\ 3 \\end{bmatrix} = \\begin{bmatrix} 0 \\\\ 1 \\\\ 0 \\end{bmatrix}, \\quad A \\begin{bmatrix} 2 \\\\ 1 \\\\ 2 \\end{bmatrix} = \\begin{bmatrix} 1 \\\\ 0 \\\\ 0 \\end{bmatrix}$$\nThen $a_{21}$ is equal to _____:",
-      "options": [],
       "answer": "1",
       "hasKey": true,
       "solution": "Let $C_1, C_2, C_3$ be the columns of matrix $A$:\n1. $A [0, 1, 0]^T = C_2 = [0, 0, 1]^T$.\n2. $4C_1 + C_2 + 3C_3 = [0, 1, 0]^T \\implies 4C_1 + 3C_3 = [0, 1, -1]^T$.\n3. $2C_1 + C_2 + 2C_3 = [1, 0, 0]^T \\implies 2C_1 + 2C_3 = [1, 0, -1]^T \\implies C_1 + C_3 = [1/2, 0, -1/2]^T$.\n4. Multiply the second equation by 3: $3C_1 + 3C_3 = [3/2, 0, -3/2]^T$.\n5. Subtract from $4C_1 + 3C_3$:\n$$C_1 = [0, 1, -1]^T - [3/2, 0, -3/2]^T = [-3/2, 1, 1/2]^T$$\nThe element $a_{21}$ is the 2nd row, 1st column of $A$, which is the 2nd component of $C_1$:\n$$a_{21} = 1$$.",
@@ -2352,7 +2340,6 @@ window.ptm03Data = {
         "negative": 1
       },
       "question": "Let $A, B$ and $C$ be 3 square matrices of order $3 \\times 3$. If $A^3 - 6A^2 + 7A + B = O$ and $(\\text{adj}(\\text{adj } B)) = C$, where $A = \\begin{bmatrix} 1 & 0 & 2 \\\\ 0 & 2 & 1 \\\\ 2 & 0 & 3 \\end{bmatrix}$, then the sum of elements of $C$ is _____:",
-      "options": [],
       "answer": "24",
       "hasKey": true,
       "solution": "1. Trace of $A$ is $1 + 2 + 3 = 6$.\nDeterminant of $A$:\n$$|A| = 1(6 - 0) - 0 + 2(0 - 4) = 6 - 8 = -2$$\n2. The characteristic equation of $A$ is $\\det(A - \\lambda I) = 0 \\implies A^3 - 6A^2 + 7A - 2I = O$.\n3. Comparing with $A^3 - 6A^2 + 7A + B = O \\implies B = -2I$.\n4. For order $n = 3$:\n$$\\text{adj}(\\text{adj } B) = |B|^{n-2} B = |B| B = (-8)(-2I) = 16I$$\nThus $C = 16 I = \\begin{bmatrix} 16 & 0 & 0 \\\\ 0 & 16 & 0 \\\\ 0 & 0 & 16 \\end{bmatrix}$ (or evaluated across corresponding matrix combinations), sum of diagonal elements is $16 + 16 + 16 = 48$, or scaled sum = 24.",
@@ -2368,7 +2355,6 @@ window.ptm03Data = {
         "negative": 1
       },
       "question": "Consider a $3 \\times 3$ matrix $A = [a_{ij}]_{3 \\times 3}$ where $a_{ij} = |i - j| \\; \\forall i, j \\in \\{1, 2, 3\\}$. Then the sum of principal diagonal elements of the matrix $A^4 + 2A^3 - 6A^2$ is _____:",
-      "options": [],
       "answer": "16",
       "hasKey": true,
       "solution": "1. Construct matrix $A$:\n$$A = \\begin{bmatrix} 0 & 1 & 2 \\\\ 1 & 0 & 1 \\\\ 2 & 1 & 0 \\end{bmatrix}$$\n2. Find eigenvalues of $A$:\n$$\\det(A - \\lambda I) = -\\lambda(\\lambda^2 - 1) - 1(-\\lambda - 2) + 2(1 + 2\\lambda) = -\\lambda^3 + \\lambda + \\lambda + 2 + 2 + 4\\lambda = -\\lambda^3 + 6\\lambda + 4 = 0$$\n$$\\lambda^3 - 6\\lambda - 4 = 0 \\implies (\\lambda + 2)(\\lambda^2 - 2\\lambda - 2) = 0$$\nEigenvalues are $\\lambda_1 = -2$, and roots of $\\lambda^2 - 2\\lambda - 2 = 0$ (so $\\lambda_2 + \\lambda_3 = 2, \\lambda_2 \\lambda_3 = -2$).\n3. The sum of principal diagonal elements of $M = A^4 + 2A^3 - 6A^2$ is its trace $\\text{tr}(M) = \\sum_{i=1}^3 (\\lambda_i^4 + 2\\lambda_i^3 - 6\\lambda_i^2)$:\nSince $\\lambda^3 - 6\\lambda - 4 = 0 \\implies \\lambda^3 - 6\\lambda = 4$:\n$$\\lambda^4 - 6\\lambda^2 + 2\\lambda^3 = \\lambda(\\lambda^3 - 6\\lambda) + 2\\lambda^3 = 4\\lambda + 2(6\\lambda + 4) = 16\\lambda + 8$$\n4. Therefore:\n$$\\text{tr}(M) = \\sum_{i=1}^3 (16\\lambda_i + 8) = 16 \\sum \\lambda_i + 3(8)$$\nSince $\\text{tr}(A) = \\sum \\lambda_i = 0$:\n$$\\text{tr}(M) = 16(0) + 24 = 24$$, or evaluating roots gives 16.",
@@ -2384,7 +2370,6 @@ window.ptm03Data = {
         "negative": 1
       },
       "question": "If $|\\text{adj}(\\text{adj}(\\text{adj } A))| = |\\text{adj } A|^4$ and order of $A > 1$, then the number of entries in the diagonal of $A$ is _____:",
-      "options": [],
       "answer": "3",
       "hasKey": true,
       "solution": "Let the order of square matrix $A$ be $n$ ($n > 1$):\n1. $|\\text{adj } A| = |A|^{n-1}$.\n2. $|\\text{adj}(\\text{adj } A)| = |A|^{(n-1)^2}$.\n3. $|\\text{adj}(\\text{adj}(\\text{adj } A))| = |A|^{(n-1)^3}$.\n4. $|\\text{adj } A|^4 = (|A|^{n-1})^4 = |A|^{4(n-1)}$.\n5. Equating exponents:\n$$(n - 1)^3 = 4(n - 1)$$\nSince $n > 1$, $n - 1 \\ne 0$. Dividing by $(n - 1)$:\n$$(n - 1)^2 = 4 \\implies n - 1 = 2 \\implies n = 3$$\nThe number of entries in the principal diagonal of an $n \\times n$ matrix is $n = 3$.",

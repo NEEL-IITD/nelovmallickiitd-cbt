@@ -202,12 +202,25 @@ export const ExerciseTestShellModal: React.FC<ExerciseTestShellModalProps> = ({
         let status = 'unattempted';
         let marksAwarded = 0;
 
-        if (resp === undefined || resp === null || resp === '' || (Array.isArray(resp) && resp.length === 0)) {
+        const isAttempted = (val: any) => val !== undefined && val !== null && String(val).trim() !== '' && !(Array.isArray(val) && val.length === 0);
+
+        if (!isAttempted(resp)) {
           status = 'unattempted';
           marksAwarded = 0;
           unattemptedCount++;
         } else if (q.type === 'single_correct') {
-          const isMatch = Number(resp) === Number(q.correctAnswer);
+          const rawCorrect = (q as any).correctAnswer !== undefined ? (q as any).correctAnswer : (q as any).answer;
+          let isMatch = false;
+          if (typeof rawCorrect === 'number') {
+            isMatch = Number(resp) === rawCorrect;
+          } else if (typeof rawCorrect === 'string') {
+            if (['A', 'B', 'C', 'D'].includes(rawCorrect.toUpperCase())) {
+              const charIdx = rawCorrect.toUpperCase().charCodeAt(0) - 65;
+              isMatch = Number(resp) === charIdx || String(resp).toUpperCase() === rawCorrect.toUpperCase();
+            } else {
+              isMatch = String(resp).trim().toLowerCase() === rawCorrect.trim().toLowerCase();
+            }
+          }
           if (isMatch) {
             status = 'correct';
             marksAwarded = qCorrectMarks;
@@ -301,9 +314,11 @@ export const ExerciseTestShellModal: React.FC<ExerciseTestShellModalProps> = ({
     setScoreSummary(null);
   };
 
+  const isVaultAttempted = (val: any) => val !== undefined && val !== null && String(val).trim() !== '' && !(Array.isArray(val) && val.length === 0);
+
   const getQuestionPaletteStyle = (qNum: number) => {
     const resp = responses[qNum];
-    const isAnswered = resp !== undefined && resp !== '' && !(Array.isArray(resp) && resp.length === 0);
+    const isAnswered = isVaultAttempted(resp);
     const isMarked = markedForReview.includes(qNum);
     const isCurrent = selectedQuestion === qNum;
 
@@ -320,8 +335,7 @@ export const ExerciseTestShellModal: React.FC<ExerciseTestShellModalProps> = ({
   };
 
   const answeredCount = Object.keys(responses).filter(k => {
-    const v = responses[Number(k)];
-    return v !== undefined && v !== '' && !(Array.isArray(v) && v.length === 0);
+    return isVaultAttempted(responses[Number(k)]);
   }).length;
   const markedCount = markedForReview.length;
   const notAnsweredCount = visitedQuestions.length - answeredCount;
