@@ -120,35 +120,44 @@ async function runQA() {
     errors.push(`Diagram verification failed for: ${missingDiagrams.join(', ')}`);
   }
 
-  // 4. Verify schedule data and strict syllabus isolation
-  console.log('\n[TEST 4] Verifying scheduleData.js and strict syllabus isolation');
+  // 4. Verify schedule data and complete 3-subject syllabi
+  console.log('\n[TEST 4] Verifying scheduleData.js for complete 3-subject syllabi');
   const scheduleRes = await fetchUrl('/data/scheduleData.js');
   if (scheduleRes.statusCode === 200) {
     const scheduleContent = scheduleRes.data.toString();
-    if (scheduleContent.includes('Thermal Properties of Matter') &&
-        scheduleContent.includes('Heat Transfer') &&
-        scheduleContent.includes('IUPAC Nomenclature & Structural Basics') &&
-        scheduleContent.includes('General Organic Chemistry (GOC)') &&
-        scheduleContent.includes('Isomerism in Organic Compounds')) {
+    
+    // Check PTM 01
+    const ptm01Match = scheduleContent.match(/id:\s*['"]jee-mains-ptm-01['"][\s\S]*?id:\s*['"]jee-mains-ptm-02['"]/);
+    if (ptm01Match && ptm01Match[0].includes('Kinetic Theory of Gases') && ptm01Match[0].includes('Hydrocarbons') && ptm01Match[0].includes('Trigonometric Ratios')) {
       passed++;
-      console.log('✓ PTM 03 full syllabus topics present in scheduleData.js');
+      console.log('✓ PTM 01 complete 3-subject syllabus present (Physics + Chemistry + Math)');
     } else {
-      errors.push('PTM 03 syllabus topics missing from scheduleData.js');
+      errors.push('PTM 01 missing complete 3-subject syllabus in scheduleData.js');
     }
 
-    // Verify PTM 01, 02, 04 do not have syllabus
-    const ptm02Match = scheduleContent.match(/id:\s*['"]jee-mains-ptm-02['"][\s\S]*?route:/);
-    if (ptm02Match && !ptm02Match[0].includes('syllabus:')) {
+    // Check PTM 02
+    const ptm02Match = scheduleContent.match(/id:\s*['"]jee-mains-ptm-02['"][\s\S]*?id:\s*['"]jee-mains-ptm-03['"]/);
+    if (ptm02Match && ptm02Match[0].includes('Thermal Expansion') && ptm02Match[0].includes('IUPAC Nomenclature') && ptm02Match[0].includes('Quadratic Equations')) {
       passed++;
-      console.log('✓ Strict isolation confirmed: PTM 02 syllabus removed cleanly');
+      console.log('✓ PTM 02 complete 3-subject syllabus present (Physics + Chemistry + Math)');
     } else {
-      errors.push('PTM 02 still has syllabus');
+      errors.push('PTM 02 missing complete 3-subject syllabus in scheduleData.js');
     }
 
+    // Check PTM 03
+    const ptm03Match = scheduleContent.match(/id:\s*['"]jee-mains-ptm-03['"][\s\S]*?id:\s*['"]jee-mains-ptm-04['"]/);
+    if (ptm03Match && ptm03Match[0].includes('Thermal Properties of Matter') && ptm03Match[0].includes('IUPAC Nomenclature & Structural Basics') && ptm03Match[0].includes('Matrices & Matrix Algebra')) {
+      passed++;
+      console.log('✓ PTM 03 complete 3-subject syllabus present (Physics + Chemistry + Math)');
+    } else {
+      errors.push('PTM 03 missing complete 3-subject syllabus in scheduleData.js');
+    }
+
+    // Verify PTM 04 has no syllabus
     const ptm04Match = scheduleContent.match(/id:\s*['"]jee-mains-ptm-04['"][\s\S]*?route:/);
     if (ptm04Match && !ptm04Match[0].includes('syllabus:')) {
       passed++;
-      console.log('✓ Strict isolation confirmed: PTM 04 has no syllabus');
+      console.log('✓ PTM 04 has no syllabus (ready for future release)');
     } else {
       errors.push('PTM 04 has unexpected syllabus');
     }

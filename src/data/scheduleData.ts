@@ -29,7 +29,23 @@ export const JEE_MAINS_2027_SCHEDULE: ScheduleTestItem[] = [
     startIso: "2026-11-22T10:00:00+05:30",
     endIso: "2026-11-22T20:00:00+05:30",
     route: "/test/jee-mains/ptm-01",
-    hashRoute: "#/test/jee-mains/ptm-01"
+    hashRoute: "#/test/jee-mains/ptm-01",
+    syllabus: {
+      physics: [
+        "Kinetic Theory of Gases (degrees of freedom, RMS, average and most probable speeds, Maxwell distribution, mean free path, relaxation time)",
+        "Thermodynamics (First Law of Thermodynamics, work done in isobaric, isothermal, adiabatic, isochoric and cyclic processes, Carnot engine efficiency, adiabatic bulk modulus)"
+      ],
+      chemistry: [
+        "Hydrocarbons (alkanes, alkenes, alkynes, free-radical halogenation, oxymercuration-demercuration, conjugated dienes, Wurtz-Fittig reaction)",
+        "General Organic Chemistry (Aromaticity, Huckel's rule, acidic strength and pKa, dipole moment of alkyl halides)",
+        "Purification & Separation Methods (distillation types: simple, fractional, steam, vacuum; chromatography: TLC; Kjeldahl's method)"
+      ],
+      mathematics: [
+        "Trigonometric Ratios & Identities (compound angles, multiple & submultiple angles, transformation formulas, summation of trigonometric series)",
+        "Trigonometric Functions & Properties (domain, range, periodicity, greatest integer combinations)",
+        "Trigonometric Equations (number of roots, general solutions, system of equations)"
+      ]
+    }
   },
   {
     id: "jee-mains-ptm-02",
@@ -41,7 +57,25 @@ export const JEE_MAINS_2027_SCHEDULE: ScheduleTestItem[] = [
     startIso: "2026-11-25T09:00:00+05:30",
     endIso: "2026-11-25T21:00:00+05:30",
     route: "/test/jee-mains/ptm-02",
-    hashRoute: "#/test/jee-mains/ptm-02"
+    hashRoute: "#/test/jee-mains/ptm-02",
+    syllabus: {
+      physics: [
+        "Thermal Expansion of Solids and Liquids (linear, superficial, and cubical expansion; bimetallic strips, apparent expansion)",
+        "Calorimetry and Heat Transfer (principle of calorimetry, water equivalent, latent heat of fusion and vaporization, phase change)",
+        "Heat Conduction (Fourier's law, steady state heat current, thermal resistance of series and parallel composite rods, spherical and cylindrical shells)",
+        "Thermal Radiation (Stefan-Boltzmann law, Wien's displacement law, Newton's law of cooling, blackbody radiation)"
+      ],
+      chemistry: [
+        "IUPAC Nomenclature & Structural Basics (rules of IUPAC naming for polyfunctional organic compounds, bond line notation, sigma and pi bond counts, hybridization)",
+        "General Organic Chemistry (Electronic effects: Inductive, Resonance/Mesomeric, Hyperconjugation, and Electromeric effects; Aromaticity and Hückel's 4n+2 rule; Reaction intermediates: stability of carbocations, carbanions, and free radicals; Acidic and basic strengths of organic compounds)",
+        "Isomerism in Organic Compounds (Structural isomerism: chain, position, functional, metamerism, tautomerism; Stereoisomerism: geometrical cis/trans isomerism, optical isomerism, enantiomers, diastereomers, meso compounds, conformers of cyclohexane and ethane)"
+      ],
+      mathematics: [
+        "Quadratic Equations & Expressions (relations between roots and coefficients, nature of roots, common roots, sign of quadratic expressions, location of roots, reducible quadratic equations)",
+        "Logarithms & Inequalities (properties of logarithms, logarithmic equations and inequalities, base transformations, domain restrictions)",
+        "Sequences & Series (Arithmetic Progression: general term, sum of n terms, arithmetic mean; Geometric Progression: finite and infinite sums, geometric mean; Arithmetico-Geometric Progression (AGP), Telescoping series summation, Newton's sums for polynomial roots)"
+      ]
+    }
   },
   {
     id: "jee-mains-ptm-03",
@@ -64,6 +98,11 @@ export const JEE_MAINS_2027_SCHEDULE: ScheduleTestItem[] = [
         "IUPAC Nomenclature & Structural Basics (Counting σ/π bonds, hybridization of carbon atoms, and IUPAC naming of polyfunctional organic compounds and enynes)",
         "General Organic Chemistry (GOC) (Electronic effects: inductive effect, resonance, hyperconjugation in carbocations, radicals, and alkenes; aromaticity and non-aromaticity; stability, geometry, and hybridization of reaction intermediates: carbocations, carbanions, free radicals; acidic strength of carboxylic acids and C–H acidity; basic strength of amines in aqueous medium)",
         "Isomerism in Organic Compounds (Structural isomerism: chain, position, functional, metamerism, tautomerism; conformational isomerism: cyclohexane, 1,4-cyclohexanediol, ethane; geometrical cis/trans isomerism; optical isomerism: Fischer projections, enantiomers, diastereomers, and meso compounds)"
+      ],
+      mathematics: [
+        "Matrices & Matrix Algebra (Types of matrices: symmetric, skew-symmetric, orthogonal, idempotent, and nilpotent; matrix multiplication, powers of matrices, trace of matrix powers tr(A^n), and polynomial matrix expressions)",
+        "Determinants & Matrix Inversion (Properties of determinants, minors and cofactors, adjoint of a matrix and its iterative properties: |adj A| = |A|^(n-1), |adj(adj A)| = |A|^((n-1)^2), and matrix inverse A^(-1) = adj A / |A|)",
+        "System of Linear Equations (Cramer's rule, consistency and inconsistency of linear non-homogeneous and homogeneous systems, conditions for unique solution, infinitely many solutions, and trivial/non-trivial solutions)"
       ]
     }
   },

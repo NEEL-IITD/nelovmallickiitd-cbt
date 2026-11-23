@@ -14024,6 +14024,16 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [previewItem, setPreviewItem] = useState(null);
       const [previewTab, setPreviewTab] = useState('syllabus');
 
+      // Handle Escape key to close preview modal
+      useEffect(() => {
+        if (!previewItem) return;
+        const handleKeyDown = (e) => {
+          if (e.key === 'Escape') setPreviewItem(null);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, [previewItem]);
+
       const schedule = window.JEE_MAINS_2027_SCHEDULE || [];
       const revisionCard = window.FINAL_REVISION_CARD || {
         dateStr: "Jan 18 – Jan 20, 2027",
@@ -14369,7 +14379,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   const attempts = getAttemptCount(item.id);
                   const countdown = formatCountdown(item.startIso);
                   const isCurrentlyLocked = !started && !isAdmin;
-                  const hasSyllabus = item.id === 'jee-mains-ptm-03' && !!(item.syllabus && Object.keys(item.syllabus).length > 0);
+                  const hasSyllabus = Boolean(item.syllabus && Object.values(item.syllabus).some(arr => Array.isArray(arr) && arr.length > 0));
 
                   return (
                     <Tilt3DCard
@@ -14562,7 +14572,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       const attempts = getAttemptCount(item.id);
                       const countdown = formatCountdown(item.startIso);
                       const isCurrentlyLocked = !started && !isAdmin;
-                      const hasSyllabus = item.id === 'jee-mains-ptm-03' && !!(item.syllabus && Object.keys(item.syllabus).length > 0);
+                      const hasSyllabus = Boolean(item.syllabus && Object.values(item.syllabus).some(arr => Array.isArray(arr) && arr.length > 0));
 
                       return (
                         <tr
@@ -14804,10 +14814,10 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       </div>
 
                       {/* Physics Syllabus Card */}
-                      <div className="rounded-2xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/30 dark:bg-sky-950/20 p-5 space-y-3">
+                      <div className="rounded-2xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/40 dark:bg-sky-950/20 p-5 space-y-3">
                         <div className="flex items-center gap-2.5">
-                          <span className="w-8 h-8 rounded-xl bg-sky-500/20 border border-sky-400/40 text-sky-600 dark:text-sky-300 flex items-center justify-center font-black text-xs">
-                            PH
+                          <span className="px-2.5 py-1 rounded-xl bg-sky-500/20 border border-sky-400/40 text-sky-700 dark:text-sky-300 font-extrabold text-xs shrink-0 tracking-wide">
+                            PH · Q1–Q25
                           </span>
                           <div>
                             <h4 className="font-black text-sm text-sky-950 dark:text-sky-200">
@@ -14836,10 +14846,10 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       </div>
 
                       {/* Chemistry Syllabus Card */}
-                      <div className="rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/30 dark:bg-emerald-950/20 p-5 space-y-3">
+                      <div className="rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/40 dark:bg-emerald-950/20 p-5 space-y-3">
                         <div className="flex items-center gap-2.5">
-                          <span className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-600 dark:text-emerald-300 flex items-center justify-center font-black text-xs">
-                            CH
+                          <span className="px-2.5 py-1 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-700 dark:text-emerald-300 font-extrabold text-xs shrink-0 tracking-wide">
+                            CH · Q26–Q50
                           </span>
                           <div>
                             <h4 className="font-black text-sm text-emerald-950 dark:text-emerald-200">
@@ -14867,33 +14877,37 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         </ul>
                       </div>
 
-                      {/* Mathematics Syllabus Card - Shown only if mathematics syllabus is explicitly defined */}
-                      {previewItem.syllabus && previewItem.syllabus.mathematics && previewItem.syllabus.mathematics.length > 0 && (
-                        <div className="rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/30 dark:bg-amber-950/20 p-5 space-y-3">
-                          <div className="flex items-center gap-2.5">
-                            <span className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-600 dark:text-amber-300 flex items-center justify-center font-black text-xs">
-                              MA
-                            </span>
-                            <div>
-                              <h4 className="font-black text-sm text-amber-950 dark:text-amber-200">
-                                Mathematics Syllabus (25 Questions · 100 Marks)
-                              </h4>
-                              <p className="text-[11px] text-amber-800/80 dark:text-amber-400">
-                                {previewItem.code === 'PTM 02' ? 'Quadratic Equations, Inequalities & Sequences Focus' : (previewItem.code === 'PTM 01' ? 'Trigonometry & Functional Relations' : 'Standard JEE Mains Pattern')}
-                              </p>
-                            </div>
+                      {/* Mathematics Syllabus Card */}
+                      <div className="rounded-2xl border border-purple-200 dark:border-purple-900/60 bg-purple-50/40 dark:bg-purple-950/20 p-5 space-y-3">
+                        <div className="flex items-center gap-2.5">
+                          <span className="px-2.5 py-1 rounded-xl bg-purple-500/20 border border-purple-400/40 text-purple-700 dark:text-purple-300 font-extrabold text-xs shrink-0 tracking-wide">
+                            MA · Q51–Q75
+                          </span>
+                          <div>
+                            <h4 className="font-black text-sm text-purple-950 dark:text-purple-200">
+                              Mathematics Syllabus (25 Questions · 100 Marks)
+                            </h4>
+                            <p className="text-[11px] text-purple-800/80 dark:text-purple-400">
+                              {previewItem.code === 'PTM 03' ? 'Matrices, Determinants & System of Linear Equations Focus' : (previewItem.code === 'PTM 02' ? 'Quadratic Equations, Inequalities & Sequences Focus' : (previewItem.code === 'PTM 01' ? 'Trigonometry & Functional Relations' : 'Standard JEE Mains Pattern'))}
+                            </p>
                           </div>
+                        </div>
 
-                          <ul className="space-y-2 text-xs text-slate-700 dark:text-zinc-300 pl-1">
-                            {previewItem.syllabus.mathematics.map((item, idx) => (
+                        <ul className="space-y-2 text-xs text-slate-700 dark:text-zinc-300 pl-1">
+                          {previewItem.syllabus && previewItem.syllabus.mathematics && previewItem.syllabus.mathematics.length > 0 ? (
+                            previewItem.syllabus.mathematics.map((item, idx) => (
                               <li key={idx} className="flex items-start gap-2.5">
-                                <span className="text-amber-500 font-bold mt-0.5">•</span>
+                                <span className="text-purple-500 font-bold mt-0.5">•</span>
                                 <span>{item}</span>
                               </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                            ))
+                          ) : (
+                            <li className="flex items-start gap-2.5 text-slate-500 dark:text-zinc-400 italic">
+                              <span>Detailed Mathematics syllabus for {previewItem.code} will be published prior to the scheduled test window.</span>
+                            </li>
+                          )}
+                        </ul>
+                      </div>
 
                     </div>
                   )}

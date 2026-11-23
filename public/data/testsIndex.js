@@ -47,8 +47,8 @@
     "examType": "JEE Mains",
     "code": "PTM 03",
     "title": "JEE Mains 2027 Test Series — PTM 03",
-    "subtitle": "Full Syllabus Comprehensive Mock Examination",
-    "status": "coming_soon",
+    "subtitle": "Thermal Properties of Matter, Heat Transfer, IUPAC, GOC, Isomerism & Matrices",
+    "status": "live",
     "durationMinutes": 180,
     "totalMarks": 300,
     "totalQuestions": 75,
@@ -57,8 +57,8 @@
       "Chemistry (25 Qs)",
       "Mathematics (25 Qs)"
     ],
-    "description": "Standard NTA JEE Mains CBT pattern: 20 Single Correct MCQs (+4, -1) and 5 Numerical Value questions (+4, -1) per subject.",
-    "isLive": false,
+    "description": "Standard NTA JEE Mains CBT pattern: 20 Single Correct MCQs (+4, -1) and 5 Numerical Value questions (+4, -1) per subject. Thermal Properties of Matter, Heat Conduction, GOC, Isomerism, Matrices & Determinants.",
+    "isLive": true,
     "isFree": true
   },
   {

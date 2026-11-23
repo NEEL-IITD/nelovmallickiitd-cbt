@@ -22,6 +22,11 @@ window.ptm03Data = {
       "IUPAC Nomenclature & Structural Basics (Counting σ/π bonds, hybridization of carbon atoms, and IUPAC naming of polyfunctional organic compounds and enynes)",
       "General Organic Chemistry (GOC) (Electronic effects: inductive effect, resonance, hyperconjugation in carbocations, radicals, and alkenes; aromaticity and non-aromaticity; stability, geometry, and hybridization of reaction intermediates: carbocations, carbanions, free radicals; acidic strength of carboxylic acids and C–H acidity; basic strength of amines in aqueous medium)",
       "Isomerism in Organic Compounds (Structural isomerism: chain, position, functional, metamerism, tautomerism; conformational isomerism: cyclohexane, 1,4-cyclohexanediol, ethane; geometrical cis/trans isomerism; optical isomerism: Fischer projections, enantiomers, diastereomers, and meso compounds)"
+    ],
+    "mathematics": [
+      "Matrices & Matrix Algebra (Types of matrices: symmetric, skew-symmetric, orthogonal, idempotent, and nilpotent; matrix multiplication, powers of matrices, trace of matrix powers tr(A^n), and polynomial matrix expressions)",
+      "Determinants & Matrix Inversion (Properties of determinants, minors and cofactors, adjoint of a matrix and its iterative properties: |adj A| = |A|^(n-1), |adj(adj A)| = |A|^((n-1)^2), and matrix inverse A^(-1) = adj A / |A|)",
+      "System of Linear Equations (Cramer's rule, consistency and inconsistency of linear non-homogeneous and homogeneous systems, conditions for unique solution, infinitely many solutions, and trivial/non-trivial solutions)"
     ]
   },
   "sectionsSummary": [
