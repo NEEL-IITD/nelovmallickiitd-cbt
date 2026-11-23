@@ -2113,6 +2113,239 @@
     });
   }
 
+  
+  // ============================================================================
+  // CHAPTERWISE PROGRESS & MASTERY STORE (0-100% Checklist + Test Count Engine)
+  // Mentored by Nelov Mallick (IIT Delhi) · 100% Free Forever
+  // ============================================================================
+  const CHAPTER_PROGRESS_KEY = 'nelov_chapter_progress';
+  const CHAPTER_PROGRESS_EVENT = 'nelov:chapter-progress-updated';
+
+  window.chapterProgressStore = {
+    getAllProgress(userId) {
+      try {
+        const uId = userId || (window.authService?.getCurrentUser()?.id) || 'guest';
+        const raw = localStorage.getItem('nelov_' + uId + '_chapter_progress');
+        const guestRaw = localStorage.getItem(CHAPTER_PROGRESS_KEY);
+        let store = {};
+        if (guestRaw) {
+          try { Object.assign(store, JSON.parse(guestRaw)); } catch (e) {}
+        }
+        if (raw && raw !== guestRaw) {
+          try { Object.assign(store, JSON.parse(raw)); } catch (e) {}
+        }
+        return store;
+      } catch (e) {
+        return {};
+      }
+    },
+
+    getChapterProgress(subject, chapterSlug, chapterCode, exercises, userId) {
+      const all = this.getAllProgress(userId);
+      const subNorm = (subject || '').toLowerCase().trim();
+      const slugNorm = (chapterSlug || '').toLowerCase().trim();
+      const key = subNorm + ':' + slugNorm;
+      const existing = all[key] || all[slugNorm] || null;
+
+      const testsCount = this.getChapterTestsCount(subject, chapterSlug, chapterCode, exercises, userId);
+
+      let checklist = {
+        notes: false,
+        formula: false,
+        pyqs: false,
+        tests: false
+      };
+
+      if (existing && existing.checklist) {
+        checklist = {
+          notes: Boolean(existing.checklist.notes),
+          formula: Boolean(existing.checklist.formula),
+          pyqs: Boolean(existing.checklist.pyqs),
+          tests: Boolean(existing.checklist.tests)
+        };
+      }
+
+      // Auto-mark tests if student has attempted at least one test
+      if (testsCount > 0 && !checklist.tests) {
+        checklist.tests = true;
+      }
+
+      const checkedCount = [checklist.notes, checklist.formula, checklist.pyqs, checklist.tests].filter(Boolean).length;
+      const progressPercent = Math.round((checkedCount / 4) * 100);
+
+      return {
+        checklist,
+        progressPercent,
+        testsGivenCount: testsCount
+      };
+    },
+
+    getChapterTestsCount(subject, chapterSlug, chapterCode, exercises, userId) {
+      try {
+        const uId = userId || (window.authService?.getCurrentUser()?.id) || 'guest';
+        let attempts = [];
+        if (window.studentStorage?.getAttempts) {
+          attempts = window.studentStorage.getAttempts(uId) || [];
+        } else {
+          const raw = localStorage.getItem('nelov_' + uId + '_attempts') || localStorage.getItem('nelov_guest_attempts');
+          if (raw) attempts = JSON.parse(raw);
+        }
+
+        const rawVault = localStorage.getItem('nelov_vault_exercise_attempts');
+        if (rawVault) {
+          try {
+            const parsed = JSON.parse(rawVault);
+            if (Array.isArray(parsed)) attempts = attempts.concat(parsed);
+          } catch (e) {}
+        }
+
+        if (!Array.isArray(attempts) || attempts.length === 0) return 0;
+
+        const normSlug = (chapterSlug || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        const normCode = (chapterCode || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        const exerciseIds = new Set((exercises || []).map(e => String(e.id || '').toLowerCase()));
+
+        let count = 0;
+        const countedKeys = new Set();
+
+        for (const att of attempts) {
+          if (!att) continue;
+          const dedupeKey = att.id || (att.testId + '_' + (att.completedAt || '') + '_' + (att.percentage || ''));
+          if (countedKeys.has(dedupeKey)) continue;
+
+          const tId = String(att.testId || att.testCode || '').toLowerCase();
+          const attSlug = String(att.chapterSlug || att.chapterId || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+          let matches = false;
+          if (exerciseIds.has(tId)) {
+            matches = true;
+          } else if (normSlug && (attSlug === normSlug || tId.startsWith(normSlug + '-') || tId.startsWith(normSlug + '_') || tId.includes(normSlug))) {
+            matches = true;
+          } else if (normCode && (attSlug === normCode || tId.startsWith(normCode + '-') || tId.startsWith(normCode + '_') || tId.includes(normCode))) {
+            matches = true;
+          }
+
+          if (matches) {
+            count++;
+            countedKeys.add(dedupeKey);
+          }
+        }
+        return count;
+      } catch (e) {
+        return 0;
+      }
+    },
+
+    setMilestone(subject, chapterSlug, milestone, value, userId) {
+      const all = this.getAllProgress(userId);
+      const subNorm = (subject || '').toLowerCase().trim();
+      const slugNorm = (chapterSlug || '').toLowerCase().trim();
+      const key = subNorm + ':' + slugNorm;
+      const existing = all[key] || {
+        subject: subNorm,
+        chapterSlug: slugNorm,
+        checklist: { notes: false, formula: false, pyqs: false, tests: false },
+        progressPercent: 0,
+        updatedAt: new Date().toISOString()
+      };
+
+      const newChecklist = {
+        ...existing.checklist,
+        [milestone]: Boolean(value)
+      };
+
+      const checkedCount = [newChecklist.notes, newChecklist.formula, newChecklist.pyqs, newChecklist.tests].filter(Boolean).length;
+      const progressPercent = Math.round((checkedCount / 4) * 100);
+
+      const updated = {
+        subject: subNorm,
+        chapterSlug: slugNorm,
+        checklist: newChecklist,
+        progressPercent,
+        updatedAt: new Date().toISOString()
+      };
+
+      all[key] = updated;
+
+      try {
+        const uId = userId || (window.authService?.getCurrentUser()?.id) || 'guest';
+        localStorage.setItem('nelov_' + uId + '_chapter_progress', JSON.stringify(all));
+        localStorage.setItem(CHAPTER_PROGRESS_KEY, JSON.stringify(all));
+      } catch (e) {}
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent(CHAPTER_PROGRESS_EVENT, { detail: updated }));
+      }
+
+      this.syncChapterToSupabase(updated, userId);
+      return updated;
+    },
+
+    async syncChapterToSupabase(data, userId) {
+      if (!isConfigured || !supabaseClient) return;
+      try {
+        const uId = userId || (window.authService?.getCurrentUser()?.id);
+        if (!uId || uId === 'guest') return;
+
+        const payload = {
+          user_id: uId,
+          subject: data.subject.toLowerCase(),
+          chapter_slug: data.chapterSlug.toLowerCase(),
+          checklist: data.checklist,
+          progress_percent: data.progressPercent,
+          updated_at: data.updatedAt || new Date().toISOString()
+        };
+
+        const { error } = await supabaseClient
+          .from('chapter_progress')
+          .upsert(payload, { onConflict: 'user_id,subject,chapter_slug' });
+
+        if (error) {
+          console.warn('[ChapterProgress] Supabase sync warning:', error.message);
+        }
+      } catch (e) {
+        console.warn('[ChapterProgress] Supabase sync exception:', e);
+      }
+    },
+
+    async fetchProgressFromSupabase(userId) {
+      if (!isConfigured || !supabaseClient) return this.getAllProgress(userId);
+      try {
+        const uId = userId || (window.authService?.getCurrentUser()?.id);
+        if (!uId || uId === 'guest') return this.getAllProgress(userId);
+
+        const { data, error } = await supabaseClient
+          .from('chapter_progress')
+          .select('*')
+          .eq('user_id', uId);
+
+        if (error || !data) return this.getAllProgress(userId);
+
+        const all = this.getAllProgress(userId);
+        data.forEach(row => {
+          const key = (row.subject || '').toLowerCase() + ':' + (row.chapter_slug || '').toLowerCase();
+          all[key] = {
+            subject: row.subject,
+            chapterSlug: row.chapter_slug,
+            checklist: row.checklist || { notes: false, formula: false, pyqs: false, tests: false },
+            progressPercent: row.progress_percent || 0,
+            updatedAt: row.updated_at || new Date().toISOString()
+          };
+        });
+
+        localStorage.setItem('nelov_' + uId + '_chapter_progress', JSON.stringify(all));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent(CHAPTER_PROGRESS_EVENT, { detail: all }));
+        }
+        return all;
+      } catch (e) {
+        return this.getAllProgress(userId);
+      }
+    }
+  };
+
+  window.chapterProgressService = window.chapterProgressStore;
+
   // Alias adminService to studentStorage for full backward and cross-module compatibility
   window.adminService = window.studentStorage;
 })();

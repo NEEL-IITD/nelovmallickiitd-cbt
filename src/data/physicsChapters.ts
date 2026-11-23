@@ -41,6 +41,8 @@ export type PhysicsUnitCategory =
   | 'Optics'
   | 'Modern Physics';
 
+export type ChapterWeightage = 'high' | 'mid' | 'low';
+
 export interface PhysicsChapter {
   id: string; // 'c1' .. 'c28'
   code: string; // 'C1' .. 'C28'
@@ -48,6 +50,7 @@ export interface PhysicsChapter {
   name: string;
   fullName: string;
   category: PhysicsUnitCategory;
+  weightage?: ChapterWeightage;
   iconName: string;
   badgeText: string;
   theory: ChapterTheory;
@@ -66,6 +69,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C1 - Unit & Dimension: Theory, Exercise (Combined)
   {
     id: 'c1',
+    weightage: 'mid',
     code: 'C1',
     chapterNumber: 1,
     name: 'Unit & Dimension',
@@ -108,6 +112,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C2 - Error: Theory, Exercise 1, Exercise 2, Exercise 3
   {
     id: 'c2',
+    weightage: 'mid',
     code: 'C2',
     chapterNumber: 2,
     name: 'Error',
@@ -179,6 +184,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C3 - Vector & Calculus: Theory, Exercise (Combined)
   {
     id: 'c3',
+    weightage: 'low',
     code: 'C3',
     chapterNumber: 3,
     name: 'Vector & Calculus',
@@ -221,6 +227,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C4 - Kinematics: Theory (49 Pages) + 6 Exercises
   {
     id: 'c4',
+    weightage: 'mid',
     code: 'C4',
     chapterNumber: 4,
     name: 'Kinematics',
@@ -346,6 +353,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C5 - NLM, Friction: Theory (NLM, Friction, Constraint), Exercise (Combined)
   {
     id: 'c5',
+    weightage: 'mid',
     code: 'C5',
     chapterNumber: 5,
     name: 'NLM, Friction',
@@ -388,6 +396,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C6 - Circular & WPE: Theory (Circular Motion, WPE), Exercise (Combined)
   {
     id: 'c6',
+    weightage: 'mid',
     code: 'C6',
     chapterNumber: 6,
     name: 'Circular & WPE',
@@ -430,6 +439,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C7 - COM: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4, Exercise 5
   {
     id: 'c7',
+    weightage: 'mid',
     code: 'C7',
     chapterNumber: 7,
     name: 'COM (Center of Mass)',
@@ -529,6 +539,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C8 - Rotational Motion: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4, Exercise 5
   {
     id: 'c8',
+    weightage: 'high',
     code: 'C8',
     chapterNumber: 8,
     name: 'Rotational Motion',
@@ -628,6 +639,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C9 - Gravitation: Theory, Exercise (Combined)
   {
     id: 'c9',
+    weightage: 'high',
     code: 'C9',
     chapterNumber: 9,
     name: 'Gravitation',
@@ -670,6 +682,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C10 - Elasticity and Thermal Expansion: Theory, Exercise 1, Exercise 2, Exercise 3
   {
     id: 'c10',
+    weightage: 'mid',
     code: 'C10',
     chapterNumber: 10,
     name: 'Elasticity & Thermal Expansion',
@@ -741,6 +754,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C11 - Fluid: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4, Exercise 5
   {
     id: 'c11',
+    weightage: 'mid',
     code: 'C11',
     chapterNumber: 11,
     name: 'Fluid Mechanics',
@@ -840,6 +854,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C12 - Surface Tension and Viscosity: Theory, Exercise 1, Exercise 2, Exercise 3
   {
     id: 'c12',
+    weightage: 'mid',
     code: 'C12',
     chapterNumber: 12,
     name: 'Surface Tension & Viscosity',
@@ -911,6 +926,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C13 - S.H.M: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4, Exercise 5
   {
     id: 'c13',
+    weightage: 'mid',
     code: 'C13',
     chapterNumber: 13,
     name: 'S.H.M (Simple Harmonic Motion)',
@@ -1010,6 +1026,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C14 - String Wave: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4, Exercise 5
   {
     id: 'c14',
+    weightage: 'mid',
     code: 'C14',
     chapterNumber: 14,
     name: 'String Wave',
@@ -1109,6 +1126,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C15 - Sound Wave: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4, Exercise 5
   {
     id: 'c15',
+    weightage: 'mid',
     code: 'C15',
     chapterNumber: 15,
     name: 'Sound Wave',
@@ -1208,6 +1226,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C16 - Heat-1: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4, Exercise 5
   {
     id: 'c16',
+    weightage: 'high',
     code: 'C16',
     chapterNumber: 16,
     name: 'Heat-1 (Calorimetry & KTG)',
@@ -1307,6 +1326,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C17 - Heat-2: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4, Exercise 5
   {
     id: 'c17',
+    weightage: 'high',
     code: 'C17',
     chapterNumber: 17,
     name: 'Heat-2 (Thermodynamics & Heat Transfer)',
@@ -1406,6 +1426,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C18 - Electrostatics-1: Theory, Exercise (Combined)
   {
     id: 'c18',
+    weightage: 'high',
     code: 'C18',
     chapterNumber: 18,
     name: 'Electrostatics-1',
@@ -1448,6 +1469,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C19 - Electrostatics-2: Theory, Exercise (Combined)
   {
     id: 'c19',
+    weightage: 'high',
     code: 'C19',
     chapterNumber: 19,
     name: 'Electrostatics-2 (Gauss Law & Conductors)',
@@ -1490,6 +1512,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C20 - Capacitance: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4, Exercise 5
   {
     id: 'c20',
+    weightage: 'mid',
     code: 'C20',
     chapterNumber: 20,
     name: 'Capacitance',
@@ -1589,6 +1612,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C21 - Current Electricity: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4, Exercise 5
   {
     id: 'c21',
+    weightage: 'high',
     code: 'C21',
     chapterNumber: 21,
     name: 'Current Electricity',
@@ -1688,6 +1712,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C22 - Magnetism: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4, Exercise 5
   {
     id: 'c22',
+    weightage: 'high',
     code: 'C22',
     chapterNumber: 22,
     name: 'Magnetism (Magnetic Effect of Current)',
@@ -1787,6 +1812,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C23 - E.M.I: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4, Exercise 5
   {
     id: 'c23',
+    weightage: 'high',
     code: 'C23',
     chapterNumber: 23,
     name: 'E.M.I (Electromagnetic Induction)',
@@ -1886,6 +1912,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C24 - Alternating Current: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4
   {
     id: 'c24',
+    weightage: 'high',
     code: 'C24',
     chapterNumber: 24,
     name: 'Alternating Current',
@@ -1971,6 +1998,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C25 - Geometrical Optics: Theory, Exercise (Combined)
   {
     id: 'c25',
+    weightage: 'high',
     code: 'C25',
     chapterNumber: 25,
     name: 'Geometrical Optics',
@@ -2013,6 +2041,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C26 - Wave Optics: Theory, Exercise (Combined)
   {
     id: 'c26',
+    weightage: 'mid',
     code: 'C26',
     chapterNumber: 26,
     name: 'Wave Optics',
@@ -2055,6 +2084,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C27 - Modern Physics-I: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4, Exercise 5
   {
     id: 'c27',
+    weightage: 'high',
     code: 'C27',
     chapterNumber: 27,
     name: 'Modern Physics-I (Photoelectric & Atomic)',
@@ -2154,6 +2184,7 @@ export const physicsChaptersData: PhysicsChapter[] = [
   // C28 - Modern Physics-II: Theory, Exercise 1, Exercise 2, Exercise 3, Exercise 4, Exercise 5
   {
     id: 'c28',
+    weightage: 'high',
     code: 'C28',
     chapterNumber: 28,
     name: 'Modern Physics-II (Nuclear Physics & Radioactivity)',

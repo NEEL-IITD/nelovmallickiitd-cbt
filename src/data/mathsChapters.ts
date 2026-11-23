@@ -21,6 +21,8 @@ export interface MathsSubTopic {
   exercises: ChapterExercise[];
 }
 
+export type ChapterWeightage = 'high' | 'mid' | 'low';
+
 export interface MathsChapter {
   id: string;
   code: string;
@@ -28,6 +30,7 @@ export interface MathsChapter {
   name: string;
   fullName: string;
   category: MathsUnitCategory;
+  weightage?: ChapterWeightage;
   iconName: string;
   badgeText: string;
   hasSubTopics?: boolean;
@@ -47,6 +50,7 @@ export interface MathsChapter {
 export const mathsChaptersData: MathsChapter[] = [
   {
     "id": "c01",
+    weightage: 'low',
     "code": "C01",
     "chapterNumber": 1,
     "name": "Logarithm",
@@ -93,6 +97,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c02",
+    weightage: 'mid',
     "code": "C02",
     "chapterNumber": 2,
     "name": "Trigonometric Ratios & Identities (Ph-I)",
@@ -139,6 +144,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c03",
+    "weightage": "high",
     "code": "C03",
     "chapterNumber": 3,
     "name": "Quadratic Equation",
@@ -185,6 +191,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c04",
+    "weightage": "high",
     "code": "C04",
     "chapterNumber": 4,
     "name": "Sequence & Series",
@@ -288,6 +295,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c05",
+    "weightage": "high",
     "code": "C05",
     "chapterNumber": 5,
     "name": "Binomial Theorem",
@@ -391,6 +399,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c06",
+    weightage: 'mid',
     "code": "C06",
     "chapterNumber": 6,
     "name": "Trigonometric Equation (Ph-II)",
@@ -494,6 +503,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c07",
+    weightage: 'low',
     "code": "C07",
     "chapterNumber": 7,
     "name": "Solution of Triangle (Ph-III)",
@@ -597,6 +607,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c08",
+    "weightage": "high",
     "code": "C08",
     "chapterNumber": 8,
     "name": "Straight Line",
@@ -700,6 +711,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c09",
+    "weightage": "high",
     "code": "C09",
     "chapterNumber": 9,
     "name": "Circle",
@@ -803,6 +815,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c10",
+    "weightage": "high",
     "code": "C10",
     "chapterNumber": 10,
     "name": "Determinant & Matrices",
@@ -906,6 +919,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c13",
+    "weightage": "high",
     "code": "C13",
     "chapterNumber": 13,
     "name": "Function",
@@ -952,6 +966,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c14",
+    weightage: 'mid',
     "code": "C14",
     "chapterNumber": 14,
     "name": "ITF (Inverse Trigonometric Functions)",
@@ -998,6 +1013,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c15",
+    "weightage": "high",
     "code": "C15",
     "chapterNumber": 15,
     "name": "Limits",
@@ -1044,6 +1060,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c16",
+    weightage: 'mid',
     "code": "C16",
     "chapterNumber": 16,
     "name": "Continuity & Differentiability",
@@ -1090,6 +1107,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c17",
+    weightage: 'mid',
     "code": "C17",
     "chapterNumber": 17,
     "name": "MOD (Method of Differentiation)",
@@ -1136,6 +1154,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c18",
+    "weightage": "high",
     "code": "C18",
     "chapterNumber": 18,
     "name": "Applications of Derivative",
@@ -1437,6 +1456,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c19",
+    weightage: 'mid',
     "code": "C19",
     "chapterNumber": 19,
     "name": "Indefinite Integration",
@@ -1553,6 +1573,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c20",
+    "weightage": "high",
     "code": "C20",
     "chapterNumber": 20,
     "name": "Definite Integration",
@@ -1669,6 +1690,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c21",
+    "weightage": "high",
     "code": "C21",
     "chapterNumber": 21,
     "name": "Vector",
@@ -1771,6 +1793,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c22",
+    "weightage": "high",
     "code": "C22",
     "chapterNumber": 22,
     "name": "3D Geometry",
@@ -1874,6 +1897,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c23",
+    "weightage": "high",
     "code": "C23",
     "chapterNumber": 23,
     "name": "Differential Equation",
@@ -1977,6 +2001,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c24",
+    weightage: 'mid',
     "code": "C24",
     "chapterNumber": 24,
     "name": "Area Under The Curve",
@@ -2080,6 +2105,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c25",
+    weightage: 'mid',
     "code": "C25",
     "chapterNumber": 25,
     "name": "Complex Number",
@@ -2183,6 +2209,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c26",
+    "weightage": "high",
     "code": "C26",
     "chapterNumber": 26,
     "name": "Parabola",
@@ -2286,6 +2313,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c27",
+    "weightage": "mid",
     "code": "C27",
     "chapterNumber": 27,
     "name": "Ellipse",
@@ -2389,6 +2417,7 @@ export const mathsChaptersData: MathsChapter[] = [
   },
   {
     "id": "c28",
+    "weightage": "mid",
     "code": "C28",
     "chapterNumber": 28,
     "name": "Hyperbola",

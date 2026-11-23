@@ -1,10 +1,2476 @@
 // NelovMallickIITD · Mathematics Chapters Global Data
 (function() {
-  window.mathsChaptersData = [{"id":"c01","code":"C01","chapterNumber":1,"name":"Logarithm","fullName":"C01 - Logarithm","category":"Algebra","iconName":"Hash","badgeText":"Theory + Combined Exercise","hasSubTopics":false,"theory":{"title":"Theory Notes: Logarithmic Identities & Inequations","topics":["Fundamental Logarithmic Identities & Base Change","Logarithmic Equations & Extraneous Roots","Logarithmic Inequations & Base Interval Analysis","Characteristic & Mantissa of Logarithms"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Foundational algebra of logarithmic functions, monotonicity conditions for inequalities, and domain boundaries."},"exercises":[{"id":"c01-combined","title":"Exercise (Combined)","type":"combined","questionCount":30,"timeMinutes":60,"marks":120,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Combined drill on logarithmic properties, inequalities with variable bases, and characteristic-mantissa."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c02","code":"C02","chapterNumber":2,"name":"Trigonometric Ratios & Identities (Ph-I)","fullName":"C02 - Trigonometric Ratios & Identities (Ph-I)","category":"Trigonometry","iconName":"Triangle","badgeText":"Theory + Combined Exercise","hasSubTopics":false,"theory":{"title":"Theory Notes: Compound Angles & Transformation Formulas","topics":["Compound Angles (sin/cos/tan(A±B)) & Multiple Angles","Transformation of Sum/Difference into Products","Conditional Trigonometric Identities in Triangles","Maximum and Minimum Values of a cos θ + b sin θ"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Algebraic manipulations of circular trigonometric functions, angle summation identities, and bounded ranges."},"exercises":[{"id":"c02-combined","title":"Exercise (Combined)","type":"combined","questionCount":30,"timeMinutes":60,"marks":120,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Intensive practice on angle transformations, telescoping trigonometric series, and extreme values."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c03","code":"C03","chapterNumber":3,"name":"Quadratic Equation","fullName":"C03 - Quadratic Equation","category":"Algebra","iconName":"Variable","badgeText":"Theory + Combined Exercise","hasSubTopics":false,"theory":{"title":"Theory Notes: Roots, Discriminant & Location of Roots","topics":["Relation Between Roots & Coefficients (Vieta Formulas)","Nature of Roots & Sign of Quadratic Expressions","Location of Roots (6 Classical Boundary Conditions)","Common Roots of Two Quadratic Equations (Cramer Condition)"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Parabolic geometry of quadratic polynomials, discriminants, root locations with respect to fixed real numbers, and transformations."},"exercises":[{"id":"c03-combined","title":"Exercise (Combined)","type":"combined","questionCount":30,"timeMinutes":60,"marks":120,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Complete mock on Vieta formulas, location of roots constraints, symmetric functions of roots, and higher degree polynomials."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c04","code":"C04","chapterNumber":4,"name":"Sequence & Series","fullName":"C04 - Sequence & Series","category":"Algebra","iconName":"TrendingUp","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: AP, GP, HP & Special Series","topics":["Arithmetic & Geometric Progressions (AP & GP)","Arithmetico-Geometric Progression (AGP)","AM-GM-HM Inequality & Applications","Sigma Notations, Method of Differences & Telescoping Series"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Summation techniques for standard and non-standard numeric sequences, inequality bounds, and telescoping cancellation."},"exercises":[{"id":"c04-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"AP properties, general terms, and sum of n terms."},{"id":"c04-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"GP properties, infinite geometric series, and product of terms."},{"id":"c04-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"AGP summation and recursive sequence formulations."},{"id":"c04-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"AM >= GM >= HM inequality applications for optimization."},{"id":"c04-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Method of differences and advanced telescoping rational summations."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c05","code":"C05","chapterNumber":5,"name":"Binomial Theorem","fullName":"C05 - Binomial Theorem","category":"Algebra","iconName":"Percent","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: Binomial Theorem for Any Index","topics":["General & Middle Terms in Binomial Expansions","Properties of Binomial Coefficients & Summation Formulas","Multinomial Theorem & Coefficient Evaluation","Binomial Theorem for Negative/Fractional Indices & Divisibility"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Combinatorial polynomial expansions, coefficient properties, calculus-based series evaluation, and remainder theorems."},"exercises":[{"id":"c05-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"General term, independent of x terms, and middle term calculation."},{"id":"c05-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Series involving binomial coefficients (sum, alternate sum)."},{"id":"c05-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Differentiation and integration techniques for coefficient series."},{"id":"c05-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Divisibility and remainder problems using binomial expansions."},{"id":"c05-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Multinomial theorem, greatest term, and fractional exponent approximations."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c06","code":"C06","chapterNumber":6,"name":"Trigonometric Equation (Ph-II)","fullName":"C06 - Trigonometric Equation (Ph-II)","category":"Trigonometry","iconName":"PieChart","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: General Solutions & Inequations","topics":["General Solutions of sin θ = sin α, cos θ = cos α, tan θ = tan α","Solving a cos θ + b sin θ = c by Auxiliary Angle","Factorization & Quadratic Trigonometric Equations","Trigonometric Inequations on the Unit Circle"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Periodic solution sets, boundary rejection based on domain restrictions, and bounded trigonometric systems."},"exercises":[{"id":"c06-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"General solutions of standard linear trigonometric equations."},{"id":"c06-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Equations reducible to quadratic form in sin θ or cos θ."},{"id":"c06-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Auxiliary angle method (a cos θ + b sin θ = c) and existence conditions."},{"id":"c06-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Number of solutions in given intervals [0, 2π], [-π, π]."},{"id":"c06-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Systems of simultaneous trigonometric equations and inequalities."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c07","code":"C07","chapterNumber":7,"name":"Solution of Triangle (Ph-III)","fullName":"C07 - Solution of Triangle (Ph-III)","category":"Trigonometry","iconName":"Shapes","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: Sine, Cosine Rules & Triangle Circles","topics":["Sine Rule, Cosine Rule & Projection Formulas","Half-Angle Formulas (Hero Formula & Tangent Rule)","Circumradius (R), Inradius (r) & Exradii (r1, r2, r3)","Pedal Triangle, Excentral Triangle & Orthocenter Relations"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Geometric properties of triangle centers, circumcircle, incircle, excircles, and cyclic polygon trigonometry."},"exercises":[{"id":"c07-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Sine rule, cosine rule, and projection rule applications."},{"id":"c07-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Area of triangles and half-angle formulas for sides and angles."},{"id":"c07-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Inradius r and circumradius R relations (Euler formula)."},{"id":"c07-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Exradii r1, r2, r3 and distance between triangle centers."},{"id":"c07-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Pedal triangle, orthic triangles, and cyclic quadrilateral geometry."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c08","code":"C08","chapterNumber":8,"name":"Straight Line","fullName":"C08 - Straight Line","category":"Coordinate Geometry","iconName":"Slash","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: 2D Coordinate Geometry of Lines","topics":["Various Forms of Line Equations (Slope-Intercept, Normal, Symmetric)","Distance of a Point from a Line & Distance Between Parallel Lines","Family of Lines Passing Through Intersection (L1 + λL2 = 0)","Angle Bisectors, Foot of Perpendicular & Image of a Point"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Linear locus in Cartesian plane, homogenous second-degree equations, pair of straight lines, and angular bisectors."},"exercises":[{"id":"c08-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Slope formulas, intercepts, and parametric equations of a line."},{"id":"c08-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Perpendicular distance, area of triangles, and collinearity."},{"id":"c08-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Family of straight lines and concurrency conditions."},{"id":"c08-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Equations of angle bisectors: acute vs obtuse and containing origin."},{"id":"c08-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Pair of straight lines passing through origin and homogenization."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c09","code":"C09","chapterNumber":9,"name":"Circle","fullName":"C09 - Circle","category":"Coordinate Geometry","iconName":"Circle","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: Circle Geometry & Tangent Systems","topics":["Standard, Central & Diametric Forms of Circle Equations","Line and Circle Intersection (Condition of Tangency)","Pair of Tangents, Length of Tangent & Chord of Contact","Orthogonal Circles, Radical Axis & Coaxial System of Circles"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Quadratic curves with equal coefficients and zero cross-term, pole and polar lines, and power of a point."},"exercises":[{"id":"c09-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Equation of circles from given center/radius and 3 non-collinear points."},{"id":"c09-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Condition of tangency and equations of tangents in slope and point form."},{"id":"c09-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Length of tangent, director circle, and chord of contact (T = 0)."},{"id":"c09-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Common tangents to two circles (direct and transverse)."},{"id":"c09-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Orthogonal intersection of circles, radical axis, and family of circles."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c10","code":"C10","chapterNumber":10,"name":"Determinant & Matrices","fullName":"C10 - Determinant & Matrices","category":"Algebra","iconName":"Grid","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: Matrix Algebra & Determinant Properties","topics":["Properties of Determinants & Row/Column Operations","Cramer Rule for System of Linear Equations","Matrix Operations, Adjoint & Invertibility (A · adj(A) = |A|·I)","Cayley-Hamilton Theorem & Orthogonal/Symmetric Matrices"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Linear transformations, rank, consistency of simultaneous linear systems, and characteristic polynomial analysis."},"exercises":[{"id":"c10-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Evaluation of determinants using properties and cyclic symmetry."},{"id":"c10-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Cramer rule and consistency conditions (unique, infinite, no solution)."},{"id":"c10-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Matrix multiplication, trace, transpose, and symmetric/skew-symmetric."},{"id":"c10-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Adjoint and inverse of matrices, determinant of adjoint identities."},{"id":"c10-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Powers of matrices, Cayley-Hamilton theorem, and idempotent/orthogonal matrices."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c13","code":"C13","chapterNumber":13,"name":"Function","fullName":"C13 - Function","category":"Calculus","iconName":"FunctionSquare","badgeText":"Theory + Combined Exercise","hasSubTopics":false,"theory":{"title":"Theory Notes: Domain, Range, Types & Composite Functions","topics":["Domain & Range Determination of Algebraic & Transcendental Functions","Classification: One-One (Injective), Onto (Surjective) & Bijective","Composite Functions (fog & gof) & Invertible Functions","Even/Odd Functions, Periodic Functions & Functional Equations"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Mapping rules, bijectivity as criteria for invertibility, Cauchy functional equations, and fundamental period calculation."},"exercises":[{"id":"c13-combined","title":"Exercise (Combined)","type":"combined","questionCount":30,"timeMinutes":60,"marks":120,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Comprehensive calculus drill covering domain intersections, range optimization, composite function graphs, and functional equations."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c14","code":"C14","chapterNumber":14,"name":"ITF (Inverse Trigonometric Functions)","fullName":"C14 - ITF (Inverse Trigonometric Functions)","category":"Trigonometry","iconName":"RotateCcw","badgeText":"Theory + Combined Exercise","hasSubTopics":false,"theory":{"title":"Theory Notes: Principal Value Branches & Identities","topics":["Domains & Principal Value Ranges of 6 Inverse Trig Functions","Self-Inversion Properties (sin^-1(sin x) & sin(sin^-1 x))","Sum & Difference Formulas (tan^-1 x + tan^-1 y)","Telescoping Series of Inverse Tangents"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Branch cuts for inverse circular functions, piecewise evaluation graphs, and summation of inverse tangent series."},"exercises":[{"id":"c14-combined","title":"Exercise (Combined)","type":"combined","questionCount":30,"timeMinutes":60,"marks":120,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Essential mock test on principal branch evaluations, non-standard graph tracing, and telescoping series of arctan terms."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c15","code":"C15","chapterNumber":15,"name":"Limits","fullName":"C15 - Limits","category":"Calculus","iconName":"MoveRight","badgeText":"Theory + Combined Exercise","hasSubTopics":false,"theory":{"title":"Theory Notes: Indeterminate Forms & Asymptotic Behavior","topics":["7 Indeterminate Forms (0/0, ∞/∞, 0·∞, ∞-∞, 0^0, ∞^0, 1^∞)","Standard Trigonometric & Exponential Limit Identities","L'Hopital Rule & Taylor/Maclaurin Series Expansion","1^Infinity Exponential Limits & Squeeze Play Theorem"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Local behavior near singularities, asymptotic series truncations, dominant terms, and Sandwich theorem bounds."},"exercises":[{"id":"c15-combined","title":"Exercise (Combined)","type":"combined","questionCount":30,"timeMinutes":60,"marks":120,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Thorough test on algebraic factoring, 1^infinity formulations, series expansions, and sandwich theorem limits."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c16","code":"C16","chapterNumber":16,"name":"Continuity & Differentiability","fullName":"C16 - Continuity & Differentiability","category":"Calculus","iconName":"Activity","badgeText":"Theory + Combined Exercise","hasSubTopics":false,"theory":{"title":"Theory Notes: Continuity Criteria & Differentiability in R","topics":["Definition of Continuity (LHL = RHL = f(a))","Types of Discontinuity (Removable, Jump, Essential)","Left Hand & Right Hand Derivatives (LHD & RHD)","Differentiability Implies Continuity (Converse Failure)"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Topological smoothness, intermediate value theorem, corner points, cusps, and differentiability of composite functions."},"exercises":[{"id":"c16-combined","title":"Exercise (Combined)","type":"combined","questionCount":30,"timeMinutes":60,"marks":120,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Full mock covering continuity at point and intervals, differentiability of piecewise defined functions, and intermediate value theorem."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c17","code":"C17","chapterNumber":17,"name":"MOD (Method of Differentiation)","fullName":"C17 - MOD (Method of Differentiation)","category":"Calculus","iconName":"Percent","badgeText":"Theory + Combined Exercise","hasSubTopics":false,"theory":{"title":"Theory Notes: Rules of Differentiation & Higher Derivatives","topics":["Product, Quotient & Chain Rules","Logarithmic Differentiation for Variable Exponents","Parametric & Implicit Differentiation","Higher Order Derivatives & Successive Differentiation"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Computational techniques for instantaneous rates of change, inverse function derivatives, and determinant differentiation."},"exercises":[{"id":"c17-combined","title":"Exercise (Combined)","type":"combined","questionCount":30,"timeMinutes":60,"marks":120,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Comprehensive drill on chain rule, logarithmic differentiation, derivatives of parametric functions, and second-order derivatives."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c18","code":"C18","chapterNumber":18,"name":"Applications of Derivative","fullName":"C18 - Applications of Derivative","category":"Calculus","iconName":"TrendingUp","badgeText":"3 Sub-Topics • 15 Exercises","hasSubTopics":true,"subTopics":[{"id":"c18-sub1","name":"Monotonicity","slug":"monotonicity","theory":{"title":"Theory Notes: Monotonicity & Mean Value Theorems","topics":["Sign of First Derivative & Strict Increasing/Decreasing","Rolle Theorem & Lagrange Mean Value Theorem (LMVT)","Cauchy Mean Value Theorem & Applications to Inequalities","Concavity, Convexity & Points of Inflection (f''(x))"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Global and interval monotonicity, proving non-trivial mathematical inequalities via first derivatives, and LMVT applications."},"exercises":[{"id":"c18-sub1-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Intervals of increase and decrease using first derivative."},{"id":"c18-sub1-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Rolle theorem verification and roots of derivatives."},{"id":"c18-sub1-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Lagrange Mean Value Theorem (LMVT) applications."},{"id":"c18-sub1-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Proving functional inequalities using monotonicity."},{"id":"c18-sub1-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Advanced concavity, inflection points, and curve behavior."}]},{"id":"c18-sub2","name":"Maxima & Minima","slug":"maxima-minima","theory":{"title":"Theory Notes: Extrema of Functions & Optimization","topics":["Local Extrema: First & Second Derivative Tests","Higher Derivative Test for Extrema at Stationary Points","Global (Absolute) Extrema in Closed Bounded Intervals [a, b]","Geometric & Applied Optimization Word Problems"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Critical points, Fermat theorem, second order Taylor sufficiency conditions, and constrained geometric optimization."},"exercises":[{"id":"c18-sub2-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Critical points and local maxima/minima using first derivative test."},{"id":"c18-sub2-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Second derivative test and point of inflection identification."},{"id":"c18-sub2-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Absolute (global) maxima and minima on closed intervals."},{"id":"c18-sub2-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Geometric optimization problems (cylinders, cones, boxes)."},{"id":"c18-sub2-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Multi-variable reduction, parametric constraints, and advanced extrema."}]},{"id":"c18-sub3","name":"Tangent & Normal","slug":"tangent-normal","theory":{"title":"Theory Notes: Tangents, Normals & Rate of Change","topics":["Slope of Tangent & Normal to Curves (dy/dx)","Equations of Tangent & Normal at Point (x1, y1)","Angle of Intersection of Two Curves & Orthogonal Trajectories","Lengths of Tangent, Subtangent, Normal & Subnormal"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Differential geometry of plane curves, linear approximation, rate of change of geometric quantities, and orthogonal intersections."},"exercises":[{"id":"c18-sub3-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Slopes and equations of tangents and normals to Cartesian curves."},{"id":"c18-sub3-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Rate of change of physical quantities (distance, volume, shadow)."},{"id":"c18-sub3-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Angle of intersection between curves and orthogonality conditions."},{"id":"c18-sub3-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Length of subtangent and subnormal evaluations."},{"id":"c18-sub3-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Common tangents between multiple curves and envelope curves."}]}],"theory":{"title":"Theory Notes: Applications of Derivative (Monotonicity, Extrema & Tangents)","topics":["Monotonicity & Inequations Proving","Local & Global Maxima/Minima Optimization","Tangents, Normals & Orthogonal Curves","Rolle & LMVT Theorems"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Three unified calculus pillars: curve slope analysis, rate measurement, and function optimization."},"exercises":[],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c19","code":"C19","chapterNumber":19,"name":"Indefinite Integration","fullName":"C19 - Indefinite Integration","category":"Calculus","iconName":"Maximize2","badgeText":"Theory + 6 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: Antiderivatives & Integration Techniques","topics":["Standard Algebraic, Trig, Exponential & Hyperbolic Antiderivatives","Integration by Substitution (Method of Change of Variable)","Integration by Parts (ILATE Rule) & Special Forms e^x(f(x) + f'(x))","Partial Fractions & Integration of Rational/Irrational Algebraic Forms"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Reverse differential operator algorithms, algebraic transformations, trigonometric substitutions, and reduction formulas."},"exercises":[{"id":"c19-elem","title":"Elementary Exercise","type":"combined","questionCount":20,"timeMinutes":40,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Fundamental standard antiderivatives and basic algebraic substitutions."},{"id":"c19-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Method of substitution and trigonometric identities integration."},{"id":"c19-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Integration by parts (ILATE) and exponential forms e^x(f + f')."},{"id":"c19-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Integration using partial fractions and rational functions."},{"id":"c19-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Special integrals of the form dx / (a + b cos x) and quadratic square roots."},{"id":"c19-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Euler substitutions, algebraic twin integrals, and reduction formulas."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c20","code":"C20","chapterNumber":20,"name":"Definite Integration","fullName":"C20 - Definite Integration","category":"Calculus","iconName":"Bookmark","badgeText":"Theory + 6 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: Definite Integrals as Area & Properties","topics":["Fundamental Theorem of Calculus & Newton-Leibniz Formula","Standard Properties (P1 to P7, King Property, Queen Property)","Leibniz Rule for Differentiation Under the Integral Sign","Definite Integral as the Limit of a Riemann Sum"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Riemann integral foundations, symmetry transformations, periodic integral reduction, and differentiation under integral sign."},"exercises":[{"id":"c20-elem","title":"Elementary Exercise","type":"combined","questionCount":20,"timeMinutes":40,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Evaluation of definite integrals using fundamental theorem of calculus."},{"id":"c20-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Properties: change of variable and splitting intervals for piecewise functions."},{"id":"c20-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"King property: integral from a to b f(x)dx = integral f(a+b-x)dx."},{"id":"c20-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Even/odd function properties, Queen property for symmetric limits."},{"id":"c20-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Leibniz differentiation rule under integral sign."},{"id":"c20-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Limit of sum formulation, periodic functions, and estimation of integrals."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c21","code":"C21","chapterNumber":21,"name":"Vector","fullName":"C21 - Vector","category":"Vectors & 3D","iconName":"Navigation","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: Vector Algebra (Part 1, Part 2, Part 3)","topics":["Part 1: Representation, Addition, Section Formula & Direction Cosines","Part 2: Dot Product (Scalar Product) & Projections","Part 3: Cross Product, Scalar Triple Product (STP) & Vector Triple Product (VTP)"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"3-dimensional vector spaces, orthogonality, coplanarity criteria, and vector triple product expansions."},"exercises":[{"id":"c21-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Vector representation, collinearity, linear combination, and section formula."},{"id":"c21-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Dot product, projection of vector on line, and perpendicular vectors."},{"id":"c21-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Cross product, area of triangle and parallelogram."},{"id":"c21-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Scalar Triple Product [a b c], volume of parallelepiped, and coplanarity."},{"id":"c21-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Vector Triple Product a x (b x c), vector equations, and reciprocal system."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c22","code":"C22","chapterNumber":22,"name":"3D Geometry","fullName":"C22 - 3D Geometry","category":"Vectors & 3D","iconName":"Box","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: Lines and Planes in 3D Space","topics":["Direction Cosines & Direction Ratios of 3D Lines","Equation of a Line in Vector & Cartesian Forms","Shortest Distance Between Two Skew Lines","Equation of a Plane, Angle Between Planes & Line-Plane Intersection"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Euclidean spatial geometry, skew lines distance minimization, plane normal vectors, and coplanar conditions."},"exercises":[{"id":"c22-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Direction cosines, direction ratios, and angle between two lines."},{"id":"c22-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Equation of a line, intersection of two lines, and foot of perpendicular."},{"id":"c22-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Shortest distance between skew lines and parallel lines."},{"id":"c22-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Equation of plane, distance of point from plane, and family of planes."},{"id":"c22-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Line of intersection of planes, image in a plane, and coplanarity."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c23","code":"C23","chapterNumber":23,"name":"Differential Equation","fullName":"C23 - Differential Equation","category":"Calculus","iconName":"Binary","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: First Order Differential Equations","topics":["Order & Degree of Differential Equations","Formation of Differential Equations by Eliminating Arbitrary Constants","Variable Separable Method & Reducible Forms","Homogeneous Equations & First Order Linear DE (Integrating Factor IF)"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Mathematical modeling of dynamic rates, exact differentials, linear integrating factors, and Bernoulli equations."},"exercises":[{"id":"c23-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Order and degree determination, differential equation formation."},{"id":"c23-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Variable separable form and equations reducible to variable separable."},{"id":"c23-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Homogeneous differential equations (substitution y = vx)."},{"id":"c23-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Linear differential equations (dy/dx + Py = Q, Integrating Factor)."},{"id":"c23-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Bernoulli equations, exact differentials, and orthogonal trajectories."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c24","code":"C24","chapterNumber":24,"name":"Area Under The Curve","fullName":"C24 - Area Under The Curve","category":"Calculus","iconName":"Maximize2","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: Bounded Planar Areas & Quadrature","topics":["Area Bounded by Curve y = f(x), x-axis & Ordinates x = a, b","Area Between Two Intersecting Curves (f(x) - g(x))","Symmetric Integrations for Parabolic & Circular Regions","Curve Tracing for Inequations & Region Shading"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Definite integral application for bounded planar regions, split intervals around intersection nodes, and inverse axis integration."},"exercises":[{"id":"c24-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Standard area bounded by single curve and coordinate axes."},{"id":"c24-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Area between line and parabola, line and circle."},{"id":"c24-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Area between two intersecting parabolas (standard 16ab/3 formula)."},{"id":"c24-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Area of piecewise defined functions and modulus regions."},{"id":"c24-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Regions defined by simultaneous inequalities and inverse trigonometric curves."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c25","code":"C25","chapterNumber":25,"name":"Complex Number","fullName":"C25 - Complex Number","category":"Algebra","iconName":"Compass","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: Argand Plane, De Moivre & Cube Roots of Unity","topics":["Algebraic Operations, Conjugate, Modulus & Argument","Polar & Euler Form (r e^(iθ))","De Moivre Theorem & n-th Roots of Unity (1, ω, ω^2)","Geometry in Argand Plane (Circle, Straight Line, Ellipse Equations)"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"2D plane complex representations, rotational operators, unimodular vectors, and geometric loci in the complex plane."},"exercises":[{"id":"c25-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Modulus, argument, and conjugate properties."},{"id":"c25-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Euler form and De Moivre theorem for powers of complex numbers."},{"id":"c25-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Cube roots of unity (1, ω, ω^2) and polynomial factorizations."},{"id":"c25-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Locus in Argand plane: circles |z - z0| = r, perpendicular bisectors."},{"id":"c25-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Rotation theorem (coni method) and n-th roots of unity geometry."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c26","code":"C26","chapterNumber":26,"name":"Parabola","fullName":"C26 - Parabola","category":"Coordinate Geometry","iconName":"TrendingUp","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: Conic Definition & Parabola Geometry","topics":["Standard Equation y^2 = 4ax, Focus, Directrix & Latus Rectum","Parametric Coordinates (at^2, 2at) & Chord Equations","Equations of Tangents in Slope, Point & Parametric Forms","Normals to Parabola, Co-normal Points & Reflection Property"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Locus with eccentricity e = 1, focal chord harmonic properties, point of intersection of tangents, and 3 co-normal points."},"exercises":[{"id":"c26-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Standard parabola equations, focus, directrix, and latus rectum."},{"id":"c26-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Parametric coordinates (at^2, 2at) and focal chord properties (t1 t2 = -1)."},{"id":"c26-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Equations of tangents in slope and parametric forms."},{"id":"c26-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Normals to parabola and condition for 3 co-normal points."},{"id":"c26-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Director circle, optical reflection property, and common tangents."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c27","code":"C27","chapterNumber":27,"name":"Ellipse","fullName":"C27 - Ellipse","category":"Coordinate Geometry","iconName":"Circle","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: Central Conic x^2/a^2 + y^2/b^2 = 1","topics":["Standard Equation, Eccentricity (e < 1), Foci & Directrices","Auxiliary Circle & Eccentric Angle (a cos θ, b sin θ)","Tangents, Normals & Director Circle (x^2 + y^2 = a^2 + b^2)","Focal Distances Sum SP + S'P = 2a & Optical Property"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Central conic with eccentricity less than 1, conjugate diameters, focal property, and slope condition of tangency."},"exercises":[{"id":"c27-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Standard ellipse equations, eccentricity, foci, and axes lengths."},{"id":"c27-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Parametric form (a cos θ, b sin θ) and auxiliary circle."},{"id":"c27-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Condition of tangency (c^2 = a^2 m^2 + b^2) and director circle."},{"id":"c27-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Equations of normals and reflection property of ellipse."},{"id":"c27-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Focal chord properties, common tangents, and locus problems."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}},{"id":"c28","code":"C28","chapterNumber":28,"name":"Hyperbola","fullName":"C28 - Hyperbola","category":"Coordinate Geometry","iconName":"Shapes","badgeText":"Theory + 5 Exercises","hasSubTopics":false,"theory":{"title":"Theory Notes: Central Conic x^2/a^2 - y^2/b^2 = 1","topics":["Standard Equation, Eccentricity (e > 1), Foci & Directrices","Conjugate Hyperbola & Rectangular Hyperbola (xy = c^2)","Asymptotes of Hyperbola & Angle Between Asymptotes","Director Circle (x^2 + y^2 = a^2 - b^2) & Focal Property |SP - S'P| = 2a"],"status":"upload_pending","statusLabel":"Theory Notes — Upload Pending","summary":"Open central conic with eccentricity greater than 1, asymptotic bounds, equilateral hyperbolas, and tangent properties."},"exercises":[{"id":"c28-ex1","title":"Exercise 1","type":"numbered","number":1,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Standard hyperbola equations, eccentricity, and foci."},{"id":"c28-ex2","title":"Exercise 2","type":"numbered","number":2,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Mains","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Conjugate hyperbola relations (1/e1^2 + 1/e2^2 = 1)."},{"id":"c28-ex3","title":"Exercise 3","type":"numbered","number":3,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Condition of tangency (c^2 = a^2 m^2 - b^2) and director circle."},{"id":"c28-ex4","title":"Exercise 4","type":"numbered","number":4,"questionCount":20,"timeMinutes":45,"marks":80,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"Both","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Asymptotes equations and their geometric properties."},{"id":"c28-ex5","title":"Exercise 5","type":"numbered","number":5,"questionCount":25,"timeMinutes":60,"marks":100,"status":"ready_for_upload","statusLabel":"Ready for Upload / Coming Soon","targetExam":"JEE Advanced","markingScheme":"+4 for Correct, -1 for Incorrect (Single Choice/Numerical)","description":"Rectangular hyperbola xy = c^2 parametric form (ct, c/t) and normal chords."}],"colorTheme":{"accent":"#7C3AED","bgLight":"#F5F3FF","bgDark":"#2E1065","borderLight":"#DDD6FE","borderDark":"#5B21B6","glow":"rgba(124, 58, 237, 0.25)"}}];
+  window.mathsChaptersData = [
+  {
+    "id": "c01",
+    "code": "C01",
+    "chapterNumber": 1,
+    "name": "Logarithm",
+    "fullName": "C01 - Logarithm",
+    "category": "Algebra",
+    "iconName": "Hash",
+    "badgeText": "Theory + Combined Exercise",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Logarithmic Identities & Inequations",
+      "topics": [
+        "Fundamental Logarithmic Identities & Base Change",
+        "Logarithmic Equations & Extraneous Roots",
+        "Logarithmic Inequations & Base Interval Analysis",
+        "Characteristic & Mantissa of Logarithms"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Foundational algebra of logarithmic functions, monotonicity conditions for inequalities, and domain boundaries."
+    },
+    "exercises": [
+      {
+        "id": "c01-combined",
+        "title": "Exercise (Combined)",
+        "type": "combined",
+        "questionCount": 30,
+        "timeMinutes": 60,
+        "marks": 120,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Combined drill on logarithmic properties, inequalities with variable bases, and characteristic-mantissa."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "low"
+  },
+  {
+    "id": "c02",
+    "code": "C02",
+    "chapterNumber": 2,
+    "name": "Trigonometric Ratios & Identities (Ph-I)",
+    "fullName": "C02 - Trigonometric Ratios & Identities (Ph-I)",
+    "category": "Trigonometry",
+    "iconName": "Triangle",
+    "badgeText": "Theory + Combined Exercise",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Compound Angles & Transformation Formulas",
+      "topics": [
+        "Compound Angles (sin/cos/tan(A±B)) & Multiple Angles",
+        "Transformation of Sum/Difference into Products",
+        "Conditional Trigonometric Identities in Triangles",
+        "Maximum and Minimum Values of a cos θ + b sin θ"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Algebraic manipulations of circular trigonometric functions, angle summation identities, and bounded ranges."
+    },
+    "exercises": [
+      {
+        "id": "c02-combined",
+        "title": "Exercise (Combined)",
+        "type": "combined",
+        "questionCount": 30,
+        "timeMinutes": 60,
+        "marks": 120,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Intensive practice on angle transformations, telescoping trigonometric series, and extreme values."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "mid"
+  },
+  {
+    "id": "c03",
+    "code": "C03",
+    "chapterNumber": 3,
+    "name": "Quadratic Equation",
+    "fullName": "C03 - Quadratic Equation",
+    "category": "Algebra",
+    "iconName": "Variable",
+    "badgeText": "Theory + Combined Exercise",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Roots, Discriminant & Location of Roots",
+      "topics": [
+        "Relation Between Roots & Coefficients (Vieta Formulas)",
+        "Nature of Roots & Sign of Quadratic Expressions",
+        "Location of Roots (6 Classical Boundary Conditions)",
+        "Common Roots of Two Quadratic Equations (Cramer Condition)"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Parabolic geometry of quadratic polynomials, discriminants, root locations with respect to fixed real numbers, and transformations."
+    },
+    "exercises": [
+      {
+        "id": "c03-combined",
+        "title": "Exercise (Combined)",
+        "type": "combined",
+        "questionCount": 30,
+        "timeMinutes": 60,
+        "marks": 120,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Complete mock on Vieta formulas, location of roots constraints, symmetric functions of roots, and higher degree polynomials."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "high"
+  },
+  {
+    "id": "c04",
+    "code": "C04",
+    "chapterNumber": 4,
+    "name": "Sequence & Series",
+    "fullName": "C04 - Sequence & Series",
+    "category": "Algebra",
+    "iconName": "TrendingUp",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: AP, GP, HP & Special Series",
+      "topics": [
+        "Arithmetic & Geometric Progressions (AP & GP)",
+        "Arithmetico-Geometric Progression (AGP)",
+        "AM-GM-HM Inequality & Applications",
+        "Sigma Notations, Method of Differences & Telescoping Series"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Summation techniques for standard and non-standard numeric sequences, inequality bounds, and telescoping cancellation."
+    },
+    "exercises": [
+      {
+        "id": "c04-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "AP properties, general terms, and sum of n terms."
+      },
+      {
+        "id": "c04-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "GP properties, infinite geometric series, and product of terms."
+      },
+      {
+        "id": "c04-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "AGP summation and recursive sequence formulations."
+      },
+      {
+        "id": "c04-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "AM >= GM >= HM inequality applications for optimization."
+      },
+      {
+        "id": "c04-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Method of differences and advanced telescoping rational summations."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "high"
+  },
+  {
+    "id": "c05",
+    "code": "C05",
+    "chapterNumber": 5,
+    "name": "Binomial Theorem",
+    "fullName": "C05 - Binomial Theorem",
+    "category": "Algebra",
+    "iconName": "Percent",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Binomial Theorem for Any Index",
+      "topics": [
+        "General & Middle Terms in Binomial Expansions",
+        "Properties of Binomial Coefficients & Summation Formulas",
+        "Multinomial Theorem & Coefficient Evaluation",
+        "Binomial Theorem for Negative/Fractional Indices & Divisibility"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Combinatorial polynomial expansions, coefficient properties, calculus-based series evaluation, and remainder theorems."
+    },
+    "exercises": [
+      {
+        "id": "c05-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "General term, independent of x terms, and middle term calculation."
+      },
+      {
+        "id": "c05-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Series involving binomial coefficients (sum, alternate sum)."
+      },
+      {
+        "id": "c05-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Differentiation and integration techniques for coefficient series."
+      },
+      {
+        "id": "c05-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Divisibility and remainder problems using binomial expansions."
+      },
+      {
+        "id": "c05-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Multinomial theorem, greatest term, and fractional exponent approximations."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "high"
+  },
+  {
+    "id": "c06",
+    "code": "C06",
+    "chapterNumber": 6,
+    "name": "Trigonometric Equation (Ph-II)",
+    "fullName": "C06 - Trigonometric Equation (Ph-II)",
+    "category": "Trigonometry",
+    "iconName": "PieChart",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: General Solutions & Inequations",
+      "topics": [
+        "General Solutions of sin θ = sin α, cos θ = cos α, tan θ = tan α",
+        "Solving a cos θ + b sin θ = c by Auxiliary Angle",
+        "Factorization & Quadratic Trigonometric Equations",
+        "Trigonometric Inequations on the Unit Circle"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Periodic solution sets, boundary rejection based on domain restrictions, and bounded trigonometric systems."
+    },
+    "exercises": [
+      {
+        "id": "c06-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "General solutions of standard linear trigonometric equations."
+      },
+      {
+        "id": "c06-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Equations reducible to quadratic form in sin θ or cos θ."
+      },
+      {
+        "id": "c06-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Auxiliary angle method (a cos θ + b sin θ = c) and existence conditions."
+      },
+      {
+        "id": "c06-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Number of solutions in given intervals [0, 2π], [-π, π]."
+      },
+      {
+        "id": "c06-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Systems of simultaneous trigonometric equations and inequalities."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "mid"
+  },
+  {
+    "id": "c07",
+    "code": "C07",
+    "chapterNumber": 7,
+    "name": "Solution of Triangle (Ph-III)",
+    "fullName": "C07 - Solution of Triangle (Ph-III)",
+    "category": "Trigonometry",
+    "iconName": "Shapes",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Sine, Cosine Rules & Triangle Circles",
+      "topics": [
+        "Sine Rule, Cosine Rule & Projection Formulas",
+        "Half-Angle Formulas (Hero Formula & Tangent Rule)",
+        "Circumradius (R), Inradius (r) & Exradii (r1, r2, r3)",
+        "Pedal Triangle, Excentral Triangle & Orthocenter Relations"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Geometric properties of triangle centers, circumcircle, incircle, excircles, and cyclic polygon trigonometry."
+    },
+    "exercises": [
+      {
+        "id": "c07-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Sine rule, cosine rule, and projection rule applications."
+      },
+      {
+        "id": "c07-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Area of triangles and half-angle formulas for sides and angles."
+      },
+      {
+        "id": "c07-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Inradius r and circumradius R relations (Euler formula)."
+      },
+      {
+        "id": "c07-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Exradii r1, r2, r3 and distance between triangle centers."
+      },
+      {
+        "id": "c07-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Pedal triangle, orthic triangles, and cyclic quadrilateral geometry."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "low"
+  },
+  {
+    "id": "c08",
+    "code": "C08",
+    "chapterNumber": 8,
+    "name": "Straight Line",
+    "fullName": "C08 - Straight Line",
+    "category": "Coordinate Geometry",
+    "iconName": "Slash",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: 2D Coordinate Geometry of Lines",
+      "topics": [
+        "Various Forms of Line Equations (Slope-Intercept, Normal, Symmetric)",
+        "Distance of a Point from a Line & Distance Between Parallel Lines",
+        "Family of Lines Passing Through Intersection (L1 + λL2 = 0)",
+        "Angle Bisectors, Foot of Perpendicular & Image of a Point"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Linear locus in Cartesian plane, homogenous second-degree equations, pair of straight lines, and angular bisectors."
+    },
+    "exercises": [
+      {
+        "id": "c08-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Slope formulas, intercepts, and parametric equations of a line."
+      },
+      {
+        "id": "c08-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Perpendicular distance, area of triangles, and collinearity."
+      },
+      {
+        "id": "c08-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Family of straight lines and concurrency conditions."
+      },
+      {
+        "id": "c08-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Equations of angle bisectors: acute vs obtuse and containing origin."
+      },
+      {
+        "id": "c08-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Pair of straight lines passing through origin and homogenization."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "high"
+  },
+  {
+    "id": "c09",
+    "code": "C09",
+    "chapterNumber": 9,
+    "name": "Circle",
+    "fullName": "C09 - Circle",
+    "category": "Coordinate Geometry",
+    "iconName": "Circle",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Circle Geometry & Tangent Systems",
+      "topics": [
+        "Standard, Central & Diametric Forms of Circle Equations",
+        "Line and Circle Intersection (Condition of Tangency)",
+        "Pair of Tangents, Length of Tangent & Chord of Contact",
+        "Orthogonal Circles, Radical Axis & Coaxial System of Circles"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Quadratic curves with equal coefficients and zero cross-term, pole and polar lines, and power of a point."
+    },
+    "exercises": [
+      {
+        "id": "c09-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Equation of circles from given center/radius and 3 non-collinear points."
+      },
+      {
+        "id": "c09-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Condition of tangency and equations of tangents in slope and point form."
+      },
+      {
+        "id": "c09-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Length of tangent, director circle, and chord of contact (T = 0)."
+      },
+      {
+        "id": "c09-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Common tangents to two circles (direct and transverse)."
+      },
+      {
+        "id": "c09-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Orthogonal intersection of circles, radical axis, and family of circles."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "high"
+  },
+  {
+    "id": "c10",
+    "code": "C10",
+    "chapterNumber": 10,
+    "name": "Determinant & Matrices",
+    "fullName": "C10 - Determinant & Matrices",
+    "category": "Algebra",
+    "iconName": "Grid",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Matrix Algebra & Determinant Properties",
+      "topics": [
+        "Properties of Determinants & Row/Column Operations",
+        "Cramer Rule for System of Linear Equations",
+        "Matrix Operations, Adjoint & Invertibility (A · adj(A) = |A|·I)",
+        "Cayley-Hamilton Theorem & Orthogonal/Symmetric Matrices"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Linear transformations, rank, consistency of simultaneous linear systems, and characteristic polynomial analysis."
+    },
+    "exercises": [
+      {
+        "id": "c10-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Evaluation of determinants using properties and cyclic symmetry."
+      },
+      {
+        "id": "c10-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Cramer rule and consistency conditions (unique, infinite, no solution)."
+      },
+      {
+        "id": "c10-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Matrix multiplication, trace, transpose, and symmetric/skew-symmetric."
+      },
+      {
+        "id": "c10-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Adjoint and inverse of matrices, determinant of adjoint identities."
+      },
+      {
+        "id": "c10-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Powers of matrices, Cayley-Hamilton theorem, and idempotent/orthogonal matrices."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "high"
+  },
+  {
+    "id": "c13",
+    "code": "C13",
+    "chapterNumber": 13,
+    "name": "Function",
+    "fullName": "C13 - Function",
+    "category": "Calculus",
+    "iconName": "FunctionSquare",
+    "badgeText": "Theory + Combined Exercise",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Domain, Range, Types & Composite Functions",
+      "topics": [
+        "Domain & Range Determination of Algebraic & Transcendental Functions",
+        "Classification: One-One (Injective), Onto (Surjective) & Bijective",
+        "Composite Functions (fog & gof) & Invertible Functions",
+        "Even/Odd Functions, Periodic Functions & Functional Equations"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Mapping rules, bijectivity as criteria for invertibility, Cauchy functional equations, and fundamental period calculation."
+    },
+    "exercises": [
+      {
+        "id": "c13-combined",
+        "title": "Exercise (Combined)",
+        "type": "combined",
+        "questionCount": 30,
+        "timeMinutes": 60,
+        "marks": 120,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Comprehensive calculus drill covering domain intersections, range optimization, composite function graphs, and functional equations."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "high"
+  },
+  {
+    "id": "c14",
+    "code": "C14",
+    "chapterNumber": 14,
+    "name": "ITF (Inverse Trigonometric Functions)",
+    "fullName": "C14 - ITF (Inverse Trigonometric Functions)",
+    "category": "Trigonometry",
+    "iconName": "RotateCcw",
+    "badgeText": "Theory + Combined Exercise",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Principal Value Branches & Identities",
+      "topics": [
+        "Domains & Principal Value Ranges of 6 Inverse Trig Functions",
+        "Self-Inversion Properties (sin^-1(sin x) & sin(sin^-1 x))",
+        "Sum & Difference Formulas (tan^-1 x + tan^-1 y)",
+        "Telescoping Series of Inverse Tangents"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Branch cuts for inverse circular functions, piecewise evaluation graphs, and summation of inverse tangent series."
+    },
+    "exercises": [
+      {
+        "id": "c14-combined",
+        "title": "Exercise (Combined)",
+        "type": "combined",
+        "questionCount": 30,
+        "timeMinutes": 60,
+        "marks": 120,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Essential mock test on principal branch evaluations, non-standard graph tracing, and telescoping series of arctan terms."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "mid"
+  },
+  {
+    "id": "c15",
+    "code": "C15",
+    "chapterNumber": 15,
+    "name": "Limits",
+    "fullName": "C15 - Limits",
+    "category": "Calculus",
+    "iconName": "MoveRight",
+    "badgeText": "Theory + Combined Exercise",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Indeterminate Forms & Asymptotic Behavior",
+      "topics": [
+        "7 Indeterminate Forms (0/0, ∞/∞, 0·∞, ∞-∞, 0^0, ∞^0, 1^∞)",
+        "Standard Trigonometric & Exponential Limit Identities",
+        "L'Hopital Rule & Taylor/Maclaurin Series Expansion",
+        "1^Infinity Exponential Limits & Squeeze Play Theorem"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Local behavior near singularities, asymptotic series truncations, dominant terms, and Sandwich theorem bounds."
+    },
+    "exercises": [
+      {
+        "id": "c15-combined",
+        "title": "Exercise (Combined)",
+        "type": "combined",
+        "questionCount": 30,
+        "timeMinutes": 60,
+        "marks": 120,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Thorough test on algebraic factoring, 1^infinity formulations, series expansions, and sandwich theorem limits."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "high"
+  },
+  {
+    "id": "c16",
+    "code": "C16",
+    "chapterNumber": 16,
+    "name": "Continuity & Differentiability",
+    "fullName": "C16 - Continuity & Differentiability",
+    "category": "Calculus",
+    "iconName": "Activity",
+    "badgeText": "Theory + Combined Exercise",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Continuity Criteria & Differentiability in R",
+      "topics": [
+        "Definition of Continuity (LHL = RHL = f(a))",
+        "Types of Discontinuity (Removable, Jump, Essential)",
+        "Left Hand & Right Hand Derivatives (LHD & RHD)",
+        "Differentiability Implies Continuity (Converse Failure)"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Topological smoothness, intermediate value theorem, corner points, cusps, and differentiability of composite functions."
+    },
+    "exercises": [
+      {
+        "id": "c16-combined",
+        "title": "Exercise (Combined)",
+        "type": "combined",
+        "questionCount": 30,
+        "timeMinutes": 60,
+        "marks": 120,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Full mock covering continuity at point and intervals, differentiability of piecewise defined functions, and intermediate value theorem."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "mid"
+  },
+  {
+    "id": "c17",
+    "code": "C17",
+    "chapterNumber": 17,
+    "name": "MOD (Method of Differentiation)",
+    "fullName": "C17 - MOD (Method of Differentiation)",
+    "category": "Calculus",
+    "iconName": "Percent",
+    "badgeText": "Theory + Combined Exercise",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Rules of Differentiation & Higher Derivatives",
+      "topics": [
+        "Product, Quotient & Chain Rules",
+        "Logarithmic Differentiation for Variable Exponents",
+        "Parametric & Implicit Differentiation",
+        "Higher Order Derivatives & Successive Differentiation"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Computational techniques for instantaneous rates of change, inverse function derivatives, and determinant differentiation."
+    },
+    "exercises": [
+      {
+        "id": "c17-combined",
+        "title": "Exercise (Combined)",
+        "type": "combined",
+        "questionCount": 30,
+        "timeMinutes": 60,
+        "marks": 120,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Comprehensive drill on chain rule, logarithmic differentiation, derivatives of parametric functions, and second-order derivatives."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "mid"
+  },
+  {
+    "id": "c18",
+    "code": "C18",
+    "chapterNumber": 18,
+    "name": "Applications of Derivative",
+    "fullName": "C18 - Applications of Derivative",
+    "category": "Calculus",
+    "iconName": "TrendingUp",
+    "badgeText": "3 Sub-Topics • 15 Exercises",
+    "hasSubTopics": true,
+    "subTopics": [
+      {
+        "id": "c18-sub1",
+        "name": "Monotonicity",
+        "slug": "monotonicity",
+        "theory": {
+          "title": "Theory Notes: Monotonicity & Mean Value Theorems",
+          "topics": [
+            "Sign of First Derivative & Strict Increasing/Decreasing",
+            "Rolle Theorem & Lagrange Mean Value Theorem (LMVT)",
+            "Cauchy Mean Value Theorem & Applications to Inequalities",
+            "Concavity, Convexity & Points of Inflection (f''(x))"
+          ],
+          "status": "upload_pending",
+          "statusLabel": "Theory Notes — Upload Pending",
+          "summary": "Global and interval monotonicity, proving non-trivial mathematical inequalities via first derivatives, and LMVT applications."
+        },
+        "exercises": [
+          {
+            "id": "c18-sub1-ex1",
+            "title": "Exercise 1",
+            "type": "numbered",
+            "number": 1,
+            "questionCount": 20,
+            "timeMinutes": 45,
+            "marks": 80,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "JEE Mains",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Intervals of increase and decrease using first derivative."
+          },
+          {
+            "id": "c18-sub1-ex2",
+            "title": "Exercise 2",
+            "type": "numbered",
+            "number": 2,
+            "questionCount": 20,
+            "timeMinutes": 45,
+            "marks": 80,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "JEE Mains",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Rolle theorem verification and roots of derivatives."
+          },
+          {
+            "id": "c18-sub1-ex3",
+            "title": "Exercise 3",
+            "type": "numbered",
+            "number": 3,
+            "questionCount": 20,
+            "timeMinutes": 45,
+            "marks": 80,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "Both",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Lagrange Mean Value Theorem (LMVT) applications."
+          },
+          {
+            "id": "c18-sub1-ex4",
+            "title": "Exercise 4",
+            "type": "numbered",
+            "number": 4,
+            "questionCount": 20,
+            "timeMinutes": 45,
+            "marks": 80,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "Both",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Proving functional inequalities using monotonicity."
+          },
+          {
+            "id": "c18-sub1-ex5",
+            "title": "Exercise 5",
+            "type": "numbered",
+            "number": 5,
+            "questionCount": 25,
+            "timeMinutes": 60,
+            "marks": 100,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "JEE Advanced",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Advanced concavity, inflection points, and curve behavior."
+          }
+        ]
+      },
+      {
+        "id": "c18-sub2",
+        "name": "Maxima & Minima",
+        "slug": "maxima-minima",
+        "theory": {
+          "title": "Theory Notes: Extrema of Functions & Optimization",
+          "topics": [
+            "Local Extrema: First & Second Derivative Tests",
+            "Higher Derivative Test for Extrema at Stationary Points",
+            "Global (Absolute) Extrema in Closed Bounded Intervals [a, b]",
+            "Geometric & Applied Optimization Word Problems"
+          ],
+          "status": "upload_pending",
+          "statusLabel": "Theory Notes — Upload Pending",
+          "summary": "Critical points, Fermat theorem, second order Taylor sufficiency conditions, and constrained geometric optimization."
+        },
+        "exercises": [
+          {
+            "id": "c18-sub2-ex1",
+            "title": "Exercise 1",
+            "type": "numbered",
+            "number": 1,
+            "questionCount": 20,
+            "timeMinutes": 45,
+            "marks": 80,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "JEE Mains",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Critical points and local maxima/minima using first derivative test."
+          },
+          {
+            "id": "c18-sub2-ex2",
+            "title": "Exercise 2",
+            "type": "numbered",
+            "number": 2,
+            "questionCount": 20,
+            "timeMinutes": 45,
+            "marks": 80,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "JEE Mains",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Second derivative test and point of inflection identification."
+          },
+          {
+            "id": "c18-sub2-ex3",
+            "title": "Exercise 3",
+            "type": "numbered",
+            "number": 3,
+            "questionCount": 20,
+            "timeMinutes": 45,
+            "marks": 80,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "Both",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Absolute (global) maxima and minima on closed intervals."
+          },
+          {
+            "id": "c18-sub2-ex4",
+            "title": "Exercise 4",
+            "type": "numbered",
+            "number": 4,
+            "questionCount": 20,
+            "timeMinutes": 45,
+            "marks": 80,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "Both",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Geometric optimization problems (cylinders, cones, boxes)."
+          },
+          {
+            "id": "c18-sub2-ex5",
+            "title": "Exercise 5",
+            "type": "numbered",
+            "number": 5,
+            "questionCount": 25,
+            "timeMinutes": 60,
+            "marks": 100,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "JEE Advanced",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Multi-variable reduction, parametric constraints, and advanced extrema."
+          }
+        ]
+      },
+      {
+        "id": "c18-sub3",
+        "name": "Tangent & Normal",
+        "slug": "tangent-normal",
+        "theory": {
+          "title": "Theory Notes: Tangents, Normals & Rate of Change",
+          "topics": [
+            "Slope of Tangent & Normal to Curves (dy/dx)",
+            "Equations of Tangent & Normal at Point (x1, y1)",
+            "Angle of Intersection of Two Curves & Orthogonal Trajectories",
+            "Lengths of Tangent, Subtangent, Normal & Subnormal"
+          ],
+          "status": "upload_pending",
+          "statusLabel": "Theory Notes — Upload Pending",
+          "summary": "Differential geometry of plane curves, linear approximation, rate of change of geometric quantities, and orthogonal intersections."
+        },
+        "exercises": [
+          {
+            "id": "c18-sub3-ex1",
+            "title": "Exercise 1",
+            "type": "numbered",
+            "number": 1,
+            "questionCount": 20,
+            "timeMinutes": 45,
+            "marks": 80,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "JEE Mains",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Slopes and equations of tangents and normals to Cartesian curves."
+          },
+          {
+            "id": "c18-sub3-ex2",
+            "title": "Exercise 2",
+            "type": "numbered",
+            "number": 2,
+            "questionCount": 20,
+            "timeMinutes": 45,
+            "marks": 80,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "JEE Mains",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Rate of change of physical quantities (distance, volume, shadow)."
+          },
+          {
+            "id": "c18-sub3-ex3",
+            "title": "Exercise 3",
+            "type": "numbered",
+            "number": 3,
+            "questionCount": 20,
+            "timeMinutes": 45,
+            "marks": 80,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "Both",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Angle of intersection between curves and orthogonality conditions."
+          },
+          {
+            "id": "c18-sub3-ex4",
+            "title": "Exercise 4",
+            "type": "numbered",
+            "number": 4,
+            "questionCount": 20,
+            "timeMinutes": 45,
+            "marks": 80,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "Both",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Length of subtangent and subnormal evaluations."
+          },
+          {
+            "id": "c18-sub3-ex5",
+            "title": "Exercise 5",
+            "type": "numbered",
+            "number": 5,
+            "questionCount": 25,
+            "timeMinutes": 60,
+            "marks": 100,
+            "status": "ready_for_upload",
+            "statusLabel": "Ready for Upload / Coming Soon",
+            "targetExam": "JEE Advanced",
+            "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+            "description": "Common tangents between multiple curves and envelope curves."
+          }
+        ]
+      }
+    ],
+    "theory": {
+      "title": "Theory Notes: Applications of Derivative (Monotonicity, Extrema & Tangents)",
+      "topics": [
+        "Monotonicity & Inequations Proving",
+        "Local & Global Maxima/Minima Optimization",
+        "Tangents, Normals & Orthogonal Curves",
+        "Rolle & LMVT Theorems"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Three unified calculus pillars: curve slope analysis, rate measurement, and function optimization."
+    },
+    "exercises": [],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "high"
+  },
+  {
+    "id": "c19",
+    "code": "C19",
+    "chapterNumber": 19,
+    "name": "Indefinite Integration",
+    "fullName": "C19 - Indefinite Integration",
+    "category": "Calculus",
+    "iconName": "Maximize2",
+    "badgeText": "Theory + 6 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Antiderivatives & Integration Techniques",
+      "topics": [
+        "Standard Algebraic, Trig, Exponential & Hyperbolic Antiderivatives",
+        "Integration by Substitution (Method of Change of Variable)",
+        "Integration by Parts (ILATE Rule) & Special Forms e^x(f(x) + f'(x))",
+        "Partial Fractions & Integration of Rational/Irrational Algebraic Forms"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Reverse differential operator algorithms, algebraic transformations, trigonometric substitutions, and reduction formulas."
+    },
+    "exercises": [
+      {
+        "id": "c19-elem",
+        "title": "Elementary Exercise",
+        "type": "combined",
+        "questionCount": 20,
+        "timeMinutes": 40,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Fundamental standard antiderivatives and basic algebraic substitutions."
+      },
+      {
+        "id": "c19-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Method of substitution and trigonometric identities integration."
+      },
+      {
+        "id": "c19-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Integration by parts (ILATE) and exponential forms e^x(f + f')."
+      },
+      {
+        "id": "c19-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Integration using partial fractions and rational functions."
+      },
+      {
+        "id": "c19-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Special integrals of the form dx / (a + b cos x) and quadratic square roots."
+      },
+      {
+        "id": "c19-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Euler substitutions, algebraic twin integrals, and reduction formulas."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "mid"
+  },
+  {
+    "id": "c20",
+    "code": "C20",
+    "chapterNumber": 20,
+    "name": "Definite Integration",
+    "fullName": "C20 - Definite Integration",
+    "category": "Calculus",
+    "iconName": "Bookmark",
+    "badgeText": "Theory + 6 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Definite Integrals as Area & Properties",
+      "topics": [
+        "Fundamental Theorem of Calculus & Newton-Leibniz Formula",
+        "Standard Properties (P1 to P7, King Property, Queen Property)",
+        "Leibniz Rule for Differentiation Under the Integral Sign",
+        "Definite Integral as the Limit of a Riemann Sum"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Riemann integral foundations, symmetry transformations, periodic integral reduction, and differentiation under integral sign."
+    },
+    "exercises": [
+      {
+        "id": "c20-elem",
+        "title": "Elementary Exercise",
+        "type": "combined",
+        "questionCount": 20,
+        "timeMinutes": 40,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Evaluation of definite integrals using fundamental theorem of calculus."
+      },
+      {
+        "id": "c20-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Properties: change of variable and splitting intervals for piecewise functions."
+      },
+      {
+        "id": "c20-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "King property: integral from a to b f(x)dx = integral f(a+b-x)dx."
+      },
+      {
+        "id": "c20-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Even/odd function properties, Queen property for symmetric limits."
+      },
+      {
+        "id": "c20-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Leibniz differentiation rule under integral sign."
+      },
+      {
+        "id": "c20-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Limit of sum formulation, periodic functions, and estimation of integrals."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "high"
+  },
+  {
+    "id": "c21",
+    "code": "C21",
+    "chapterNumber": 21,
+    "name": "Vector",
+    "fullName": "C21 - Vector",
+    "category": "Vectors & 3D",
+    "iconName": "Navigation",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Vector Algebra (Part 1, Part 2, Part 3)",
+      "topics": [
+        "Part 1: Representation, Addition, Section Formula & Direction Cosines",
+        "Part 2: Dot Product (Scalar Product) & Projections",
+        "Part 3: Cross Product, Scalar Triple Product (STP) & Vector Triple Product (VTP)"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "3-dimensional vector spaces, orthogonality, coplanarity criteria, and vector triple product expansions."
+    },
+    "exercises": [
+      {
+        "id": "c21-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Vector representation, collinearity, linear combination, and section formula."
+      },
+      {
+        "id": "c21-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Dot product, projection of vector on line, and perpendicular vectors."
+      },
+      {
+        "id": "c21-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Cross product, area of triangle and parallelogram."
+      },
+      {
+        "id": "c21-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Scalar Triple Product [a b c], volume of parallelepiped, and coplanarity."
+      },
+      {
+        "id": "c21-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Vector Triple Product a x (b x c), vector equations, and reciprocal system."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "high"
+  },
+  {
+    "id": "c22",
+    "code": "C22",
+    "chapterNumber": 22,
+    "name": "3D Geometry",
+    "fullName": "C22 - 3D Geometry",
+    "category": "Vectors & 3D",
+    "iconName": "Box",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Lines and Planes in 3D Space",
+      "topics": [
+        "Direction Cosines & Direction Ratios of 3D Lines",
+        "Equation of a Line in Vector & Cartesian Forms",
+        "Shortest Distance Between Two Skew Lines",
+        "Equation of a Plane, Angle Between Planes & Line-Plane Intersection"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Euclidean spatial geometry, skew lines distance minimization, plane normal vectors, and coplanar conditions."
+    },
+    "exercises": [
+      {
+        "id": "c22-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Direction cosines, direction ratios, and angle between two lines."
+      },
+      {
+        "id": "c22-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Equation of a line, intersection of two lines, and foot of perpendicular."
+      },
+      {
+        "id": "c22-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Shortest distance between skew lines and parallel lines."
+      },
+      {
+        "id": "c22-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Equation of plane, distance of point from plane, and family of planes."
+      },
+      {
+        "id": "c22-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Line of intersection of planes, image in a plane, and coplanarity."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "high"
+  },
+  {
+    "id": "c23",
+    "code": "C23",
+    "chapterNumber": 23,
+    "name": "Differential Equation",
+    "fullName": "C23 - Differential Equation",
+    "category": "Calculus",
+    "iconName": "Binary",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: First Order Differential Equations",
+      "topics": [
+        "Order & Degree of Differential Equations",
+        "Formation of Differential Equations by Eliminating Arbitrary Constants",
+        "Variable Separable Method & Reducible Forms",
+        "Homogeneous Equations & First Order Linear DE (Integrating Factor IF)"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Mathematical modeling of dynamic rates, exact differentials, linear integrating factors, and Bernoulli equations."
+    },
+    "exercises": [
+      {
+        "id": "c23-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Order and degree determination, differential equation formation."
+      },
+      {
+        "id": "c23-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Variable separable form and equations reducible to variable separable."
+      },
+      {
+        "id": "c23-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Homogeneous differential equations (substitution y = vx)."
+      },
+      {
+        "id": "c23-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Linear differential equations (dy/dx + Py = Q, Integrating Factor)."
+      },
+      {
+        "id": "c23-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Bernoulli equations, exact differentials, and orthogonal trajectories."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "high"
+  },
+  {
+    "id": "c24",
+    "code": "C24",
+    "chapterNumber": 24,
+    "name": "Area Under The Curve",
+    "fullName": "C24 - Area Under The Curve",
+    "category": "Calculus",
+    "iconName": "Maximize2",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Bounded Planar Areas & Quadrature",
+      "topics": [
+        "Area Bounded by Curve y = f(x), x-axis & Ordinates x = a, b",
+        "Area Between Two Intersecting Curves (f(x) - g(x))",
+        "Symmetric Integrations for Parabolic & Circular Regions",
+        "Curve Tracing for Inequations & Region Shading"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Definite integral application for bounded planar regions, split intervals around intersection nodes, and inverse axis integration."
+    },
+    "exercises": [
+      {
+        "id": "c24-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Standard area bounded by single curve and coordinate axes."
+      },
+      {
+        "id": "c24-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Area between line and parabola, line and circle."
+      },
+      {
+        "id": "c24-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Area between two intersecting parabolas (standard 16ab/3 formula)."
+      },
+      {
+        "id": "c24-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Area of piecewise defined functions and modulus regions."
+      },
+      {
+        "id": "c24-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Regions defined by simultaneous inequalities and inverse trigonometric curves."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "mid"
+  },
+  {
+    "id": "c25",
+    "code": "C25",
+    "chapterNumber": 25,
+    "name": "Complex Number",
+    "fullName": "C25 - Complex Number",
+    "category": "Algebra",
+    "iconName": "Compass",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Argand Plane, De Moivre & Cube Roots of Unity",
+      "topics": [
+        "Algebraic Operations, Conjugate, Modulus & Argument",
+        "Polar & Euler Form (r e^(iθ))",
+        "De Moivre Theorem & n-th Roots of Unity (1, ω, ω^2)",
+        "Geometry in Argand Plane (Circle, Straight Line, Ellipse Equations)"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "2D plane complex representations, rotational operators, unimodular vectors, and geometric loci in the complex plane."
+    },
+    "exercises": [
+      {
+        "id": "c25-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Modulus, argument, and conjugate properties."
+      },
+      {
+        "id": "c25-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Euler form and De Moivre theorem for powers of complex numbers."
+      },
+      {
+        "id": "c25-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Cube roots of unity (1, ω, ω^2) and polynomial factorizations."
+      },
+      {
+        "id": "c25-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Locus in Argand plane: circles |z - z0| = r, perpendicular bisectors."
+      },
+      {
+        "id": "c25-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Rotation theorem (coni method) and n-th roots of unity geometry."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "mid"
+  },
+  {
+    "id": "c26",
+    "code": "C26",
+    "chapterNumber": 26,
+    "name": "Parabola",
+    "fullName": "C26 - Parabola",
+    "category": "Coordinate Geometry",
+    "iconName": "TrendingUp",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Conic Definition & Parabola Geometry",
+      "topics": [
+        "Standard Equation y^2 = 4ax, Focus, Directrix & Latus Rectum",
+        "Parametric Coordinates (at^2, 2at) & Chord Equations",
+        "Equations of Tangents in Slope, Point & Parametric Forms",
+        "Normals to Parabola, Co-normal Points & Reflection Property"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Locus with eccentricity e = 1, focal chord harmonic properties, point of intersection of tangents, and 3 co-normal points."
+    },
+    "exercises": [
+      {
+        "id": "c26-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Standard parabola equations, focus, directrix, and latus rectum."
+      },
+      {
+        "id": "c26-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Parametric coordinates (at^2, 2at) and focal chord properties (t1 t2 = -1)."
+      },
+      {
+        "id": "c26-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Equations of tangents in slope and parametric forms."
+      },
+      {
+        "id": "c26-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Normals to parabola and condition for 3 co-normal points."
+      },
+      {
+        "id": "c26-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Director circle, optical reflection property, and common tangents."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "high"
+  },
+  {
+    "id": "c27",
+    "code": "C27",
+    "chapterNumber": 27,
+    "name": "Ellipse",
+    "fullName": "C27 - Ellipse",
+    "category": "Coordinate Geometry",
+    "iconName": "Circle",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Central Conic x^2/a^2 + y^2/b^2 = 1",
+      "topics": [
+        "Standard Equation, Eccentricity (e < 1), Foci & Directrices",
+        "Auxiliary Circle & Eccentric Angle (a cos θ, b sin θ)",
+        "Tangents, Normals & Director Circle (x^2 + y^2 = a^2 + b^2)",
+        "Focal Distances Sum SP + S'P = 2a & Optical Property"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Central conic with eccentricity less than 1, conjugate diameters, focal property, and slope condition of tangency."
+    },
+    "exercises": [
+      {
+        "id": "c27-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Standard ellipse equations, eccentricity, foci, and axes lengths."
+      },
+      {
+        "id": "c27-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Parametric form (a cos θ, b sin θ) and auxiliary circle."
+      },
+      {
+        "id": "c27-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Condition of tangency (c^2 = a^2 m^2 + b^2) and director circle."
+      },
+      {
+        "id": "c27-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Equations of normals and reflection property of ellipse."
+      },
+      {
+        "id": "c27-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Focal chord properties, common tangents, and locus problems."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "mid"
+  },
+  {
+    "id": "c28",
+    "code": "C28",
+    "chapterNumber": 28,
+    "name": "Hyperbola",
+    "fullName": "C28 - Hyperbola",
+    "category": "Coordinate Geometry",
+    "iconName": "Shapes",
+    "badgeText": "Theory + 5 Exercises",
+    "hasSubTopics": false,
+    "theory": {
+      "title": "Theory Notes: Central Conic x^2/a^2 - y^2/b^2 = 1",
+      "topics": [
+        "Standard Equation, Eccentricity (e > 1), Foci & Directrices",
+        "Conjugate Hyperbola & Rectangular Hyperbola (xy = c^2)",
+        "Asymptotes of Hyperbola & Angle Between Asymptotes",
+        "Director Circle (x^2 + y^2 = a^2 - b^2) & Focal Property |SP - S'P| = 2a"
+      ],
+      "status": "upload_pending",
+      "statusLabel": "Theory Notes — Upload Pending",
+      "summary": "Open central conic with eccentricity greater than 1, asymptotic bounds, equilateral hyperbolas, and tangent properties."
+    },
+    "exercises": [
+      {
+        "id": "c28-ex1",
+        "title": "Exercise 1",
+        "type": "numbered",
+        "number": 1,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Standard hyperbola equations, eccentricity, and foci."
+      },
+      {
+        "id": "c28-ex2",
+        "title": "Exercise 2",
+        "type": "numbered",
+        "number": 2,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Mains",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Conjugate hyperbola relations (1/e1^2 + 1/e2^2 = 1)."
+      },
+      {
+        "id": "c28-ex3",
+        "title": "Exercise 3",
+        "type": "numbered",
+        "number": 3,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Condition of tangency (c^2 = a^2 m^2 - b^2) and director circle."
+      },
+      {
+        "id": "c28-ex4",
+        "title": "Exercise 4",
+        "type": "numbered",
+        "number": 4,
+        "questionCount": 20,
+        "timeMinutes": 45,
+        "marks": 80,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "Both",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Asymptotes equations and their geometric properties."
+      },
+      {
+        "id": "c28-ex5",
+        "title": "Exercise 5",
+        "type": "numbered",
+        "number": 5,
+        "questionCount": 25,
+        "timeMinutes": 60,
+        "marks": 100,
+        "status": "ready_for_upload",
+        "statusLabel": "Ready for Upload / Coming Soon",
+        "targetExam": "JEE Advanced",
+        "markingScheme": "+4 for Correct, -1 for Incorrect (Single Choice/Numerical)",
+        "description": "Rectangular hyperbola xy = c^2 parametric form (ct, c/t) and normal chords."
+      }
+    ],
+    "colorTheme": {
+      "accent": "#7C3AED",
+      "bgLight": "#F5F3FF",
+      "bgDark": "#2E1065",
+      "borderLight": "#DDD6FE",
+      "borderDark": "#5B21B6",
+      "glow": "rgba(124, 58, 237, 0.25)"
+    },
+    "weightage": "mid"
+  }
+];
 })();
-
-window.getMathsChapterById = function(id) {
-  if (!id) return null;
-  const clean = id.toLowerCase().trim();
-  return (window.mathsChaptersData || []).find(c => c.id === clean || c.code.toLowerCase().replace(/\s+/g, '-') === clean || c.code.toLowerCase() === clean) || null;
-};

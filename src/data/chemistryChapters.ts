@@ -11,6 +11,8 @@ export type ChemistryUnitCategory =
   | 'Inorganic Chemistry'
   | 'Physical Chemistry';
 
+export type ChapterWeightage = 'high' | 'mid' | 'low';
+
 export interface ChemistryChapter {
   id: string;
   code: string;
@@ -18,6 +20,7 @@ export interface ChemistryChapter {
   name: string;
   fullName: string;
   category: ChemistryUnitCategory;
+  weightage?: ChapterWeightage;
   iconName: string;
   badgeText: string;
   theory: ChapterTheory;
@@ -35,6 +38,7 @@ export interface ChemistryChapter {
 export const chemistryChaptersData: ChemistryChapter[] = [
   {
     "id": "ch-1",
+    weightage: 'mid',
     "code": "Ch 1",
     "chapterNumber": 1,
     "name": "Acidity & Basicity",
@@ -80,6 +84,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-2",
+    weightage: 'mid',
     "code": "Ch 2",
     "chapterNumber": 2,
     "name": "Alcohol & Ether",
@@ -210,6 +215,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-3",
+    weightage: 'mid',
     "code": "Ch 3",
     "chapterNumber": 3,
     "name": "Alkyl Halide",
@@ -326,6 +332,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-4",
+    weightage: 'mid',
     "code": "Ch 4",
     "chapterNumber": 4,
     "name": "Aromatic Compound",
@@ -414,6 +421,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-5",
+    "weightage": "high",
     "code": "Ch 5",
     "chapterNumber": 5,
     "name": "Atomic Structure",
@@ -459,6 +467,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-6",
+    weightage: 'mid',
     "code": "Ch 6",
     "chapterNumber": 6,
     "name": "Biomolecules",
@@ -547,6 +556,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-7",
+    weightage: 'high',
     "code": "Ch 7",
     "chapterNumber": 7,
     "name": "Carbonyl Compounds",
@@ -649,6 +659,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-8",
+    weightage: 'high',
     "code": "Ch 8",
     "chapterNumber": 8,
     "name": "Carboxylic Acid & Derivatives",
@@ -737,6 +748,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-9",
+    "weightage": "high",
     "code": "Ch 9",
     "chapterNumber": 9,
     "name": "Chemical Bonding",
@@ -825,6 +837,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-10",
+    weightage: 'mid',
     "code": "Ch 10",
     "chapterNumber": 10,
     "name": "Chemical Equilibrium",
@@ -913,6 +926,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-11",
+    "weightage": "high",
     "code": "Ch 11",
     "chapterNumber": 11,
     "name": "Chemical Kinetics",
@@ -958,6 +972,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-12",
+    "weightage": "high",
     "code": "Ch 12",
     "chapterNumber": 12,
     "name": "Coordination Compounds",
@@ -1003,6 +1018,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-13",
+    "weightage": "high",
     "code": "Ch 13",
     "chapterNumber": 13,
     "name": "Electrochemistry",
@@ -1105,6 +1121,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-14",
+    weightage: 'mid',
     "code": "Ch 14",
     "chapterNumber": 14,
     "name": "Gaseous State",
@@ -1207,6 +1224,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-15",
+    "weightage": "high",
     "code": "Ch 15",
     "chapterNumber": 15,
     "name": "GOC (General Organic Chemistry)",
@@ -1252,6 +1270,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-16",
+    weightage: 'mid',
     "code": "Ch 16",
     "chapterNumber": 16,
     "name": "Grignard Reagent",
@@ -1312,6 +1331,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-17",
+    "weightage": "high",
     "code": "Ch 17",
     "chapterNumber": 17,
     "name": "Hydrocarbons",
@@ -1414,6 +1434,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-18",
+    "weightage": "high",
     "code": "Ch 18",
     "chapterNumber": 18,
     "name": "Ionic Equilibrium",
@@ -1516,6 +1537,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-19",
+    weightage: 'mid',
     "code": "Ch 19",
     "chapterNumber": 19,
     "name": "Isomerism",
@@ -1561,6 +1583,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-20",
+    "weightage": "high",
     "code": "Ch 20",
     "chapterNumber": 20,
     "name": "Liquid Solution",
@@ -1663,6 +1686,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-21",
+    weightage: 'low',
     "code": "Ch 21",
     "chapterNumber": 21,
     "name": "Metallurgy",
@@ -1737,6 +1761,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-22",
+    "weightage": "high",
     "code": "Ch 22",
     "chapterNumber": 22,
     "name": "Periodic Table",
@@ -1811,6 +1836,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-23",
+    weightage: 'mid',
     "code": "Ch 23",
     "chapterNumber": 23,
     "name": "Redox Reactions",
@@ -1913,6 +1939,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-24",
+    weightage: 'mid',
     "code": "Ch 24",
     "chapterNumber": 24,
     "name": "Salt Analysis",
@@ -2001,6 +2028,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-25",
+    weightage: 'mid',
     "code": "Ch 25",
     "chapterNumber": 25,
     "name": "Solid State",
@@ -2103,6 +2131,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-26",
+    weightage: 'mid',
     "code": "Ch 26",
     "chapterNumber": 26,
     "name": "Stoichiometry-1",
@@ -2148,6 +2177,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-27",
+    weightage: 'mid',
     "code": "Ch 27",
     "chapterNumber": 27,
     "name": "Stoichiometry-2",
@@ -2193,6 +2223,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-28",
+    weightage: 'mid',
     "code": "Ch 28",
     "chapterNumber": 28,
     "name": "Thermochemistry",
@@ -2295,6 +2326,7 @@ export const chemistryChaptersData: ChemistryChapter[] = [
   },
   {
     "id": "ch-29",
+    "weightage": "high",
     "code": "Ch 29",
     "chapterNumber": 29,
     "name": "Thermodynamics",
