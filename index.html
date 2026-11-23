@@ -77,6 +77,7 @@
   <script src="/data/jee-advanced/pta06.js"></script>
   <script src="/data/jee-mains/ptm01.js"></script>
   <script src="/data/jee-mains/ptm02.js"></script>
+  <script src="/data/jee-mains/ptm03.js"></script>
   <script src="/data/rankPredictor.js"></script>
   <script src="/data/authStore.js"></script>
   <script src="/data/resourcesIndex.js"></script>
@@ -9280,6 +9281,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         if ((!qBreakdown || qBreakdown.length === 0) && attempt.responses) {
           try {
             const paper = (window.getTestById ? window.getTestById(attempt.testId) : null) ||
+              (attempt.testId?.includes('ptm03') || attempt.testId?.includes('ptm-03') ? window.ptm03Data : null) ||
               (attempt.testId?.includes('ptm02') || attempt.testId?.includes('ptm-02') ? window.ptm02Data : null) ||
               (attempt.testId?.includes('ptm01') || attempt.testId?.includes('ptm-01') ? window.ptm01Data : null) ||
               (attempt.testId?.includes('pta06') || attempt.testId?.includes('pta-06') ? window.pta06Data : null) ||
@@ -14094,7 +14096,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       };
 
       const isTestReady = (id) => {
-        return id === 'jee-mains-ptm-01' || id === 'jee-mains-ptm-02' || id.includes('pta-04') || id.includes('pta-05') || id.includes('pta-06') || testConfigs[id] === 'live';
+        return id === 'jee-mains-ptm-01' || id === 'jee-mains-ptm-02' || id === 'jee-mains-ptm-03' || id.includes('pta-04') || id.includes('pta-05') || id.includes('pta-06') || testConfigs[id] === 'live';
       };
 
       const handleAction = (item) => {
@@ -14367,7 +14369,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   const attempts = getAttemptCount(item.id);
                   const countdown = formatCountdown(item.startIso);
                   const isCurrentlyLocked = !started && !isAdmin;
-                  const hasSyllabus = !!(item.id === 'jee-mains-ptm-02' || (item.syllabus && Object.keys(item.syllabus).length > 0));
+                  const hasSyllabus = item.id === 'jee-mains-ptm-03' && !!(item.syllabus && Object.keys(item.syllabus).length > 0);
 
                   return (
                     <Tilt3DCard
@@ -14560,7 +14562,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       const attempts = getAttemptCount(item.id);
                       const countdown = formatCountdown(item.startIso);
                       const isCurrentlyLocked = !started && !isAdmin;
-                      const hasSyllabus = !!(item.id === 'jee-mains-ptm-02' || (item.syllabus && Object.keys(item.syllabus).length > 0));
+                      const hasSyllabus = item.id === 'jee-mains-ptm-03' && !!(item.syllabus && Object.keys(item.syllabus).length > 0);
 
                       return (
                         <tr
@@ -14812,7 +14814,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                               Physics Syllabus (25 Questions · 100 Marks)
                             </h4>
                             <p className="text-[11px] text-sky-800/80 dark:text-sky-400">
-                              {previewItem.code === 'PTM 02' ? 'Thermal Physics & Heat Transfer Focus' : (previewItem.code === 'PTM 01' ? 'Thermodynamics & Kinetic Theory Focus' : 'Standard JEE Mains Pattern')}
+                              {previewItem.code === 'PTM 03' ? 'Thermal Properties of Matter & Heat Transfer Focus' : (previewItem.code === 'PTM 02' ? 'Thermal Physics & Heat Transfer Focus' : (previewItem.code === 'PTM 01' ? 'Thermodynamics & Kinetic Theory Focus' : 'Standard JEE Mains Pattern'))}
                             </p>
                           </div>
                         </div>
@@ -14844,7 +14846,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                               Chemistry Syllabus (25 Questions · 100 Marks)
                             </h4>
                             <p className="text-[11px] text-emerald-800/80 dark:text-emerald-400">
-                              {previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern')}
+                              {previewItem.code === 'PTM 03' ? 'IUPAC, General Organic Chemistry (GOC) & Isomerism Focus' : (previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern'))}
                             </p>
                           </div>
                         </div>
@@ -14865,37 +14867,33 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         </ul>
                       </div>
 
-                      {/* Mathematics Syllabus Card */}
-                      <div className="rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/30 dark:bg-amber-950/20 p-5 space-y-3">
-                        <div className="flex items-center gap-2.5">
-                          <span className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-600 dark:text-amber-300 flex items-center justify-center font-black text-xs">
-                            MA
-                          </span>
-                          <div>
-                            <h4 className="font-black text-sm text-amber-950 dark:text-amber-200">
-                              Mathematics Syllabus (25 Questions · 100 Marks)
-                            </h4>
-                            <p className="text-[11px] text-amber-800/80 dark:text-amber-400">
-                              {previewItem.code === 'PTM 02' ? 'Quadratic Equations, Inequalities & Sequences Focus' : (previewItem.code === 'PTM 01' ? 'Trigonometry & Functional Relations' : 'Standard JEE Mains Pattern')}
-                            </p>
+                      {/* Mathematics Syllabus Card - Shown only if mathematics syllabus is explicitly defined */}
+                      {previewItem.syllabus && previewItem.syllabus.mathematics && previewItem.syllabus.mathematics.length > 0 && (
+                        <div className="rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/30 dark:bg-amber-950/20 p-5 space-y-3">
+                          <div className="flex items-center gap-2.5">
+                            <span className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-600 dark:text-amber-300 flex items-center justify-center font-black text-xs">
+                              MA
+                            </span>
+                            <div>
+                              <h4 className="font-black text-sm text-amber-950 dark:text-amber-200">
+                                Mathematics Syllabus (25 Questions · 100 Marks)
+                              </h4>
+                              <p className="text-[11px] text-amber-800/80 dark:text-amber-400">
+                                {previewItem.code === 'PTM 02' ? 'Quadratic Equations, Inequalities & Sequences Focus' : (previewItem.code === 'PTM 01' ? 'Trigonometry & Functional Relations' : 'Standard JEE Mains Pattern')}
+                              </p>
+                            </div>
                           </div>
-                        </div>
 
-                        <ul className="space-y-2 text-xs text-slate-700 dark:text-zinc-300 pl-1">
-                          {previewItem.syllabus && previewItem.syllabus.mathematics ? (
-                            previewItem.syllabus.mathematics.map((item, idx) => (
+                          <ul className="space-y-2 text-xs text-slate-700 dark:text-zinc-300 pl-1">
+                            {previewItem.syllabus.mathematics.map((item, idx) => (
                               <li key={idx} className="flex items-start gap-2.5">
                                 <span className="text-amber-500 font-bold mt-0.5">•</span>
                                 <span>{item}</span>
                               </li>
-                            ))
-                          ) : (
-                            <li className="flex items-start gap-2.5 text-slate-500 dark:text-zinc-400 italic">
-                              <span>Detailed Mathematics syllabus for {previewItem.code} will be published prior to the scheduled test window.</span>
-                            </li>
-                          )}
-                        </ul>
-                      </div>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
 
                     </div>
                   )}
@@ -15312,6 +15310,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const currentPaper = useMemo(() => {
         if (!activeTestId) return window.pta04Data || null;
         const clean = activeTestId.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (clean.includes('ptm03') || clean.includes('ptm3')) {
+          return window.ptm03Data || null;
+        }
         if (clean.includes('ptm02') || clean.includes('ptm2')) {
           return window.ptm02Data || null;
         }
@@ -15758,7 +15759,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
         // Standardize canonical ID
         let canonicalId = testId;
-        if (testId.includes('ptm-02') || testId.includes('ptm02')) canonicalId = 'jee-mains-ptm-02';
+        if (testId.includes('ptm-03') || testId.includes('ptm03')) canonicalId = 'jee-mains-ptm-03';
+        else if (testId.includes('ptm-02') || testId.includes('ptm02')) canonicalId = 'jee-mains-ptm-02';
         else if (testId.includes('ptm-01') || testId.includes('ptm01')) canonicalId = 'jee-mains-ptm-01';
         else if (testId.includes('pta-04') || testId.includes('pta04')) canonicalId = 'jee-advanced-pta-04';
         else if (testId.includes('pta-05') || testId.includes('pta05')) canonicalId = 'jee-advanced-pta-05';
@@ -15768,7 +15770,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         const all = window.allTests || [];
         const meta = window.getTestById ? window.getTestById(canonicalId) : all.find(t => t.id === canonicalId);
 
-        const isVerifiedLive = canonicalId === 'jee-mains-ptm-02' || canonicalId === 'jee-mains-ptm-01' || canonicalId.includes('pta-04') || canonicalId.includes('pta-05') || canonicalId.includes('pta-06');
+        const isVerifiedLive = canonicalId === 'jee-mains-ptm-03' || canonicalId === 'jee-mains-ptm-02' || canonicalId === 'jee-mains-ptm-01' || canonicalId.includes('pta-04') || canonicalId.includes('pta-05') || canonicalId.includes('pta-06');
         const configuredStatus = isVerifiedLive ? 'live' : (testConfigs[canonicalId] || (meta ? meta.status : 'coming_soon'));
 
         if (!isVerifiedLive && configuredStatus === 'coming_soon') {
@@ -17446,6 +17448,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                       </span>
                                       <div className="flex-1">
                                         <RichMathContent text={opt.text} />
+                                        {opt.image && (
+                                          <img src={opt.image} alt="" className="mt-2 max-h-24 rounded-lg border p-1 bg-white" />
+                                        )}
                                       </div>
                                       {optBadge}
                                     </div>

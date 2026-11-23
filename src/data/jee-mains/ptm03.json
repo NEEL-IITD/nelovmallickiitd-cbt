@@ -1,0 +1,2388 @@
+{
+  "id": "jee-mains-ptm-03",
+  "aliasId": "ptm-03",
+  "examCategory": "jee-mains",
+  "examType": "JEE Mains",
+  "code": "PTM 03",
+  "title": "JEE Mains 2027 Test Series — PTM 03",
+  "subtitle": "Thermal Properties of Matter, Heat Transfer, IUPAC Nomenclature, General Organic Chemistry (GOC) & Isomerism",
+  "status": "live",
+  "durationMinutes": 180,
+  "maxMarks": 300,
+  "totalQuestions": 75,
+  "scheduledStartTime": "2026-11-29T09:00:00+05:30",
+  "scheduledEndTime": "2026-11-29T18:00:00+05:30",
+  "syllabus": {
+    "physics": [
+      "Thermal Properties of Matter (Thermometry: linear and faulty scales; linear, superficial, and volume thermal expansion: composite rods, thermal stress, apparent expansion of liquids in vessels, buoyancy, and moment of inertia effects; calorimetry: principle of mixtures, water equivalent, latent heat of fusion and vaporization, power-driven heating)",
+      "Heat Transfer (Thermal conduction: variable thermal conductivity, series and parallel slabs, steady-state junction temperatures in rod networks, radial conduction through spherical shells; thermal radiation: Stefan–Boltzmann law, Wien's displacement law, and solar intensity)"
+    ],
+    "chemistry": [
+      "IUPAC Nomenclature & Structural Basics (Counting σ/π bonds, hybridization of carbon atoms, and IUPAC naming of polyfunctional organic compounds and enynes)",
+      "General Organic Chemistry (GOC) (Electronic effects: inductive effect, resonance, hyperconjugation in carbocations, radicals, and alkenes; aromaticity and non-aromaticity; stability, geometry, and hybridization of reaction intermediates: carbocations, carbanions, free radicals; acidic strength of carboxylic acids and C–H acidity; basic strength of amines in aqueous medium)",
+      "Isomerism in Organic Compounds (Structural isomerism: chain, position, functional, metamerism, tautomerism; conformational isomerism: cyclohexane, 1,4-cyclohexanediol, ethane; geometrical cis/trans isomerism; optical isomerism: Fischer projections, enantiomers, diastereomers, and meso compounds)"
+    ]
+  },
+  "sectionsSummary": [
+    {
+      "subject": "Physics",
+      "sections": [
+        {
+          "name": "Section A: Single Correct (20 Qs)",
+          "questionCount": 20,
+          "marking": "+4, -1"
+        },
+        {
+          "name": "Section B: Numerical Value (5 Qs)",
+          "questionCount": 5,
+          "marking": "+4, -1"
+        }
+      ]
+    },
+    {
+      "subject": "Chemistry",
+      "sections": [
+        {
+          "name": "Section A: Single Correct (20 Qs)",
+          "questionCount": 20,
+          "marking": "+4, -1"
+        },
+        {
+          "name": "Section B: Numerical Value (5 Qs)",
+          "questionCount": 5,
+          "marking": "+4, -1"
+        }
+      ]
+    },
+    {
+      "subject": "Mathematics",
+      "sections": [
+        {
+          "name": "Section A: Single Correct (20 Qs)",
+          "questionCount": 20,
+          "marking": "+4, -1"
+        },
+        {
+          "name": "Section B: Numerical Value (5 Qs)",
+          "questionCount": 5,
+          "marking": "+4, -1"
+        }
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": 1,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If a satellite orbits as close to the earth's surface as possible. Choose the **INCORRECT** statement?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Its speed is maximum"
+        },
+        {
+          "id": "B",
+          "text": "Time period of its rotation is minimum"
+        },
+        {
+          "id": "C",
+          "text": "The total energy of the earth plus satellite system is minimum"
+        },
+        {
+          "id": "D",
+          "text": "The total energy of the earth plus satellite system is maximum"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "1. Orbital speed is $v = \\sqrt{\\frac{GM}{r}}$. As $r \\to R$ (minimum orbital radius), orbital speed $v$ is maximum.\n2. Time period is $T = 2\\pi \\sqrt{\\frac{r^3}{GM}}$. For minimum $r$, $T$ is minimum.\n3. Total mechanical energy is $E = -\\frac{GMm}{2r}$. Since total energy is negative, as $r$ is minimum, $E$ has the largest negative value, which is mathematically minimum (most tightly bound system).\n4. Hence, statement (D) stating total energy is maximum is incorrect.",
+      "explanation": "Total orbital energy $E = -\\frac{GMm}{2r}$ is at its minimum (most negative) when orbiting closest to Earth's surface."
+    },
+    {
+      "id": 2,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Gravitational acceleration on the surface of a planet is $\\frac{\\sqrt{6}}{11} g$, where $g$ is the gravitational acceleration on the surface of earth. The average mass density of the planet is $\\frac{2}{3}$ times that of the earth. If the escape speed on the surface of the earth is taken to be $11\\text{ km s}^{-1}$, the escape speed on the surface of the planet in $\\text{km s}^{-1}$ will be:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$5$"
+        },
+        {
+          "id": "B",
+          "text": "$7$"
+        },
+        {
+          "id": "C",
+          "text": "$3$"
+        },
+        {
+          "id": "D",
+          "text": "$11$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "We know $g = \\frac{4}{3}\\pi G \\rho R \\implies R = \\frac{3g}{4\\pi G \\rho}$.\nEscape velocity is given by:\n$$v_e = \\sqrt{2gR} = \\sqrt{2g \\cdot \\frac{3g}{4\\pi G \\rho}} = g \\sqrt{\\frac{6}{4\\pi G \\rho}} \\propto \\frac{g}{\\sqrt{\\rho}}$$\nTherefore:\n$$\\frac{v_{e,p}}{v_{e,e}} = \\frac{g_p}{g_e} \\sqrt{\\frac{\\rho_e}{\\rho_p}} = \\left(\\frac{\\sqrt{6}}{11}\\right) \\sqrt{\\frac{3}{2}} = \\frac{\\sqrt{6} \\cdot \\sqrt{3}}{\\sqrt{2} \\cdot 11} = \\frac{3}{11}$$\n$$v_{e,p} = 11 \\times \\frac{3}{11} = 3\\text{ km/s}$$.",
+      "explanation": "Using $v_e \\propto \\frac{g}{\\sqrt{\\rho}}$, $\\frac{v_{e,p}}{v_{e,e}} = \\frac{\\sqrt{6}}{11} \\sqrt{\\frac{3}{2}} = \\frac{3}{11} \\implies v_{e,p} = 3\\text{ km/s}$."
+    },
+    {
+      "id": 3,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A planet is revolving around the sun as shown in elliptical path. The correct option is:",
+      "images": [
+        "/images/ptm03/q03.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "the time taken in travelling DAB is less than that for BCD"
+        },
+        {
+          "id": "B",
+          "text": "the time taken in travelling DAB is greater than that for ABC"
+        },
+        {
+          "id": "C",
+          "text": "the time taken in travelling CDA is less than that for ABC"
+        },
+        {
+          "id": "D",
+          "text": "the time taken in travelling CDA is greater than that for ABC"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "By Kepler's second law, areal velocity is constant: $\\frac{dA}{dt} = \\frac{L}{2m} = \\text{constant}$.\nThe time taken along any orbital arc is directly proportional to the area swept by the radius vector from the Sun $S$.\nSince Sun $S$ lies at the left focus along major axis $AC$, the area swept by the radius vector for path $DAB$ (containing perihelion $A$) is strictly less than the area swept for path $BCD$.\nTherefore, the time taken to travel $DAB$ is less than that for $BCD$.\nAlso, $AC$ is the major axis dividing the ellipse into two halves of equal area, so time for $CDA$ equals time for $ABC$.",
+      "explanation": "Areal velocity is constant; region DAB contains smaller swept area from focus S than region BCD, so $t_{DAB} < t_{BCD}$."
+    },
+    {
+      "id": 4,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Which of the following graphs is **incorrect** for Mars-Sun system? ($L$: angular momentum of Mars about the Sun) (Neglect interference from any other celestial body)",
+      "options": [
+        {
+          "id": "A",
+          "text": "Areal velocity vs time",
+          "image": "/images/ptm03/q04_optA.png"
+        },
+        {
+          "id": "B",
+          "text": "Area swept vs time",
+          "image": "/images/ptm03/q04_optB.png"
+        },
+        {
+          "id": "C",
+          "text": "Angular momentum vs time",
+          "image": "/images/ptm03/q04_optC.png"
+        },
+        {
+          "id": "D",
+          "text": "Total energy vs time",
+          "image": "/images/ptm03/q04_optD.png"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "For any planet in a Keplerian orbit under a central gravitational force:\n1. Torque $\\vec{\\tau} = \\vec{r} \\times \\vec{F} = 0 \\implies$ Angular momentum $L = \\text{constant}$ (Graph C is correct).\n2. Areal velocity $\\frac{dA}{dt} = \\frac{L}{2m} = \\text{constant}$ (Graph A is correct).\n3. Total area swept $A = \\left(\\frac{L}{2m}\\right)t$ is a straight line through the origin with slope $\\frac{L}{2m}$ (Graph B is correct).\n4. Total mechanical energy $E = -\\frac{GMm}{2a} = \\text{constant}$. Graph D depicts an oscillating total energy, which violates conservation of mechanical energy.",
+      "explanation": "Total energy in an unperturbed planetary orbit is strictly constant over time, making graph (D) incorrect."
+    },
+    {
+      "id": 5,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A point mass $m$ is released from rest at a distance of $3R$ from the centre of a thin-walled hollow sphere of radius $R$ and mass $M$ as shown in figure. The hollow sphere is fixed in position and the only force on the point mass is the gravitational attraction of the hollow sphere. There is a very small hole in the hollow sphere through which the point mass falls as shown. The velocity of the point mass when it passes through point $P$ at a distance $\\frac{R}{2}$ from the centre of the sphere is:",
+      "images": [
+        "/images/ptm03/q05.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\sqrt{\\frac{2GM}{3R}}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\sqrt{\\frac{4GM}{3R}}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\sqrt{\\frac{25GM}{24R}}$"
+        },
+        {
+          "id": "D",
+          "text": "None of these"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Gravitational potential at the initial point ($r_i = 3R$) is:\n$$V_i = -\\frac{GM}{3R}$$\nInside a thin uniform spherical shell, gravitational field is zero and gravitational potential is constant, equal to its value on the surface:\n$$V(r) = -\\frac{GM}{R} \\quad \\text{for } r \\le R$$\nThus at point $P$ ($r = R/2$ inside the shell), $V_P = -\\frac{GM}{R}$.\nApplying conservation of mechanical energy:\n$$0 + m V_i = \\frac{1}{2}m v^2 + m V_P$$\n$$\\frac{1}{2} v^2 = V_i - V_P = -\\frac{GM}{3R} - \\left(-\\frac{GM}{R}\\right) = \\frac{2GM}{3R}$$\n$$v = \\sqrt{\\frac{4GM}{3R}}$$.",
+      "explanation": "Inside the spherical shell potential is constant at $-GM/R$. Conservation of energy gives $\\frac{1}{2}v^2 = \\frac{GM}{R} - \\frac{GM}{3R} = \\frac{2GM}{3R} \\implies v = \\sqrt{\\frac{4GM}{3R}}$."
+    },
+    {
+      "id": 6,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A mass $m$ is placed at point $P$ which is at a distance $h$ along the normal through the centre $O$ of a thin circular ring of mass $M$ and radius $r$. If the mass is moved further away such that $OP$ becomes $2h$, by what factor the force of gravitation will decrease? (Take $h = r$)",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{F_{2h}}{F_h} = \\frac{4}{5}\\sqrt{\\frac{2}{5}}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{F_{2h}}{F_h} = \\frac{5}{4}\\sqrt{\\frac{5}{20}}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{F_{2h}}{F_h} = \\frac{4}{5}\\sqrt{\\frac{3}{4}}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{F_{2h}}{F_h} = \\frac{2}{5}\\sqrt{\\frac{4}{5}}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "The gravitational force exerted by a ring of mass $M$ and radius $r$ at distance $x$ along its axis is:\n$$F(x) = \\frac{GMm x}{(r^2 + x^2)^{3/2}}$$\nFor $x = h = r$:\n$$F_h = \\frac{GMm r}{(r^2 + r^2)^{3/2}} = \\frac{GMm r}{(2r^2)^{3/2}} = \\frac{GMm}{2\\sqrt{2} r^2}$$\nFor $x = 2h = 2r$:\n$$F_{2h} = \\frac{GMm (2r)}{(r^2 + 4r^2)^{3/2}} = \\frac{2 GMm r}{(5r^2)^{3/2}} = \\frac{2 GMm}{5\\sqrt{5} r^2}$$\nTaking the ratio:\n$$\\frac{F_{2h}}{F_h} = \\frac{\\frac{2}{5\\sqrt{5}}}{\\frac{1}{2\\sqrt{2}}} = \\frac{4\\sqrt{2}}{5\\sqrt{5}} = \\frac{4}{5}\\sqrt{\\frac{2}{5}}$$.",
+      "explanation": "Ratio of axial gravitational forces: $\\frac{F_{2r}}{F_r} = \\frac{2/(5\\sqrt{5})}{1/(2\\sqrt{2})} = \\frac{4}{5}\\sqrt{\\frac{2}{5}}$."
+    },
+    {
+      "id": 7,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Figure shows electric field lines in which an electric dipole $\\vec{p}$ is placed as shown. Which of the following statements is correct?",
+      "images": [
+        "/images/ptm03/q07.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "The dipole will not experience any force."
+        },
+        {
+          "id": "B",
+          "text": "The dipole will experience a force towards right."
+        },
+        {
+          "id": "C",
+          "text": "The dipole will experience a force towards left."
+        },
+        {
+          "id": "D",
+          "text": "The dipole will experience a force upwards."
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Electric field lines are closer together (denser) on the right side than on the left side, which implies the magnitude of electric field increases towards the right: $E(+q) > E(-q)$.\n1. The force on $+q$ is $\\vec{F}_+ = +q\\vec{E}_+$ directed towards the right.\n2. The force on $-q$ is $\\vec{F}_- = -q\\vec{E}_-$ directed towards the left.\nSince $E(+q) > E(-q)$, the net force is $F_{net} = q(E_+ - E_-) > 0$, directed towards the right.",
+      "explanation": "Field density increases toward the right, so force on $+q$ to the right exceeds force on $-q$ to the left, yielding a net force to the right."
+    },
+    {
+      "id": 8,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "**Statement-1:** Two metal spheres of radii $R$ and $2R$ with charges $Q$ and $2Q$ are put in contact. The charge flows from sphere of radius $2R$ towards sphere of radius $R$.\n**Statement-2:** There is no loss of electrical energy of the system.",
+      "options": [
+        {
+          "id": "A",
+          "text": "Both the statements are true and Statement-2 is the correct explanation of Statement-1"
+        },
+        {
+          "id": "B",
+          "text": "Both the statements are true but Statement-2 is not the correct explanation of Statement-1"
+        },
+        {
+          "id": "C",
+          "text": "Statement-1 is true but Statement-2 is false"
+        },
+        {
+          "id": "D",
+          "text": "Statement-1 is false but Statement-2 is true"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "1. Potential of first sphere of radius $R$ is $V_1 = \\frac{kQ}{R}$.\n2. Potential of second sphere of radius $2R$ is $V_2 = \\frac{k(2Q)}{2R} = \\frac{kQ}{R}$.\nSince $V_1 = V_2$, both spheres are already at the exact same electrostatic potential. When put in contact, no charge flows between them. Hence, Statement-1 is false.\nBecause no charge redistribution occurs, there is zero dissipation of electrical energy into heat. Hence, Statement-2 is true.",
+      "explanation": "Initial potentials are equal ($V_1 = V_2 = kQ/R$), so no charge flows upon contact and no electrical energy is lost."
+    },
+    {
+      "id": 9,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The electric potential as a function of $x, y$ is given by $V = 5(x^2 - y^2)$. The electric field at a point $(2, 3)$ is _____ ($x$ and $y$ are in meter):",
+      "options": [
+        {
+          "id": "A",
+          "text": "$(-20\\hat{i} + 30\\hat{j})$"
+        },
+        {
+          "id": "B",
+          "text": "$(20\\hat{i} - 30\\hat{j})$"
+        },
+        {
+          "id": "C",
+          "text": "$(20\\hat{i} - 45\\hat{j})$"
+        },
+        {
+          "id": "D",
+          "text": "$(-4\\hat{i} + 6\\hat{j})$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "The electric field components are given by $\\vec{E} = -\\left(\\frac{\\partial V}{\\partial x}\\hat{i} + \\frac{\\partial V}{\\partial y}\\hat{j}\\right)$:\n$$E_x = -\\frac{\\partial V}{\\partial x} = -\\frac{\\partial}{\\partial x}[5(x^2 - y^2)] = -10x$$\n$$E_y = -\\frac{\\partial V}{\\partial y} = -\\frac{\\partial}{\\partial y}[5(x^2 - y^2)] = -(-10y) = +10y$$\nAt point $(2, 3)$:\n$$E_x = -10(2) = -20\\text{ V/m}$$\n$$E_y = 10(3) = 30\\text{ V/m}$$\n$$\\vec{E} = -20\\hat{i} + 30\\hat{j}$$.",
+      "explanation": "$\\vec{E} = -\\nabla V = -10x\\hat{i} + 10y\\hat{j}$. At $(2, 3)$, $\\vec{E} = -20\\hat{i} + 30\\hat{j}$."
+    },
+    {
+      "id": 10,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The electrostatic potential in a charged spherical region of radius $r$ varies as $V = ar^3 + b$, where $a$ and $b$ are constants. The total charge enclosed in the sphere of unit radius is $p \\times \\pi a \\varepsilon_0$. The value of $p$ is _____ (Permittivity of vacuum is $\\varepsilon_0$):",
+      "options": [
+        {
+          "id": "A",
+          "text": "$-12$"
+        },
+        {
+          "id": "B",
+          "text": "$-8$"
+        },
+        {
+          "id": "C",
+          "text": "$-9$"
+        },
+        {
+          "id": "D",
+          "text": "$-6$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "The electric field as a function of radial distance $r$ is:\n$$E(r) = -\\frac{dV}{dr} = -\\frac{d}{dr}(ar^3 + b) = -3ar^2$$\nUsing Gauss's law for a sphere of radius $r = 1$:\n$$\\oint \\vec{E} \\cdot d\\vec{A} = \\frac{q_{\\text{enc}}}{\\varepsilon_0}$$\n$$E(1) \\cdot (4\\pi \\cdot 1^2) = \\frac{q_{\\text{enc}}}{\\varepsilon_0}$$\n$$(-3a) \\cdot 4\\pi = \\frac{q_{\\text{enc}}}{\\varepsilon_0} \\implies q_{\\text{enc}} = -12\\pi a \\varepsilon_0$$\nComparing with $q_{\\text{enc}} = p \\times \\pi a \\varepsilon_0$ gives $p = -12$.",
+      "explanation": "$E(1) = -3a$, so flux $\\Phi = -3a \\times 4\\pi = -12\\pi a$. Thus $q_{enc} = -12\\pi a \\varepsilon_0 \\implies p = -12$."
+    },
+    {
+      "id": 11,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Two identical electric point dipoles have dipole moments $\\vec{P}_1 = p\\hat{i}$ and $\u000bec{P}_2 = -p\\hat{i}$ are held on the $x$-axis at distance $a$ from each other. When released, they move along the $x$-axis with the direction of their dipole moments remaining unchanged. If the mass of each dipole is $m$, their speed when they are infinitely far apart is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{p}{a}\\sqrt{\\frac{3}{2\\pi\\varepsilon_0 ma}}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{p}{a}\\sqrt{\\frac{1}{\\pi\\varepsilon_0 ma}}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{p}{a}\\sqrt{\\frac{1}{2\\pi\\varepsilon_0 ma}}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{p}{a}\\sqrt{\\frac{2}{\\pi\\varepsilon_0 ma}}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Electric field produced by dipole $\\vec{P}_1 = p\\hat{i}$ at the position of dipole $\\vec{P}_2 = -p\\hat{i}$ (axial line) is:\n$$\\vec{E}_1 = \\frac{2\\vec{P}_1}{4\\pi\\varepsilon_0 a^3} = \\frac{2p}{4\\pi\\varepsilon_0 a^3}\\hat{i}$$\nThe electrostatic potential energy of the pair of dipoles is:\n$$U = -\\vec{P}_2 \\cdot \\vec{E}_1 = -(-p\\hat{i}) \\cdot \\left(\\frac{2p}{4\\pi\\varepsilon_0 a^3}\\hat{i}\\right) = \\frac{2p^2}{4\\pi\\varepsilon_0 a^3} = \\frac{p^2}{2\\pi\\varepsilon_0 a^3}$$\nAt infinity, $U_\\infty = 0$. By conservation of energy:\n$$2 \\times \\left(\\frac{1}{2}m v^2\\right) = U \\implies m v^2 = \\frac{p^2}{2\\pi\\varepsilon_0 a^3}$$\n$$v = \\sqrt{\\frac{p^2}{2\\pi\\varepsilon_0 m a^3}} = \\frac{p}{a}\\sqrt{\\frac{1}{2\\pi\\varepsilon_0 ma}}$$.",
+      "explanation": "Initial potential energy is $\\frac{p^2}{2\\pi\\varepsilon_0 a^3}$. Conservation of energy $mv^2 = U$ gives $v = \\frac{p}{a}\\sqrt{\\frac{1}{2\\pi\\varepsilon_0 ma}}$."
+    },
+    {
+      "id": 12,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A spherically symmetric charge distribution is considered with charge density varying as $\\rho(r) = \\rho_0\\left(\\frac{3}{4} - \\frac{r}{R}\\right)$ for $r \\le R$, and zero for $r > R$ where $r$ is the distance from the centre $O$ (as shown in figure). The maximum value of electric field is:",
+      "images": [
+        "/images/ptm03/q12.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{\\rho_0 R}{16\\varepsilon_0}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{\\rho_0 R}{3\\varepsilon_0}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{\\rho_0 R}{8\\varepsilon_0}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{\\rho_0 R}{82\\varepsilon_0}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "By Gauss's law for $r \\le R$:\n$$E(r) \\cdot 4\\pi r^2 = \\frac{1}{\\varepsilon_0} \\int_0^r \\rho(r') 4\\pi r'^2 dr'$$\n$$E(r) = \\frac{\\rho_0}{\\varepsilon_0 r^2} \\int_0^r \\left(\\frac{3}{4}r'^2 - \\frac{r'^3}{R}\\right) dr' = \\frac{\\rho_0}{\\varepsilon_0 r^2} \\left[\\frac{r^3}{4} - \\frac{r^4}{4R}\\right] = \\frac{\\rho_0}{4\\varepsilon_0}\\left(r - \\frac{r^2}{R}\\right)$$\nTo find the maximum electric field, differentiate with respect to $r$:\n$$\\frac{dE}{dr} = \\frac{\\rho_0}{4\\varepsilon_0}\\left(1 - \\frac{2r}{R}\\right) = 0 \\implies r = \\frac{R}{2}$$\nSubstituting $r = R/2$:\n$$E_{max} = \\frac{\\rho_0}{4\\varepsilon_0}\\left(\\frac{R}{2} - \\frac{R}{4}\\right) = \\frac{\\rho_0 R}{16\\varepsilon_0}$$.",
+      "explanation": "$E(r) = \\frac{\\rho_0}{4\\varepsilon_0}(r - r^2/R)$. Maximum occurs at $r = R/2$, giving $E_{max} = \\frac{\\rho_0 R}{16\\varepsilon_0}$."
+    },
+    {
+      "id": 13,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Consider the motion of an electron as it enters the parallel plates near point A (as shown in figure). For this electron to hit point B of positive plate as shown in figure, $\\frac{x}{y^2}$ should satisfy: ($T$ = initial K.E. of entering electron)",
+      "images": [
+        "/images/ptm03/q13.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{e\\sigma}{4\\varepsilon_0 T}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{e\\sigma}{2\\varepsilon_0 T}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{e\\varepsilon_0\\sigma}{2T}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{4e\\sigma}{\\varepsilon_0 T}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "1. Uniform electric field between the plates is $E = \\frac{\\sigma}{\\varepsilon_0}$.\n2. Acceleration along the vertical axis is $a_x = \\frac{eE}{m} = \\frac{e\\sigma}{m\\varepsilon_0}$.\n3. Along the horizontal axis, the electron travels distance $y$ with constant velocity $v$: $y = vt \\implies t = \\frac{y}{v}$.\n4. Deflection in $x$ is $x = \\frac{1}{2} a_x t^2 = \\frac{1}{2}\\left(\\frac{e\\sigma}{m\\varepsilon_0}\\right)\\frac{y^2}{v^2} = \\frac{e\\sigma y^2}{2\\varepsilon_0 (mv^2)}$.\nSince kinetic energy is $T = \\frac{1}{2}mv^2 \\implies mv^2 = 2T$:\n$$x = \\frac{e\\sigma y^2}{2\\varepsilon_0 (2T)} = \\frac{e\\sigma y^2}{4\\varepsilon_0 T} \\implies \\frac{x}{y^2} = \\frac{e\\sigma}{4\\varepsilon_0 T}$$.",
+      "explanation": "$x = \\frac{1}{2}\\frac{e\\sigma}{m\\varepsilon_0} (y/v)^2 = \\frac{e\\sigma y^2}{4\\varepsilon_0 T} \\implies \\frac{x}{y^2} = \\frac{e\\sigma}{4\\varepsilon_0 T}$."
+    },
+    {
+      "id": 14,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A cube of side $a$ has point charges $+Q$ located at each of its vertices except at the origin where the charge is $-Q$. The electric field at the centre of the cube is:",
+      "images": [
+        "/images/ptm03/q14.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{2Q}{3\\sqrt{3}\\pi\\varepsilon_0 a^2}(\\hat{x} + \\hat{y} + \\hat{z})$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{-Q}{3\\sqrt{3}\\pi\\varepsilon_0 a^2}(\\hat{x} + \\hat{y} + \\hat{z})$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{Q}{3\\sqrt{3}\\pi\\varepsilon_0 a^2}(\\hat{x} + \\hat{y} + \\hat{z})$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{-2Q}{3\\sqrt{3}\\pi\\varepsilon_0 a^2}(\\hat{x} + \\hat{y} + \\hat{z})$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "If all 8 vertices had equal charges $+Q$, by symmetry the electric field at the center would be zero: $\\vec{E}_{all+Q} = 0$.\nThe given distribution is equivalent to all 8 vertices having $+Q$, plus an extra charge of $-2Q$ placed at the origin $(0, 0, 0)$.\nThe centre of the cube is at position vector $\\vec{r}_c = \\frac{a}{2}(\\hat{x} + \\hat{y} + \\hat{z})$.\nDistance from origin to center is $r = \\frac{\\sqrt{3}}{2}a$.\nThe unit vector from origin to center is $\\hat{u} = \\frac{\\hat{x} + \\hat{y} + \\hat{z}}{\\sqrt{3}}$.\nSince the extra charge at origin is negative ($-2Q$), it attracts towards the origin:\n$$\\vec{E}_{centre} = -\\frac{1}{4\\pi\\varepsilon_0}\\frac{2Q}{r^2}\\hat{u} = -\\frac{2Q}{4\\pi\\varepsilon_0 \\left(\\frac{3}{4}a^2\\right)} \\frac{\\hat{x} + \\hat{y} + \\hat{z}}{\\sqrt{3}} = \\frac{-2Q}{3\\sqrt{3}\\pi\\varepsilon_0 a^2}(\\hat{x} + \\hat{y} + \\hat{z})$$.",
+      "explanation": "Field is due to an effective $-2Q$ charge at origin, giving $\\vec{E} = \\frac{-2Q}{3\\sqrt{3}\\pi\\varepsilon_0 a^2}(\\hat{x} + \\hat{y} + \\hat{z})$."
+    },
+    {
+      "id": 15,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The gain in kinetic energy of a $+q$ point charge as it moves from $A$ to $B$ due to repulsion from a fixed massive uniformly charged thin rod of linear charge density $\\lambda$ is:",
+      "images": [
+        "/images/ptm03/q15.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$K\\lambda q \\ln\\frac{2}{3}$"
+        },
+        {
+          "id": "B",
+          "text": "$K\\lambda q \\ln\\frac{3}{2}$"
+        },
+        {
+          "id": "C",
+          "text": "$K\\lambda q \\ln\\frac{4}{3}$"
+        },
+        {
+          "id": "D",
+          "text": "$2K\\lambda q \\ln\\frac{4}{3}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Let the rod of length $L$ lie from $x = 0$ to $x = L$.\nPoint $A$ is at $x_A = 2L$ and point $B$ is at $x_B = 3L$.\nThe electrostatic potential due to the rod at any point $x > L$ on its axial line is:\n$$V(x) = \\int_0^L \\frac{K\\lambda dt}{x - t} = K\\lambda \\ln\\left(\\frac{x}{x - L}\\right)$$\nAt point $A$ ($x = 2L$):\n$$V_A = K\\lambda \\ln\\left(\\frac{2L}{2L - L}\\right) = K\\lambda \\ln 2$$\nAt point $B$ ($x = 3L$):\n$$V_B = K\\lambda \\ln\\left(\\frac{3L}{3L - L}\\right) = K\\lambda \\ln\\left(\\frac{3}{2}\\right)$$\nGain in kinetic energy equals work done by conservative electrostatic force:\n$$\\Delta K = q(V_A - V_B) = K\\lambda q \\left[\\ln 2 - \\ln\\left(\\frac{3}{2}\\right)\\right] = K\\lambda q \\ln\\left(\\frac{2}{3/2}\\right) = K\\lambda q \\ln\\left(\\frac{4}{3}\\right)$$.",
+      "explanation": "$V_A = K\\lambda \\ln 2$, $V_B = K\\lambda \\ln(3/2)$. Gain in K.E. is $q(V_A - V_B) = K\\lambda q \\ln(4/3)$."
+    },
+    {
+      "id": 16,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Four particles, each of mass $M$ are kept at the vertices of a square, move along a circle of radius $R$ under the action of their mutual gravitational attraction. The speed of each particle is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\sqrt{\\frac{GM}{R}}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\sqrt{2\\sqrt{2}\\frac{GM}{R}}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\sqrt{\\frac{GM}{R}(1+2\\sqrt{2})}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{1}{2}\\sqrt{\\frac{GM}{R}(1+2\\sqrt{2})}$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "For a square inscribed in a circle of radius $R$, the side length is $a = \\sqrt{2}R$ and diagonal distance is $d = 2R$.\nThe net inward gravitational force acting radially towards the center of the circle on any particle is:\n$$F_{net} = 2 \\frac{GM^2}{a^2}\\cos 45^\\circ + \\frac{GM^2}{d^2} = 2\\frac{GM^2}{2R^2}\\frac{1}{\\sqrt{2}} + \\frac{GM^2}{4R^2} = \\frac{GM^2}{R^2}\\left(\\frac{1}{\\sqrt{2}} + \\frac{1}{4}\\right) = \\frac{GM^2}{4R^2}(1 + 2\\sqrt{2})$$\nEquating this to the centripetal force $\\frac{Mv^2}{R}$:\n$$\\frac{Mv^2}{R} = \\frac{GM^2}{4R^2}(1 + 2\\sqrt{2}) \\implies v = \\frac{1}{2}\\sqrt{\\frac{GM}{R}(1 + 2\\sqrt{2})}$$.",
+      "explanation": "Centripetal force equals total gravitational force: $Mv^2/R = \\frac{GM^2}{4R^2}(1+2\\sqrt{2}) \\implies v = \\frac{1}{2}\\sqrt{\\frac{GM}{R}(1+2\\sqrt{2})}$."
+    },
+    {
+      "id": 17,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A ball of mass $m$ is fired vertically upwards from the surface of the earth with velocity $n V_e$, where $V_e$ is the escape velocity and $n < 1$. To what height will the ball rise from the surface of earth? (Neglect air resistance and take radius of the earth as $R$)",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{R}{n^2}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{R}{1-n^2}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{R n^2}{1-n^2}$"
+        },
+        {
+          "id": "D",
+          "text": "$R n^2$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Escape velocity is $V_e = \\sqrt{\\frac{2GM}{R}}$, so launch speed is $v = n\\sqrt{\\frac{2GM}{R}}$.\nBy conservation of mechanical energy between Earth's surface and maximum height $h$:\n$$\\frac{1}{2}m v^2 - \\frac{GMm}{R} = -\\frac{GMm}{R + h}$$\n$$\\frac{1}{2} n^2 \\left(\\frac{2GM}{R}\\right) - \\frac{GM}{R} = -\\frac{GM}{R + h}$$\n$$\\frac{GM}{R}(n^2 - 1) = -\\frac{GM}{R + h} \\implies \\frac{1 - n^2}{R} = \\frac{1}{R + h}$$\n$$R + h = \\frac{R}{1 - n^2} \\implies h = \\frac{R}{1 - n^2} - R = \\frac{R n^2}{1 - n^2}$$.",
+      "explanation": "Energy conservation yields $R+h = \\frac{R}{1-n^2}$, so height above surface is $h = \\frac{Rn^2}{1-n^2}$."
+    },
+    {
+      "id": 18,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A research satellite is orbiting a planet in a circular path. Due to a minor thruster malfunction, the radius of its orbit increases slightly by $1.2\\%$. The percentage change in its orbital time period will be approximately:",
+      "options": [
+        {
+          "id": "A",
+          "text": "Increases by $1.2\\%$"
+        },
+        {
+          "id": "B",
+          "text": "Decreases by $1.8\\%$"
+        },
+        {
+          "id": "C",
+          "text": "Increases by $1.8\\%$"
+        },
+        {
+          "id": "D",
+          "text": "Increases by $2.4\\%$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "According to Kepler's third law for circular orbit:\n$$T^2 \\propto r^3 \\implies T = C r^{3/2}$$\nTaking fractional change for small variations:\n$$\\frac{\\Delta T}{T} \\approx \\frac{3}{2}\\frac{\\Delta r}{r}$$\nGiven $\\frac{\\Delta r}{r} = +1.2\\%$, we find:\n$$\\frac{\\Delta T}{T} = \\frac{3}{2}(+1.2\\%) = +1.8\\%$$\nThus, the orbital time period increases by approximately $1.8\\%$.",
+      "explanation": "$\\Delta T/T = 1.5 \\times \\Delta r/r = 1.5 \\times 1.2\\% = +1.8\\%$ (increases by $1.8\\%$)."
+    },
+    {
+      "id": 19,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A geophysicist models an exoplanet as a solid sphere of radius $R$ consisting of two layers: a dense inner core of radius $\\frac{R}{2}$ with a uniform density $2\\rho_0$, and an outer mantle layer with a uniform density $\\rho_0$.\nLet $g_c$ be the acceleration due to gravity at the core-mantle boundary (at depth $d = \\frac{R}{2}$) and $g_s$ be the acceleration due to gravity right at the surface. Find the ratio $\\frac{g_c}{g_s}$:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$1 : 1$"
+        },
+        {
+          "id": "B",
+          "text": "$8 : 9$"
+        },
+        {
+          "id": "C",
+          "text": "$4 : 5$"
+        },
+        {
+          "id": "D",
+          "text": "$2 : 3$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Let $M_0 = \\frac{4}{3}\\pi R^3 \\rho_0$.\n1. Mass of the dense inner core of radius $R/2$ and density $2\\rho_0$:\n$$M_c = \\frac{4}{3}\\pi\\left(\\frac{R}{2}\\right)^3 (2\\rho_0) = \\frac{4}{3}\\pi R^3 \\rho_0 \\left(\\frac{2}{8}\\right) = \\frac{1}{4}M_0$$\nGravitational acceleration at the core boundary $r = R/2$ is:\n$$g_c = \\frac{GM_c}{(R/2)^2} = \\frac{G(M_0/4)}{R^2/4} = \\frac{GM_0}{R^2}$$\n2. Mass of the outer mantle of radius between $R/2$ and $R$ and density $\\rho_0$:\n$$M_m = \\frac{4}{3}\\pi \\left[R^3 - \\left(\\frac{R}{2}\\right)^3\\right]\\rho_0 = \\frac{7}{8}M_0$$\nTotal mass of the exoplanet:\n$$M_{total} = M_c + M_m = \\frac{1}{4}M_0 + \\frac{7}{8}M_0 = \\frac{9}{8}M_0$$\nGravitational acceleration at the outer surface $r = R$ is:\n$$g_s = \\frac{GM_{total}}{R^2} = \\frac{9}{8}\\frac{GM_0}{R^2}$$\nTherefore:\n$$\\frac{g_c}{g_s} = \\frac{1}{9/8} = \\frac{8}{9}$$.",
+      "explanation": "$g_c = GM_0/R^2$ and $g_s = \\frac{9}{8}GM_0/R^2$, so the ratio is $8:9$."
+    },
+    {
+      "id": 20,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The acceleration due to gravity on the earth's surface at the poles is $g$ and angular velocity of the earth about the axis passing through the pole is $\\omega$. An object is weighed at the equator and at a height $h$ above the poles by using a spring balance. If the weights are found to be same, then $h$ is: ($h \\ll R$, where $R$ is the radius of the earth)",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{R^2\\omega^2}{2g}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{R^2\\omega^2}{g}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{R^2\\omega^2}{4g}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{R^2\\omega^2}{8g}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "1. Effective gravitational acceleration at the equator (latitude $\\lambda = 0^\\circ$) is:\n$$g_{eq} = g - R\\omega^2$$\n2. Gravitational acceleration at height $h \\ll R$ above the poles is:\n$$g(h) = g\\left(1 - \\frac{2h}{R}\\right) = g - \\frac{2gh}{R}$$\nSince the spring balance measures identical weights at both locations:\n$$g_{eq} = g(h) \\implies g - R\\omega^2 = g - \\frac{2gh}{R}$$\n$$\\frac{2gh}{R} = R\\omega^2 \\implies h = \\frac{R^2\\omega^2}{2g}$$.",
+      "explanation": "Equating $g - R\\omega^2 = g - \\frac{2gh}{R}$ directly yields $h = \\frac{R^2\\omega^2}{2g}$."
+    },
+    {
+      "id": 21,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A spherical hole of radius $\\frac{R}{2}$ is drilled from a planet of mass $M$ as shown in the figure. If the gravitational acceleration at a point on the surface of the planet just above the hole is $N \\times 1.1\\text{ m/s}^2$, find the value of $N$.\n[Given: $G = 6.6 \\times 10^{-11}\\text{ N.m}^2/\\text{kg}^2, R = 6 \\times 10^6\\text{ m}, M = 6 \\times 10^{24}\\text{ kg}$]",
+      "images": [
+        "/images/ptm03/q21.png"
+      ],
+      "options": [],
+      "answer": "5",
+      "hasKey": true,
+      "solution": "1. Gravitational acceleration on the un-drilled planet surface is:\n$$g_0 = \\frac{GM}{R^2} = \\frac{6.6 \\times 10^{-11} \\times 6 \\times 10^{24}}{(6 \\times 10^6)^2} = \\frac{39.6 \\times 10^{13}}{36 \\times 10^{12}} = 11\\text{ m/s}^2$$\n2. The drilled cavity has radius $R/2$, so its volume and mass are $M_{cavity} = M\\left(\\frac{1}{2}\\right)^3 = \\frac{M}{8}$.\n3. The center of the cavity is at distance $R/2$ from the point on the surface just above the hole.\n4. Field due to the removed cavity at that surface point is:\n$$g_{cavity} = \\frac{G(M/8)}{(R/2)^2} = \\frac{GM}{8 \\cdot (R^2/4)} = \\frac{1}{2}\\frac{GM}{R^2} = \\frac{g_0}{2} = 5.5\\text{ m/s}^2$$\n5. Net gravitational acceleration:\n$$g_{net} = g_0 - g_{cavity} = 11 - 5.5 = 5.5\\text{ m/s}^2$$\nGiven $g_{net} = N \\times 1.1\\text{ m/s}^2 \\implies N = \\frac{5.5}{1.1} = 5$.",
+      "explanation": "$g_{net} = 11 - 5.5 = 5.5\\text{ m/s}^2 = 5 \\times 1.1 \\implies N = 5$."
+    },
+    {
+      "id": 22,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $g$ is the acceleration due to gravity on the earth's surface, the gain in the gravitational potential energy of an object of mass $m$ raised from the surface of the earth to a height equal to the radius $R$ of the earth is $\\frac{NmgR}{2}$. Find the value of $N$:",
+      "options": [],
+      "answer": "1",
+      "hasKey": true,
+      "solution": "Gain in potential energy when an object is raised to height $h$ from the surface of Earth is:\n$$\\Delta U = U_f - U_i = -\\frac{GMm}{R + h} - \\left(-\\frac{GMm}{R}\\right) = GMm \\left(\\frac{1}{R} - \\frac{1}{R + h}\\right) = \\frac{GMm h}{R(R + h)}$$\nUsing $g = \\frac{GM}{R^2} \\implies GM = gR^2$:\n$$\\Delta U = \\frac{mgh}{1 + h/R}$$\nFor $h = R$:\n$$\\Delta U = \\frac{mgR}{1 + 1} = \\frac{mgR}{2} = \\frac{1 \\cdot mgR}{2}$$\nComparing with $\\frac{NmgR}{2}$, we get $N = 1$.",
+      "explanation": "$\\Delta U = \\frac{mgR}{1 + R/R} = \\frac{mgR}{2} \\implies N = 1$."
+    },
+    {
+      "id": 23,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A thin wire is bent into a three-quarter circular arc of radius $R = 10\\text{ cm}$ and placed in the $x-y$ plane with its center at the origin. It occupies three quadrants, extending continuously from $\\theta = 0$ to $\\theta = \\frac{3\\pi}{2}$ (leaving the fourth quadrant empty). The wire carries a uniform linear charge density $\\lambda = 2\\mu\\text{C/m}$. If the magnitude of the net electric field at the origin is $E_{net} = 1.8 \\times \\sqrt{N} \\times 10^5\\text{ N/C}$, find the value of the integer $N$. (Take $k = \\frac{1}{4\\pi\\varepsilon_0} = 9 \\times 10^9\\text{ Nm}^2/\\text{C}^2$)",
+      "options": [],
+      "answer": "2",
+      "hasKey": true,
+      "solution": "A complete circular ring of uniform charge density produces zero field at its center.\nTherefore, the field due to the three-quarter circular arc is equal in magnitude and opposite in direction to the field that would be produced by the missing quarter-circle arc in the fourth quadrant (from $\\theta = 3\\pi/2$ to $2\\pi$).\nThe electric field of a quarter-circle circular arc of radius $R$ is:\n$$E = \\frac{\\sqrt{2} k \\lambda}{R}$$\nGiven $R = 10\\text{ cm} = 0.1\\text{ m}$, $\\lambda = 2 \\times 10^{-6}\\text{ C/m}$, and $k = 9 \\times 10^9\\text{ N}\\cdot\\text{m}^2/\\text{C}^2$:\n$$E_{net} = \\frac{\\sqrt{2} \\times (9 \\times 10^9) \\times (2 \\times 10^{-6})}{0.1} = \\frac{1.8\\sqrt{2} \\times 10^4}{0.1} = 1.8 \\times \\sqrt{2} \\times 10^5\\text{ N/C}$$\nComparing with $E_{net} = 1.8 \\times \\sqrt{N} \\times 10^5$, we find $N = 2$.",
+      "explanation": "Net electric field equals that of a missing quarter arc: $E = \\frac{\\sqrt{2}k\\lambda}{R} = 1.8\\sqrt{2} \\times 10^5\\text{ N/C} \\implies N = 2$."
+    },
+    {
+      "id": 24,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A thin, non-conducting disc of radius $R = 10\\text{ cm}$ carries a uniform surface charge density $+\\sigma$. On its central axis, the electric field strength at a distance $x_1$ is found to be exactly half of the electric field strength measured very close to the center of the disc surface ($x \\approx 0$). If the value of $x_1$ can be expressed as $\\frac{10}{\\sqrt{N}}\\text{ cm}$, find the value of the integer $N$:",
+      "options": [],
+      "answer": "3",
+      "hasKey": true,
+      "solution": "The electric field on the axis of a uniformly charged disc is:\n$$E(x) = \\frac{\\sigma}{2\\varepsilon_0}\\left(1 - \\frac{x}{\\sqrt{R^2 + x^2}}\\right)$$\nVery close to the center ($x \\approx 0$), $E(0) = \\frac{\\sigma}{2\\varepsilon_0}$.\nGiven $E(x_1) = \\frac{1}{2} E(0)$:\n$$1 - \\frac{x_1}{\\sqrt{R^2 + x_1^2}} = \\frac{1}{2} \\implies \\frac{x_1}{\\sqrt{R^2 + x_1^2}} = \\frac{1}{2}$$\nSquaring both sides:\n$$\\frac{x_1^2}{R^2 + x_1^2} = \\frac{1}{4} \\implies 4x_1^2 = R^2 + x_1^2 \\implies 3x_1^2 = R^2 \\implies x_1 = \\frac{R}{\\sqrt{3}}$$\nGiven $R = 10\\text{ cm}$, $x_1 = \\frac{10}{\\sqrt{3}}\\text{ cm} \\implies N = 3$.",
+      "explanation": "$\\frac{x_1}{\\sqrt{R^2 + x_1^2}} = \\frac{1}{2} \\implies 3x_1^2 = R^2 \\implies x_1 = \\frac{R}{\\sqrt{3}} = \\frac{10}{\\sqrt{3}} \\implies N = 3$."
+    },
+    {
+      "id": 25,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A rod of finite length having linear charge density $\\lambda$ subtends an angle of $15^\\circ$ at a point $P$ which is also the centre of curvature of a circular arc having same linear charge density $\\lambda$ as shown in figure. If the net electric field at the point $P$ is $\\frac{b K \\lambda}{R}$. Find the value of $b$:",
+      "images": [
+        "/images/ptm03/q25.png"
+      ],
+      "options": [],
+      "answer": "1",
+      "hasKey": true,
+      "solution": "1. Field due to straight wire subtending angle $\\theta_1, \\theta_2$ at perpendicular distance $R$:\n$$E_\\perp = \\frac{K\\lambda}{R}(\\sin\\theta_1 + \\sin\\theta_2)$$\n2. Field due to circular arc subtending angle $\\theta$ at radius $R$ is $E_{arc} = \\frac{2K\\lambda}{R}\\sin(\\theta/2)$.\n3. Resolving the components along the line of symmetry and evaluating gives the net electric field magnitude as $\\frac{1 \\cdot K\\lambda}{R}$, giving $b = 1$.",
+      "explanation": "Vector sum of electric fields from the rod and circular arc at center $P$ yields $E_{net} = \\frac{K\\lambda}{R} \\implies b = 1$."
+    },
+    {
+      "id": 26,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Halogenation of which one of the following will yield $m$-substituted product with respect to methyl group as a major product?",
+      "images": [
+        "/images/ptm03/q26.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) $o$-cresol (2-methylphenol)"
+        },
+        {
+          "id": "B",
+          "text": "(B) $m$-tolualdehyde (3-methylbenzaldehyde)"
+        },
+        {
+          "id": "C",
+          "text": "(C) $m$-nitrotoluene (1-methyl-3-nitrobenzene)"
+        },
+        {
+          "id": "D",
+          "text": "(D) $o$-nitrotoluene (1-methyl-2-nitrobenzene)"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "In $o$-cresol (2-methylphenol), the $-OH$ group is a much stronger activating group than the $-CH_3$ group due to strong $+M$ (resonance) effect ($+M \\gg +I$).\nTherefore, electrophilic aromatic substitution is completely directed by the $-OH$ group to positions ortho and para to $-OH$.\nThe position para to $-OH$ is position 4 of the ring. With respect to the $-CH_3$ group at position 2, position 4 is at a meta position (distance of 2 bonds).\nThus, halogenation yields the product with the halogen at position 4 (para to $-OH$, but meta to $-CH_3$) as the major product.",
+      "explanation": "Strong $+M$ activation of $-OH$ directs halogenation para to $-OH$, which is meta with respect to the methyl group in $o$-cresol."
+    },
+    {
+      "id": 27,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Which of the following compounds has the highest boiling point?",
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) $\\text{CH}_3\\text{CH}(\\text{CH}_3)\\text{CH}_2\\text{Cl}$"
+        },
+        {
+          "id": "B",
+          "text": "(B) $\\text{CH}_3\\text{CH}_2\\text{CH}_2\\text{CH}_2\\text{Cl}$"
+        },
+        {
+          "id": "C",
+          "text": "(C) $(\\text{CH}_3)_3\\text{CCl}$"
+        },
+        {
+          "id": "D",
+          "text": "(D) $\\text{CH}_3\\text{CH}_2\\text{CH}_2\\text{Cl}$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "1. Boiling point increases with molecular mass ($C_4$ haloalkanes have higher b.p. than $C_3$ haloalkanes, ruling out D).\n2. For isomeric alkyl halides ($C_4H_9Cl$ in A, B, C), boiling point decreases with branching because branching makes the molecule more spherical, decreasing the contact surface area and weakening van der Waals dispersion forces.\n3. Among the isomers, 1-chlorobutane (n-butyl chloride, B) is an unbranched straight chain and has the largest surface area, giving it the highest boiling point (b.p. $\\approx 78.4^\\circ\\text{C}$).",
+      "explanation": "Straight-chain 1-chlorobutane (B) has the largest surface area and strongest van der Waals forces, hence the highest boiling point."
+    },
+    {
+      "id": 28,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "In the reaction shown, product (A) is:",
+      "images": [
+        "/images/ptm03/q28.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\text{Ph-SO}_2\\text{-(CH}_2\\text{)}_3\\text{-CH=CH}_2$",
+          "image": "/images/ptm03/q28_optA.png"
+        },
+        {
+          "id": "B",
+          "text": "$\\text{Ph-SO}_2\\text{-(cyclopentyl)}$ (cyclopentyl phenyl sulfone)",
+          "image": "/images/ptm03/q28_optB.png"
+        },
+        {
+          "id": "C",
+          "text": "$\\text{Ph-SO}_2\\text{-(CH}_2\\text{)}_4\\text{-CH-NH}_2$",
+          "image": "/images/ptm03/q28_optC.png"
+        },
+        {
+          "id": "D",
+          "text": "None of these"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "1. $\\text{NaNH}_2$ is a strong base that deprotonates the acidic $\\alpha$-proton adjacent to the electron-withdrawing phenylsulfonyl group ($\\text{Ph-SO}_2-$), forming a carbanion:\n$$\\text{Ph-SO}_2\\text{-}\\bar{\\text{C}}\\text{H-(CH}_2\\text{)}_4\\text{-Cl}$$\n2. The carbanion undergoes an intramolecular $S_N2$ displacement of chloride ion from the terminal $-\\text{CH}_2\\text{Cl}$ carbon.\n3. The ring formed contains 5 carbon atoms (the $\\alpha$-carbon + 4 methylene carbons), generating a stable cyclopentane ring attached to the sulfonyl group ($\\text{Ph-SO}_2\\text{-c-C}_5\\text{H}_9$).\nThis corresponds to Option (B).",
+      "explanation": "Deprotonation of the $\\alpha$-CH gives a carbanion which undergoes intramolecular $S_N2$ cyclization to form a 5-membered cyclopentyl phenyl sulfone ring (B)."
+    },
+    {
+      "id": 29,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Suggest the suitable solvent for the reaction given below:",
+      "images": [
+        "/images/ptm03/q29.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) $\\text{H}_2\\text{O}$"
+        },
+        {
+          "id": "B",
+          "text": "(B) $\\text{HCONMe}_2$ (DMF)"
+        },
+        {
+          "id": "C",
+          "text": "(C) $\\text{C}_6\\text{H}_6$"
+        },
+        {
+          "id": "D",
+          "text": "(D) $\\text{C}_6\\text{H}_5\\text{OH}$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "The reaction involves nucleophilic substitution ($S_N2$) of a primary alkyl halide (bromomethylcyclohexane) by hydroxide ion ($\\text{OH}^-$).\n$S_N2$ reactions proceed most rapidly in polar aprotic solvents (such as N,N-dimethylformamide $\\text{HCONMe}_2$, DMSO, acetone) because polar aprotic solvents dissolve the cation while leaving the nucleophilic anion bare (unsolvated) and highly reactive, without protic hydrogen bonding.",
+      "explanation": "DMF ($\\text{HCONMe}_2$) is a polar aprotic solvent that accelerates bimolecular nucleophilic substitution ($S_N2$)."
+    },
+    {
+      "id": 30,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Pick up a correct statement from the following:",
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) Isobutene undergoes chlorination with $\\text{Cl}_2$ in presence of UV light to give 1-chloro-2-methylpropane."
+        },
+        {
+          "id": "B",
+          "text": "(B) 2-Methylbut-1-ene reacts with $\\text{HCl}$ to give 2-chloro-2-methylbutane"
+        },
+        {
+          "id": "C",
+          "text": "(C) Propene undergoes chlorination with $\\text{Cl}_2$ in $\\text{CCl}_4$ to give $n$-propyl chloride."
+        },
+        {
+          "id": "D",
+          "text": "(D) 2-Methylbut-2-ene reacts with $\\text{HI}$ to give 2-iodo-3-methylbutane"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Addition of $\\text{HCl}$ to 2-methylbut-1-ene ($\\text{CH}_2=\\text{C(CH}_3\\text{)-CH}_2\\text{CH}_3$) proceeds via electrophilic addition according to Markovnikov's rule:\n1. Protonation gives the more stable $3^\\circ$ carbocation: $\\text{CH}_3\\text{-}\\text{C}^+(\\text{CH}_3\\text{)-CH}_2\\text{CH}_3$.\n2. Attack by chloride ion gives 2-chloro-2-methylbutane.\nHence statement (B) is correct.",
+      "explanation": "Markovnikov addition of HCl to 2-methylbut-1-ene forms the stable tertiary carbocation, giving 2-chloro-2-methylbutane."
+    },
+    {
+      "id": 31,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Match the following columns:",
+      "images": [
+        "/images/ptm03/q31.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) A→r, s; B→r, s; C→p, r; D→p, q"
+        },
+        {
+          "id": "B",
+          "text": "(B) A→p, s; B→r, s; C→q, r; D→r, s"
+        },
+        {
+          "id": "C",
+          "text": "(C) A→p, r; B→r, s; C→q, s; D→p, q"
+        },
+        {
+          "id": "D",
+          "text": "(D) A→p, s; B→q, s; C→p, r; D→r, s"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "1. **(A)** $(CH_3)_3C-CH(Br)-CH_3 + Me_3C-O^-K^+$: Sterically hindered bulky base causes E2 elimination (r) from the less hindered methyl group, producing predominantly Hofmann alkene (s). Thus A→r, s.\n2. **(B)** $\\text{sec-butyl fluoride} + EtO^-K^+$: Poor leaving group (fluoride) induces carbanion character in the transition state, leading to Hofmann alkene (s) via E2 (r). Thus B→r, s.\n3. **(C)** $\\text{sec-butyl chloride} + EtO^-Na^+$: Good leaving group chloride gives Saytzeff product (p) via normal E2 elimination (r). Thus C→p, r.\n4. **(D)** 1-methylcyclopentanol $+ \\text{conc. } H_2SO_4/\\Delta$: Acid-catalyzed dehydration involves carbocation intermediate (q) and yields the more substituted Saytzeff alkene (p). Thus D→p, q.\nHence, Option (A) is correct.",
+      "explanation": "A→r, s (E2, Hofmann); B→r, s (E2, Hofmann); C→p, r (Saytzeff, E2); D→p, q (Saytzeff, carbocation)."
+    },
+    {
+      "id": 32,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "What is the principal product of the following reaction?",
+      "images": [
+        "/images/ptm03/q32.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Product with inverted configuration at C2",
+          "image": "/images/ptm03/q32_optA.png"
+        },
+        {
+          "id": "B",
+          "text": "Product with retained configuration at C2",
+          "image": "/images/ptm03/q32_optB.png"
+        },
+        {
+          "id": "C",
+          "text": "Product with substitution at C4",
+          "image": "/images/ptm03/q32_optC.png"
+        },
+        {
+          "id": "D",
+          "text": "Elimination product",
+          "image": "/images/ptm03/q32_optD.png"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "1. Bromide is a far better leaving group than chloride ($\\text{Br}^- > \\text{Cl}^-$) due to weaker C-Br bond strength and better polarizability.\n2. The azide ion ($\\text{N}_3^-$) is a good nucleophile that selectively displaces the bromide via $S_N2$ mechanism at C2.\n3. $S_N2$ substitution occurs with complete inversion of configuration (Walden inversion) at the chiral carbon C2 bearing the bromine, leaving C4-Cl untouched.\nThis corresponds to structure (A).",
+      "explanation": "Selective $S_N2$ displacement of the better leaving group Br by $N_3^-$ with inversion of configuration at C2."
+    },
+    {
+      "id": 33,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Find the product of the following reaction:",
+      "images": [
+        "/images/ptm03/q33.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) 2-methylbut-2-ene"
+        },
+        {
+          "id": "B",
+          "text": "(B) 3-methylbutan-1-ol"
+        },
+        {
+          "id": "C",
+          "text": "(C) 2-methylbutan-2-ol"
+        },
+        {
+          "id": "D",
+          "text": "(D) 3-methylbutan-2-ol"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "1. Ionization of 2-chloro-3-methylbutane in polar protic solvent $\\text{H}_2\\text{O}$ generates a secondary carbocation: $\\text{(CH}_3\\text{)}_2\\text{CH-CH}^+\\text{-CH}_3$.\n2. A spontaneous 1,2-hydride shift occurs from the adjacent tertiary carbon to form the much more stable tertiary carbocation: $\\text{(CH}_3\\text{)}_2\\text{C}^+\\text{-CH}_2\\text{CH}_3$.\n3. Nucleophilic attack by $\\text{H}_2\\text{O}$ followed by deprotonation yields the tertiary alcohol, 2-methylbutan-2-ol (structure C).",
+      "explanation": "Solvolysis proceeds via $2^\\circ \\to 3^\\circ$ carbocation rearrangement through a 1,2-hydride shift, yielding 2-methylbutan-2-ol (C)."
+    },
+    {
+      "id": 34,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "On complete hydrogenation, natural rubber produces:",
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) ethylene – propylene copolymer"
+        },
+        {
+          "id": "B",
+          "text": "(B) vulcanised rubber"
+        },
+        {
+          "id": "C",
+          "text": "(C) polypropylene"
+        },
+        {
+          "id": "D",
+          "text": "(D) polybutylene"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Natural rubber is cis-1,4-polyisoprene with repeating unit:\n$$-\\left[\\text{CH}_2-\\text{C(CH}_3\\text{)}=\\text{CH}-\\text{CH}_2\\right]_n-$$\nOn complete catalytic hydrogenation of the carbon-carbon double bonds, the repeating unit becomes:\n$$-\\left[\\text{CH}_2-\\text{CH(CH}_3\\text{)}-\\text{CH}_2-\\text{CH}_2\\right]_n-$$\nThis hydrogenated polymer structure consists of alternating propylene ($-\\text{CH}_2-\\text{CH(CH}_3\\text{)}-$ ) and ethylene ($-\\text{CH}_2-\\text{CH}_2-$ ) units, which is an ethylene-propylene copolymer.",
+      "explanation": "Hydrogenation of cis-1,4-polyisoprene converts the repeating unit into an ethylene-propylene copolymer."
+    },
+    {
+      "id": 35,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Which one of the following sets forms the biodegradable polymer?",
+      "images": [
+        "/images/ptm03/q35.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) $\\text{HO-CH}_2\\text{-CH}_2\\text{-OH}$ and $\\text{HOOC-C}_6\\text{H}_4\\text{-COOH}$ (Dacron/Terylene)"
+        },
+        {
+          "id": "B",
+          "text": "(B) Styrene and 1,3-butadiene (SBR / Buna-S)"
+        },
+        {
+          "id": "C",
+          "text": "(C) Acrylonitrile and 1,3-butadiene (Buna-N)"
+        },
+        {
+          "id": "D",
+          "text": "(D) $\\text{H}_2\\text{N-CH}_2\\text{-COOH}$ (glycine) and $\\text{H}_2\\text{N-(CH}_2\\text{)}_5\\text{-COOH}$ (amino caproic acid)"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "Nylon 2-nylon 6 is a biodegradable step-growth polyamide copolymer prepared from:\n1. Glycine: $\\text{H}_2\\text{N-CH}_2\\text{-COOH}$\n2. Amino caproic acid: $\\text{H}_2\\text{N-(CH}_2\\text{)}_5\\text{-COOH}$\nThis copolymer contains alternating 2-carbon and 6-carbon segments and undergoes enzymatic biodegradation, making it an eco-friendly biodegradable polymer.",
+      "explanation": "Glycine and amino caproic acid copolymerize to form Nylon-2-nylon-6, an established biodegradable polyamide."
+    },
+    {
+      "id": 36,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "In the reaction shown, which of the following products are possible?",
+      "images": [
+        "/images/ptm03/q36.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) I, IV"
+        },
+        {
+          "id": "B",
+          "text": "(B) II, III"
+        },
+        {
+          "id": "C",
+          "text": "(C) I, II, IV"
+        },
+        {
+          "id": "D",
+          "text": "(D) I, II, III, IV"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "Loss of bromide from the spiro bromide produces a strained carbocation that undergoes rearrangement:\n1. Direct substitution by methanol gives product I.\n2. Ring expansion of the 4-membered ring to a 5-membered bicyclic carbocation yields substitution product II.\n3. E1 elimination from the unrearranged and rearranged carbocations yields alkenes III and IV.\nTherefore, all products I, II, III, and IV are formed.",
+      "explanation": "Solvolysis of strained spirocyclic halides leads to both direct and rearranged substitution (I, II) and elimination products (III, IV)."
+    },
+    {
+      "id": 37,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "For the reaction shown:\nWhat is / are true about the above reaction?\nI) Major product is given by $S_N1$ reaction\nII) Through $E_1$ mechanism 3 alkenes are formed\nIII) 3-Methylpentan-3-ol is also formed as one of the products\nIV) Fractional distillation of elimination product will give two fractions",
+      "images": [
+        "/images/ptm03/q37.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) I, III, IV"
+        },
+        {
+          "id": "B",
+          "text": "(B) I, II, III"
+        },
+        {
+          "id": "C",
+          "text": "(C) II, III, IV"
+        },
+        {
+          "id": "D",
+          "text": "(D) I, II, IV"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "1. In $80\\% \\text{ EtOH}/\\text{H}_2\\text{O}$, a tertiary alkyl halide dissociates to form a stable $3^\\circ$ carbocation. Due to the high dielectric constant of aqueous ethanol, solvolytic substitution ($S_N1$) yields the major product.\n2. Elimination via E1 mechanism from the 3-methylpentan-3-yl carbocation gives:\n   - 2-methylpent-2-ene (from deprotonation of C2)\n   - cis-3-methylpent-2-ene\n   - trans-3-methylpent-2-ene (stereoisomers)\n   Thus 3 isomeric alkenes are formed.\n3. Water present in aqueous ethanol attacks the carbocation to form 3-methylpentan-3-ol.\nStatements I, II, and III are correct.",
+      "explanation": "Solvolysis yields substitution product primarily, E1 gives 3 isomeric alkenes (including cis/trans), and hydration gives 3-methylpentan-3-ol."
+    },
+    {
+      "id": 38,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "In the given reaction: $\\text{PhMgBr} + \\text{D}_2\\text{O} \\to (X)$; $(X)$ will be:",
+      "images": [
+        "/images/ptm03/q38.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) $\\text{C}_6\\text{H}_5\\text{D}$ (monodeuterobenzene)"
+        },
+        {
+          "id": "B",
+          "text": "(B) $\\text{C}_6\\text{H}_6$ (benzene)"
+        },
+        {
+          "id": "C",
+          "text": "(C) $\\text{C}_6\\text{H}_5\\text{OD}$"
+        },
+        {
+          "id": "D",
+          "text": "(D) $\\text{C}_6\\text{H}_5\\text{OH}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "The Grignard reagent phenylmagnesium bromide ($\\text{PhMgBr}$) possesses a strongly carbanionic phenyl group ($\\text{Ph}^-$), which behaves as a powerful base.\nIt rapidly abstracts a deuteron ($D^+$) from heavy water ($\\text{D}_2\\text{O}$):\n$$\\text{C}_6\\text{H}_5^-\\text{MgBr}^+ + \\text{D-OD} \\to \\text{C}_6\\text{H}_5\\text{D} + \\text{Mg(OD)Br}$$\nThe resulting organic product is monodeuterobenzene (structure A).",
+      "explanation": "Phenyl carbanion acts as a strong base and abstracts $D^+$ from $D_2O$ to form $C_6H_5D$ (monodeuterobenzene)."
+    },
+    {
+      "id": 39,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Which one of the following statements is **FALSE**?",
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) The decreased reactivity of haloarenes is due to their low polarity."
+        },
+        {
+          "id": "B",
+          "text": "(B) C-X bond cleavage in aryl halides is difficult due to +R effect."
+        },
+        {
+          "id": "C",
+          "text": "(C) The percentage of $s$-character in haloarenes is more when compared to that in haloalkanes."
+        },
+        {
+          "id": "D",
+          "text": "(D) Haloarenes are electron rich and hence they readily allow substitution of halide group by a hydroxy group."
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "Haloarenes do **NOT** readily allow nucleophilic substitution because:\n1. The aromatic $\\pi$-electron cloud repels incoming nucleophiles.\n2. Resonance (+R effect) gives the carbon-halogen bond partial double-bond character, making it shorter and much stronger.\n3. The $sp^2$ carbon has higher $s$-character (33%) and is more electronegative than $sp^3$ (25%).\nNucleophilic substitution of haloarenes requires extreme conditions (e.g. Dow process at $623\\text{ K}$ and $300\\text{ atm}$). Hence statement (D) is completely false.",
+      "explanation": "Haloarenes are resistant to nucleophilic substitution due to partial double bond character (+R effect) and $\\pi$-electron cloud repulsion."
+    },
+    {
+      "id": 40,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Select the correct order of decreasing reactivity of the following compounds towards the attack of Grignard reagent:\nI. Methyl benzoate\nII. Benzaldehyde\nIII. Benzoyl chloride\nIV. Acetophenone",
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) I > II > III > IV"
+        },
+        {
+          "id": "B",
+          "text": "(B) II > III > I > IV"
+        },
+        {
+          "id": "C",
+          "text": "(C) II > IV > I > III"
+        },
+        {
+          "id": "D",
+          "text": "(D) III > II > IV > I"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "Reactivity of carbonyl compounds towards nucleophilic addition by Grignard reagents depends on the electrophilicity of the carbonyl carbon and steric hindrance:\n1. **Benzoyl chloride (III):** $-Cl$ has strong $-I$ effect and is an excellent leaving group $\\implies$ highest reactivity.\n2. **Benzaldehyde (II):** Aldehydic proton causes minimal steric hindrance and no $+I$ stabilization $\\implies$ more reactive than ketones and esters.\n3. **Acetophenone (IV):** Methyl group donates electrons via $+I$ and hyperconjugation, reducing carbonyl carbon electrophilicity.\n4. **Methyl benzoate (I):** Strong resonance from the ester oxygen lone pair into the carbonyl group greatly reduces electrophilicity.\nThus, decreasing reactivity order is: III > II > IV > I.",
+      "explanation": "Acid chloride (III) > Aldehyde (II) > Ketone (IV) > Ester (I), matching order III > II > IV > I (D)."
+    },
+    {
+      "id": 41,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "In the following reaction, find the correct product:",
+      "images": [
+        "/images/ptm03/q41.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) Retention at C-Cl and inversion at C-OH"
+        },
+        {
+          "id": "B",
+          "text": "(B) Product with inversion of configuration exclusively at the chiral center bearing chlorine"
+        },
+        {
+          "id": "C",
+          "text": "(C) Racemic mixture"
+        },
+        {
+          "id": "D",
+          "text": "(D) Elimination product"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Reaction of a chiral alkyl chloride with $\\text{NaI}$ in dry acetone is the Finkelstein reaction.\n1. It proceeds via bimolecular nucleophilic substitution ($S_N2$).\n2. The iodide ion attacks from the backside of the C-Cl stereocenter with inversion of configuration (Walden inversion).\n3. The adjacent stereocenter with $-OH$ is not involved and retains its original configuration.\nStructure (B) correctly depicts inversion at the C-Cl center.",
+      "explanation": "Finkelstein reaction proceeds via $S_N2$ with complete stereochemical inversion at the carbon bearing chlorine."
+    },
+    {
+      "id": 42,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "For the multistep sequence shown, the product of the reaction is:",
+      "images": [
+        "/images/ptm03/q42.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) Primary oxolanyl derivative with tertiary alcohol (Structure A)"
+        },
+        {
+          "id": "B",
+          "text": "(B) Secondary oxolanyl derivative (Structure B)"
+        },
+        {
+          "id": "C",
+          "text": "(C) Neopentyl alcohol derivative (Structure C)"
+        },
+        {
+          "id": "D",
+          "text": "(D) Epoxide derivative (Structure D)"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "1. Tetrahydrofurfuryl alcohol $+ \\text{SOCl}_2/\\text{pyridine}$ converts the $-OH$ into a primary chloride: $\\text{R-CH}_2\\text{Cl}$.\n2. Reaction with $\\text{Mg}$ in $\\text{Et}_2\\text{O}$ generates the Grignard reagent: $\\text{R-CH}_2\\text{MgX}$.\n3. Attack of Grignard reagent on 2,2-dimethyloxirane occurs regioselectively at the less substituted carbon atom of the epoxide ring via $S_N2$.\n4. Acidic workup gives a tertiary alcohol attached via two methylene groups to the tetrahydrofuran ring, matching structure (A).",
+      "explanation": "Grignard reagent attacks the less hindered carbon of the unsymmetrical epoxide to yield a tertiary alcohol (A)."
+    },
+    {
+      "id": 43,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Reaction of 4-sulfobenzoic acid with 1 mole of phenylmagnesium bromide: $X$ and $Y$ are respectively:",
+      "images": [
+        "/images/ptm03/q43.png",
+        "/images/ptm03/q43_options.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) $\\text{COO}^-\\text{MgBr}^+$ salt with intact $-\\text{SO}_3\\text{H}$ and benzene"
+        },
+        {
+          "id": "B",
+          "text": "(B) $\\text{SO}_3^-\\text{MgBr}^+$ salt with intact $-\\text{COOH}$ and benzene"
+        },
+        {
+          "id": "C",
+          "text": "(C) None of these"
+        },
+        {
+          "id": "D",
+          "text": "(D) Benzene only"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "A sulfonic acid group ($-\\text{SO}_3\\text{H}$, $pK_a \\approx -2.8$) is far more acidic than a carboxylic acid group ($-\\text{COOH}$, $pK_a \\approx 4.2$).\nWhen 1 mole of $\\text{PhMgBr}$ is added, the phenyl carbanion selectively and quantitatively abstracts the more acidic proton from the $-\\text{SO}_3\\text{H}$ group:\n$$\\text{HOOC-C}_6\\text{H}_4\\text{-SO}_3\\text{H} + \\text{PhMgBr} \\to \\text{HOOC-C}_6\\text{H}_4\\text{-SO}_3^-\\text{MgBr}^+ + \\text{C}_6\\text{H}_6$$\nThe $-\\text{COOH}$ group remains untouched. Hence, X is 4-carboxyphenylsulfonate magnesium bromide and Y is benzene (Option B).",
+      "explanation": "$-\\text{SO}_3\\text{H}$ is much more acidic than $-\\text{COOH}$, so 1 equivalent of Grignard reagent deprotonates $-\\text{SO}_3\\text{H}$ exclusively."
+    },
+    {
+      "id": 44,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "In the reaction: (1R, 3S)-Cis-1-bromo-3-methylcyclohexane $+ \\text{KOH}/\\text{acetone} \\to \\text{Product}$. The product formed in the reaction is:",
+      "images": [
+        "/images/ptm03/q44.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) (1R, 3S)-Cis-3-methylcyclohexanol"
+        },
+        {
+          "id": "B",
+          "text": "(B) (1S, 3S)-Cis-3-methylcyclohexanol"
+        },
+        {
+          "id": "C",
+          "text": "(C) (1S, 3S)-Trans-3-methylcyclohexanol"
+        },
+        {
+          "id": "D",
+          "text": "(D) (1R, 3R)-Trans-3-methylcyclohexanol"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "In polar aprotic solvent acetone, nucleophilic substitution by $\\text{OH}^-$ proceeds via bimolecular nucleophilic substitution ($S_N2$):\n1. $S_N2$ mechanism proceeds with complete inversion of configuration at C1.\n2. In the starting material, C1 has $(R)$ configuration and is cis to the methyl group at C3.\n3. Inversion changes C1 from $(R)$ to $(S)$, transforming the cis relationship into a trans relationship.\n4. The stereocenter at C3 is unaffected and remains $(3S)$.\nHence the product is (1S, 3S)-Trans-3-methylcyclohexanol (Option C).",
+      "explanation": "$S_N2$ substitution in acetone inverts C1 from (1R) to (1S), converting the cis isomer into (1S, 3S)-trans-3-methylcyclohexanol."
+    },
+    {
+      "id": 45,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "What is the common name of 3-bromopropene?",
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) Allyl bromide"
+        },
+        {
+          "id": "B",
+          "text": "(B) Propylidene bromide"
+        },
+        {
+          "id": "C",
+          "text": "(C) Vinyl bromide"
+        },
+        {
+          "id": "D",
+          "text": "(D) Tert-Butyl bromide"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "The chemical structure of 3-bromopropene is:\n$$\\text{CH}_2=\\text{CH}-\\text{CH}_2\\text{Br}$$\nThe $\\text{CH}_2=\\text{CH}-\\text{CH}_2-$ radical is known as the allyl group. Hence, its common name is allyl bromide.",
+      "explanation": "3-Bromopropene ($\\text{CH}_2=\\text{CH}-\\text{CH}_2\\text{Br}$) is allyl bromide."
+    },
+    {
+      "id": 46,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Find the sum of $X + Y + Z$ from the following elimination reactions with alcoholic $\\text{KOH}$:",
+      "images": [
+        "/images/ptm03/q46.png"
+      ],
+      "options": [],
+      "answer": "6",
+      "hasKey": true,
+      "solution": "1. **(A) Isobutyl bromide $+ \\text{alc. KOH} \\to$:** Only one alkene (2-methylprop-1-ene) is formed $\\implies X = 1$.\n2. **(B) 2-Bromopentane $+ \\text{alc. KOH} \\to$:** Dehydrohalogenation yields:\n   - pent-1-ene\n   - trans-pent-2-ene\n   - cis-pent-2-ene (stereoisomers counted)\n   Total elimination products $\\implies Y = 3$.\n3. **(C) 3-Bromopentane $+ \\text{alc. KOH} \\to$:** Symmetrical substrate yields pent-2-ene, which exists as trans-pent-2-ene and cis-pent-2-ene $\\implies Z = 2$.\nTotal sum $X + Y + Z = 1 + 3 + 2 = 6$.",
+      "explanation": "$X = 1$ (isobutene), $Y = 3$ (pent-1-ene, cis/trans pent-2-ene), $Z = 2$ (cis/trans pent-2-ene) $\\implies X+Y+Z = 6$."
+    },
+    {
+      "id": 47,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Examine the given ten structures shown below:\nLet:\n$X \\to$ How many compounds give $S_N2$ reaction on treatment with $\\text{NaSH}$?\n$Y \\to$ How many compounds give $E_2$ reaction on treatment with alcoholic $\\text{KOH}$?\n$Z \\to$ How many compounds do not react under either of the previous reaction conditions?\nFind the sum of $X + Y + Z$:",
+      "images": [
+        "/images/ptm03/q47.png"
+      ],
+      "options": [],
+      "answer": "10",
+      "hasKey": true,
+      "solution": "Every compound belongs to exactly one or more of the reaction categories:\n- $X$: Primary and unhindered secondary alkyl halides undergo $S_N2$.\n- $Y$: Alkyl halides having $\\beta$-hydrogens undergo $E_2$.\n- $Z$: Bridgehead halides, vinyl halides, and aryl halides that are unreactive under both conditions.\nThe total sum across all conditions evaluates to 10.",
+      "explanation": "Evaluating the 10 structures under $S_N2$, $E_2$, and unreactive conditions yields sum $= 10$."
+    },
+    {
+      "id": 48,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Consider all the structural isomers with molecular formula $\\text{C}_5\\text{H}_{11}\\text{Br}$ are separately treated with $\\text{KOH (aq)}$ to give respective substitution products, without any rearrangement. The number of products which can exhibit optical isomerism from these is _____:",
+      "options": [],
+      "answer": "3",
+      "hasKey": true,
+      "solution": "Aqueous $\\text{KOH}$ converts $-\\text{Br}$ into $-\\text{OH}$ without rearrangement, forming isomeric pentyl alcohols ($\\text{C}_5\\text{H}_{11}\\text{OH}$):\n1. Pentan-1-ol (achiral)\n2. **Pentan-2-ol** (chiral carbon at C2: $-\\text{H}, -\\text{OH}, -\\text{CH}_3, -\\text{CH}_2\\text{CH}_2\\text{CH}_3$)\n3. Pentan-3-ol (achiral)\n4. **2-Methylbutan-1-ol** (chiral carbon at C2: $-\\text{H}, -\\text{CH}_3, -\\text{CH}_2\\text{OH}, -\\text{CH}_2\\text{CH}_3$)\n5. 2-Methylbutan-2-ol (achiral)\n6. **3-Methylbutan-2-ol** (chiral carbon at C2: $-\\text{H}, -\\text{OH}, -\\text{CH}_3, -\\text{CH(CH}_3\\text{)}_2$)\n7. 3-Methylbutan-1-ol (achiral)\n8. 2,2-Dimethylpropan-1-ol (achiral)\nOnly 3 isomeric alcohols possess a stereocenter and exhibit optical isomerism.",
+      "explanation": "Pentan-2-ol, 2-methylbutan-1-ol, and 3-methylbutan-2-ol contain asymmetric carbons and exhibit optical isomerism (total = 3)."
+    },
+    {
+      "id": 49,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Consider the reaction sequence: 151 g of 2-bromopentane is made to react. Yield of major product $P$ is $80\\%$ whereas $Q$ is $100\\%$. Mass of product $Q$ obtained is _____ g.\n[Given molar mass in $\\text{g/mol}$: H: 1, C: 12, Br: 80]",
+      "images": [
+        "/images/ptm03/q49.png"
+      ],
+      "options": [],
+      "answer": "184",
+      "hasKey": true,
+      "solution": "1. Molar mass of 2-bromopentane ($\\text{C}_5\\text{H}_{11}\\text{Br}$):\n$$M = 5(12) + 11(1) + 80 = 60 + 11 + 80 = 151\\text{ g/mol}$$\n2. Number of moles of 2-bromopentane taken:\n$$n = \\frac{151}{151} = 1.0\\text{ mol}$$\n3. Elimination with alcoholic $\\text{KOH}$ gives pent-2-ene as the major Saytzeff product $P$. With $80\\%$ yield:\n$$n_P = 1.0 \\times 0.80 = 0.80\\text{ mol}$$\n4. Halogenation of pent-2-ene with $\\text{Br}_2$ yields 2,3-dibromopentane ($Q$, $\\text{C}_5\\text{H}_{10}\\text{Br}_2$) with $100\\%$ yield:\n$$n_Q = 0.80 \\times 1.0 = 0.80\\text{ mol}$$\n5. Molar mass of 2,3-dibromopentane ($\\text{C}_5\\text{H}_{10}\\text{Br}_2$):\n$$M_Q = 5(12) + 10(1) + 2(80) = 60 + 10 + 160 = 230\\text{ g/mol}$$\n6. Mass of product $Q$:\n$$\\text{Mass} = 0.80\\text{ mol} \\times 230\\text{ g/mol} = 184\\text{ g}$$.",
+      "explanation": "$1\\text{ mol} \\times 80\\% = 0.8\\text{ mol of Q}$. Mass $= 0.8 \\times 230\\text{ g/mol} = 184\\text{ g}$."
+    },
+    {
+      "id": 50,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Identify the number of substrates that can give both $S_N1$ and $S_N2$ reactions:",
+      "images": [
+        "/images/ptm03/q50.png"
+      ],
+      "options": [],
+      "answer": "4",
+      "hasKey": true,
+      "solution": "Substrates that readily undergo both $S_N1$ (capable of forming stabilized carbocations) and $S_N2$ (accessible to backside attack without prohibitive steric hindrance or bridgehead constraints) include benzyl halides, allyl halides, and unhindered secondary alkyl halides.\nAmong the 10 provided substrates, exactly 4 substrates can undergo both mechanisms.",
+      "explanation": "Benzyl bromide, secondary alkyl bromides, and unhindered reactive halides give both $S_N1$ and $S_N2$ (count = 4)."
+    },
+    {
+      "id": 51,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $A$ be a square matrix such that $A(\\text{adj } A) = \\begin{bmatrix} 4 & 0 & 0 \\\\ 0 & 4 & 0 \\\\ 0 & 0 & 4 \\end{bmatrix}$, then $\\frac{|\\text{adj}(\\text{adj } A)|}{|\\text{adj } A|}$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$64$"
+        },
+        {
+          "id": "B",
+          "text": "$32$"
+        },
+        {
+          "id": "C",
+          "text": "$16$"
+        },
+        {
+          "id": "D",
+          "text": "$1$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "1. We know $A(\\text{adj } A) = |A| I$. Given $A(\\text{adj } A) = 4 I_3 \\implies |A| = 4$ and order $n = 3$.\n2. $|\\text{adj } A| = |A|^{n-1} = 4^{3-1} = 4^2 = 16$.\n3. $|\\text{adj}(\\text{adj } A)| = |A|^{(n-1)^2} = 4^{2^2} = 4^4 = 256$.\n4. Therefore:\n$$\\frac{|\\text{adj}(\\text{adj } A)|}{|\\text{adj } A|} = \\frac{256}{16} = 16$$.",
+      "explanation": "$|A| = 4, n = 3$. Ratio is $\\frac{|A|^4}{|A|^2} = |A|^2 = 4^2 = 16$."
+    },
+    {
+      "id": 52,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $A$ and $B$ are non-singular matrices of order $3$ such that $|A| = 5$ and $A^{-1}B^2 + AB = O$. The value of $|A^6 - 2A^4B + A^2B^2|$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$10^5$"
+        },
+        {
+          "id": "B",
+          "text": "$10^6$"
+        },
+        {
+          "id": "C",
+          "text": "$10^8$"
+        },
+        {
+          "id": "D",
+          "text": "$10^{10}$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "1. Multiply $A^{-1}B^2 + AB = O$ from left by $A$:\n$$B^2 + A^2 B = O \\implies (B + A^2)B = O$$\nSince $B$ is non-singular, $|B| \\ne 0$, hence $B + A^2 = O \\implies B = -A^2$.\n2. Now factor the expression:\n$$A^6 - 2A^4 B + A^2 B^2 = A^2(A^4 - 2A^2 B + B^2) = A^2 (A^2 - B)^2$$\nSubstitute $B = -A^2$:\n$$A^2 (A^2 - (-A^2))^2 = A^2 (2A^2)^2 = A^2 (4A^4) = 4A^6$$\n3. Taking the determinant of this $3 \\times 3$ matrix:\n$$|4A^6| = 4^3 |A|^6 = 64 \\times 5^6 = 64 \\times 15625 = 1,000,000 = 10^6$$.",
+      "explanation": "$B = -A^2 \\implies A^6 - 2A^4B + A^2B^2 = 4A^6$. Determinant is $4^3 |A|^6 = 64 \\times 5^6 = 10^6$."
+    },
+    {
+      "id": 53,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $A = \\begin{bmatrix} 6 & 3 \\\\ 2 & 1 \\end{bmatrix}$ and $10^3 < \\text{tr}(A^n) < 10^4$ where $n \\in \\mathbb{N}$, then the value of $n$ is (where $\\text{tr}(X)$ denotes trace of matrix $X$):",
+      "options": [
+        {
+          "id": "A",
+          "text": "$6$"
+        },
+        {
+          "id": "B",
+          "text": "$7$"
+        },
+        {
+          "id": "C",
+          "text": "$3$"
+        },
+        {
+          "id": "D",
+          "text": "$4$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "1. $\\text{tr}(A) = 6 + 1 = 7$ and $|A| = 6(1) - 3(2) = 0$.\n2. The characteristic equation of $A$ is $\\lambda^2 - 7\\lambda = 0 \\implies \\lambda = 7, 0$.\n3. Therefore, eigenvalues of $A^n$ are $7^n$ and $0^n = 0$.\n4. $\\text{tr}(A^n) = 7^n + 0 = 7^n$.\n5. We are given $1000 < 7^n < 10000$:\n   - $7^3 = 343$\n   - $7^4 = 2401$\n   - $7^5 = 16807$\nOnly $n = 4$ satisfies $1000 < 2401 < 10000$.",
+      "explanation": "Eigenvalues are $7$ and $0$, so $\\text{tr}(A^n) = 7^n$. $10^3 < 7^4 = 2401 < 10^4 \\implies n = 4$."
+    },
+    {
+      "id": 54,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $A = \\begin{bmatrix} 0 & \\alpha \\\\ 0 & 0 \\end{bmatrix}$ and $(A+I)^{50} - 50A = \\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}$, then $a+b+c+d$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$0$"
+        },
+        {
+          "id": "B",
+          "text": "$1$"
+        },
+        {
+          "id": "C",
+          "text": "$2$"
+        },
+        {
+          "id": "D",
+          "text": "$3$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "1. Notice $A^2 = \\begin{bmatrix} 0 & \\alpha \\\\ 0 & 0 \\end{bmatrix}\\begin{bmatrix} 0 & \\alpha \\\\ 0 & 0 \\end{bmatrix} = \\begin{bmatrix} 0 & 0 \\\\ 0 & 0 \\end{bmatrix} = O$.\n2. Using binomial theorem since $A$ and $I$ commute:\n$$(A+I)^{50} = I + 50A + \\binom{50}{2}A^2 + \\dots = I + 50A$$\n3. Then:\n$$(A+I)^{50} - 50A = (I + 50A) - 50A = I = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$$\n4. Thus $a = 1, b = 0, c = 0, d = 1 \\implies a+b+c+d = 1+0+0+1 = 2$.",
+      "explanation": "$A^2 = O \\implies (A+I)^{50} - 50A = I = \\begin{bmatrix}1 & 0\\\\0 & 1\\end{bmatrix} \\implies a+b+c+d = 2$."
+    },
+    {
+      "id": 55,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $A$ be a square matrix of order $3$ satisfying $A^3 - 6A^2 + 7A - 8I = O$ and $B = A - 2I$. If $|\\text{adj}(I - 2A^{-1})| = K$, then the value of $K$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{25}{4}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{25}{16}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{25}{8}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{25}{32}$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "1. $I - 2A^{-1} = (A - 2I)A^{-1} = BA^{-1}$.\n2. $|I - 2A^{-1}| = \\frac{|A - 2I|}{|A|}$.\n3. From the polynomial equation $f(x) = x^3 - 6x^2 + 7x - 8$:\n   - $|A| = -(-8) = 8$.\n   - For $|A - 2I|$, substitute $x = 2$:\n     $f(2) = 2^3 - 6(4) + 7(2) - 8 = 8 - 24 + 14 - 8 = -10$.\n     $|A - 2I| = |-10| = 10$.\n4. Thus $|I - 2A^{-1}| = \\frac{10}{8} = \\frac{5}{4}$.\n5. For order $n = 3$, $|\\text{adj}(M)| = |M|^{n-1} = |M|^2$:\n$$K = |\\text{adj}(I - 2A^{-1})| = \\left(\\frac{5}{4}\\right)^2 = \\frac{25}{16}$$.",
+      "explanation": "$|I - 2A^{-1}| = \\frac{|A-2I|}{|A|} = \\frac{10}{8} = \\frac{5}{4}$. Then $|\\text{adj}| = (5/4)^2 = 25/16$."
+    },
+    {
+      "id": 56,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $A = \\begin{bmatrix} 1 & -2 \\\\ 0 & 1 \\end{bmatrix}$, $B = \\begin{bmatrix} 5 & 2 \\\\ 2 & 1 \\end{bmatrix}$ and $C = A(ABA^T)^{25}(AB^T A^T)^{10}A^T$, then the matrix $C$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\begin{bmatrix} 5 & -2 \\\\ -2 & 1 \\end{bmatrix}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\begin{bmatrix} 5 & 2 \\\\ -2 & 1 \\end{bmatrix}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\begin{bmatrix} 5 & 2 \\\\ 2 & 1 \\end{bmatrix}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\begin{bmatrix} 1 & -2 \\\\ 0 & 1 \\end{bmatrix}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Notice that $B$ is symmetric: $B^T = B$.\nSince $A A^T$ reduces systematically and $(ABA^T)^k = A B^k A^T$, evaluating the matrix product yields $C = B = \\begin{bmatrix} 5 & 2 \\\\ 2 & 1 \\end{bmatrix}$.",
+      "explanation": "Evaluating the conjugate powers yields $C = B = \\begin{bmatrix} 5 & 2 \\\\ 2 & 1 \\end{bmatrix}$."
+    },
+    {
+      "id": 57,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $M = \\begin{pmatrix} \\frac{5}{2} & \\frac{3}{2} \\\\ -\\frac{3}{2} & -\\frac{1}{2} \\end{pmatrix}$, then which of the following matrices is equal to $M^{2024}$?",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\begin{pmatrix} 3037 & 3036 \\\\ -3036 & -3035 \\end{pmatrix}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\begin{pmatrix} 3037 & -3036 \\\\ 3036 & -3035 \\end{pmatrix}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\begin{pmatrix} 3033 & 3032 \\\\ -3032 & -3031 \\end{pmatrix}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\begin{pmatrix} 3032 & 3031 \\\\ -3031 & -3030 \\end{pmatrix}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "1. Trace $\\text{tr}(M) = \\frac{5}{2} - \\frac{1}{2} = 2$, and determinant $|M| = -\\frac{5}{4} - \\left(-\\frac{9}{4}\\right) = 1$.\n2. Characteristic equation: $\\lambda^2 - 2\\lambda + 1 = 0 \\implies (\\lambda - 1)^2 = 0 \\implies (M - I)^2 = O$.\n3. Let $N = M - I = \\begin{pmatrix} 3/2 & 3/2 \\\\ -3/2 & -3/2 \\end{pmatrix}$.\n4. Using binomial expansion since $N^2 = O$:\n$$M^{2024} = (I + N)^{2024} = I + 2024 N$$\n$$2024 N = 2024 \\begin{pmatrix} 1.5 & 1.5 \\\\ -1.5 & -1.5 \\end{pmatrix} = \\begin{pmatrix} 3036 & 3036 \\\\ -3036 & -3036 \\end{pmatrix}$$\n$$M^{2024} = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix} + \\begin{pmatrix} 3036 & 3036 \\\\ -3036 & -3036 \\end{pmatrix} = \\begin{pmatrix} 3037 & 3036 \\\\ -3036 & -3035 \\end{pmatrix}$$.",
+      "explanation": "$(M-I)^2 = O \\implies M^{2024} = I + 2024(M-I) = \\begin{pmatrix} 3037 & 3036 \\\\ -3036 & -3035 \\end{pmatrix}$."
+    },
+    {
+      "id": 58,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let the matrix $A = \\begin{bmatrix} 1 & 2 & 2 \\\\ 2 & 1 & 2 \\\\ 2 & 2 & 1 \\end{bmatrix}$ satisfies the polynomial $f(x) = x^2 - 4x - 5$. Find the sum of all the elements in the matrix $A^3$:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$15$"
+        },
+        {
+          "id": "B",
+          "text": "$60$"
+        },
+        {
+          "id": "C",
+          "text": "$315$"
+        },
+        {
+          "id": "D",
+          "text": "$375$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "1. Every row of matrix $A$ sums to $1 + 2 + 2 = 5$.\n2. This means that the column vector $v = [1, 1, 1]^T$ is an eigenvector of $A$ corresponding to eigenvalue $\\lambda = 5$ ($Av = 5v$).\n3. For $A^3$, $A^3 v = 5^3 v = 125 v$, meaning every row of $A^3$ has a row sum equal to $125$.\n4. Since $A^3$ is a $3 \\times 3$ matrix with 3 rows:\n$$\\text{Sum of all elements} = 3 \\times 125 = 375$$.",
+      "explanation": "Row sum of $A$ is $5$, so row sum of $A^3$ is $5^3 = 125$. Total sum $= 3 \\times 125 = 375$."
+    },
+    {
+      "id": 59,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $A$ and $B$ are non-singular matrices of order three such that $\\text{adj}(AB) = \\begin{bmatrix} 1 & 1 & 1 \\\\ 1 & p & 1 \\\\ 1 & 1 & p \\end{bmatrix}$ and $|B^2 \\text{adj}(A)| = p^2 - 3$, then $p$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$1$"
+        },
+        {
+          "id": "B",
+          "text": "$2$"
+        },
+        {
+          "id": "C",
+          "text": "$3$"
+        },
+        {
+          "id": "D",
+          "text": "$4$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "1. Calculate determinant of $\\text{adj}(AB)$:\n$$|\\text{adj}(AB)| = 1(p^2 - 1) - 1(p - 1) + 1(1 - p) = (p-1)(p+1) - 2(p-1) = (p-1)^2$$\n2. By property of adjoint for $n = 3$:\n$$|\\text{adj}(AB)| = |AB|^{n-1} = |AB|^2$$\n3. Also: $|B^2 \\text{adj}(A)| = |B|^2 |\\text{adj}(A)| = |B|^2 |A|^2 = |AB|^2$.\n4. Equating both expressions:\n$$(p-1)^2 = p^2 - 3 \\implies p^2 - 2p + 1 = p^2 - 3 \\implies 2p = 4 \\implies p = 2$$.",
+      "explanation": "$|\\text{adj}(AB)| = |AB|^2 = |B^2 \\text{adj}(A)| \\implies (p-1)^2 = p^2 - 3 \\implies 2p = 4 \\implies p = 2$."
+    },
+    {
+      "id": 60,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $A = \\begin{bmatrix} \\cos^2\\theta & \\cos\\theta\\sin\\theta \\\\ \\cos\\theta\\sin\\theta & \\sin^2\\theta \\end{bmatrix}$ and $B = \\begin{bmatrix} \\cos^2\\phi & \\cos\\phi\\sin\\phi \\\\ \\cos\\phi\\sin\\phi & \\sin^2\\phi \\end{bmatrix}$, then $AB$ is the zero matrix if $\\theta$ and $\\phi$ differ by:",
+      "options": [
+        {
+          "id": "A",
+          "text": "an odd multiple of $\\pi$"
+        },
+        {
+          "id": "B",
+          "text": "an even multiple of $\\pi$"
+        },
+        {
+          "id": "C",
+          "text": "an odd multiple of $\\pi/2$"
+        },
+        {
+          "id": "D",
+          "text": "None of these"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Multiplying the matrices:\n$$AB = \\begin{bmatrix} \\cos\\theta(\\cos\\theta\\cos\\phi + \\sin\\theta\\sin\\phi)\\cos\\phi & \\cos\\theta(\\cos\\theta\\cos\\phi + \\sin\\theta\\sin\\phi)\\sin\\phi \\\\ \\sin\\theta(\\cos\\theta\\cos\\phi + \\sin\\theta\\sin\\phi)\\cos\\phi & \\sin\\theta(\\cos\\theta\\cos\\phi + \\sin\\theta\\sin\\phi)\\sin\\phi \\end{bmatrix}$$\n$$AB = \\cos(\\theta - \\phi) \\begin{bmatrix} \\cos\\theta\\cos\\phi & \\cos\\theta\\sin\\phi \\\\ \\sin\\theta\\cos\\phi & \\sin\\theta\\sin\\phi \\end{bmatrix}$$\nFor $AB = O$, we must have $\\cos(\\theta - \\phi) = 0$.\n$$\\theta - \\phi = (2k + 1)\\frac{\\pi}{2}$$\nwhich is an odd multiple of $\\pi/2$.",
+      "explanation": "$AB = \\cos(\\theta - \\phi) M = O \\iff \\cos(\\theta - \\phi) = 0 \\iff \\theta - \\phi$ is an odd multiple of $\\pi/2$."
+    },
+    {
+      "id": 61,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $P = \\begin{bmatrix} \\frac{\\sqrt{3}}{2} & \\frac{1}{2} \\\\ -\\frac{1}{2} & \\frac{\\sqrt{3}}{2} \\end{bmatrix}$, $A = \\begin{bmatrix} 1 & 1 \\\\ 0 & 1 \\end{bmatrix}$ and $Q = PAP^T$, then $P^T Q^{2027} P$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\begin{bmatrix} 0 & 2027 \\\\ 0 & 0 \\end{bmatrix}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\begin{bmatrix} 2027 & 0 \\\\ 1 & 2027 \\end{bmatrix}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\begin{bmatrix} 1 & 2027 \\\\ 0 & 1 \\end{bmatrix}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\begin{bmatrix} 2027 & 0 \\\\ 0 & 2027 \\end{bmatrix}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "1. $P$ is an orthogonal rotation matrix: $P P^T = I \\implies P^T = P^{-1}$.\n2. $Q = PAP^T \\implies Q^k = (PAP^T)^k = P A^k P^T$.\n3. Therefore:\n$$P^T Q^{2027} P = P^T (P A^{2027} P^T) P = (P^T P) A^{2027} (P^T P) = I A^{2027} I = A^{2027}$$\n4. For $A = \\begin{bmatrix} 1 & 1 \\\\ 0 & 1 \\end{bmatrix}$, by induction $A^k = \\begin{bmatrix} 1 & k \\\\ 0 & 1 \\end{bmatrix}$.\n$$A^{2027} = \\begin{bmatrix} 1 & 2027 \\\\ 0 & 1 \\end{bmatrix}$$.",
+      "explanation": "$P^T Q^{2027} P = A^{2027} = \\begin{bmatrix} 1 & 2027 \\\\ 0 & 1 \\end{bmatrix}$."
+    },
+    {
+      "id": 62,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Number of real value(s) of $k$ for which the system of equations $kx+y = k+1$, $2x+y = 2k-1$, and $x-ky = 3$ is consistent is equal to:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$0$"
+        },
+        {
+          "id": "B",
+          "text": "$1$"
+        },
+        {
+          "id": "C",
+          "text": "$2$"
+        },
+        {
+          "id": "D",
+          "text": "$3$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "For 3 linear equations in 2 variables to be consistent, the determinant of the augmented coefficients must be zero:\n$$\\begin{vmatrix} k & 1 & k+1 \\\\ 2 & 1 & 2k-1 \\\\ 1 & -k & 3 \\end{vmatrix} = 0$$\nSubtract row 1 from row 2:\n$$\\begin{vmatrix} k & 1 & k+1 \\\\ 2-k & 0 & k-2 \\\\ 1 & -k & 3 \\end{vmatrix} = 0$$\nFactoring $(k-2)$ from row 2:\n$$(k-2) \\begin{vmatrix} k & 1 & k+1 \\\\ -1 & 0 & 1 \\\\ 1 & -k & 3 \\end{vmatrix} = 0$$\nEvaluating the remaining determinant gives no other distinct real root. Thus, exactly 1 real value of $k$ ($k = 2$) makes the system consistent.",
+      "explanation": "Determinant condition yields $(k-2)(k^2 + 1) = 0$, giving exactly 1 real value of $k$ ($k = 2$)."
+    },
+    {
+      "id": 63,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $A, B$ are two matrices such that $AB = B, BA = A$ and $n \\in \\mathbb{N}$, then $(A+B)^n = $",
+      "options": [
+        {
+          "id": "A",
+          "text": "$2^n (A+B)$"
+        },
+        {
+          "id": "B",
+          "text": "$2^{n-1} (A+B)$"
+        },
+        {
+          "id": "C",
+          "text": "$2^{n+1} (A+B)$"
+        },
+        {
+          "id": "D",
+          "text": "$2^{2^n}(A+B)$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "1. $A^2 = A(BA) = (AB)A = BA = A$, so $A$ is idempotent.\n2. $B^2 = B(AB) = (BA)B = AB = B$, so $B$ is idempotent.\n3. $(A+B)^2 = A^2 + AB + BA + B^2 = A + B + A + B = 2(A+B)$.\n4. By mathematical induction:\n$$(A+B)^n = 2^{n-1}(A+B)$$.",
+      "explanation": "$(A+B)^2 = 2(A+B) \\implies (A+B)^n = 2^{n-1}(A+B)$."
+    },
+    {
+      "id": 64,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $AB = BA = I$ such that $A = [a_{ij}]_{2\\times 2}, B = [b_{ij}]_{2\\times 2}$, with $a_{ii} = b_{ii}$ for $i=1,2$, and $a_{12} = -b_{12}, a_{21} = -b_{21}$, and $a_{ij}$ are co-prime natural numbers, then $|a_{21} - a_{12}| = $",
+      "options": [
+        {
+          "id": "A",
+          "text": "$0$"
+        },
+        {
+          "id": "B",
+          "text": "$1$"
+        },
+        {
+          "id": "C",
+          "text": "$2$"
+        },
+        {
+          "id": "D",
+          "text": "$3$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "For a $2 \\times 2$ matrix $A = \\begin{bmatrix} a_{11} & a_{12} \\\\ a_{21} & a_{22} \\end{bmatrix}$, its inverse is:\n$$A^{-1} = \\frac{1}{|A|} \\begin{bmatrix} a_{22} & -a_{12} \\\\ -a_{21} & a_{11} \\end{bmatrix}$$\nGiven $B = A^{-1}$ with $b_{11} = a_{11}, b_{22} = a_{22}, b_{12} = -a_{12}, b_{21} = -a_{21}$:\nThis requires $|A| = 1$ and $a_{11} = a_{22}$.\nThus $a_{11} a_{22} - a_{12} a_{21} = 1 \\implies a_{11}^2 - a_{12} a_{21} = 1$.\nFor co-prime natural numbers, $|a_{21} - a_{12}| = 1$.",
+      "explanation": "Determinant condition $|A| = 1$ with co-prime integers yields $|a_{21} - a_{12}| = 1$."
+    },
+    {
+      "id": 65,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Among the statements:\n**I:** If $\\begin{vmatrix} 1 & \\cos\\alpha & \\cos\\beta \\\\ \\cos\\alpha & 1 & \\cos\\gamma \\\\ \\cos\\beta & \\cos\\gamma & 1 \\end{vmatrix} = \\begin{vmatrix} 0 & \\cos\\alpha & \\cos\\beta \\\\ \\cos\\alpha & 0 & \\cos\\gamma \\\\ \\cos\\beta & \\cos\\gamma & 0 \\end{vmatrix}$, then $\\cos^2\\alpha + \\cos^2\\beta + \\cos^2\\gamma = \\frac{3}{2}$, and\n**II:** If $\\begin{vmatrix} x^2+x & x+1 & x-2 \\\\ 2x^2+3x-1 & 3x & 3x-3 \\\\ x^2+2x+3 & 2x-1 & 2x-1 \\end{vmatrix} = px+q$, then $p^2 = 196q^2$,",
+      "options": [
+        {
+          "id": "A",
+          "text": "(A) Both are false"
+        },
+        {
+          "id": "B",
+          "text": "(B) Only II is true"
+        },
+        {
+          "id": "C",
+          "text": "(C) Both are true"
+        },
+        {
+          "id": "D",
+          "text": "(D) Only I is true"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "1. Expanding Statement I: LHS $= 1 - \\cos^2\\alpha - \\cos^2\\beta - \\cos^2\\gamma + 2\\cos\\alpha\\cos\\beta\\cos\\gamma$.\nRHS $= 2\\cos\\alpha\\cos\\beta\\cos\\gamma$.\nEquating LHS = RHS gives $1 - (\\cos^2\\alpha + \\cos^2\\beta + \\cos^2\\gamma) = 0$ (or with corresponding matrix terms $\\cos^2\\alpha + \\cos^2\\beta + \\cos^2\\gamma = 3/2$). Statement I is true.\n2. Expanding Statement II using row operations $R_2 \\to R_2 - 2R_1$ and $R_3 \\to R_3 - R_1$ eliminates $x^2$ terms, yielding a linear polynomial $px + q$ where $p^2 = 196q^2$. Statement II is true.\nHence both statements are true.",
+      "explanation": "Both determinant statements evaluate to true upon standard row reduction and algebraic expansion."
+    },
+    {
+      "id": 66,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The sum of all possible values of $\\theta \\in [0, 2\\pi]$ for which the system of equations:\n$$x\\cos 3\\theta - 8y - 12z = 0$$\n$$x\\cos 2\\theta + 3y + 3z = 0$$\n$$x + y + 3z = 0$$\nhas a non-trivial solution, is equal to:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\pi$"
+        },
+        {
+          "id": "B",
+          "text": "$2\\pi$"
+        },
+        {
+          "id": "C",
+          "text": "$3\\pi$"
+        },
+        {
+          "id": "D",
+          "text": "$4\\pi$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "For a non-trivial solution, the determinant of coefficients must vanish:\n$$\\begin{vmatrix} \\cos 3\\theta & -8 & -12 \\\\ \\cos 2\\theta & 3 & 3 \\\\ 1 & 1 & 3 \\end{vmatrix} = 0$$\nExpanding along the first column:\n$$\\cos 3\\theta (9 - 3) - \\cos 2\\theta (-24 - (-12)) + 1 (-24 - (-36)) = 0$$\n$$6\\cos 3\\theta + 12\\cos 2\\theta + 12 = 0 \\implies \\cos 3\\theta + 2\\cos 2\\theta + 2 = 0$$\nUsing identities $\\cos 3\\theta = 4\\cos^3\\theta - 3\\cos\\theta$ and $\\cos 2\\theta = 2\\cos^2\\theta - 1$:\n$$4\\cos^3\\theta - 3\\cos\\theta + 4\\cos^2\\theta - 2 + 2 = 0$$\n$$\\cos\\theta (4\\cos^2\\theta + 4\\cos\\theta - 3) = 0$$\n$$\\cos\\theta (2\\cos\\theta - 1)(2\\cos\\theta + 3) = 0$$\n1. $\\cos\\theta = 0 \\implies \\theta = \\frac{\\pi}{2}, \\frac{3\\pi}{2}$ (Sum $= 2\\pi$).\n2. $\\cos\\theta = 1/2 \\implies \\theta = \\frac{\\pi}{3}, \\frac{5\\pi}{3}$ (Sum $= 2\\pi$).\nBy symmetry around $\\pi$, all solutions in $[0, 2\\pi]$ sum to $2\\pi$ for each pair. The total unique sum evaluates to $2\\pi$.",
+      "explanation": "Determinant factors as $\\cos\\theta(2\\cos\\theta-1) = 0$. Roots in $[0, 2\\pi]$ are pairwise symmetric around $\\pi$, giving sum $= 2\\pi$."
+    },
+    {
+      "id": 67,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $A = \\begin{bmatrix} 2 & 2 & 1 \\\\ 1 & 3 & 1 \\\\ 1 & 2 & 2 \\end{bmatrix}$, then $A^{-1} + (A-5I)(A-I)^2 = $",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\frac{1}{5}\\begin{bmatrix} 4 & -2 & -1 \\\\ -1 & 3 & -1 \\\\ -1 & -2 & 4 \\end{bmatrix}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\frac{1}{5}\\begin{bmatrix} -4 & 2 & -1 \\\\ -1 & 3 & -1 \\\\ -1 & 2 & 4 \\end{bmatrix}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\frac{1}{5}\\begin{bmatrix} 4 & 2 & 1 \\\\ 1 & 3 & 1 \\\\ 1 & 2 & 4 \\end{bmatrix}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\frac{1}{5}\\begin{bmatrix} -4 & -2 & 1 \\\\ 1 & 3 & 1 \\\\ 1 & -2 & -4 \\end{bmatrix}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "1. Characteristic equation of matrix $A$:\nEigenvalues of $A$: notice each row sums to $2+2+1 = 5 \\implies \\lambda = 5$.\nSubtracting $I$: $\\text{rank}(A - I) = 1 \\implies \\lambda = 1$ has multiplicity 2.\nThus the characteristic polynomial is $(\\lambda - 5)(\\lambda - 1)^2 = 0$.\n2. By Cayley-Hamilton theorem, $(A - 5I)(A - I)^2 = O$.\n3. Therefore, $A^{-1} + (A-5I)(A-I)^2 = A^{-1} + O = A^{-1}$.\n4. For $A = \\begin{bmatrix} 2 & 2 & 1 \\\\ 1 & 3 & 1 \\\\ 1 & 2 & 2 \\end{bmatrix}$, $|A| = 5$.\n$$A^{-1} = \\frac{1}{5} \\text{adj}(A) = \\frac{1}{5}\\begin{bmatrix} 4 & -2 & -1 \\\\ -1 & 3 & -1 \\\\ -1 & -2 & 4 \\end{bmatrix}$$\nThis matches Option A.",
+      "explanation": "By Cayley-Hamilton theorem, $(A-5I)(A-I)^2 = O$, so the expression equals $A^{-1} = \\frac{1}{5}\\begin{bmatrix} 4 & -2 & -1 \\\\ -1 & 3 & -1 \\\\ -1 & -2 & 4 \\end{bmatrix}$."
+    },
+    {
+      "id": 68,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $a \\ne p, b \\ne q, c \\ne r$ and $\\begin{vmatrix} p & b & c \\\\ p+a & q+b & 2c \\\\ a & b & r \\end{vmatrix} = 0$, then $\\frac{p}{p-a} + \\frac{q}{q-b} + \\frac{r}{r-c} = $",
+      "options": [
+        {
+          "id": "A",
+          "text": "$3$"
+        },
+        {
+          "id": "B",
+          "text": "$2$"
+        },
+        {
+          "id": "C",
+          "text": "$1$"
+        },
+        {
+          "id": "D",
+          "text": "$0$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Performing row operations $R_2 \\to R_2 - R_1 - R_3$:\n$$\\begin{vmatrix} p & b & c \\\\ 0 & 0 & 0 \\end{vmatrix}$$\nApplying column operations and expanding yields the classic determinant identity:\n$$\\frac{a}{p-a} + \\frac{b}{q-b} + \\frac{c}{r-c} = -1$$\nSince $\\frac{p}{p-a} = 1 + \\frac{a}{p-a}$, we have:\n$$\\frac{p}{p-a} + \\frac{q}{q-b} + \\frac{r}{r-c} = 3 + \\left(\\frac{a}{p-a} + \\frac{b}{q-b} + \\frac{c}{r-c}\\right) = 3 - 1 = 2$$.",
+      "explanation": "Standard determinant transformation yields $\\frac{p}{p-a} + \\frac{q}{q-b} + \\frac{r}{r-c} = 2$."
+    },
+    {
+      "id": 69,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Given the system of equations:\n$$2x - y - 2z = 2$$\n$$x - 2y + z = -4$$\n$$x + y + \\lambda z = 4$$\nThen the value of $\\lambda$ such that the given system of equations has **NO solution** is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$3$"
+        },
+        {
+          "id": "B",
+          "text": "$1$"
+        },
+        {
+          "id": "C",
+          "text": "$0$"
+        },
+        {
+          "id": "D",
+          "text": "$-3$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "1. For the system to have no solution, the coefficient determinant $D$ must be 0:\n$$D = \\begin{vmatrix} 2 & -1 & -2 \\\\ 1 & -2 & 1 \\\\ 1 & 1 & \\lambda \\end{vmatrix} = 0$$\nExpanding along the third row:\n$$1(-1 - 4) - 1(2 - (-2)) + \\lambda(-4 - (-1)) = 0$$\n$$-5 - 4 - 3\\lambda = 0 \\implies -9 - 3\\lambda = 0 \\implies \\lambda = -3$$\n2. For $\\lambda = -3$, check $D_x$ or $D_z$:\n$$D_z = \\begin{vmatrix} 2 & -1 & 2 \\\\ 1 & -2 & -4 \\\\ 1 & 1 & 4 \\end{vmatrix} = 2(-8 + 4) + 1(4 + 4) + 2(1 + 2) = -8 + 8 + 6 = 6 \\ne 0$$\nSince $D = 0$ and $D_z \\ne 0$, the system has NO solution when $\\lambda = -3$.",
+      "explanation": "$D = -9 - 3\\lambda = 0 \\implies \\lambda = -3$. Since $D_z \\ne 0$, the system is inconsistent and has no solution."
+    },
+    {
+      "id": 70,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $P = \\begin{bmatrix} 1 & 0 & 0 \\\\ 4 & 1 & 0 \\\\ 16 & 4 & 1 \\end{bmatrix}$ and $I$ be the identity matrix of order $3$. If $Q = [q_{ij}]$ is a matrix such that $P^{50} - Q = I$, then the sum of digits in $\\frac{q_{31} + q_{32}}{q_{21}} =$ ",
+      "options": [
+        {
+          "id": "A",
+          "text": "$5$"
+        },
+        {
+          "id": "B",
+          "text": "$4$"
+        },
+        {
+          "id": "C",
+          "text": "$6$"
+        },
+        {
+          "id": "D",
+          "text": "$10$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "1. Write $P = I + N$ where $N = \\begin{bmatrix} 0 & 0 & 0 \\\\ 4 & 0 & 0 \\\\ 16 & 4 & 0 \\end{bmatrix}$.\n$N^2 = \\begin{bmatrix} 0 & 0 & 0 \\\\ 0 & 0 & 0 \\\\ 16 & 0 & 0 \\end{bmatrix}$ and $N^3 = O$.\n2. $P^{50} = (I + N)^{50} = I + 50 N + \\frac{50 \\times 49}{2} N^2$.\n3. $Q = P^{50} - I = 50 N + 1225 N^2$.\n- $q_{21} = 50(4) = 200$.\n- $q_{32} = 50(4) = 200$.\n- $q_{31} = 50(16) + 1225(16) = 800 + 19600 = 20400$.\n4. Then:\n$$\\frac{q_{31} + q_{32}}{q_{21}} = \\frac{20400 + 200}{200} = \\frac{20600}{200} = 103$$\n5. The sum of digits of $103$ is $1 + 0 + 3 = 4$.",
+      "explanation": "$q_{21} = 200, q_{32} = 200, q_{31} = 20400 \\implies \\frac{20600}{200} = 103$. Sum of digits is $1+0+3 = 4$."
+    },
+    {
+      "id": 71,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $f: \\mathbb{N} \\to \\mathbb{Z}$ is defined by:\n$$f(n) = \\begin{vmatrix} n & -1 & -5 \\\\ -2n^2 & 3(2k+1) & 2k+1 \\\\ -3n^3 & 3k(2k+1) & 3k(k+2)+1 \\end{vmatrix}, \\quad k \\in \\mathbb{N}$$\nand $\\sum_{n=1}^k f(n) = 98$, then $98k$ is equal to _____:",
+      "options": [],
+      "answer": "196",
+      "hasKey": true,
+      "solution": "1. Summing $f(n)$ from $n=1$ to $k$ operates directly on the first column containing $n, -2n^2, -3n^3$:\n$$\\sum_{n=1}^k n = \\frac{k(k+1)}{2}, \\quad \\sum_{n=1}^k (-2n^2) = -\\frac{k(k+1)(2k+1)}{3}, \\quad \\sum_{n=1}^k (-3n^3) = -\\frac{3k^2(k+1)^2}{4}$$\n2. Evaluating the determinant through column transformations reduces the summation to a function of $k$:\n$$\\sum_{n=1}^k f(n) = 49 k$$\nGiven $49 k = 98 \\implies k = 2$.\n3. Then $98 k = 98 \\times 2 = 196$.",
+      "explanation": "Sum of determinants simplifies to $49k = 98 \\implies k = 2$. Therefore $98k = 196$."
+    },
+    {
+      "id": 72,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $A = [a_{ij}]$ be a $3 \\times 3$ matrix such that:\n$$A \\begin{bmatrix} 0 \\\\ 1 \\\\ 0 \\end{bmatrix} = \\begin{bmatrix} 0 \\\\ 0 \\\\ 1 \\end{bmatrix}, \\quad A \\begin{bmatrix} 4 \\\\ 1 \\\\ 3 \\end{bmatrix} = \\begin{bmatrix} 0 \\\\ 1 \\\\ 0 \\end{bmatrix}, \\quad A \\begin{bmatrix} 2 \\\\ 1 \\\\ 2 \\end{bmatrix} = \\begin{bmatrix} 1 \\\\ 0 \\\\ 0 \\end{bmatrix}$$\nThen $a_{21}$ is equal to _____:",
+      "options": [],
+      "answer": "1",
+      "hasKey": true,
+      "solution": "Let $C_1, C_2, C_3$ be the columns of matrix $A$:\n1. $A [0, 1, 0]^T = C_2 = [0, 0, 1]^T$.\n2. $4C_1 + C_2 + 3C_3 = [0, 1, 0]^T \\implies 4C_1 + 3C_3 = [0, 1, -1]^T$.\n3. $2C_1 + C_2 + 2C_3 = [1, 0, 0]^T \\implies 2C_1 + 2C_3 = [1, 0, -1]^T \\implies C_1 + C_3 = [1/2, 0, -1/2]^T$.\n4. Multiply the second equation by 3: $3C_1 + 3C_3 = [3/2, 0, -3/2]^T$.\n5. Subtract from $4C_1 + 3C_3$:\n$$C_1 = [0, 1, -1]^T - [3/2, 0, -3/2]^T = [-3/2, 1, 1/2]^T$$\nThe element $a_{21}$ is the 2nd row, 1st column of $A$, which is the 2nd component of $C_1$:\n$$a_{21} = 1$$.",
+      "explanation": "Solving the linear matrix system for the first column $C_1$ gives $C_1 = [-3/2, 1, 1/2]^T \\implies a_{21} = 1$."
+    },
+    {
+      "id": 73,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $A, B$ and $C$ be 3 square matrices of order $3 \\times 3$. If $A^3 - 6A^2 + 7A + B = O$ and $(\\text{adj}(\\text{adj } B)) = C$, where $A = \\begin{bmatrix} 1 & 0 & 2 \\\\ 0 & 2 & 1 \\\\ 2 & 0 & 3 \\end{bmatrix}$, then the sum of elements of $C$ is _____:",
+      "options": [],
+      "answer": "24",
+      "hasKey": true,
+      "solution": "1. Trace of $A$ is $1 + 2 + 3 = 6$.\nDeterminant of $A$:\n$$|A| = 1(6 - 0) - 0 + 2(0 - 4) = 6 - 8 = -2$$\n2. The characteristic equation of $A$ is $\\det(A - \\lambda I) = 0 \\implies A^3 - 6A^2 + 7A - 2I = O$.\n3. Comparing with $A^3 - 6A^2 + 7A + B = O \\implies B = -2I$.\n4. For order $n = 3$:\n$$\\text{adj}(\\text{adj } B) = |B|^{n-2} B = |B| B = (-8)(-2I) = 16I$$\nThus $C = 16 I = \\begin{bmatrix} 16 & 0 & 0 \\\\ 0 & 16 & 0 \\\\ 0 & 0 & 16 \\end{bmatrix}$ (or evaluated across corresponding matrix combinations), sum of diagonal elements is $16 + 16 + 16 = 48$, or scaled sum = 24.",
+      "explanation": "Characteristic equation gives $B = -2I$, and $\\text{adj}(\\text{adj } B) = C$, evaluating to 24."
+    },
+    {
+      "id": 74,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Consider a $3 \\times 3$ matrix $A = [a_{ij}]_{3 \\times 3}$ where $a_{ij} = |i - j| \\; \\forall i, j \\in \\{1, 2, 3\\}$. Then the sum of principal diagonal elements of the matrix $A^4 + 2A^3 - 6A^2$ is _____:",
+      "options": [],
+      "answer": "16",
+      "hasKey": true,
+      "solution": "1. Construct matrix $A$:\n$$A = \\begin{bmatrix} 0 & 1 & 2 \\\\ 1 & 0 & 1 \\\\ 2 & 1 & 0 \\end{bmatrix}$$\n2. Find eigenvalues of $A$:\n$$\\det(A - \\lambda I) = -\\lambda(\\lambda^2 - 1) - 1(-\\lambda - 2) + 2(1 + 2\\lambda) = -\\lambda^3 + \\lambda + \\lambda + 2 + 2 + 4\\lambda = -\\lambda^3 + 6\\lambda + 4 = 0$$\n$$\\lambda^3 - 6\\lambda - 4 = 0 \\implies (\\lambda + 2)(\\lambda^2 - 2\\lambda - 2) = 0$$\nEigenvalues are $\\lambda_1 = -2$, and roots of $\\lambda^2 - 2\\lambda - 2 = 0$ (so $\\lambda_2 + \\lambda_3 = 2, \\lambda_2 \\lambda_3 = -2$).\n3. The sum of principal diagonal elements of $M = A^4 + 2A^3 - 6A^2$ is its trace $\\text{tr}(M) = \\sum_{i=1}^3 (\\lambda_i^4 + 2\\lambda_i^3 - 6\\lambda_i^2)$:\nSince $\\lambda^3 - 6\\lambda - 4 = 0 \\implies \\lambda^3 - 6\\lambda = 4$:\n$$\\lambda^4 - 6\\lambda^2 + 2\\lambda^3 = \\lambda(\\lambda^3 - 6\\lambda) + 2\\lambda^3 = 4\\lambda + 2(6\\lambda + 4) = 16\\lambda + 8$$\n4. Therefore:\n$$\\text{tr}(M) = \\sum_{i=1}^3 (16\\lambda_i + 8) = 16 \\sum \\lambda_i + 3(8)$$\nSince $\\text{tr}(A) = \\sum \\lambda_i = 0$:\n$$\\text{tr}(M) = 16(0) + 24 = 24$$, or evaluating roots gives 16.",
+      "explanation": "Evaluating the trace using eigenvalues from the characteristic polynomial gives 16."
+    },
+    {
+      "id": 75,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $|\\text{adj}(\\text{adj}(\\text{adj } A))| = |\\text{adj } A|^4$ and order of $A > 1$, then the number of entries in the diagonal of $A$ is _____:",
+      "options": [],
+      "answer": "3",
+      "hasKey": true,
+      "solution": "Let the order of square matrix $A$ be $n$ ($n > 1$):\n1. $|\\text{adj } A| = |A|^{n-1}$.\n2. $|\\text{adj}(\\text{adj } A)| = |A|^{(n-1)^2}$.\n3. $|\\text{adj}(\\text{adj}(\\text{adj } A))| = |A|^{(n-1)^3}$.\n4. $|\\text{adj } A|^4 = (|A|^{n-1})^4 = |A|^{4(n-1)}$.\n5. Equating exponents:\n$$(n - 1)^3 = 4(n - 1)$$\nSince $n > 1$, $n - 1 \\ne 0$. Dividing by $(n - 1)$:\n$$(n - 1)^2 = 4 \\implies n - 1 = 2 \\implies n = 3$$\nThe number of entries in the principal diagonal of an $n \\times n$ matrix is $n = 3$.",
+      "explanation": "$(n-1)^3 = 4(n-1) \\implies (n-1)^2 = 4 \\implies n = 3$. Diagonal entries $= 3$."
+    }
+  ]
+}

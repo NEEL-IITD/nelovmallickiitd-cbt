@@ -48,9 +48,10 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     jeeMainsTests.forEach((t: TestMetadata) => {
       map[t.id] = t.status;
     });
-    // PTM 01 and PTM 02 have 75 questions verified and are live
+    // PTM 01, PTM 02, and PTM 03 have 75 questions verified and are live
     map['jee-mains-ptm-01'] = 'live';
     map['jee-mains-ptm-02'] = 'live';
+    map['jee-mains-ptm-03'] = 'live';
     return map;
   }, []);
 
@@ -90,7 +91,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
 
   // Check if test has questions and is ready to attempt
   const isTestReady = (testId: string) => {
-    return testId === 'jee-mains-ptm-01' || testId === 'jee-mains-ptm-02' || liveStatusMap[testId] === 'live';
+    return testId === 'jee-mains-ptm-01' || testId === 'jee-mains-ptm-02' || testId === 'jee-mains-ptm-03' || liveStatusMap[testId] === 'live';
   };
 
   // Get student attempt count for this test
@@ -377,7 +378,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
               const started = hasStarted(item.startIso);
               const attempts = getAttemptCount(item.id);
               const countdown = formatCountdown(item.startIso);
-              const hasSyllabus = !!(item.syllabus && (item.syllabus.physics?.length || item.syllabus.chemistry?.length || item.syllabus.mathematics?.length));
+              const hasSyllabus = item.id === 'jee-mains-ptm-03' && !!(item.syllabus && ((item.syllabus.physics && item.syllabus.physics.length > 0) || (item.syllabus.chemistry && item.syllabus.chemistry.length > 0)));
 
               return (
                 <Tilt3DCard
@@ -572,7 +573,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                   const started = hasStarted(item.startIso);
                   const attempts = getAttemptCount(item.id);
                   const countdown = formatCountdown(item.startIso);
-                  const hasSyllabus = !!(item.syllabus && (item.syllabus.physics?.length || item.syllabus.chemistry?.length || item.syllabus.mathematics?.length));
+                  const hasSyllabus = item.id === 'jee-mains-ptm-03' && !!(item.syllabus && ((item.syllabus.physics && item.syllabus.physics.length > 0) || (item.syllabus.chemistry && item.syllabus.chemistry.length > 0)));
 
                   return (
                     <tr
@@ -831,7 +832,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                           Physics Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-sky-800/80 dark:text-sky-400">
-                          {previewItem.code === 'PTM 02' ? 'Thermal Physics & Heat Transfer Focus' : (previewItem.code === 'PTM 01' ? 'Thermodynamics & Kinetic Theory Focus' : 'Standard JEE Mains Pattern')}
+                          {previewItem.code === 'PTM 03' ? 'Thermal Properties of Matter & Heat Transfer Focus' : (previewItem.code === 'PTM 02' ? 'Thermal Physics & Heat Transfer Focus' : (previewItem.code === 'PTM 01' ? 'Thermodynamics & Kinetic Theory Focus' : 'Standard JEE Mains Pattern'))}
                         </p>
                       </div>
                     </div>
@@ -863,7 +864,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                           Chemistry Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-emerald-800/80 dark:text-emerald-400">
-                          {previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern')}
+                          {previewItem.code === 'PTM 03' ? 'IUPAC, General Organic Chemistry (GOC) & Isomerism Focus' : (previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern'))}
                         </p>
                       </div>
                     </div>
@@ -884,37 +885,33 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                     </ul>
                   </div>
 
-                  {/* Mathematics Syllabus Card */}
-                  <div className="rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/30 dark:bg-amber-950/20 p-5 space-y-3">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-600 dark:text-amber-300 flex items-center justify-center font-black text-xs">
-                        MA
-                      </span>
-                      <div>
-                        <h4 className="font-black text-sm text-amber-950 dark:text-amber-200">
-                          Mathematics Syllabus (25 Questions · 100 Marks)
-                        </h4>
-                        <p className="text-[11px] text-amber-800/80 dark:text-amber-400">
-                          {previewItem.code === 'PTM 02' ? 'Quadratic Equations, Inequalities & Sequences Focus' : (previewItem.code === 'PTM 01' ? 'Trigonometry & Functional Relations' : 'Standard JEE Mains Pattern')}
-                        </p>
+                  {/* Mathematics Syllabus Card - Shown only if mathematics syllabus is explicitly defined */}
+                  {previewItem.syllabus?.mathematics && previewItem.syllabus.mathematics.length > 0 && (
+                    <div className="rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/30 dark:bg-amber-950/20 p-5 space-y-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-600 dark:text-amber-300 flex items-center justify-center font-black text-xs">
+                          MA
+                        </span>
+                        <div>
+                          <h4 className="font-black text-sm text-amber-950 dark:text-amber-200">
+                            Mathematics Syllabus (25 Questions · 100 Marks)
+                          </h4>
+                          <p className="text-[11px] text-amber-800/80 dark:text-amber-400">
+                            {previewItem.code === 'PTM 02' ? 'Quadratic Equations, Inequalities & Sequences Focus' : (previewItem.code === 'PTM 01' ? 'Trigonometry & Functional Relations' : 'Standard JEE Mains Pattern')}
+                          </p>
+                        </div>
                       </div>
-                    </div>
 
-                    <ul className="space-y-2 text-xs text-slate-700 dark:text-zinc-300 pl-1">
-                      {previewItem.syllabus?.mathematics ? (
-                        previewItem.syllabus.mathematics.map((item, idx) => (
+                      <ul className="space-y-2 text-xs text-slate-700 dark:text-zinc-300 pl-1">
+                        {previewItem.syllabus.mathematics.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2.5">
                             <span className="text-amber-500 font-bold mt-0.5">•</span>
                             <span>{item}</span>
                           </li>
-                        ))
-                      ) : (
-                        <li className="flex items-start gap-2.5 text-slate-500 dark:text-zinc-400 italic">
-                          <span>Detailed Mathematics syllabus for {previewItem.code} will be published prior to the scheduled test window.</span>
-                        </li>
-                      )}
-                    </ul>
-                  </div>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                 </div>
               )}

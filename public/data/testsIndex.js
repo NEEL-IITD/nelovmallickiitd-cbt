@@ -585,6 +585,12 @@
     if (cleanId.includes('ptm01') || cleanId.includes('ptm1')) {
       return window.ptm01Data;
     }
+    if (cleanId.includes('ptm02') || cleanId.includes('ptm2')) {
+      return window.ptm02Data;
+    }
+    if (cleanId.includes('ptm03') || cleanId.includes('ptm3')) {
+      return window.ptm03Data;
+    }
     if (cleanId.includes('pta04') || cleanId.includes('pta4')) {
       return window.pta04Data;
     }
