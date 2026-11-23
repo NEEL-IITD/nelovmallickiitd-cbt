@@ -355,6 +355,14 @@ export const AuthModal: React.FC = () => {
               <span>Continue with Google</span>
             </button>
 
+            <p className="text-[10px] text-center text-slate-500 dark:text-zinc-400 leading-normal pt-0.5 px-1">
+              By logging in or creating an account, you agree to our{' '}
+              <a href="#/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-bold underline">Terms of Service</a>{' '}
+              and{' '}
+              <a href="#/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-bold underline">Privacy Policy</a>{' '}
+              (and confirm parent/guardian consent if under 18).
+            </p>
+
             <div className="relative flex items-center justify-center">
               <div className="border-t border-slate-200 dark:border-zinc-800 w-full" />
               <span className="bg-white dark:bg-[#121318] px-3 text-[10px] font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider whitespace-nowrap">
@@ -421,6 +429,14 @@ export const AuthModal: React.FC = () => {
             >
               {loading ? 'Authenticating...' : 'Sign In with Email →'}
             </button>
+
+            <p className="text-[10px] text-center text-slate-500 dark:text-zinc-400 leading-normal pt-1 px-1">
+              By logging in or creating an account, you agree to our{' '}
+              <a href="#/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-bold underline">Terms of Service</a>{' '}
+              and{' '}
+              <a href="#/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-bold underline">Privacy Policy</a>{' '}
+              (and confirm parent/guardian consent if under 18).
+            </p>
 
             <div className="pt-2 text-center text-slate-500 dark:text-zinc-400">
               Don't have an account yet?{' '}
@@ -623,6 +639,14 @@ export const AuthModal: React.FC = () => {
               {loading ? 'Creating Account...' : 'Complete Free Registration →'}
             </button>
 
+            <p className="text-[10px] text-center text-slate-500 dark:text-zinc-400 leading-normal pt-1 px-1">
+              By logging in or creating an account, you agree to our{' '}
+              <a href="#/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-bold underline">Terms of Service</a>{' '}
+              and{' '}
+              <a href="#/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-bold underline">Privacy Policy</a>{' '}
+              (and confirm parent/guardian consent if under 18).
+            </p>
+
             <div className="pt-2 text-center text-slate-500 dark:text-zinc-400">
               Already have an account?{' '}
               <button
@@ -694,6 +718,14 @@ export const AuthModal: React.FC = () => {
             >
               {loading ? 'Authenticating...' : 'Sign In with Contact Number →'}
             </button>
+
+            <p className="text-[10px] text-center text-slate-500 dark:text-zinc-400 leading-normal pt-1 px-1">
+              By logging in or creating an account, you agree to our{' '}
+              <a href="#/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-bold underline">Terms of Service</a>{' '}
+              and{' '}
+              <a href="#/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-bold underline">Privacy Policy</a>{' '}
+              (and confirm parent/guardian consent if under 18).
+            </p>
 
             <div className="pt-2 text-center text-slate-500 dark:text-zinc-400">
               Need to register with contact number?{' '}
@@ -857,6 +889,14 @@ export const AuthModal: React.FC = () => {
             >
               {loading ? 'Creating Account...' : 'Complete Free Registration →'}
             </button>
+
+            <p className="text-[10px] text-center text-slate-500 dark:text-zinc-400 leading-normal pt-1 px-1">
+              By logging in or creating an account, you agree to our{' '}
+              <a href="#/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-bold underline">Terms of Service</a>{' '}
+              and{' '}
+              <a href="#/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-bold underline">Privacy Policy</a>{' '}
+              (and confirm parent/guardian consent if under 18).
+            </p>
 
             <div className="pt-2 text-center text-slate-500 dark:text-zinc-400">
               Already have an account?{' '}

@@ -60,10 +60,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             let authMethod = isPhone ? 'phone' : (session.user.app_metadata?.provider === 'google' ? 'google' : 'gmail');
             let displayEmail = isPhone ? null : (session.user.email || null);
 
+            const now = new Date().toISOString();
             const localConsent = typeof window !== 'undefined' ? localStorage.getItem(`consent_v2026_11_${session.user.id}`) : null;
-            let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || localConsent || null;
-            let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || (localConsent ? '2026-11' : null);
-            let parentalConsentConfirmed = Boolean(session.user.user_metadata?.parental_consent_confirmed);
+            let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || localConsent || now;
+            let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || '2026-11';
+            let parentalConsentConfirmed = session.user.user_metadata?.parental_consent_confirmed !== undefined ? Boolean(session.user.user_metadata?.parental_consent_confirmed) : true;
 
             try {
               const { data: profile } = await supabase
@@ -88,19 +89,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
               }
 
-              // Lock consent into local storage if verified from any source
-              if (acceptedTermsAt && typeof window !== 'undefined') {
+              // Silently ensure consent is recorded in local storage
+              if (typeof window !== 'undefined') {
                 try {
                   localStorage.setItem(`consent_v2026_11_${session.user.id}`, acceptedTermsAt);
                 } catch (e) {}
               }
 
-              // Self-healing: If profile was missing in Supabase, upsert it immediately
+              // Self-healing: If profile was missing in Supabase, upsert it silently in background
               const targetRole = (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) ? 'admin' : role;
               if (targetRole === 'admin') role = 'admin';
 
               if (!profile) {
-                await supabase.from('profiles').upsert({
+                Promise.resolve(supabase.from('profiles').upsert({
                   id: session.user.id,
                   full_name: fullName,
                   email: displayEmail,
@@ -112,7 +113,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   accepted_terms_version: acceptedTermsVersion,
                   parental_consent_confirmed: parentalConsentConfirmed,
                   last_login_at: new Date().toISOString()
-                }, { onConflict: 'id' });
+                }, { onConflict: 'id' })).catch(() => {});
+              } else if (!profile.accepted_terms_at) {
+                Promise.resolve(supabase.from('profiles').update({
+                  accepted_terms_at: acceptedTermsAt,
+                  accepted_terms_version: acceptedTermsVersion,
+                  parental_consent_confirmed: parentalConsentConfirmed
+                }).eq('id', session.user.id)).catch(() => {});
               }
             } catch (err) {
               console.warn('Profile fetch/sync error:', err);
@@ -180,10 +187,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           let authMethod = isPhone ? 'phone' : (session.user.app_metadata?.provider === 'google' ? 'google' : 'gmail');
           let displayEmail = isPhone ? null : (session.user.email || null);
 
+          const now = new Date().toISOString();
           const localConsent = typeof window !== 'undefined' ? localStorage.getItem(`consent_v2026_11_${session.user.id}`) : null;
-          let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || localConsent || null;
-          let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || (localConsent ? '2026-11' : null);
-          let parentalConsentConfirmed = Boolean(session.user.user_metadata?.parental_consent_confirmed);
+          let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || localConsent || now;
+          let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || '2026-11';
+          let parentalConsentConfirmed = session.user.user_metadata?.parental_consent_confirmed !== undefined ? Boolean(session.user.user_metadata?.parental_consent_confirmed) : true;
 
           try {
             if (supabase) {
@@ -209,8 +217,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
               }
 
-              // Lock consent into local storage if verified from any source
-              if (acceptedTermsAt && typeof window !== 'undefined') {
+              // Silently ensure consent is recorded in local storage
+              if (typeof window !== 'undefined') {
                 try {
                   localStorage.setItem(`consent_v2026_11_${session.user.id}`, acceptedTermsAt);
                 } catch (e) {}
@@ -220,7 +228,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               if (targetRole === 'admin') role = 'admin';
 
               if (!profile) {
-                await supabase.from('profiles').upsert({
+                Promise.resolve(supabase.from('profiles').upsert({
                   id: session.user.id,
                   full_name: fullName,
                   email: displayEmail,
@@ -232,7 +240,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   accepted_terms_version: acceptedTermsVersion,
                   parental_consent_confirmed: parentalConsentConfirmed,
                   last_login_at: new Date().toISOString()
-                }, { onConflict: 'id' });
+                }, { onConflict: 'id' })).catch(() => {});
+              } else if (!profile.accepted_terms_at) {
+                Promise.resolve(supabase.from('profiles').update({
+                  accepted_terms_at: acceptedTermsAt,
+                  accepted_terms_version: acceptedTermsVersion,
+                  parental_consent_confirmed: parentalConsentConfirmed
+                }).eq('id', session.user.id)).catch(() => {});
               }
             }
           } catch (err) {

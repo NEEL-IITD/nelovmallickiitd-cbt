@@ -348,9 +348,10 @@
         let userContact = formattedPhone || data.user.user_metadata?.contact_number || null;
         let authMethod = isPhoneLogin ? 'phone' : (isGmail(authEmail) ? 'gmail' : 'email_with_phone');
         let displayEmail = isPhoneLogin ? null : authEmail;
-        let acceptedTermsAt = null;
-        let acceptedTermsVersion = null;
-        let parentalConsentConfirmed = false;
+        const localConsent = typeof window !== 'undefined' ? localStorage.getItem(`consent_v2026_11_${data.user.id}`) : null;
+        let acceptedTermsAt = data.user.user_metadata?.accepted_terms_at || localConsent || new Date().toISOString();
+        let acceptedTermsVersion = data.user.user_metadata?.accepted_terms_version || '2026-11';
+        let parentalConsentConfirmed = Boolean(data.user.user_metadata?.parental_consent_confirmed);
 
         try {
           const { data: profile } = await supabaseClient
@@ -373,6 +374,12 @@
             }
           }
 
+          if (typeof window !== 'undefined' && acceptedTermsAt) {
+            try {
+              localStorage.setItem(`consent_v2026_11_${data.user.id}`, acceptedTermsAt);
+            } catch (e) {}
+          }
+
           const targetRole = (isAdminEmail(displayEmail) || isAdminEmail(data.user.email)) ? 'admin' : role;
           if (targetRole === 'admin') role = 'admin';
 
@@ -390,6 +397,12 @@
               parental_consent_confirmed: parentalConsentConfirmed,
               last_login_at: new Date().toISOString()
             }, { onConflict: 'id' });
+          } else if (!profile.accepted_terms_at) {
+            await supabaseClient.from('profiles').update({
+              accepted_terms_at: acceptedTermsAt,
+              accepted_terms_version: acceptedTermsVersion,
+              last_login_at: new Date().toISOString()
+            }).eq('id', data.user.id);
           }
         } catch (e) {
           console.warn('Profile sync notice:', e);
@@ -1798,8 +1811,8 @@
       let authMethod = isPhone ? 'phone' : (session.user.app_metadata?.provider === 'google' ? 'google' : 'gmail');
       let displayEmail = isPhone ? null : session.user.email;
       const localConsent = typeof window !== 'undefined' ? localStorage.getItem(`consent_v2026_11_${session.user.id}`) : null;
-      let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || localConsent || null;
-      let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || (localConsent ? '2026-11' : null);
+      let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || localConsent || new Date().toISOString();
+      let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || '2026-11';
       let parentalConsentConfirmed = Boolean(session.user.user_metadata?.parental_consent_confirmed);
 
       try {
@@ -1851,6 +1864,12 @@
             parental_consent_confirmed: parentalConsentConfirmed,
             last_login_at: new Date().toISOString()
           }, { onConflict: 'id' });
+        } else if (!profile.accepted_terms_at) {
+          await supabaseClient.from('profiles').update({
+            accepted_terms_at: acceptedTermsAt,
+            accepted_terms_version: acceptedTermsVersion,
+            last_login_at: new Date().toISOString()
+          }).eq('id', session.user.id);
         }
       } catch (e) {
         console.warn('Profile sync notice on login:', e);

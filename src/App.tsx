@@ -39,10 +39,9 @@ import { Disclaimer } from './components/legal/Disclaimer';
 import { CopyrightPolicy } from './components/legal/CopyrightPolicy';
 import { AccountPrivacy } from './components/legal/AccountPrivacy';
 import { StorageNotice } from './components/legal/StorageNotice';
-import { TermsAcceptanceModal } from './components/legal/TermsAcceptanceModal';
 
 export const AppContent: React.FC = () => {
-  const { user, isCloudConnected, openAuthModal, acceptTerms, logOut } = useAuth();
+  const { user, isCloudConnected, openAuthModal } = useAuth();
 
   // Global State
   const [exam, setExam] = useState<ExamType>('jee');
@@ -281,16 +280,6 @@ export const AppContent: React.FC = () => {
 
       {/* Lightweight Essential Storage / Cookie Notice */}
       <StorageNotice />
-
-      {/* First-Time Google Sign-In & DPDP Terms Consent Modal */}
-      <TermsAcceptanceModal
-        isOpen={Boolean(user && !user.acceptedTermsAt && !(typeof window !== 'undefined' && localStorage.getItem(`consent_v2026_11_${user.id}`)))}
-        userName={user?.name}
-        onAccept={async (parentalConsent) => {
-          await acceptTerms('2026-11', parentalConsent);
-        }}
-        onSignOut={logOut}
-      />
 
     </div>
   );
