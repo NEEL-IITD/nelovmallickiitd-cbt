@@ -9604,12 +9604,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         const headers = ['Full Name', 'Gmail / Email', 'Contact Number', 'Login Method', 'Target Exam', 'Role', 'Joined Date', 'Unique Tests Given', 'Total Attempts', 'Tests Breakdown', 'Avg Score %', 'Lectures Completed', 'Bookmarks'];
         const rows = students.map((s) => {
           const sId = s.id;
-          const studentAttempts = allAttempts.filter((a) => (a.userId === sId || a.user_id === sId) || (s.email && (a.studentEmail === s.email || a.email === s.email)));
+          const studentAttempts = allAttempts.filter((a) => (a.userId === sId || a.user_id === sId) || (s.email && (a.studentEmail === s.email || a.email === s.email)) || (s.contact_number && (a.studentContact === s.contact_number || a.contactNumber === s.contact_number)));
           const uniqueTests = new Set(studentAttempts.map(a => a.testCode || a.code || a.testId)).size;
 
           const attemptCountByTest = {};
           studentAttempts.forEach(a => {
-            const code = a.testCode || a.code || (a.testId ? a.testId.replace('jee-mains-', '').replace('jee-advanced-', '').toUpperCase() : 'Test');
+            const rawCode = a.testCode || a.code || (a.testId ? a.testId.replace('jee-mains-', '').replace('jee-advanced-', '').toUpperCase() : 'PTM 01');
+            const code = rawCode.replace('-', ' ').trim();
             attemptCountByTest[code] = (attemptCountByTest[code] || 0) + 1;
           });
           const breakdown = Object.entries(attemptCountByTest).map(([c, count]) => `${c} (${count}/3)`).join('; ') || 'No tests yet';
@@ -10040,24 +10041,44 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           {/* Main Content Area */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 
-            {/* Supabase Cloud Connection / RLS Warning Banner */}
-            {supabaseError && (
-              <div className="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">⚠️</span>
-                  <div>
-                    <p className="font-bold text-xs uppercase tracking-wider text-amber-700 dark:text-amber-400">Database Connection Notice</p>
-                    <p className="text-xs">{supabaseError} — Showing local/cached student records if available.</p>
-                  </div>
+            {/* Supabase Live Status & Force Refresh Bar */}
+            <div className="mb-6 p-4 rounded-2xl bg-white dark:bg-[#121318] border border-slate-200 dark:border-zinc-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <span className={`inline-block w-2.5 h-2.5 rounded-full ${isCloudConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
+                  <span className="text-xs font-bold text-slate-700 dark:text-zinc-200">
+                    {isCloudConnected ? 'Supabase Live Connected' : 'Offline / Cache Mode'}
+                  </span>
                 </div>
-                <button
-                  onClick={() => loadData()}
-                  className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap"
-                >
-                  <span>↻</span> Retry Supabase Sync
-                </button>
+                <span className="text-slate-300 dark:text-zinc-700">|</span>
+                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300">
+                  {students.length} Student Profiles
+                </span>
+                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                  {allAttempts.length} Total Attempts
+                </span>
+                {supabaseError && (
+                  <span className="text-xs text-rose-600 dark:text-rose-400 font-medium">
+                    ⚠️ {supabaseError}
+                  </span>
+                )}
               </div>
-            )}
+              <button
+                onClick={async () => {
+                  setLoading(true);
+                  if (window.studentStorage?.syncLocalAttemptsToSupabase) {
+                    try {
+                      await window.studentStorage.syncLocalAttemptsToSupabase();
+                    } catch (e) {}
+                  }
+                  await loadData();
+                }}
+                disabled={loading}
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-2 whitespace-nowrap"
+              >
+                <span>🔄</span> Force Refresh From Supabase
+              </button>
+            </div>
 
             {/* 1. OVERVIEW & ANALYTICS TAB */}
             {adminTab === 'overview' && (
@@ -10288,13 +10309,14 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         ) : (
                           filteredStudents.map((s, idx) => {
                             const sId = s.id;
-                            const studentAttempts = allAttempts.filter((a) => (a.userId === sId || a.user_id === sId) || (s.email && (a.studentEmail === s.email || a.email === s.email)));
+                            const studentAttempts = allAttempts.filter((a) => (a.userId === sId || a.user_id === sId) || (s.email && (a.studentEmail === s.email || a.email === s.email)) || (s.contact_number && (a.studentContact === s.contact_number || a.contactNumber === s.contact_number)));
                             const uniqueTestsCount = new Set(studentAttempts.map(a => a.testCode || a.code || a.testId)).size;
 
                             // Count attempts per test
                             const testCountMap = {};
                             studentAttempts.forEach(a => {
-                              const code = a.testCode || a.code || (a.testId ? a.testId.replace('jee-mains-', '').replace('jee-advanced-', '').toUpperCase() : 'Test');
+                              const rawCode = a.testCode || a.code || (a.testId ? a.testId.replace('jee-mains-', '').replace('jee-advanced-', '').toUpperCase() : 'PTM 01');
+                              const code = rawCode.replace('-', ' ').trim();
                               testCountMap[code] = (testCountMap[code] || 0) + 1;
                             });
                             const breakdownBadges = Object.entries(testCountMap).map(([tCode, count]) => ({

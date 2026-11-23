@@ -625,18 +625,35 @@
       // Canonical test ID normalization (e.g. ptm-01 -> jee-mains-ptm-01, pta-04 -> jee-advanced-pta-04)
       const rawTestKey = String(attemptRecord.testId || attemptRecord.testCode || '').toLowerCase().trim();
       let canonicalTestId = attemptRecord.testId || '';
+      let canonicalCode = attemptRecord.testCode || attemptRecord.code || '';
       const mPtm = rawTestKey.match(/ptm[-\s_]?0?(\d+)/);
       if (mPtm) {
         const num = String(parseInt(mPtm[1], 10)).padStart(2, '0');
         canonicalTestId = `jee-mains-ptm-${num}`;
+        canonicalCode = `PTM ${num}`;
       } else {
         const mPta = rawTestKey.match(/pta[-\s_]?0?(\d+)/);
         if (mPta) {
           const num = String(parseInt(mPta[1], 10)).padStart(2, '0');
           canonicalTestId = `jee-advanced-pta-${num}`;
+          canonicalCode = `PTA ${num}`;
         }
       }
-      if (!canonicalTestId) canonicalTestId = attemptRecord.testId || 'jee-mains-ptm-01';
+      if (!canonicalTestId) {
+        canonicalTestId = attemptRecord.testId || 'jee-mains-ptm-01';
+        canonicalCode = 'PTM 01';
+      }
+
+      // Resolve live authenticated Supabase user ID if available
+      let effectiveUserId = userId;
+      if (window.authService?.isCloudConnected() && supabaseClient) {
+        try {
+          const { data: authData } = await supabaseClient.auth.getUser();
+          if (authData?.user?.id && uuidRegex.test(authData.user.id)) {
+            effectiveUserId = authData.user.id;
+          }
+        } catch (e) {}
+      }
 
       // 1. Save to local storage cache immediately
       try {
@@ -648,31 +665,48 @@
           attempts.unshift(attemptRecord);
         }
         localStorage.setItem(`nelov_${userId}_attempts`, JSON.stringify(attempts));
+        if (effectiveUserId !== userId) {
+          localStorage.setItem(`nelov_${effectiveUserId}_attempts`, JSON.stringify(attempts));
+        }
       } catch (e) {}
 
-      // 2. Cloud sync to Supabase public.test_attempts with retry
-      if (window.authService.isCloudConnected() && supabaseClient) {
+      // 2. Cloud sync to Supabase public.test_attempts with profile pre-check and retry
+      if (window.authService?.isCloudConnected() && supabaseClient && uuidRegex.test(effectiveUserId)) {
+        // Pre-check / upsert student profile so foreign key constraint test_attempts_user_id_fkey is satisfied
+        try {
+          const profileName = attemptRecord.candidateName || attemptRecord.studentName || 'JEE Aspirant';
+          const profileEmail = attemptRecord.email || attemptRecord.studentEmail || null;
+          await supabaseClient.from('profiles').upsert({
+            id: effectiveUserId,
+            full_name: profileName,
+            email: profileEmail,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'id', ignoreDuplicates: true });
+        } catch (pe) {
+          console.warn('[Supabase] profile pre-check notice:', pe);
+        }
+
         const timeSec = attemptRecord.timeTakenSeconds || (attemptRecord.timeSpentTotal ? Math.round(attemptRecord.timeSpentTotal) : 0);
         const payload = {
           id: attemptUuid,
-          user_id: userId,
+          user_id: effectiveUserId,
           test_id: canonicalTestId,
           exam_type: attemptRecord.examType || (canonicalTestId.includes('mains') ? 'JEE Mains' : 'JEE Advanced'),
-          code: attemptRecord.testCode || (canonicalTestId.includes('ptm') ? canonicalTestId.replace('jee-mains-', '').toUpperCase() : canonicalTestId.replace('jee-advanced-', '').toUpperCase()),
+          code: canonicalCode,
           obtained_marks: Number(attemptRecord.totalMarksScored ?? attemptRecord.obtainedMarks ?? 0),
           total_marks: Number(attemptRecord.totalMaxMarks ?? attemptRecord.totalMarks ?? 300),
           percentage: Number(attemptRecord.percentage ?? 0),
           accuracy: Number(attemptRecord.accuracy ?? 0),
           time_taken_seconds: timeSec,
           estimated_rank_label: attemptRecord.predictedAirDisplay || 'AIR Qualified',
-          subject_breakdown: attemptRecord.subjectStats || {},
+          subject_breakdown: attemptRecord.subjectStats || attemptRecord.subjectBreakdown || {},
           responses: attemptRecord.responses || {},
           time_per_question: attemptRecord.timePerQuestion || {},
           mistake_tags: {
             ...(attemptRecord.mistakeTags || {}),
             submission_trigger: attemptRecord.submissionTrigger || 'manual'
           },
-          submitted_at: attemptRecord.completedAt || new Date().toISOString()
+          submitted_at: attemptRecord.completedAt || attemptRecord.submittedAt || new Date().toISOString()
         };
 
         let savedCloud = false;
@@ -693,7 +727,192 @@
             await new Promise(r => setTimeout(r, 600));
           }
         }
+
+        if (!savedCloud) {
+          try {
+            const qKey = 'nelov_pending_sync_attempts';
+            const rawQ = localStorage.getItem(qKey);
+            const q = rawQ ? JSON.parse(rawQ) : [];
+            if (!q.some(item => item.id === attemptUuid)) {
+              q.push({ ...attemptRecord, id: attemptUuid, userId: effectiveUserId, testId: canonicalTestId, testCode: canonicalCode });
+              localStorage.setItem(qKey, JSON.stringify(q));
+            }
+          } catch (qe) {}
+        }
+      } else {
+        try {
+          const qKey = 'nelov_pending_sync_attempts';
+          const rawQ = localStorage.getItem(qKey);
+          const q = rawQ ? JSON.parse(rawQ) : [];
+          if (!q.some(item => item.id === attemptUuid)) {
+            q.push({ ...attemptRecord, id: attemptUuid, userId: effectiveUserId, testId: canonicalTestId, testCode: canonicalCode });
+            localStorage.setItem(qKey, JSON.stringify(q));
+          }
+        } catch (qe) {}
       }
+    },
+    async syncLocalAttemptsToSupabase() {
+      if (!window.authService?.isCloudConnected() || !supabaseClient) {
+        return { synced: 0, pending: 0 };
+      }
+
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      let authUser = null;
+      try {
+        const { data: authData } = await supabaseClient.auth.getUser();
+        authUser = authData?.user;
+      } catch (e) {}
+
+      if (!authUser || !authUser.id || !uuidRegex.test(authUser.id)) {
+        return { synced: 0, pending: 0 };
+      }
+
+      // Collect local attempt candidates from pending sync and all student storage keys
+      const candidates = [];
+      const seenCandIds = new Set();
+      try {
+        const qRaw = localStorage.getItem('nelov_pending_sync_attempts');
+        if (qRaw) {
+          const list = JSON.parse(qRaw);
+          if (Array.isArray(list)) {
+            list.forEach(item => {
+              if (item && !seenCandIds.has(item.id)) {
+                if (item.id) seenCandIds.add(item.id);
+                candidates.push(item);
+              }
+            });
+          }
+        }
+
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('nelov_') && key.endsWith('_attempts')) {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const list = JSON.parse(raw);
+              if (Array.isArray(list)) {
+                list.forEach(item => {
+                  if (item && item.id && !seenCandIds.has(item.id)) {
+                    seenCandIds.add(item.id);
+                    candidates.push(item);
+                  }
+                });
+              }
+            }
+          }
+        }
+      } catch (e) {}
+
+      if (candidates.length === 0) return { synced: 0, pending: 0 };
+
+      // Ensure profile row exists
+      try {
+        await supabaseClient.from('profiles').upsert({
+          id: authUser.id,
+          full_name: authUser.user_metadata?.full_name || 'JEE Aspirant',
+          email: authUser.email || null,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'id', ignoreDuplicates: true });
+      } catch (pe) {}
+
+      // Check existing attempts in Supabase for this user
+      const existingIds = new Set();
+      try {
+        const { data: userAttempts } = await supabaseClient
+          .from('test_attempts')
+          .select('id')
+          .eq('user_id', authUser.id);
+        if (Array.isArray(userAttempts)) {
+          userAttempts.forEach(a => existingIds.add(a.id));
+        }
+      } catch (e) {}
+
+      let syncedCount = 0;
+      for (const attempt of candidates) {
+        let attId = attempt.id;
+        if (!attId || !uuidRegex.test(attId)) {
+          attId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+            const r = Math.random() * 16 | 0;
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+          });
+          attempt.id = attId;
+        }
+
+        if (existingIds.has(attId)) continue;
+
+        // Canonical test ID and code
+        const rawTestKey = String(attempt.testId || attempt.testCode || '').toLowerCase().trim();
+        let canonicalTestId = attempt.testId || '';
+        let canonicalCode = attempt.testCode || attempt.code || '';
+        const mPtm = rawTestKey.match(/ptm[-\s_]?0?(\d+)/);
+        if (mPtm) {
+          const num = String(parseInt(mPtm[1], 10)).padStart(2, '0');
+          canonicalTestId = `jee-mains-ptm-${num}`;
+          canonicalCode = `PTM ${num}`;
+        } else {
+          const mPta = rawTestKey.match(/pta[-\s_]?0?(\d+)/);
+          if (mPta) {
+            const num = String(parseInt(mPta[1], 10)).padStart(2, '0');
+            canonicalTestId = `jee-advanced-pta-${num}`;
+            canonicalCode = `PTA ${num}`;
+          }
+        }
+        if (!canonicalTestId) {
+          canonicalTestId = 'jee-mains-ptm-01';
+          canonicalCode = 'PTM 01';
+        }
+
+        const timeSec = attempt.timeTakenSeconds || (attempt.timeSpentTotal ? Math.round(attempt.timeSpentTotal) : 0);
+        const payload = {
+          id: attId,
+          user_id: authUser.id,
+          test_id: canonicalTestId,
+          exam_type: attempt.examType || (canonicalTestId.includes('mains') ? 'JEE Mains' : 'JEE Advanced'),
+          code: canonicalCode,
+          obtained_marks: Number(attempt.totalMarksScored ?? attempt.obtainedMarks ?? 0),
+          total_marks: Number(attempt.totalMaxMarks ?? attempt.totalMarks ?? 300),
+          percentage: Number(attempt.percentage ?? 0),
+          accuracy: Number(attempt.accuracy ?? 0),
+          time_taken_seconds: timeSec,
+          estimated_rank_label: attempt.predictedAirDisplay || 'AIR Qualified',
+          subject_breakdown: attempt.subjectStats || attempt.subjectBreakdown || {},
+          responses: attempt.responses || {},
+          time_per_question: attempt.timePerQuestion || {},
+          mistake_tags: {
+            ...(attempt.mistakeTags || {}),
+            submission_trigger: attempt.submissionTrigger || 'manual',
+            sync_recovery: true
+          },
+          submitted_at: attempt.completedAt || attempt.submittedAt || new Date().toISOString()
+        };
+
+        try {
+          const { error } = await supabaseClient.from('test_attempts').insert(payload);
+          if (!error) {
+            existingIds.add(attId);
+            syncedCount++;
+          }
+        } catch (err) {}
+      }
+
+      // Clean up synced items from pending sync queue
+      try {
+        const qRaw = localStorage.getItem('nelov_pending_sync_attempts');
+        if (qRaw) {
+          const list = JSON.parse(qRaw);
+          if (Array.isArray(list)) {
+            const remaining = list.filter(item => !existingIds.has(item.id));
+            if (remaining.length > 0) {
+              localStorage.setItem('nelov_pending_sync_attempts', JSON.stringify(remaining));
+            } else {
+              localStorage.removeItem('nelov_pending_sync_attempts');
+            }
+          }
+        }
+      } catch (e) {}
+
+      console.log(`[Supabase] syncLocalAttemptsToSupabase finished. Synced ${syncedCount} attempts.`);
+      return { synced: syncedCount, existing: existingIds.size };
     },
 
     getAttempts(userId) {
@@ -707,32 +926,65 @@
     },
 
     async getAllAttempts() {
-      // Unified query: Supabase Cloud + Local Storage merge
+      // 2-phase resilient query: test_attempts + profiles mapping
       const allAttempts = [];
       const seenIds = new Set();
+      let cloudQuerySucceeded = false;
 
       if (window.authService && window.authService.isCloudConnected() && supabaseClient) {
         try {
-          const { data, error } = await supabaseClient
+          // Query 1: test_attempts
+          const { data: attemptsData, error: attError } = await supabaseClient
             .from('test_attempts')
-            .select(`
-              *,
-              profiles:user_id (
-                full_name,
-                email,
-                contact_number,
-                auth_method
-              )
-            `)
+            .select('*')
             .order('submitted_at', { ascending: false });
 
-          if (!error && Array.isArray(data)) {
-            data.forEach(d => {
+          if (attError) {
+            console.error('[Supabase] studentStorage.getAllAttempts error:', attError.message);
+            this._lastAttemptsError = attError;
+          } else {
+            this._lastAttemptsError = null;
+            cloudQuerySucceeded = true;
+          }
+
+          // Query 2: profiles lookup
+          const { data: profilesData, error: profError } = await supabaseClient
+            .from('profiles')
+            .select('*');
+
+          if (profError) {
+            console.warn('[Supabase] studentStorage.getAllAttempts profiles warning:', profError.message);
+            this._lastProfilesError = profError;
+          } else {
+            this._lastProfilesError = null;
+          }
+
+          const profilesMap = {};
+          if (Array.isArray(profilesData)) {
+            profilesData.forEach(p => {
+              if (p.id) profilesMap[p.id] = p;
+            });
+          }
+
+          if (Array.isArray(attemptsData)) {
+            attemptsData.forEach(d => {
               seenIds.add(d.id);
-              const rawEmail = d.profiles?.email || '';
+              const p = profilesMap[d.user_id] || {};
+              const rawEmail = p.email || '';
               const isSynthetic = rawEmail.endsWith('@phone.nelovportal.local');
-              const studentName = d.profiles?.full_name || 'Student Aspirant';
-              const code = d.code || (d.test_id ? d.test_id.replace('jee-mains-', '').replace('jee-advanced-', '').toUpperCase() : 'PTM 01');
+              const studentName = p.full_name || p.name || 'JEE Aspirant';
+              
+              const rawId = String(d.test_id || '').toLowerCase();
+              let code = d.code || '';
+              if (rawId.includes('ptm')) {
+                const m = rawId.match(/ptm[-\s_]?0?(\d+)/i);
+                code = m ? `PTM ${m[1].padStart(2, '0')}` : (code || 'PTM 01');
+              } else if (rawId.includes('pta')) {
+                const m = rawId.match(/pta[-\s_]?0?(\d+)/i);
+                code = m ? `PTA ${m[1].padStart(2, '0')}` : (code || 'PTA 04');
+              } else if (!code) {
+                code = 'PTM 01';
+              }
 
               allAttempts.push({
                 id: d.id,
@@ -743,11 +995,11 @@
                 userName: studentName,
                 studentEmail: isSynthetic ? '' : rawEmail,
                 email: isSynthetic ? '' : rawEmail,
-                studentContact: d.profiles?.contact_number || '',
-                contactNumber: d.profiles?.contact_number || '',
-                authMethod: d.profiles?.auth_method || (d.profiles?.contact_number ? 'phone' : 'gmail'),
+                studentContact: p.contact_number || '',
+                contactNumber: p.contact_number || '',
+                authMethod: p.auth_method || (p.contact_number ? 'phone' : 'gmail'),
                 testId: d.test_id,
-                examType: d.exam_type,
+                examType: d.exam_type || (rawId.includes('mains') ? 'JEE Mains' : 'JEE Advanced'),
                 testCode: code,
                 code: code,
                 obtainedMarks: Number(d.obtained_marks ?? 0),
@@ -761,16 +1013,16 @@
                 estimatedRankLabel: d.estimated_rank_label,
                 predictedAirDisplay: d.estimated_rank_label,
                 subjectStats: d.subject_breakdown || {},
+                subjectBreakdown: d.subject_breakdown || {},
                 responses: d.responses || {},
+                mistakeTags: d.mistake_tags || {},
                 submittedAt: d.submitted_at,
                 completedAt: d.submitted_at
               });
             });
-          } else if (error) {
-            console.warn('[Supabase] studentStorage.getAllAttempts error:', error.message);
           }
         } catch (e) {
-          console.warn('[Supabase] studentStorage.getAllAttempts exception:', e);
+          console.error('[Supabase] studentStorage.getAllAttempts exception:', e);
         }
       }
 
@@ -778,19 +1030,33 @@
       try {
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
-          if (key && key.startsWith('nelov_') && key.endsWith('_attempts')) {
+          if (key && (key.startsWith('nelov_') && key.endsWith('_attempts') || key === 'nelov_pending_sync_attempts')) {
             const uId = key.replace('nelov_', '').replace('_attempts', '');
             const raw = localStorage.getItem(key);
             if (raw) {
               const list = JSON.parse(raw);
               if (Array.isArray(list)) {
                 list.forEach(item => {
-                  if (!item.id || !seenIds.has(item.id)) {
-                    if (item.id) seenIds.add(item.id);
+                  if (item && item.id && !seenIds.has(item.id)) {
+                    seenIds.add(item.id);
+                    const rawId = String(item.testId || item.testCode || '').toLowerCase();
+                    let code = item.testCode || item.code || '';
+                    if (rawId.includes('ptm')) {
+                      const m = rawId.match(/ptm[-\s_]?0?(\d+)/i);
+                      code = m ? `PTM ${m[1].padStart(2, '0')}` : (code || 'PTM 01');
+                    } else if (rawId.includes('pta')) {
+                      const m = rawId.match(/pta[-\s_]?0?(\d+)/i);
+                      code = m ? `PTA ${m[1].padStart(2, '0')}` : (code || 'PTA 04');
+                    } else if (!code) {
+                      code = 'PTM 01';
+                    }
+
                     allAttempts.push({
                       ...item,
                       userId: item.userId || uId,
                       user_id: item.userId || uId,
+                      testCode: code,
+                      code: code,
                       obtainedMarks: Number(item.totalMarksScored ?? item.obtainedMarks ?? 0),
                       totalMarksScored: Number(item.totalMarksScored ?? item.obtainedMarks ?? 0),
                       totalMarks: Number(item.totalMaxMarks ?? item.totalMarks ?? 300),
@@ -806,8 +1072,8 @@
         }
       } catch (e) {}
 
-      if (allAttempts.length === 0) {
-        // Resilient fallback attempts for offline / pre-migration demo
+      // ONLY show demo fallback if totally offline or cloud failed completely and local is empty
+      if (!cloudQuerySucceeded && allAttempts.length === 0) {
         const demoAttempts = [
           {
             id: '00000000-0000-4000-a000-000000000001',
@@ -868,96 +1134,6 @@
             attemptCount: 1,
             submittedAt: '2026-11-22T11:15:00.000Z',
             completedAt: '2026-11-22T11:15:00.000Z'
-          },
-          {
-            id: '00000000-0000-4000-a000-000000000003',
-            userId: 'b33a3cd1-f022-45b8-981b-186df5946825',
-            user_id: 'b33a3cd1-f022-45b8-981b-186df5946825',
-            studentName: 'Kartiki Apparao Mali',
-            candidateName: 'Kartiki Apparao Mali',
-            userName: 'Kartiki Apparao Mali',
-            studentEmail: 'kartikimali00@gmail.com',
-            email: 'kartikimali00@gmail.com',
-            studentContact: '+91 97654 32109',
-            contactNumber: '+91 97654 32109',
-            testId: 'jee-mains-ptm-01',
-            testCode: 'PTM 01',
-            code: 'PTM 01',
-            examType: 'JEE Mains',
-            obtainedMarks: 242,
-            totalMarksScored: 242,
-            totalMarks: 300,
-            totalMaxMarks: 300,
-            percentage: 80.67,
-            accuracy: 88.0,
-            timeTakenSeconds: 10450,
-            time_taken_seconds: 10450,
-            estimatedRankLabel: 'AIR 650 - 980',
-            predictedAirDisplay: 'AIR 650 - 980',
-            attemptNumber: 1,
-            attemptCount: 1,
-            submittedAt: '2026-11-22T12:00:00.000Z',
-            completedAt: '2026-11-22T12:00:00.000Z'
-          },
-          {
-            id: '00000000-0000-4000-a000-000000000004',
-            userId: 'usr_demo_04',
-            user_id: 'usr_demo_04',
-            studentName: 'Aarav Patel',
-            candidateName: 'Aarav Patel',
-            userName: 'Aarav Patel',
-            studentEmail: 'aarav.patel@gmail.com',
-            email: 'aarav.patel@gmail.com',
-            studentContact: '+91 99887 76655',
-            contactNumber: '+91 99887 76655',
-            testId: 'jee-mains-ptm-01',
-            testCode: 'PTM 01',
-            code: 'PTM 01',
-            examType: 'JEE Mains',
-            obtainedMarks: 230,
-            totalMarksScored: 230,
-            totalMarks: 300,
-            totalMaxMarks: 300,
-            percentage: 76.67,
-            accuracy: 85.2,
-            timeTakenSeconds: 10600,
-            time_taken_seconds: 10600,
-            estimatedRankLabel: 'AIR 1100 - 1600',
-            predictedAirDisplay: 'AIR 1100 - 1600',
-            attemptNumber: 1,
-            attemptCount: 1,
-            submittedAt: '2026-11-22T12:45:00.000Z',
-            completedAt: '2026-11-22T12:45:00.000Z'
-          },
-          {
-            id: '00000000-0000-4000-a000-000000000005',
-            userId: 'usr_demo_05',
-            user_id: 'usr_demo_05',
-            studentName: 'Priya Verma',
-            candidateName: 'Priya Verma',
-            userName: 'Priya Verma',
-            studentEmail: 'priya.verma@gmail.com',
-            email: 'priya.verma@gmail.com',
-            studentContact: '+91 98712 34567',
-            contactNumber: '+91 98712 34567',
-            testId: 'jee-mains-ptm-01',
-            testCode: 'PTM 01',
-            code: 'PTM 01',
-            examType: 'JEE Mains',
-            obtainedMarks: 218,
-            totalMarksScored: 218,
-            totalMarks: 300,
-            totalMaxMarks: 300,
-            percentage: 72.67,
-            accuracy: 82.5,
-            timeTakenSeconds: 10750,
-            time_taken_seconds: 10750,
-            estimatedRankLabel: 'AIR 1800 - 2400',
-            predictedAirDisplay: 'AIR 1800 - 2400',
-            attemptNumber: 1,
-            attemptCount: 1,
-            submittedAt: '2026-11-22T13:20:00.000Z',
-            completedAt: '2026-11-22T13:20:00.000Z'
           }
         ];
         allAttempts.push(...demoAttempts);
@@ -1909,6 +2085,11 @@
         createdAt: session.user.created_at
       };
       window.authService.setActiveSession(user);
+      if (window.studentStorage?.syncLocalAttemptsToSupabase) {
+        window.studentStorage.syncLocalAttemptsToSupabase().catch(err => {
+          console.warn('[Sync] Auto-recovery sync notice on login:', err);
+        });
+      }
 
       const saved = sessionStorage.getItem(REDIRECT_KEY);
       if (saved) {
