@@ -1368,23 +1368,28 @@ GRANT SELECT ON public.vault_theory_notes TO anon, authenticated;
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'storage' AND table_name = 'objects') THEN
-    ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+    BEGIN
+      DROP POLICY IF EXISTS "Public Select Storage Objects" ON storage.objects;
+      DROP POLICY IF EXISTS "Admin Insert Storage Objects" ON storage.objects;
+      DROP POLICY IF EXISTS "Admin Update Storage Objects" ON storage.objects;
+      DROP POLICY IF EXISTS "Admin Delete Storage Objects" ON storage.objects;
 
-    DROP POLICY IF EXISTS "Public Select Storage Objects" ON storage.objects;
-    DROP POLICY IF EXISTS "Admin Insert Storage Objects" ON storage.objects;
-    DROP POLICY IF EXISTS "Admin Update Storage Objects" ON storage.objects;
-    DROP POLICY IF EXISTS "Admin Delete Storage Objects" ON storage.objects;
+      CREATE POLICY "Public Select Storage Objects"
+        ON storage.objects FOR SELECT USING (true);
 
-    CREATE POLICY "Public Select Storage Objects"
-      ON storage.objects FOR SELECT USING (true);
+      CREATE POLICY "Admin Insert Storage Objects"
+        ON storage.objects FOR INSERT WITH CHECK ((SELECT public.is_admin()));
 
-    CREATE POLICY "Admin Insert Storage Objects"
-      ON storage.objects FOR INSERT WITH CHECK ((SELECT public.is_admin()));
+      CREATE POLICY "Admin Update Storage Objects"
+        ON storage.objects FOR UPDATE USING ((SELECT public.is_admin())) WITH CHECK ((SELECT public.is_admin()));
 
-    CREATE POLICY "Admin Update Storage Objects"
-      ON storage.objects FOR UPDATE USING ((SELECT public.is_admin())) WITH CHECK ((SELECT public.is_admin()));
-
-    CREATE POLICY "Admin Delete Storage Objects"
-      ON storage.objects FOR DELETE USING ((SELECT public.is_admin()));
+      CREATE POLICY "Admin Delete Storage Objects"
+        ON storage.objects FOR DELETE USING ((SELECT public.is_admin()));
+    EXCEPTION
+      WHEN insufficient_privilege THEN
+        RAISE NOTICE 'Notice: storage.objects policy update skipped due to role privileges.';
+      WHEN OTHERS THEN
+        RAISE NOTICE 'Notice on storage.objects: %', SQLERRM;
+    END;
   END IF;
 END $$;
