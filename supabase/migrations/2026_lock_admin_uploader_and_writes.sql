@@ -8,10 +8,9 @@
 -- 3. Ensure mallicknelov@gmail.com profile is set to role = 'admin'.
 -- 4. Add BEFORE INSERT OR UPDATE trigger on public.profiles to prevent role escalation.
 -- 5. Tighten RLS on public.profiles to prevent self-elevation to admin.
--- 6. Enforce strict public.is_admin() write policies on public.test_configs,
---    public.vault_exercises, and public.vault_theory_notes while keeping SELECT public.
--- 7. Secure Supabase Storage (storage.objects) so SELECT is public, but INSERT,
---    UPDATE, and DELETE are strictly restricted to public.is_admin().
+-- 6. Enforce strict public.is_admin() write policies on public.test_configs.
+-- 7. Ensure public.vault_exercises & public.vault_theory_notes tables exist and lock write access.
+-- 8. Secure Supabase Storage (storage.objects) so SELECT is public, but write is strictly admin.
 -- ==============================================================================
 
 -- 1. Lock public.is_admin() strictly to mallicknelov@gmail.com
@@ -88,9 +87,7 @@ CREATE POLICY "profiles_update_policy"
     OR (auth.uid() = id AND (role = 'student' OR LOWER(COALESCE(email, '')) = 'mallicknelov@gmail.com'))
   );
 
--- 6. Lock Write Access on Content Tables to public.is_admin() Only
-
--- 6A. public.test_configs
+-- 6. Lock Write Access on public.test_configs
 DROP POLICY IF EXISTS "test_configs_admin_write" ON public.test_configs;
 DROP POLICY IF EXISTS "test_configs_admin_insert" ON public.test_configs;
 DROP POLICY IF EXISTS "test_configs_admin_update" ON public.test_configs;
@@ -102,55 +99,115 @@ CREATE POLICY "test_configs_admin_write"
   USING ((SELECT public.is_admin()))
   WITH CHECK ((SELECT public.is_admin()));
 
--- 6B. public.vault_exercises
+-- ==============================================================================
+-- 7. Ensure Vault Tables Exist & Enforce Strict RLS
+-- ==============================================================================
+
+-- 7A. public.vault_exercises
+CREATE TABLE IF NOT EXISTS public.vault_exercises (
+  id TEXT PRIMARY KEY,
+  subject TEXT NOT NULL CHECK (subject IN ('physics', 'chemistry', 'mathematics')),
+  chapter_id TEXT NOT NULL,
+  chapter_name TEXT,
+  exercise_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  duration_minutes INT NOT NULL DEFAULT 60,
+  default_marking JSONB NOT NULL DEFAULT '{"correct": 4, "incorrect": -1, "unattempted": 0}'::jsonb,
+  questions JSONB NOT NULL DEFAULT '[]'::jsonb,
+  total_questions INT NOT NULL DEFAULT 0,
+  total_marks NUMERIC NOT NULL DEFAULT 0,
+  uploaded_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_vault_exercises_subject ON public.vault_exercises(subject);
+CREATE INDEX IF NOT EXISTS idx_vault_exercises_chapter ON public.vault_exercises(chapter_id);
+CREATE INDEX IF NOT EXISTS idx_vault_exercises_lookup ON public.vault_exercises(subject, chapter_id, exercise_id);
+CREATE INDEX IF NOT EXISTS idx_vault_exercises_updated ON public.vault_exercises(updated_at DESC);
+
+ALTER TABLE public.vault_exercises ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public read access for vault exercises" ON public.vault_exercises;
 DROP POLICY IF EXISTS "Admins can insert vault exercises" ON public.vault_exercises;
 DROP POLICY IF EXISTS "Admins can update vault exercises" ON public.vault_exercises;
 DROP POLICY IF EXISTS "Admins can delete vault exercises" ON public.vault_exercises;
+DROP POLICY IF EXISTS "vault_exercises_select_public" ON public.vault_exercises;
 DROP POLICY IF EXISTS "vault_exercises_admin_insert" ON public.vault_exercises;
 DROP POLICY IF EXISTS "vault_exercises_admin_update" ON public.vault_exercises;
 DROP POLICY IF EXISTS "vault_exercises_admin_delete" ON public.vault_exercises;
 
+CREATE POLICY "vault_exercises_select_public"
+  ON public.vault_exercises FOR SELECT
+  USING (true);
+
 CREATE POLICY "vault_exercises_admin_insert"
-  ON public.vault_exercises
-  FOR INSERT
+  ON public.vault_exercises FOR INSERT
   WITH CHECK ((SELECT public.is_admin()));
 
 CREATE POLICY "vault_exercises_admin_update"
-  ON public.vault_exercises
-  FOR UPDATE
+  ON public.vault_exercises FOR UPDATE
   USING ((SELECT public.is_admin()))
   WITH CHECK ((SELECT public.is_admin()));
 
 CREATE POLICY "vault_exercises_admin_delete"
-  ON public.vault_exercises
-  FOR DELETE
+  ON public.vault_exercises FOR DELETE
   USING ((SELECT public.is_admin()));
 
--- 6C. public.vault_theory_notes
+GRANT SELECT ON public.vault_exercises TO anon, authenticated;
+
+-- 7B. public.vault_theory_notes
+CREATE TABLE IF NOT EXISTS public.vault_theory_notes (
+  id TEXT PRIMARY KEY,
+  subject TEXT NOT NULL CHECK (subject IN ('physics', 'chemistry', 'mathematics')),
+  chapter_id TEXT NOT NULL,
+  chapter_name TEXT,
+  title TEXT NOT NULL,
+  pdf_url TEXT NOT NULL,
+  file_name TEXT,
+  file_size_bytes BIGINT DEFAULT 0,
+  uploaded_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_vault_theory_subject ON public.vault_theory_notes(subject);
+CREATE INDEX IF NOT EXISTS idx_vault_theory_chapter ON public.vault_theory_notes(chapter_id);
+CREATE INDEX IF NOT EXISTS idx_vault_theory_lookup ON public.vault_theory_notes(subject, chapter_id);
+
+ALTER TABLE public.vault_theory_notes ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public read access for vault theory notes" ON public.vault_theory_notes;
 DROP POLICY IF EXISTS "Admins can insert vault theory notes" ON public.vault_theory_notes;
 DROP POLICY IF EXISTS "Admins can update vault theory notes" ON public.vault_theory_notes;
 DROP POLICY IF EXISTS "Admins can delete vault theory notes" ON public.vault_theory_notes;
+DROP POLICY IF EXISTS "vault_theory_notes_select_public" ON public.vault_theory_notes;
 DROP POLICY IF EXISTS "vault_theory_notes_admin_insert" ON public.vault_theory_notes;
 DROP POLICY IF EXISTS "vault_theory_notes_admin_update" ON public.vault_theory_notes;
 DROP POLICY IF EXISTS "vault_theory_notes_admin_delete" ON public.vault_theory_notes;
 
+CREATE POLICY "vault_theory_notes_select_public"
+  ON public.vault_theory_notes FOR SELECT
+  USING (true);
+
 CREATE POLICY "vault_theory_notes_admin_insert"
-  ON public.vault_theory_notes
-  FOR INSERT
+  ON public.vault_theory_notes FOR INSERT
   WITH CHECK ((SELECT public.is_admin()));
 
 CREATE POLICY "vault_theory_notes_admin_update"
-  ON public.vault_theory_notes
-  FOR UPDATE
+  ON public.vault_theory_notes FOR UPDATE
   USING ((SELECT public.is_admin()))
   WITH CHECK ((SELECT public.is_admin()));
 
 CREATE POLICY "vault_theory_notes_admin_delete"
-  ON public.vault_theory_notes
-  FOR DELETE
+  ON public.vault_theory_notes FOR DELETE
   USING ((SELECT public.is_admin()));
 
--- 7. Supabase Storage (storage.objects) RLS Policies
+GRANT SELECT ON public.vault_theory_notes TO anon, authenticated;
+
+-- ==============================================================================
+-- 8. Supabase Storage (storage.objects) RLS Policies
+-- ==============================================================================
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'storage' AND table_name = 'objects') THEN
