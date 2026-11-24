@@ -741,7 +741,8 @@
           estimated_rank_label: attemptRecord.predictedAirDisplay || 'AIR Qualified',
           subject_breakdown: attemptRecord.subjectStats || attemptRecord.subjectBreakdown || {},
           responses: attemptRecord.responses || {},
-          time_per_question: attemptRecord.timePerQuestion || {},
+          time_per_question: attemptRecord.questionTimings || attemptRecord.question_timings || attemptRecord.timePerQuestion || {},
+          question_timings: attemptRecord.questionTimings || attemptRecord.question_timings || attemptRecord.timePerQuestion || {},
           mistake_tags: {
             ...(attemptRecord.mistakeTags || {}),
             submission_trigger: attemptRecord.submissionTrigger || 'manual'
@@ -755,6 +756,11 @@
             const { data, error } = await supabaseClient.from('test_attempts').insert(payload);
             if (error) {
               console.warn(`[Supabase] saveAttempt try ${tryIdx + 1} warning:`, error.message);
+              // Fallback: If DB schema does not have question_timings column yet, retry insert without it
+              if (payload.question_timings && (error.status === 400 || error.code === '42703' || error.message?.includes('question_timings'))) {
+                console.warn('[Supabase] question_timings column missing in DB, retrying without question_timings...');
+                delete payload.question_timings;
+              }
               // Handle 401 JWT expiration on long 3-hour tests by refreshing session and retrying
               if (error.status === 401 || error.message?.includes('JWT') || error.message?.includes('token') || error.message?.includes('expired') || error.message?.includes('auth')) {
                 console.log('[Supabase] Re-authenticating / refreshing session for retry...');
@@ -940,7 +946,8 @@
           estimated_rank_label: attempt.predictedAirDisplay || 'AIR Qualified',
           subject_breakdown: attempt.subjectStats || attempt.subjectBreakdown || {},
           responses: attempt.responses || {},
-          time_per_question: attempt.timePerQuestion || {},
+          time_per_question: attempt.questionTimings || attempt.question_timings || attempt.timePerQuestion || {},
+          question_timings: attempt.questionTimings || attempt.question_timings || attempt.timePerQuestion || {},
           mistake_tags: {
             ...(attempt.mistakeTags || {}),
             submission_trigger: attempt.submissionTrigger || 'manual',
@@ -950,7 +957,12 @@
         };
 
         try {
-          const { error } = await supabaseClient.from('test_attempts').insert(payload);
+          let { error } = await supabaseClient.from('test_attempts').insert(payload);
+          if (error && payload.question_timings && (error.status === 400 || error.code === '42703' || error.message?.includes('question_timings'))) {
+            delete payload.question_timings;
+            const res2 = await supabaseClient.from('test_attempts').insert(payload);
+            error = res2.error;
+          }
           if (!error) {
             existingIds.add(attId);
             syncedCount++;

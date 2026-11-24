@@ -303,6 +303,7 @@ CREATE TABLE IF NOT EXISTS public.test_attempts (
   subject_breakdown JSONB NOT NULL DEFAULT '{}'::jsonb,
   responses JSONB NOT NULL DEFAULT '{}'::jsonb,
   time_per_question JSONB NOT NULL DEFAULT '{}'::jsonb,
+  question_timings JSONB NOT NULL DEFAULT '{}'::jsonb,
   mistake_tags JSONB NOT NULL DEFAULT '{}'::jsonb,
   submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

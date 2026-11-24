@@ -7173,6 +7173,342 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       );
     }
 
+    // COMPONENT: Flagship Time & Efficiency Analytics Dashboard with Time-Sink Question Detector
+    function TimeAndEfficiencyDashboard({ evaluationData, onNavigateToQuestion }) {
+      if (!evaluationData) return null;
+      const ev = evaluationData;
+      const breakdown = ev.questionBreakdown || [];
+      const subjectStats = ev.subjectStats || {};
+
+      // Check if per-question timing data exists
+      const hasTimingData = breakdown.some(q => q.timeSpent > 0);
+
+      // Classifications
+      const criticalTimeSinks = breakdown.filter(q => q.timeSpent > 180 && (q.status === 'incorrect' || q.status === 'unattempted'));
+      const slowOvertimeCorrect = breakdown.filter(q => q.timeSpent > 210 && q.status === 'correct');
+      const rushedMistakes = breakdown.filter(q => q.timeSpent > 0 && q.timeSpent < 25 && q.status === 'incorrect');
+
+      const totalTimeSinkSec = criticalTimeSinks.reduce((sum, q) => sum + (q.timeSpent || 0), 0);
+      const totalNegativeMarksLost = criticalTimeSinks
+        .filter(q => q.status === 'incorrect')
+        .reduce((sum, q) => {
+          const neg = (q.question && q.question.marking && q.question.marking.negative !== undefined) ? q.question.marking.negative : 1;
+          return sum + neg;
+        }, 0);
+
+      const subjects = ['Physics', 'Chemistry', 'Mathematics'].filter(s => subjectStats[s]);
+      const totalTestTimeSec = Object.values(subjectStats).reduce((sum, s) => sum + (s.timeSpent || 0), 0) || 1;
+
+      const subjectMetrics = subjects.map(subj => {
+        const s = subjectStats[subj] || { scored: 0, max: 100, attempted: 0, correct: 0, partial: 0, incorrect: 0, timeSpent: 0 };
+        const timeSec = s.timeSpent || 0;
+        const timePct = totalTestTimeSec > 0 ? Math.round((timeSec / totalTestTimeSec) * 100) : 0;
+        const marks = s.scored || 0;
+        const maxMarks = s.max || 100;
+        const marksPct = maxMarks > 0 ? Math.round((marks / maxMarks) * 100) : 0;
+        const acc = s.attempted > 0 ? Math.round(((s.correct + s.partial) / s.attempted) * 100) : 0;
+        const avgTimePerAttQ = s.attempted > 0 ? Math.round(timeSec / s.attempted) : 0;
+        const effScore = timeSec > 0 ? Number(((marks / (timeSec / 600))).toFixed(1)) : 0;
+        return {
+          subject: subj,
+          timeSec,
+          timePct,
+          marks,
+          maxMarks,
+          marksPct,
+          accuracy: acc,
+          attempted: s.attempted,
+          avgTimePerAttQ,
+          effScore
+        };
+      });
+
+      // Plain-English Smart Insight Generator
+      let smartInsight = null;
+      if (hasTimingData && subjectMetrics.length >= 2) {
+        const sortedByRoi = [...subjectMetrics].sort((a, b) => b.effScore - a.effScore);
+        const highest = sortedByRoi[0];
+        const lowest = sortedByRoi[sortedByRoi.length - 1];
+
+        if (highest.effScore > 0 && highest.subject !== lowest.subject) {
+          smartInsight = (
+            <span>
+              <strong>{highest.subject}</strong> was your highest-ROI subject — delivering <strong>{highest.marks} marks</strong> in {highest.timePct}% of your exam time (<strong>{highest.effScore} marks per 10 min</strong>). In contrast, <strong>{lowest.subject}</strong> yielded {lowest.effScore} marks per 10 min ({lowest.timePct}% time for {lowest.marks} marks). Strategy Tip: Solve your high-confidence questions in {highest.subject} early to build confidence and secure a safe time buffer for {lowest.subject}.
+            </span>
+          );
+        } else if (highest.effScore <= 0) {
+          smartInsight = (
+            <span>
+              Strategy Tip: Focus on question selection during round 1 to convert your invested time into positive marks and eliminate negative marking across all subjects.
+            </span>
+          );
+        }
+      }
+
+      const sortedTimeSinks = [...criticalTimeSinks].sort((a, b) => (b.timeSpent || 0) - (a.timeSpent || 0));
+
+      return (
+        <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] p-6 sm:p-8 shadow-sm space-y-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-zinc-800 pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold flex items-center justify-center text-base">
+                  ⚡
+                </span>
+                <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-zinc-50">
+                  Time & Efficiency Analytics
+                </h3>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
+                Subject-wise pacing efficiency, marks-per-minute ROI & Time-Sink question detection
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 font-mono">
+                Total Time: {formatDuration(totalTestTimeSec)}
+              </span>
+            </div>
+          </div>
+
+          {!hasTimingData ? (
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs text-slate-500 dark:text-zinc-400 flex items-center gap-3">
+              <span className="text-base">ℹ️</span>
+              <p>
+                Time-per-question analytics are available for tests submitted after this update. Previous submissions only recorded overall total duration.
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Dynamic Plain-English Smart Insight Banner */}
+              {smartInsight && (
+                <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-900/50 text-xs sm:text-sm text-indigo-950 dark:text-indigo-200 flex items-start gap-3 leading-relaxed shadow-xs">
+                  <span className="text-lg leading-none flex-shrink-0">💡</span>
+                  <div>{smartInsight}</div>
+                </div>
+              )}
+
+              {/* Subject-Wise Time vs. Marks Split (3 Cards) */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+                  Subject Pacing & Efficiency Split
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {subjectMetrics.map(sm => (
+                    <div
+                      key={sm.subject}
+                      className="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800/80 bg-slate-50/50 dark:bg-zinc-900/40 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-800/60 transition-colors"
+                    >
+                      <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-zinc-800 pb-2">
+                        <span className="font-extrabold text-sm text-slate-900 dark:text-zinc-100">{sm.subject}</span>
+                        <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+                          {sm.effScore} marks / 10m
+                        </span>
+                      </div>
+
+                      <div className="space-y-2 text-xs">
+                        <div className="flex justify-between text-slate-600 dark:text-zinc-400">
+                          <span>Time Spent:</span>
+                          <span className="font-mono font-bold text-slate-900 dark:text-zinc-100">
+                            {formatDuration(sm.timeSec)} ({sm.timePct}%)
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-slate-600 dark:text-zinc-400">
+                          <span>Marks Scored:</span>
+                          <span className="font-mono font-bold text-slate-900 dark:text-zinc-100">
+                            {sm.marks} / {sm.maxMarks} ({sm.marksPct}%)
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-slate-600 dark:text-zinc-400">
+                          <span>Accuracy:</span>
+                          <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                            {sm.accuracy}% ({sm.attempted} Qs)
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-slate-600 dark:text-zinc-400 pt-1 border-t border-slate-200/50 dark:border-zinc-800/60">
+                          <span>Avg Time / Attempted Q:</span>
+                          <span className="font-mono font-bold text-slate-700 dark:text-zinc-300">
+                            {sm.avgTimePerAttQ > 0 ? formatDuration(sm.avgTimePerAttQ) : '—'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Visual Comparison Bar Chart (% Time Spent vs % Marks Scored) */}
+              <div className="p-5 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/40 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
+                  <div className="flex items-center gap-4 font-bold">
+                    <span className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
+                      <span className="w-3 h-3 rounded-sm bg-indigo-500 inline-block" /> % Time Spent
+                    </span>
+                    <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+                      <span className="w-3 h-3 rounded-sm bg-emerald-500 inline-block" /> % Marks Yield
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-slate-400">
+                    High-yielding subjects have Marks bar higher than Time bar
+                  </span>
+                </div>
+
+                <div className="space-y-3 pt-1">
+                  {subjectMetrics.map(sm => (
+                    <div key={sm.subject} className="space-y-1.5 text-xs">
+                      <div className="flex justify-between font-bold">
+                        <span className="text-slate-800 dark:text-zinc-200">{sm.subject}</span>
+                        <span className="font-mono text-[11px] text-slate-500">
+                          Time: {sm.timePct}% · Marks: {sm.marksPct}%
+                        </span>
+                      </div>
+                      <div className="space-y-1">
+                        {/* Time Spent Bar */}
+                        <div className="h-2 bg-slate-200/60 dark:bg-zinc-800 rounded-full overflow-hidden flex">
+                          <div
+                            className="h-full bg-indigo-500 rounded-full transition-all duration-500"
+                            style={{ width: `${Math.min(100, Math.max(2, sm.timePct))}%` }}
+                            title={`Time: ${sm.timePct}%`}
+                          />
+                        </div>
+                        {/* Marks Yield Bar */}
+                        <div className="h-2 bg-slate-200/60 dark:bg-zinc-800 rounded-full overflow-hidden flex">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${sm.marksPct >= sm.timePct ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                            style={{ width: `${Math.min(100, Math.max(2, sm.marksPct))}%` }}
+                            title={`Marks: ${sm.marksPct}%`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Time-Sink Question Detector Section */}
+              <div className="space-y-4 pt-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+                    Time-Sink Question Detector
+                  </h4>
+                  <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-500">
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-500" /> &gt;3m Waste</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500" /> &gt;3.5m Overtime</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-500" /> &lt;25s Rushed</span>
+                  </div>
+                </div>
+
+                {/* Spotlight Card */}
+                {criticalTimeSinks.length > 0 ? (
+                  <div className="rounded-2xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/60 dark:bg-rose-950/20 p-5 space-y-4 shadow-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-rose-200/60 dark:border-rose-900/40 pb-3">
+                      <div>
+                        <div className="flex items-center gap-2 text-rose-700 dark:text-rose-300 font-extrabold text-sm sm:text-base">
+                          <span>🔥</span>
+                          <span>Time-Sink Trap Spotlight: {criticalTimeSinks.length} Question{criticalTimeSinks.length > 1 ? 's' : ''} Identified</span>
+                        </div>
+                        <p className="text-xs text-rose-600 dark:text-rose-400 mt-0.5">
+                          You spent <strong>{formatDuration(totalTimeSinkSec)}</strong> across these {criticalTimeSinks.length} questions ({totalNegativeMarksLost > 0 ? `losing -${totalNegativeMarksLost} negative marks` : 'scoring 0 marks'}).
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 font-mono text-xs font-bold text-rose-700 dark:text-rose-300 bg-white/80 dark:bg-rose-900/40 px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-800">
+                        <span>Time Trapped:</span>
+                        <span>{formatDuration(totalTimeSinkSec)}</span>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-slate-600 dark:text-zinc-300 leading-relaxed">
+                      Time-Sinks are questions where you invested over 3 minutes without scoring positive marks. Nelov Mallick's Rule: if you cannot map a complete solution path within 90 seconds, flag the question, move on, and return only after picking all low-hanging fruits.
+                    </p>
+
+                    {/* Scrollable list of Time-Sink questions */}
+                    <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                      {sortedTimeSinks.map((item) => {
+                        const qObj = item.question;
+                        const isInc = item.status === 'incorrect';
+                        const neg = (qObj.marking && qObj.marking.negative !== undefined) ? qObj.marking.negative : 1;
+                        return (
+                          <div
+                            key={qObj.id}
+                            className="p-3 rounded-xl bg-white dark:bg-[#12131a] border border-rose-200/80 dark:border-rose-900/50 flex items-center justify-between gap-3 text-xs shadow-xs"
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <span className="w-7 h-7 rounded-lg bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 font-bold flex items-center justify-center flex-shrink-0 text-xs">
+                                Q{qObj.id}
+                              </span>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-bold text-slate-800 dark:text-zinc-100">{qObj.subject}</span>
+                                  <span className="text-[10px] text-slate-400 font-medium">({qObj.section || 'Sec 1'})</span>
+                                </div>
+                                <div className="text-[11px] text-rose-600 dark:text-rose-400 font-medium flex items-center gap-2">
+                                  <span>Time: <strong>{formatDuration(item.timeSpent)}</strong></span>
+                                  <span>·</span>
+                                  <span>{isInc ? `Incorrect (-${neg})` : 'Skipped (0)'}</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => onNavigateToQuestion && onNavigateToQuestion(qObj.id)}
+                              className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-colors flex items-center gap-1 shadow-xs flex-shrink-0"
+                            >
+                              <span>Review Q{qObj.id}</span>
+                              <span>→</span>
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/60 dark:bg-emerald-950/20 p-5 space-y-2 shadow-xs">
+                    <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-extrabold text-sm sm:text-base">
+                      <span>🌟</span>
+                      <span>Clean Time Discipline — Zero 3+ Minute Time-Sink Traps!</span>
+                    </div>
+                    <p className="text-xs text-emerald-800 dark:text-emerald-300 leading-relaxed">
+                      Flawless time discipline! You did not linger over 3 minutes on any question that yielded 0 or negative marks. Maintaining this calm time awareness guarantees that you will reach every solvable question in your paper.
+                    </p>
+                  </div>
+                )}
+
+                {/* Additional Pacing Badges (Overtime Correct & Rushed Mistakes) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div className="p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">⏳</span>
+                      <div>
+                        <p className="font-bold text-slate-800 dark:text-zinc-200">Overtime Correct (&gt;3.5m)</p>
+                        <p className="text-[11px] text-slate-500">Correct answers that required extra time</p>
+                      </div>
+                    </div>
+                    <span className="font-mono font-extrabold px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                      {slowOvertimeCorrect.length} Qs
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">⚡</span>
+                      <div>
+                        <p className="font-bold text-slate-800 dark:text-zinc-200">Rushed Mistakes (&lt;25s)</p>
+                        <p className="text-[11px] text-slate-500">Fast incorrect choices (hasty reads)</p>
+                      </div>
+                    </div>
+                    <span className="font-mono font-extrabold px-2.5 py-1 rounded-lg bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
+                      {rushedMistakes.length} Qs
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      );
+    }
+
     // COMPONENT: Question-Type Performance & Accuracy Chart
     function QuestionTypePerformanceChart({ questionTypeStats }) {
       if (!questionTypeStats) return null;
@@ -11014,6 +11350,18 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                 const timeStr = att.timeTakenSeconds ? `${Math.floor(att.timeTakenSeconds / 60)}m ${att.timeTakenSeconds % 60}s` : '—';
                                 const istDate = new Date(att.submittedAt || att.completedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
 
+                                const sb = att.subject_breakdown || att.subjectStats || {};
+                                const qTimes = att.question_timings || att.questionTimings || att.time_per_question || {};
+                                const pTime = sb.Physics?.timeSpent ? Math.round(sb.Physics.timeSpent / 60) + 'm' : null;
+                                const cTime = sb.Chemistry?.timeSpent ? Math.round(sb.Chemistry.timeSpent / 60) + 'm' : null;
+                                const mTime = sb.Mathematics?.timeSpent ? Math.round(sb.Mathematics.timeSpent / 60) + 'm' : null;
+                                let timeSinksAdminCount = 0;
+                                if (Array.isArray(att.questionBreakdown)) {
+                                  timeSinksAdminCount = att.questionBreakdown.filter(q => q.timeSpent > 180 && (q.status === 'incorrect' || q.status === 'unattempted')).length;
+                                } else if (qTimes && typeof qTimes === 'object' && Object.keys(qTimes).length > 0) {
+                                  timeSinksAdminCount = Object.values(qTimes).filter(t => Number(t) > 180).length;
+                                }
+
                                 return (
                                   <div key={att.id || i} className="p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs hover:bg-slate-50 dark:hover:bg-zinc-900/40 transition-colors">
                                     <div>
@@ -11026,6 +11374,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                       <p className="text-[10px] text-slate-500 pt-0.5">
                                         Submitted: {istDate} IST · Time: {timeStr}
                                       </p>
+                                      {(pTime || cTime || mTime || Object.keys(qTimes).length > 0) && (
+                                        <p className="text-[10px] font-mono font-medium text-slate-500 pt-0.5">
+                                          Phy: {pTime || '—'} · Chem: {cTime || '—'} · Maths: {mTime || '—'} · Time-Sinks: <span className={timeSinksAdminCount > 0 ? "text-rose-600 font-bold" : "text-emerald-600 font-bold"}>{timeSinksAdminCount}</span>
+                                        </p>
+                                      )}
                                     </div>
                                     <div className="text-left sm:text-right">
                                       <p className="font-mono font-bold text-slate-900 dark:text-zinc-100">
@@ -15377,6 +15730,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const answersRef = useRef({});
       const statusesRef = useRef({});
       const questionTimesRef = useRef({});
+      const questionTimingsRef = useRef({});
+      const activeQuestionEnteredAtRef = useRef(Date.now());
       const hasSubmittedRef = useRef(false);
       const timerIntervalRef = useRef(null);
       const examEndTimeRef = useRef(null);
@@ -15702,10 +16057,26 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const currentQuestionsRef = useRef(currentQuestions);
       useEffect(() => { currentQuestionsRef.current = currentQuestions; }, [currentQuestions]);
 
+      // Ref-based Per-Question Timing Flush & Accumulation
+      const flushCurrentQuestionTime = (targetQId) => {
+        const qId = targetQId !== undefined && targetQId !== null
+          ? targetQId
+          : (currentQuestion ? currentQuestion.id : null);
+        if (qId === null || qId === undefined) return;
+        const now = Date.now();
+        const entered = activeQuestionEnteredAtRef.current || now;
+        const elapsed = Math.max(0, Math.round((now - entered) / 1000));
+        const key = String(qId);
+        questionTimingsRef.current[key] = (questionTimingsRef.current[key] || 0) + elapsed;
+        questionTimesRef.current[key] = questionTimingsRef.current[key];
+        activeQuestionEnteredAtRef.current = now;
+      };
+
       // Synchronize Live Answers & Statuses to Operational Refs and Local Draft
       const syncSessionDraft = (newAnswers, newStatuses) => {
         if (!currentUser || !activeTestId) return;
         try {
+          flushCurrentQuestionTime();
           const draft = {
             candidateName: currentUser.name,
             activeTestId,
@@ -15714,7 +16085,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             currentQIndex: currentQIndexRef.current,
             timeLeft: timeLeftRef.current,
             examEndTime: examEndTimeRef.current,
-            questionTimes: questionTimesRef.current
+            questionTimes: questionTimingsRef.current,
+            questionTimings: questionTimingsRef.current
           };
           window.studentStorage?.saveSession(currentUser.id, activeTestId, draft);
         } catch (e) {
@@ -15777,22 +16149,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
         timerIntervalRef.current = setInterval(updateTimer, 500);
 
-        // Per-question time accumulation (every 1s)
-        const qTimeInterval = setInterval(() => {
-          if (hasSubmittedRef.current || view !== 'exam') return;
-          const qs = currentQuestionsRef.current;
-          const idx = currentQIndexRef.current;
-          const q = qs && qs[idx];
-          if (!q) return;
-          questionTimesRef.current = {
-            ...questionTimesRef.current,
-            [q.id]: (questionTimesRef.current[q.id] || 0) + 1
-          };
-          setQuestionTimes(questionTimesRef.current);
-        }, 1000);
-
         const handleVisibilityOrFocus = () => {
           updateTimer();
+          if (view === 'exam') {
+            flushCurrentQuestionTime();
+          }
         };
         document.addEventListener('visibilitychange', handleVisibilityOrFocus);
         window.addEventListener('focus', handleVisibilityOrFocus);
@@ -15802,7 +16163,6 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             clearInterval(timerIntervalRef.current);
             timerIntervalRef.current = null;
           }
-          clearInterval(qTimeInterval);
           document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
           window.removeEventListener('focus', handleVisibilityOrFocus);
         };
@@ -15893,6 +16253,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         answersRef.current = {};
         statusesRef.current = {};
         questionTimesRef.current = {};
+        questionTimingsRef.current = {};
+        activeQuestionEnteredAtRef.current = Date.now();
         hasSubmittedRef.current = false;
         setIsSubmitting(false);
         setSubmitTrigger(null);
@@ -15905,13 +16267,16 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         // Check for saved session scoped strictly to this user
         const saved = window.studentStorage.getSession(user.id, canonicalId);
         if (saved && saved.responses) {
+          const restoredTimings = saved.questionTimings || saved.questionTimes || {};
           answersRef.current = { ...saved.responses };
           statusesRef.current = { ...(saved.statuses || {}) };
-          questionTimesRef.current = { ...(saved.questionTimes || {}) };
+          questionTimesRef.current = { ...restoredTimings };
+          questionTimingsRef.current = { ...restoredTimings };
+          activeQuestionEnteredAtRef.current = Date.now();
           setResponses(saved.responses);
           setStatuses(saved.statuses || {});
           setCurrentQIndex(saved.currentQIndex || 0);
-          setQuestionTimes(saved.questionTimes || {});
+          setQuestionTimes(restoredTimings);
 
           const isOngoingSession = Boolean(
             (saved.examEndTime && saved.examEndTime > Date.now()) ||
@@ -15943,6 +16308,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           answersRef.current = {};
           statusesRef.current = {};
           questionTimesRef.current = {};
+          questionTimingsRef.current = {};
+          activeQuestionEnteredAtRef.current = Date.now();
           setResponses({});
           setStatuses({});
           setQuestionTimes({});
@@ -15965,6 +16332,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         hasSubmittedRef.current = false;
         setIsSubmitting(false);
         setSubmitTrigger(null);
+        activeQuestionEnteredAtRef.current = Date.now();
 
         const durationSec = (currentPaper?.durationMinutes || 180) * 60;
         if (!examEndTimeRef.current || examEndTimeRef.current <= Date.now()) {
@@ -16059,6 +16427,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       // Palette Actions
       const handleSaveAndNext = () => {
         if (!currentQuestion) return;
+        flushCurrentQuestionTime();
         const qId = currentQuestion.id;
         const resp = answersRef.current[qId];
         const hasAnswer = isQuestionAttempted(resp);
@@ -16087,6 +16456,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       const handleMarkForReviewAndNext = () => {
         if (!currentQuestion) return;
+        flushCurrentQuestionTime();
         const qId = currentQuestion.id;
         const resp = answersRef.current[qId];
         const hasAnswer = isQuestionAttempted(resp);
@@ -16128,6 +16498,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const handleJumpToQuestion = (targetIdx) => {
         const targetQ = currentQuestions[targetIdx];
         if (!targetQ) return;
+        flushCurrentQuestionTime();
         setCurrentQIndex(targetIdx);
         if (!statusesRef.current[targetQ.id]) {
           statusesRef.current[targetQ.id] = 'not_answered';
@@ -16140,6 +16511,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       // Unified Robust Submit Function (Supports Manual Submit & 3-Hour Auto-Submit)
       const submitExam = async (trigger = 'manual') => {
         if (hasSubmittedRef.current) return;
+        flushCurrentQuestionTime();
         hasSubmittedRef.current = true;
         setIsSubmitting(true);
         setSubmitTrigger(trigger);
@@ -16151,12 +16523,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
         const paperToEval = currentPaper || (typeof getFullTestPaperById === 'function' ? getFullTestPaperById(activeTestId) : (window.getFullTestPaperById ? window.getFullTestPaperById(activeTestId) : window.pta04Data));
         const finalAnswers = { ...answersRef.current };
-        const finalTimes = { ...questionTimesRef.current };
+        const finalTimes = { ...questionTimingsRef.current };
         const durationSec = (paperToEval?.durationMinutes || 180) * 60;
         const remainingSec = Math.max(0, timeLeftRef.current);
         const timeTaken = Math.max(1, durationSec - remainingSec);
 
         const evalResults = evaluatePaper(paperToEval, finalAnswers, finalTimes);
+        evalResults.questionTimings = finalTimes;
         evalResults.submissionTrigger = trigger;
         evalResults.testId = activeTestId;
         evalResults.completedAt = new Date().toISOString();
@@ -16195,6 +16568,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           rankPrediction: evalResults.rankPrediction,
           questionBreakdown: evalResults.questionBreakdown,
           responses: finalAnswers,
+          timePerQuestion: finalTimes,
+          questionTimings: finalTimes,
+          question_timings: finalTimes,
           submissionTrigger: trigger
         };
 
@@ -17104,13 +17480,41 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       if (view === 'result' && evaluationData) {
         const ev = evaluationData;
 
+        const timeSinksList = ev.questionBreakdown.filter(i => i.timeSpent > 180 && (i.status === 'incorrect' || i.status === 'unattempted'));
+        const rushedList = ev.questionBreakdown.filter(i => i.timeSpent > 0 && i.timeSpent < 25 && i.status === 'incorrect');
+
         // Dual Filter Logic: Subject and Status
         const filteredQuestions = ev.questionBreakdown.filter((item) => {
           const qObj = item.question;
           const matchSubj = reviewSubjectFilter === 'all' || qObj.subject === reviewSubjectFilter;
-          const matchStatus = reviewStatusFilter === 'all' || item.status === reviewStatusFilter;
+          let matchStatus = true;
+          if (reviewStatusFilter === 'all') {
+            matchStatus = true;
+          } else if (reviewStatusFilter === 'time_sinks') {
+            matchStatus = item.timeSpent > 180 && (item.status === 'incorrect' || item.status === 'unattempted');
+          } else if (reviewStatusFilter === 'rushed') {
+            matchStatus = item.timeSpent > 0 && item.timeSpent < 25 && item.status === 'incorrect';
+          } else {
+            matchStatus = item.status === reviewStatusFilter;
+          }
           return matchSubj && matchStatus;
         });
+
+        // Navigation to a specific review question card
+        const handleNavigateToReviewQuestion = (qId) => {
+          setReviewSubjectFilter('all');
+          setReviewStatusFilter('all');
+          setTimeout(() => {
+            const el = document.getElementById('question-card-' + qId);
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              el.classList.add('ring-4', 'ring-rose-500', 'transition-all', 'duration-500');
+              setTimeout(() => {
+                el.classList.remove('ring-4', 'ring-rose-500');
+              }, 2500);
+            }
+          }, 100);
+        };
 
         // Subject Counts for filter tabs
         const mathCount = ev.questionBreakdown.filter(i => i.question.subject === 'Mathematics').length;
@@ -17223,6 +17627,12 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 evaluationData={ev}
                 currentUser={currentUser}
                 setView={setView}
+              />
+
+              {/* FLAGSHIP TIME & EFFICIENCY ANALYTICS DASHBOARD */}
+              <TimeAndEfficiencyDashboard
+                evaluationData={ev}
+                onNavigateToQuestion={handleNavigateToReviewQuestion}
               />
 
               {/* 2. GRAPHICAL PERFORMANCE ANALYSIS DASHBOARD */}
@@ -17368,6 +17778,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         { id: 'partial', label: `Partial (${ev.partialCount})` },
                         { id: 'incorrect', label: `Incorrect (${ev.incorrectCount})` },
                         { id: 'unattempted', label: `Skipped (${ev.unattemptedCount})` },
+                        { id: 'time_sinks', label: `🔥 Time-Sinks (>3m) (${timeSinksList.length})` },
+                        { id: 'rushed', label: `⚡ Rushed (<25s) (${rushedList.length})` },
                       ].map((btn) => (
                         <button
                           key={btn.id}
@@ -17431,6 +17843,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       return (
                         <div
                           key={qObj.id}
+                          id={'question-card-' + qObj.id}
                           className="rounded-2xl border border-slate-200 dark:border-zinc-800 p-6 space-y-5 hover:border-indigo-300 dark:hover:border-indigo-800/60 transition-colors bg-white dark:bg-[#12131a]"
                         >
                           {/* Top Meta Bar */}
@@ -17448,9 +17861,31 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                 {formatLabel}
                               </span>
                               <span className="text-slate-300 dark:text-zinc-700">·</span>
-                              <span className="text-[11px] font-mono text-slate-500 flex items-center gap-1">
-                                ⏱️ {formatDuration(item.timeSpent)}
-                              </span>
+                              {item.timeSpent > 180 && (item.status === 'incorrect' || item.status === 'unattempted') ? (
+                                <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-300 dark:border-rose-800 flex items-center gap-1 shadow-xs">
+                                  <span>🔥</span>
+                                  <span>Time-Sink · {formatDuration(item.timeSpent)}</span>
+                                </span>
+                              ) : item.timeSpent > 210 && item.status === 'correct' ? (
+                                <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300 dark:border-amber-800 flex items-center gap-1 shadow-xs">
+                                  <span>⏳</span>
+                                  <span>Overtime · {formatDuration(item.timeSpent)}</span>
+                                </span>
+                              ) : item.timeSpent > 0 && item.timeSpent < 25 && item.status === 'incorrect' ? (
+                                <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-orange-100 text-orange-800 dark:bg-orange-950/70 dark:text-orange-300 border border-orange-300 dark:border-orange-800 flex items-center gap-1 shadow-xs">
+                                  <span>⚡</span>
+                                  <span>Rushed · {item.timeSpent}s</span>
+                                </span>
+                              ) : item.timeSpent > 0 ? (
+                                <span className="px-2.5 py-0.5 rounded-md text-[11px] font-mono font-bold bg-slate-100 text-slate-700 dark:bg-zinc-800 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 flex items-center gap-1">
+                                  <span>⏱️</span>
+                                  <span>{formatDuration(item.timeSpent)}</span>
+                                </span>
+                              ) : (
+                                <span className="text-[11px] font-mono text-slate-400">
+                                  ⏱️ —
+                                </span>
+                              )}
                             </div>
 
                             <div className="flex items-center gap-2">

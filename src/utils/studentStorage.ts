@@ -40,6 +40,8 @@ export interface TestAttemptRecord {
   incorrectQuestionIds?: number[];
   responses?: Record<string, any>;
   timePerQuestion?: Record<string, number>;
+  questionTimings?: Record<string, number>;
+  question_timings?: Record<string, number>;
   mistakeTags?: Record<string, string>;
   submissionTrigger?: string;
   timeTakenSeconds?: number;
@@ -216,7 +218,8 @@ export const studentStorage = {
           estimated_rank_label: attemptRecord.predictedAirDisplay || 'AIR Qualified',
           subject_breakdown: attemptRecord.subjectStats || (attemptRecord as any).subjectBreakdown || {},
           responses: attemptRecord.responses || {},
-          time_per_question: attemptRecord.timePerQuestion || {},
+          time_per_question: attemptRecord.questionTimings || attemptRecord.question_timings || attemptRecord.timePerQuestion || {},
+          question_timings: attemptRecord.questionTimings || attemptRecord.question_timings || attemptRecord.timePerQuestion || {},
           mistake_tags: {
             ...(attemptRecord.mistakeTags || {}),
             submission_trigger: (attemptRecord as any).submissionTrigger || 'manual'
@@ -230,6 +233,11 @@ export const studentStorage = {
             const { error } = await supabase.from('test_attempts').insert(payload);
             if (error) {
               console.warn(`[Supabase] saveAttempt try ${tryIdx + 1} warning:`, error.message);
+              // Fallback: If DB schema does not have question_timings column yet, retry insert without it
+              if ((payload as any).question_timings && ((error as any).status === 400 || (error as any).code === '42703' || error.message?.includes('question_timings'))) {
+                console.warn('[Supabase] question_timings column missing in DB, retrying without question_timings...');
+                delete (payload as any).question_timings;
+              }
               if ((error as any).status === 401 || error.message?.includes('JWT') || error.message?.includes('token') || error.message?.includes('expired') || error.message?.includes('auth')) {
                 console.log('[Supabase] Refreshing token on 401 during retry...');
                 try {
@@ -415,7 +423,8 @@ export const studentStorage = {
         estimated_rank_label: attempt.predictedAirDisplay || 'AIR Qualified',
         subject_breakdown: attempt.subjectStats || attempt.subjectBreakdown || {},
         responses: attempt.responses || {},
-        time_per_question: attempt.timePerQuestion || {},
+        time_per_question: attempt.questionTimings || attempt.question_timings || attempt.timePerQuestion || {},
+        question_timings: attempt.questionTimings || attempt.question_timings || attempt.timePerQuestion || {},
         mistake_tags: {
           ...(attempt.mistakeTags || {}),
           submission_trigger: attempt.submissionTrigger || 'manual',
@@ -425,7 +434,12 @@ export const studentStorage = {
       };
 
       try {
-        const { error } = await supabase.from('test_attempts').insert(payload);
+        let { error } = await supabase.from('test_attempts').insert(payload);
+        if (error && (payload as any).question_timings && ((error as any).status === 400 || (error as any).code === '42703' || error.message?.includes('question_timings'))) {
+          delete (payload as any).question_timings;
+          const res2 = await supabase.from('test_attempts').insert(payload);
+          error = res2.error;
+        }
         if (!error) {
           existingIds.add(attId);
           syncedCount++;
