@@ -3,13 +3,53 @@
 // Curated by Nelov Mallick (IIT Delhi) · 100% Free Forever
 // ==============================================================================
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { JEE_MAINS_2027_SCHEDULE, FINAL_REVISION_CARD, ScheduleTestItem } from '../data/scheduleData';
 import { Tilt3DCard } from './ui/Tilt3DCard';
 import { useAuth } from '../context/AuthContext';
 import { studentStorage } from '../utils/studentStorage';
 import { jeeMainsTests } from '../data/testsIndex';
 import { TestMetadata } from '../data/testTypes';
+
+// Rich KaTeX, Markdown bold (**...**), and HTML subscript/superscript renderer for syllabus entries
+const RichSyllabusText: React.FC<{ text: string; className?: string }> = ({ text, className = '' }) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const formattedHtml = useMemo(() => {
+    if (!text) return '';
+    return String(text)
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900 dark:text-zinc-100">$1</strong>')
+      .replace(/\n\n/g, '<div class="h-2.5"></div>')
+      .replace(/\n/g, '<br/>');
+  }, [text]);
+
+  useEffect(() => {
+    const win = window as any;
+    if (containerRef.current && win.renderMathInElement) {
+      try {
+        win.renderMathInElement(containerRef.current, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\[', right: '\\]', display: true },
+            { left: '\\(', right: '\\)', display: false }
+          ],
+          throwOnError: false
+        });
+      } catch (e) {
+        console.error('KaTeX rendering error:', e);
+      }
+    }
+  }, [formattedHtml]);
+
+  return (
+    <div
+      ref={containerRef}
+      className={className}
+      dangerouslySetInnerHTML={{ __html: formattedHtml }}
+    />
+  );
+};
 
 interface ScheduleViewProps {
   onNavigate?: (hash: string) => void;
@@ -874,8 +914,8 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                       {previewItem.syllabus?.physics ? (
                         previewItem.syllabus.physics.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2.5">
-                            <span className="text-sky-500 font-bold mt-0.5">•</span>
-                            <span>{item}</span>
+                            <span className="text-sky-500 font-bold leading-relaxed">•</span>
+                            <RichSyllabusText text={item} className="flex-1 leading-relaxed" />
                           </li>
                         ))
                       ) : (
@@ -897,7 +937,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                           Chemistry Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-emerald-800/80 dark:text-emerald-400">
-                          {previewItem.code === 'PTM 03' ? 'IUPAC, General Organic Chemistry (GOC) & Isomerism Focus' : (previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern'))}
+                          {previewItem.code === 'PTM 03' ? 'Haloalkanes & Haloarenes, Grignard Reagents & Polymers Focus' : (previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern'))}
                         </p>
                       </div>
                     </div>
@@ -906,8 +946,8 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                       {previewItem.syllabus?.chemistry ? (
                         previewItem.syllabus.chemistry.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2.5">
-                            <span className="text-emerald-500 font-bold mt-0.5">•</span>
-                            <span>{item}</span>
+                            <span className="text-emerald-500 font-bold leading-relaxed">•</span>
+                            <RichSyllabusText text={item} className="flex-1 leading-relaxed" />
                           </li>
                         ))
                       ) : (
@@ -938,8 +978,8 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                       {previewItem.syllabus?.mathematics && previewItem.syllabus.mathematics.length > 0 ? (
                         previewItem.syllabus.mathematics.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2.5">
-                            <span className="text-purple-500 font-bold mt-0.5">•</span>
-                            <span>{item}</span>
+                            <span className="text-purple-500 font-bold leading-relaxed">•</span>
+                            <RichSyllabusText text={item} className="flex-1 leading-relaxed" />
                           </li>
                         ))
                       ) : (

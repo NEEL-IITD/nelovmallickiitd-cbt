@@ -15255,8 +15255,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           {previewItem.syllabus && previewItem.syllabus.physics ? (
                             previewItem.syllabus.physics.map((item, idx) => (
                               <li key={idx} className="flex items-start gap-2.5">
-                                <span className="text-sky-500 font-bold mt-0.5">•</span>
-                                <span>{item}</span>
+                                <span className="text-sky-500 font-bold leading-relaxed">•</span>
+                                <RichMathContent text={item} className="flex-1 leading-relaxed" />
                               </li>
                             ))
                           ) : (
@@ -15278,7 +15278,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                               Chemistry Syllabus (25 Questions · 100 Marks)
                             </h4>
                             <p className="text-[11px] text-emerald-800/80 dark:text-emerald-400">
-                              {previewItem.code === 'PTM 03' ? 'IUPAC, General Organic Chemistry (GOC) & Isomerism Focus' : (previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern'))}
+                              {previewItem.code === 'PTM 03' ? 'Haloalkanes & Haloarenes, Grignard Reagents & Polymers Focus' : (previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern'))}
                             </p>
                           </div>
                         </div>
@@ -15287,8 +15287,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           {previewItem.syllabus && previewItem.syllabus.chemistry ? (
                             previewItem.syllabus.chemistry.map((item, idx) => (
                               <li key={idx} className="flex items-start gap-2.5">
-                                <span className="text-emerald-500 font-bold mt-0.5">•</span>
-                                <span>{item}</span>
+                                <span className="text-emerald-500 font-bold leading-relaxed">•</span>
+                                <RichMathContent text={item} className="flex-1 leading-relaxed" />
                               </li>
                             ))
                           ) : (
@@ -15319,8 +15319,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           {previewItem.syllabus && previewItem.syllabus.mathematics && previewItem.syllabus.mathematics.length > 0 ? (
                             previewItem.syllabus.mathematics.map((item, idx) => (
                               <li key={idx} className="flex items-start gap-2.5">
-                                <span className="text-purple-500 font-bold mt-0.5">•</span>
-                                <span>{item}</span>
+                                <span className="text-purple-500 font-bold leading-relaxed">•</span>
+                                <RichMathContent text={item} className="flex-1 leading-relaxed" />
                               </li>
                             ))
                           ) : (

@@ -146,7 +146,7 @@ async function runQA() {
 
     // Check PTM 03
     const ptm03Match = scheduleContent.match(/id:\s*['"]jee-mains-ptm-03['"][\s\S]*?id:\s*['"]jee-mains-ptm-04['"]/);
-    if (ptm03Match && ptm03Match[0].includes('Thermal Properties of Matter') && ptm03Match[0].includes('IUPAC Nomenclature & Structural Basics') && ptm03Match[0].includes('Matrices & Matrix Algebra')) {
+    if (ptm03Match && ptm03Match[0].includes('Thermal Properties of Matter') && ptm03Match[0].includes('Haloalkanes & Haloarenes') && ptm03Match[0].includes('Matrices & Matrix Algebra')) {
       passed++;
       console.log('✓ PTM 03 complete 3-subject syllabus present (Physics + Chemistry + Math)');
     } else {

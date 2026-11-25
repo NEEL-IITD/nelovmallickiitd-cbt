@@ -81,9 +81,9 @@
           "Heat Transfer (Thermal conduction: variable thermal conductivity, series and parallel slabs, steady-state junction temperatures in rod networks, radial conduction through spherical shells; thermal radiation: Stefan–Boltzmann law, Wien's displacement law, and solar intensity)"
         ],
         chemistry: [
-          "IUPAC Nomenclature & Structural Basics (Counting σ/π bonds, hybridization of carbon atoms, and IUPAC naming of polyfunctional organic compounds and enynes)",
-          "General Organic Chemistry (GOC) (Electronic effects: inductive effect, resonance, hyperconjugation in carbocations, radicals, and alkenes; aromaticity and non-aromaticity; stability, geometry, and hybridization of reaction intermediates: carbocations, carbanions, free radicals; acidic strength of carboxylic acids and C–H acidity; basic strength of amines in aqueous medium)",
-          "Isomerism in Organic Compounds (Structural isomerism: chain, position, functional, metamerism, tautomerism; conformational isomerism: cyclohexane, 1,4-cyclohexanediol, ethane; geometrical cis/trans isomerism; optical isomerism: Fischer projections, enantiomers, diastereomers, and meso compounds)"
+          "**Haloalkanes & Haloarenes:** Common names, physical properties (boiling points), preparation from alkenes and alcohols (SOCl<sub>2</sub>/pyridine), substitution mechanisms (S<sub>N</sub>1, S<sub>N</sub>2, Finkelstein reaction, solvent effects, stereochemistry, rearrangements/ring expansion), elimination reactions (E1, E2, Saytzeff vs. Hofmann products), and reactivity/electrophilic substitution of haloarenes.",
+          "**Grignard Reagents:** Acid–base reactions (D<sub>2</sub>O, -COOH vs. -SO<sub>3</sub>H), nucleophilic addition to carbonyl/acid derivatives, and epoxide ring opening.",
+          "**Polymers:** Natural rubber (hydrogenation) and biodegradable polymers."
         ],
         mathematics: [
           "Matrices & Matrix Algebra (Types of matrices: symmetric, skew-symmetric, orthogonal, idempotent, and nilpotent; matrix multiplication, powers of matrices, trace of matrix powers tr(A^n), and polynomial matrix expressions)",
