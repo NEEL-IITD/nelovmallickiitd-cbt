@@ -19,6 +19,7 @@ import {
   X
 } from 'lucide-react';
 import { dailyPlannerService, DAILY_PLANNER_STAGES } from '../services/dailyPlannerService';
+import { cloudSyncService } from '../services/cloudSyncService';
 
 interface DailyStudyPlannerViewProps {
   userId?: string | null;
@@ -53,15 +54,21 @@ export const DailyStudyPlannerView: React.FC<DailyStudyPlannerViewProps> = ({
     const stop = () => setIsDraggingPaint(false);
     window.addEventListener('mouseup', stop);
     window.addEventListener('touchend', stop);
+    const unsubSync = cloudSyncService.subscribeSyncStatus((st) => {
+      if (st.status === 'saving') setSaveLabel('Saving...');
+      else if (st.status === 'saved') setSaveLabel(userId && userId !== 'guest' ? 'Saved to cloud' : 'Saved locally');
+      else if (st.status === 'offline') setSaveLabel('Saved offline');
+    });
     return () => {
       window.removeEventListener('mouseup', stop);
       window.removeEventListener('touchend', stop);
+      unsubSync();
     };
-  }, []);
+  }, [userId]);
 
   const pulseSaved = () => {
     setSaveLabel('Saving...');
-    setTimeout(() => setSaveLabel('Saved'), 250);
+    setTimeout(() => setSaveLabel((p) => (p === 'Saving...' ? 'Saved' : p)), 600);
   };
 
   const dayPlan = useMemo(

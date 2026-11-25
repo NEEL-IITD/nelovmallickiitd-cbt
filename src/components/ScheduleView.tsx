@@ -60,7 +60,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
   onNavigate = (hash) => { window.location.hash = hash; },
   onSelectTest
 }) => {
-  const { user, openAuthModal } = useAuth();
+  const { user, isAdmin, openAuthModal } = useAuth();
 
   // Filter & Layout States
   const [selectedPhase, setSelectedPhase] = useState<number | 'all'>('all');
@@ -76,7 +76,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     return () => clearInterval(timer);
   }, []);
 
-  const isAdmin = user && user.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+  // Admin mode gated strictly by verified Supabase profile role via AuthContext
 
   // Modal state for Preview Details (Syllabus + Instructions)
   const [previewItem, setPreviewItem] = useState<ScheduleTestItem | null>(null);

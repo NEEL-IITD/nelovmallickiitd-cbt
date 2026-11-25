@@ -32,6 +32,7 @@ import { LecturesSection } from './components/LecturesSection';
 import { LeaderboardHub } from './components/LeaderboardHub';
 import { ScheduleView } from './components/ScheduleView';
 import { DashboardView } from './components/DashboardView';
+import { AuthPage } from './components/AuthPage';
 import { StudyResourcesVaultShowcase } from './components/vault/StudyResourcesVaultShowcase';
 import { SubjectResourcesHub } from './components/vault/SubjectResourcesHub';
 import { PrivacyPolicy } from './components/legal/PrivacyPolicy';
@@ -59,6 +60,9 @@ export const AppContent: React.FC = () => {
   const [dismissBanner, setDismissBanner] = useState<boolean>(false);
 
   const isDashboardRoute = currentHash.toLowerCase() === '#/dashboard' || currentHash.toLowerCase().startsWith('#/dashboard/');
+  const lowHash = currentHash.toLowerCase();
+  const isLoginRoute = lowHash === '#/login' || lowHash.startsWith('#/login?') || window.location.pathname.toLowerCase() === '/login';
+  const isSignupRoute = lowHash === '#/signup' || lowHash.startsWith('#/signup?') || window.location.pathname.toLowerCase() === '/signup';
 
   // Sync dark class on document element
   useEffect(() => {
@@ -106,6 +110,17 @@ export const AppContent: React.FC = () => {
     window.location.hash = hash;
     setCurrentHash(hash);
   };
+
+  if (isLoginRoute || isSignupRoute) {
+    const mode = lowHash.includes('recovery=1') ? 'recovery' : (isSignupRoute ? 'signup' : 'login');
+    return (
+      <AuthPage
+        initialMode={mode}
+        onSuccess={() => handleNavigate('#/dashboard')}
+        onContinueGuest={() => handleNavigate('#/dashboard')}
+      />
+    );
+  }
 
   if (isDashboardRoute) {
     return (

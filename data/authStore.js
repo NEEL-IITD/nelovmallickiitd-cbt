@@ -11,9 +11,30 @@
   const ERROR_REPORTS_KEY = 'nelov_error_reports';
   const TEST_CONFIGS_OVERRIDE_KEY = 'nelov_test_configs_overrides';
 
-  // Environment detection
-  const envUrl = (window.__ENV__ && window.__ENV__.VITE_SUPABASE_URL) || localStorage.getItem('VITE_SUPABASE_URL') || 'https://lyzmismtmtsvlqpzdruy.supabase.co';
-  const envAnonKey = (window.__ENV__ && window.__ENV__.VITE_SUPABASE_ANON_KEY) || localStorage.getItem('VITE_SUPABASE_ANON_KEY') || 'sb_publishable_NqVe4faHT7ccXhQoj8r6ng_KT4hmaSy';
+  // Environment detection (supports VITE_ and NEXT_PUBLIC_ prefixes cleanly)
+  const envUrl =
+    (window.__ENV__ && (window.__ENV__.VITE_SUPABASE_URL || window.__ENV__.NEXT_PUBLIC_SUPABASE_URL)) ||
+    localStorage.getItem('VITE_SUPABASE_URL') ||
+    localStorage.getItem('NEXT_PUBLIC_SUPABASE_URL') ||
+    'https://lyzmismtmtsvlqpzdruy.supabase.co';
+  const envAnonKey =
+    (window.__ENV__ && (window.__ENV__.VITE_SUPABASE_ANON_KEY || window.__ENV__.NEXT_PUBLIC_SUPABASE_ANON_KEY)) ||
+    localStorage.getItem('VITE_SUPABASE_ANON_KEY') ||
+    localStorage.getItem('NEXT_PUBLIC_SUPABASE_ANON_KEY') ||
+    'sb_publishable_NqVe4faHT7ccXhQoj8r6ng_KT4hmaSy';
+
+  const SYNC_STATUS_EVENT = 'nelov:sync-status';
+  let syncStatusState = { status: 'saved', detail: '', timestamp: Date.now() };
+  function emitSyncStatus(status, detail = '') {
+    syncStatusState = { status, detail, timestamp: Date.now() };
+    try {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent(SYNC_STATUS_EVENT, {
+          detail: syncStatusState
+        }));
+      }
+    } catch (e) {}
+  }
 
   const isConfigured = Boolean(
     envUrl &&
@@ -181,24 +202,24 @@
       }
 
       if (!hasEmail) {
-        if (!hasContact) throw new Error('Please enter your 10-digit contact number.');
+        if (!hasContact) throw new Error('Please enter your email or 10-digit contact number.');
         authMethod = 'phone';
         authEmail = getSyntheticPhoneEmail(contactNumber);
       } else if (isGmail(trimmedEmail)) {
         authMethod = 'gmail';
         authEmail = trimmedEmail;
       } else {
-        // Non-Gmail strictly requires contact number!
-        if (!hasContact) {
-          throw new Error('Contact number is strictly required when not using a @gmail.com address.');
-        }
-        authMethod = 'email_with_phone';
+        authMethod = hasContact ? 'email_with_phone' : 'email';
         authEmail = trimmedEmail;
       }
 
       const termsTimestamp = acceptedTermsAt || new Date().toISOString();
       const termsVer = acceptedTermsVersion || '2026-11';
       const parentalBool = Boolean(parentalConsentConfirmed);
+      const resolvedTargetExam = targetExam || 'JEE 2027';
+      // Backwards-compatible metadata for Postgres triggers before optional schema migration is executed
+      const compatAuthMethod = !hasEmail ? 'phone' : (hasContact && !isGmail(trimmedEmail) ? 'email_with_phone' : 'gmail');
+      const compatTargetExam = (resolvedTargetExam === 'JEE 2027') ? 'Both' : resolvedTargetExam;
 
       // 1. Supabase Cloud Auth
       if (this.isCloudConnected()) {
@@ -206,11 +227,13 @@
           email: authEmail,
           password,
           options: {
+            emailRedirectTo: typeof window !== 'undefined' ? (window.location.origin + window.location.pathname) : undefined,
             data: {
               full_name: trimmedName,
               contact_number: formattedContact,
-              auth_method: authMethod,
-              target_exam: targetExam || 'JEE Advanced',
+              auth_method: compatAuthMethod,
+              target_exam: compatTargetExam,
+              preferred_exam: resolvedTargetExam,
               accepted_terms_at: termsTimestamp,
               accepted_terms_version: termsVer,
               parental_consent_confirmed: parentalBool
@@ -226,7 +249,17 @@
         }
         if (!data.user) throw new Error('Registration failed. Please try again.');
 
-        const isUserAdmin = isAdminEmail(hasEmail ? trimmedEmail : null);
+        let verifiedRole = 'student';
+        try {
+          if (data.session) {
+            const { data: profRow } = await supabaseClient
+              .from('profiles')
+              .select('role')
+              .eq('id', data.user.id)
+              .maybeSingle();
+            if (profRow?.role === 'admin') verifiedRole = 'admin';
+          }
+        } catch (e) {}
 
         const cleanUser = {
           id: data.user.id,
@@ -234,18 +267,27 @@
           email: authMethod === 'phone' ? null : trimmedEmail,
           contactNumber: formattedContact,
           authMethod,
-          targetExam: targetExam || 'JEE Advanced',
-          role: isUserAdmin ? 'admin' : 'student',
+          targetExam: resolvedTargetExam,
+          dailyQuestionGoal: 30,
+          currentStreak: 0,
+          avatarUrl: data.user.user_metadata?.avatar_url || null,
+          role: verifiedRole,
+          needsEmailConfirmation: !data.session,
           acceptedTermsAt: termsTimestamp,
           acceptedTermsVersion: termsVer,
           parentalConsentConfirmed: parentalBool,
           createdAt: data.user.created_at || new Date().toISOString()
         };
-        this.setActiveSession(cleanUser);
+        if (data.session) {
+          this.setActiveSession(cleanUser);
+          if (window.cloudSyncEngine?.hydrateAndMigrateOnLogin) {
+            window.cloudSyncEngine.hydrateAndMigrateOnLogin(cleanUser).catch(() => {});
+          }
+        }
         return cleanUser;
       }
 
-      // 2. Local Fallback Mode
+      // 2. Local Fallback Mode (offline / missing Supabase keys)
       const users = getStoredUsers();
       if (hasEmail && users.some(u => u.email === trimmedEmail)) {
         throw new Error('An account with this email already exists. Please log in.');
@@ -255,8 +297,8 @@
       }
 
       const passwordHash = await hashPassword(password);
-      const isUserAdmin = isAdminEmail(hasEmail ? trimmedEmail : null);
-      const role = isUserAdmin ? 'admin' : 'student';
+      // Security: Never auto-grant admin in client fallback signup
+      const role = 'student';
 
       const newUser = {
         id: 'usr_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
@@ -264,7 +306,9 @@
         email: authMethod === 'phone' ? null : trimmedEmail,
         contactNumber: formattedContact,
         authMethod,
-        targetExam: targetExam || 'JEE Advanced',
+        targetExam: resolvedTargetExam,
+        dailyQuestionGoal: 30,
+        currentStreak: 0,
         role,
         createdAt: new Date().toISOString(),
         passwordHash
@@ -280,10 +324,15 @@
         contactNumber: newUser.contactNumber,
         authMethod: newUser.authMethod,
         targetExam: newUser.targetExam,
+        dailyQuestionGoal: newUser.dailyQuestionGoal,
+        currentStreak: 0,
         role: newUser.role,
         createdAt: newUser.createdAt
       };
       this.setActiveSession(cleanUser);
+      if (window.cloudSyncEngine?.migrateGuestLocalData) {
+        window.cloudSyncEngine.migrateGuestLocalData(cleanUser.id);
+      }
       return cleanUser;
     },
 
@@ -322,60 +371,24 @@
         });
 
         if (error) {
-          if (isAdminEmail(authEmail)) {
-            console.warn('Supabase password login returned error for admin, authenticating admin session directly:', error.message);
-            try {
-              const { data: profile } = await supabaseClient
-                .from('profiles')
-                .select('*')
-                .eq('email', authEmail)
-                .maybeSingle();
-              if (profile) {
-                const adminUser = {
-                  id: profile.id,
-                  name: profile.full_name || 'Nelov Mallick',
-                  email: profile.email || 'mallicknelov@gmail.com',
-                  contactNumber: profile.contact_number,
-                  authMethod: profile.auth_method || 'gmail',
-                  targetExam: profile.target_exam || 'Both',
-                  role: 'admin',
-                  acceptedTermsAt: profile.accepted_terms_at || '2026-11-20T00:00:00.000Z',
-                  acceptedTermsVersion: profile.accepted_terms_version || '2026-11',
-                  parentalConsentConfirmed: true,
-                  createdAt: profile.created_at || new Date().toISOString()
-                };
-                this.setActiveSession(adminUser);
-                return adminUser;
-              }
-            } catch (pErr) {
-              console.warn('Direct profile lookup fallback:', pErr);
-            }
-            const fallbackAdmin = {
-              id: 'dd2eead0-660e-45c0-818d-70d416c3b134',
-              name: 'Nelov Mallick',
-              email: 'mallicknelov@gmail.com',
-              contactNumber: '+91 98765 43210',
-              authMethod: 'gmail',
-              targetExam: 'Both',
-              role: 'admin',
-              acceptedTermsAt: '2026-11-20T00:00:00.000Z',
-              acceptedTermsVersion: '2026-11',
-              parentalConsentConfirmed: true,
-              createdAt: new Date().toISOString()
-            };
-            this.setActiveSession(fallbackAdmin);
-            return fallbackAdmin;
-          }
           throw new Error(isPhoneLogin ? 'Incorrect contact number or password/PIN.' : error.message);
         }
         if (!data.user) throw new Error('Invalid credentials.');
 
         let role = 'student';
         let fullName = data.user.user_metadata?.full_name || (isPhoneLogin ? 'Student Aspirant' : authEmail.split('@')[0]);
-        let targetExam = data.user.user_metadata?.target_exam || 'JEE Advanced';
+        let targetExam = data.user.user_metadata?.preferred_exam || data.user.user_metadata?.target_exam || 'JEE 2027';
         let userContact = formattedPhone || data.user.user_metadata?.contact_number || null;
-        let authMethod = isPhoneLogin ? 'phone' : (isGmail(authEmail) ? 'gmail' : 'email_with_phone');
+        let authMethod = isPhoneLogin ? 'phone' : (isGmail(authEmail) ? 'gmail' : 'email');
         let displayEmail = isPhoneLogin ? null : authEmail;
+        let avatarUrl = data.user.user_metadata?.avatar_url || data.user.user_metadata?.picture || null;
+        let localGoal = 30;
+        try {
+          const lp = JSON.parse(localStorage.getItem(`nelov_${data.user.id}_daily_planner_v1`) || 'null');
+          if (lp?.dailyTarget) localGoal = Number(lp.dailyTarget);
+        } catch (e) {}
+        let dailyQuestionGoal = Number(data.user.user_metadata?.daily_question_goal || localGoal || 30);
+        let currentStreak = 0;
         const localConsent = typeof window !== 'undefined' ? localStorage.getItem(`consent_v2026_11_${data.user.id}`) : null;
         let acceptedTermsAt = data.user.user_metadata?.accepted_terms_at || localConsent || new Date().toISOString();
         let acceptedTermsVersion = data.user.user_metadata?.accepted_terms_version || '2026-11';
@@ -384,16 +397,23 @@
         try {
           const { data: profile } = await supabaseClient
             .from('profiles')
-            .select('full_name, email, contact_number, auth_method, target_exam, role, accepted_terms_at, accepted_terms_version, parental_consent_confirmed')
+            .select('*')
             .eq('id', data.user.id)
-            .single();
+            .maybeSingle();
 
           if (profile) {
-            if (profile.role === 'admin') role = 'admin';
+            role = profile.role === 'admin' ? 'admin' : 'student';
             if (profile.full_name) fullName = profile.full_name;
             if (profile.contact_number) userContact = profile.contact_number;
             if (profile.auth_method) authMethod = profile.auth_method;
-            if (profile.target_exam) targetExam = profile.target_exam;
+            if (profile.target_exam) {
+              targetExam = (profile.target_exam === 'Both' && data.user.user_metadata?.preferred_exam)
+                ? data.user.user_metadata.preferred_exam
+                : profile.target_exam;
+            }
+            if (profile.avatar_url) avatarUrl = profile.avatar_url;
+            if (profile.daily_question_goal) dailyQuestionGoal = Number(profile.daily_question_goal);
+            if (profile.current_streak !== undefined && profile.current_streak !== null) currentStreak = Number(profile.current_streak) || 0;
             if (profile.accepted_terms_at) acceptedTermsAt = profile.accepted_terms_at;
             if (profile.accepted_terms_version) acceptedTermsVersion = profile.accepted_terms_version;
             if (profile.parental_consent_confirmed) parentalConsentConfirmed = Boolean(profile.parental_consent_confirmed);
@@ -408,23 +428,22 @@
             } catch (e) {}
           }
 
-          const targetRole = (isAdminEmail(displayEmail) || isAdminEmail(data.user.email)) ? 'admin' : role;
-          if (targetRole === 'admin') role = 'admin';
-
           if (!profile) {
+            const safeExam = targetExam === 'JEE 2027' ? 'Both' : targetExam;
+            const safeMethod = (authMethod === 'email') ? 'gmail' : authMethod;
             await supabaseClient.from('profiles').upsert({
               id: data.user.id,
               full_name: fullName,
               email: displayEmail,
               contact_number: userContact,
-              auth_method: authMethod,
-              target_exam: targetExam,
-              role: targetRole,
+              auth_method: safeMethod,
+              target_exam: safeExam,
+              role: 'student',
               accepted_terms_at: acceptedTermsAt,
               accepted_terms_version: acceptedTermsVersion,
               parental_consent_confirmed: parentalConsentConfirmed,
               last_login_at: new Date().toISOString()
-            }, { onConflict: 'id' });
+            }, { onConflict: 'id', ignoreDuplicates: true });
           } else if (!profile.accepted_terms_at) {
             await supabaseClient.from('profiles').update({
               accepted_terms_at: acceptedTermsAt,
@@ -436,10 +455,6 @@
           console.warn('Profile sync notice:', e);
         }
 
-        if (isAdminEmail(displayEmail) || isAdminEmail(data.user.email)) {
-          role = 'admin';
-        }
-
         const cleanUser = {
           id: data.user.id,
           name: fullName,
@@ -447,6 +462,9 @@
           contactNumber: userContact,
           authMethod,
           targetExam,
+          avatarUrl,
+          dailyQuestionGoal,
+          currentStreak,
           role,
           acceptedTermsAt,
           acceptedTermsVersion,
@@ -454,6 +472,9 @@
           createdAt: data.user.created_at || new Date().toISOString()
         };
         this.setActiveSession(cleanUser);
+        if (window.cloudSyncEngine?.hydrateAndMigrateOnLogin) {
+          window.cloudSyncEngine.hydrateAndMigrateOnLogin(cleanUser).catch(() => {});
+        }
         return cleanUser;
       }
 
@@ -473,8 +494,8 @@
         throw new Error('Incorrect password / PIN. Please verify your credentials and try again.');
       }
 
-      let role = user.role || 'student';
-      if (isAdminEmail(user.email)) role = 'admin';
+      // Security: Never auto-grant admin in offline/local mode
+      const role = user.role === 'admin' ? 'admin' : 'student';
 
       const cleanUser = {
         id: user.id,
@@ -482,11 +503,17 @@
         email: user.email,
         contactNumber: user.contactNumber,
         authMethod: user.authMethod,
-        targetExam: user.targetExam,
+        targetExam: user.targetExam || 'JEE 2027',
+        dailyQuestionGoal: user.dailyQuestionGoal || 30,
+        currentStreak: user.currentStreak || 0,
+        avatarUrl: user.avatarUrl || null,
         role,
         createdAt: user.createdAt
       };
       this.setActiveSession(cleanUser);
+      if (window.cloudSyncEngine?.migrateGuestLocalData) {
+        window.cloudSyncEngine.migrateGuestLocalData(cleanUser.id);
+      }
       return cleanUser;
     },
 
@@ -520,19 +547,133 @@
 
     async resetPassword(email) {
       const trimmedEmail = (email || '').trim().toLowerCase();
-      if (!trimmedEmail) throw new Error('Please enter your email.');
-
-      if (this.isCloudConnected()) {
-        const { error } = await supabaseClient.auth.resetPasswordForEmail(trimmedEmail, {
-          redirectTo: window.location.origin + '#/login'
-        });
-        if (error) throw new Error(error.message);
-        return;
+      if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+        throw new Error('Please enter a valid email address.');
       }
 
-      const users = getStoredUsers();
-      if (!users.some(u => u.email === trimmedEmail)) {
-        throw new Error('No registered account found with this email.');
+      if (this.isCloudConnected()) {
+        const redirectTo = typeof window !== 'undefined'
+          ? (window.location.origin + window.location.pathname + '#/login?recovery=1')
+          : undefined;
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(trimmedEmail, {
+          redirectTo
+        });
+        if (error) throw new Error(error.message);
+        return {
+          sentEmail: true,
+          message: `Password reset instructions sent to ${trimmedEmail}. Check your inbox (and spam folder).`
+        };
+      }
+
+      throw new Error('Email password reset requires Supabase Cloud connection. Configure Supabase env vars or sign in locally.');
+    },
+
+    async updatePassword(newPassword) {
+      if (!newPassword || newPassword.length < 6) {
+        throw new Error('Password must be at least 6 characters long.');
+      }
+      if (!this.isCloudConnected() || !supabaseClient) {
+        throw new Error('Password recovery update requires active Supabase session.');
+      }
+      const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+      if (error) throw new Error(error.message);
+      return { success: true };
+    },
+
+    async updateProfile(updates = {}) {
+      const current = this.getCurrentUser();
+      if (!current) throw new Error('Sign in required to update profile settings.');
+
+      const nextName = updates.name !== undefined ? String(updates.name || '').trim() : current.name;
+      const nextTargetExam = updates.targetExam !== undefined ? String(updates.targetExam || 'JEE 2027').trim() : (current.targetExam || 'JEE 2027');
+      const nextGoal = updates.dailyQuestionGoal !== undefined
+        ? Math.max(1, Math.min(500, Math.round(Number(updates.dailyQuestionGoal) || 30)))
+        : (current.dailyQuestionGoal || 30);
+      const nextAvatar = updates.avatarUrl !== undefined ? updates.avatarUrl : (current.avatarUrl || null);
+
+      const updatedUser = {
+        ...current,
+        name: nextName || current.name,
+        targetExam: nextTargetExam,
+        dailyQuestionGoal: nextGoal,
+        avatarUrl: nextAvatar
+      };
+      this.setActiveSession(updatedUser);
+
+      if (updates.dailyQuestionGoal !== undefined && window.dailyPlannerStore?.setDailyTarget) {
+        window.dailyPlannerStore.setDailyTarget(nextGoal, updatedUser.id);
+      }
+
+      if (this.isCloudConnected() && supabaseClient && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(updatedUser.id || ''))) {
+        emitSyncStatus('saving', 'Updating profile');
+        try {
+          try {
+            await supabaseClient.auth.updateUser({
+              data: {
+                full_name: updatedUser.name,
+                preferred_exam: updatedUser.targetExam,
+                daily_question_goal: nextGoal
+              }
+            });
+          } catch (e) {}
+          const safeTargetExam = updatedUser.targetExam === 'JEE 2027' ? 'Both' : updatedUser.targetExam;
+          let { error } = await supabaseClient
+            .from('profiles')
+            .update({
+              full_name: updatedUser.name,
+              target_exam: updatedUser.targetExam,
+              daily_question_goal: nextGoal,
+              avatar_url: nextAvatar,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', updatedUser.id);
+          if (error && (error.code === '23514' || error.status === 400 || /target_exam|column/i.test(error.message || ''))) {
+            const fallbackRes = await supabaseClient
+              .from('profiles')
+              .update({
+                full_name: updatedUser.name,
+                target_exam: safeTargetExam
+              })
+              .eq('id', updatedUser.id);
+            error = fallbackRes.error;
+          }
+          if (error) throw error;
+          emitSyncStatus('saved', 'Profile saved');
+        } catch (err) {
+          emitSyncStatus('offline', err?.message || 'Profile sync deferred');
+          throw new Error(err?.message || 'Could not update profile in Supabase.');
+        }
+      } else {
+        // Local fallback sync
+        const users = getStoredUsers();
+        const idx = users.findIndex(u => u.id === updatedUser.id);
+        if (idx !== -1) {
+          users[idx] = { ...users[idx], name: updatedUser.name, targetExam: updatedUser.targetExam, dailyQuestionGoal: nextGoal };
+          saveStoredUsers(users);
+        }
+        emitSyncStatus('saved', 'Saved locally');
+      }
+      return updatedUser;
+    },
+
+    async continueAsGuest() {
+      try {
+        localStorage.setItem('nelov_guest_mode', '1');
+      } catch (e) {}
+      if (this.getCurrentUser()) {
+        await this.logOut();
+      }
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('nelov_auth_changed', { detail: { user: null, guestMode: true } }));
+      }
+      return { guest: true };
+    },
+
+    isGuestMode() {
+      try {
+        return !this.getCurrentUser() && localStorage.getItem('nelov_guest_mode') === '1';
+      } catch (e) {
+        return false;
       }
     },
 
@@ -547,10 +688,19 @@
 
     isAdmin() {
       const user = this.getCurrentUser();
-      return Boolean(user && (user.role === 'admin' || isAdminEmail(user.email)) && user.email?.trim().toLowerCase() === 'mallicknelov@gmail.com');
+      if (!user || user.role !== 'admin') return false;
+      if (this.isCloudConnected()) {
+        return typeof user.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(user.id);
+      }
+      return true;
     },
 
     setUserRole(userId, role) {
+      // Security: Only local fallback dev mode allows role mutation; cloud role is managed strictly by Postgres profiles.role
+      if (this.isCloudConnected()) {
+        console.warn('[Security] Role changes must be applied in Supabase public.profiles.');
+        return;
+      }
       const current = this.getCurrentUser();
       if (current && current.id === userId) {
         current.role = role;
@@ -584,13 +734,14 @@
 
     setActiveSession(user) {
       try {
+        if (user) localStorage.removeItem('nelov_guest_mode');
         localStorage.setItem(SESSION_KEY, JSON.stringify(user));
         window.dispatchEvent(new CustomEvent('nelov_auth_changed', { detail: { user } }));
       } catch (e) {}
     },
 
-    async logOut() {
-      if (this.isCloudConnected()) {
+    async logOut(opts = {}) {
+      if (!opts?.skipSupabaseSignOut && this.isCloudConnected()) {
         try {
           await supabaseClient.auth.signOut();
         } catch (e) {}
@@ -607,6 +758,28 @@
   // STUDENT STORAGE & CLOUD SYNC
   // ============================================================================
   window.studentStorage = {
+    _draftTimers: {},
+
+    _canonicalizeTestKey(testId, testCode) {
+      const raw = String(testId || testCode || '').toLowerCase().trim();
+      const mPtm = raw.match(/ptm[-\s_]?0?(\d+)/);
+      if (mPtm) {
+        const num = String(parseInt(mPtm[1], 10)).padStart(2, '0');
+        return { testId: `jee-mains-ptm-${num}`, code: `PTM ${num}`, examType: 'JEE Mains', testType: 'mock' };
+      }
+      const mPta = raw.match(/pta[-\s_]?0?(\d+)/);
+      if (mPta) {
+        const num = String(parseInt(mPta[1], 10)).padStart(2, '0');
+        return { testId: `jee-advanced-pta-${num}`, code: `PTA ${num}`, examType: 'JEE Advanced', testType: 'mock' };
+      }
+      return {
+        testId: testId || 'jee-mains-ptm-01',
+        code: testCode || 'PTM 01',
+        examType: raw.includes('mains') ? 'JEE Mains' : 'JEE Advanced',
+        testType: raw.includes('chapter') ? 'chapter_exercise' : 'mock'
+      };
+    },
+
     saveSession(userId, testId, sessionData) {
       if (!userId || !testId) return;
       try {
@@ -616,7 +789,71 @@
           updatedAt: (sessionData && sessionData.updatedAt) || new Date().toISOString()
         };
         localStorage.setItem(`nelov_${userId}_session_${testId}`, JSON.stringify(stamped));
+        this._scheduleSessionCloudSync(userId, testId, stamped);
       } catch (e) {}
+    },
+
+    _scheduleSessionCloudSync(userId, testId, stamped) {
+      if (typeof window === 'undefined') return;
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!window.authService?.isCloudConnected() || !supabaseClient || !uuidRegex.test(String(userId))) return;
+
+      const key = `${userId}:${testId}`;
+      if (this._draftTimers[key]) clearTimeout(this._draftTimers[key]);
+      this._draftTimers[key] = setTimeout(async () => {
+        try {
+          emitSyncStatus('saving', 'Syncing CBT session');
+          const { data: sessData } = await supabaseClient.auth.getSession();
+          const authUid = sessData?.session?.user?.id;
+          if (!authUid || !uuidRegex.test(authUid)) return;
+
+          const canon = this._canonicalizeTestKey(testId, stamped.testCode);
+          let draftId = stamped.cloudDraftId;
+          if (!draftId || !uuidRegex.test(draftId)) {
+            const { data: existingDraft } = await supabaseClient
+              .from('test_attempts')
+              .select('id')
+              .eq('user_id', authUid)
+              .eq('test_id', canon.testId)
+              .eq('status', 'in_progress')
+              .maybeSingle();
+            draftId = existingDraft?.id || (typeof crypto !== 'undefined' && crypto.randomUUID
+              ? crypto.randomUUID()
+              : undefined);
+            if (draftId) {
+              stamped.cloudDraftId = draftId;
+              try {
+                localStorage.setItem(`nelov_${userId}_session_${testId}`, JSON.stringify(stamped));
+              } catch (e) {}
+            }
+          }
+
+          const draftPayload = {
+            ...(draftId ? { id: draftId } : {}),
+            user_id: authUid,
+            test_id: canon.testId,
+            exam_type: canon.examType,
+            test_type: canon.testType,
+            code: canon.code,
+            status: 'in_progress',
+            responses: stamped.responses || {},
+            marked_for_review: stamped.markedForReview || stamped.reviewSet || [],
+            time_remaining_seconds: stamped.timeLeftSeconds ?? stamped.timeRemainingSeconds ?? null,
+            time_spent_seconds: stamped.timeSpentSeconds ?? 0,
+            time_per_question: stamped.questionTimings || {},
+            obtained_marks: 0,
+            total_marks: stamped.totalMaxMarks || 300,
+            percentage: 0,
+            accuracy: 0,
+            updated_at: new Date().toISOString()
+          };
+
+          const { error } = await supabaseClient
+            .from('test_attempts')
+            .upsert(draftPayload, { onConflict: 'id' });
+          if (!error) emitSyncStatus('saved', 'Session synced');
+        } catch (e) {}
+      }, 1400);
     },
 
     getSession(userId, testId) {
@@ -658,6 +895,21 @@
       if (!userId || !testId) return;
       try {
         localStorage.removeItem(`nelov_${userId}_session_${testId}`);
+        const timerKey = `${userId}:${testId}`;
+        if (this._draftTimers && this._draftTimers[timerKey]) {
+          clearTimeout(this._draftTimers[timerKey]);
+          delete this._draftTimers[timerKey];
+        }
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (window.authService?.isCloudConnected() && supabaseClient && uuidRegex.test(String(userId))) {
+          const canon = this._canonicalizeTestKey(testId);
+          supabaseClient
+            .from('test_attempts')
+            .delete()
+            .match({ user_id: userId, test_id: canon.testId, status: 'in_progress' })
+            .then(() => {})
+            .catch(() => {});
+        }
       } catch (e) {}
     },
 
@@ -757,39 +1009,53 @@
         }
 
         const timeSec = attemptRecord.timeTakenSeconds || (attemptRecord.timeSpentTotal ? Math.round(attemptRecord.timeSpentTotal) : 0);
+        const obtainedMarksNum = Number(attemptRecord.totalMarksScored ?? attemptRecord.obtainedMarks ?? 0);
+        const totalMarksNum = Number(attemptRecord.totalMaxMarks ?? attemptRecord.totalMarks ?? 300);
+        const testTypeVal = canonicalTestId.includes('chapter') ? 'chapter_exercise' : 'mock';
         const payload = {
           id: attemptUuid,
           user_id: effectiveUserId,
           test_id: canonicalTestId,
           exam_type: attemptRecord.examType || (canonicalTestId.includes('mains') ? 'JEE Mains' : 'JEE Advanced'),
+          test_type: testTypeVal,
+          status: 'completed',
           code: canonicalCode,
-          obtained_marks: Number(attemptRecord.totalMarksScored ?? attemptRecord.obtainedMarks ?? 0),
-          total_marks: Number(attemptRecord.totalMaxMarks ?? attemptRecord.totalMarks ?? 300),
+          obtained_marks: obtainedMarksNum,
+          total_marks: totalMarksNum,
+          score: obtainedMarksNum,
+          max_score: totalMarksNum,
           percentage: Number(attemptRecord.percentage ?? 0),
           accuracy: Number(attemptRecord.accuracy ?? 0),
           time_taken_seconds: timeSec,
+          time_spent_seconds: timeSec,
           estimated_rank_label: attemptRecord.predictedAirDisplay || 'AIR Qualified',
           subject_breakdown: attemptRecord.subjectStats || attemptRecord.subjectBreakdown || {},
           responses: attemptRecord.responses || {},
+          marked_for_review: attemptRecord.markedForReview || [],
           time_per_question: attemptRecord.questionTimings || attemptRecord.question_timings || attemptRecord.timePerQuestion || {},
           question_timings: attemptRecord.questionTimings || attemptRecord.question_timings || attemptRecord.timePerQuestion || {},
           mistake_tags: {
             ...(attemptRecord.mistakeTags || {}),
             submission_trigger: attemptRecord.submissionTrigger || 'manual'
           },
-          submitted_at: attemptRecord.completedAt || attemptRecord.submittedAt || new Date().toISOString()
+          submitted_at: attemptRecord.completedAt || attemptRecord.submittedAt || new Date().toISOString(),
+          updated_at: new Date().toISOString()
         };
 
+        emitSyncStatus('saving', 'Saving test attempt');
         let savedCloud = false;
         for (let tryIdx = 0; tryIdx < 3; tryIdx++) {
           try {
-            const { data, error } = await supabaseClient.from('test_attempts').insert(payload);
+            const { data, error } = await supabaseClient.from('test_attempts').upsert(payload, { onConflict: 'id' });
             if (error) {
               console.warn(`[Supabase] saveAttempt try ${tryIdx + 1} warning:`, error.message);
-              // Fallback: If DB schema does not have question_timings column yet, retry insert without it
-              if (payload.question_timings && (error.status === 400 || error.code === '42703' || error.message?.includes('question_timings'))) {
-                console.warn('[Supabase] question_timings column missing in DB, retrying without question_timings...');
-                delete payload.question_timings;
+              // Fallback: If DB schema is missing additive columns yet, strip them and retry insert
+              if (error.status === 400 || error.code === '42703' || /column|schema cache/i.test(error.message || '')) {
+                ['question_timings', 'test_type', 'status', 'score', 'max_score', 'time_spent_seconds', 'marked_for_review', 'updated_at'].forEach((col) => {
+                  if (col in payload && (error.message?.includes(col) || col !== 'status')) {
+                    delete payload[col];
+                  }
+                });
               }
               // Handle 401 JWT expiration on long 3-hour tests by refreshing session and retrying
               if (error.status === 401 || error.message?.includes('JWT') || error.message?.includes('token') || error.message?.includes('expired') || error.message?.includes('auth')) {
@@ -804,7 +1070,15 @@
               }
             } else {
               savedCloud = true;
+              emitSyncStatus('saved', 'Test attempt saved');
               console.log('[Supabase] Successfully saved test attempt to cloud (201 Created):', attemptUuid);
+              // Clean up any leftover in_progress draft row for this test
+              supabaseClient
+                .from('test_attempts')
+                .delete()
+                .match({ user_id: effectiveUserId, test_id: canonicalTestId, status: 'in_progress' })
+                .then(() => {})
+                .catch(() => {});
               break;
             }
           } catch (err) {
@@ -1073,6 +1347,7 @@
 
           if (Array.isArray(attemptsData)) {
             attemptsData.forEach(d => {
+              if (d.status === 'in_progress') return;
               seenIds.add(d.id);
               const p = profilesMap[d.user_id] || {};
               const rawEmail = p.email || '';
@@ -1260,7 +1535,8 @@
           .order('submitted_at', { ascending: false });
 
         if (!error && data) {
-          const records = data.map(d => ({
+          const completedRows = data.filter(d => d.status !== 'in_progress');
+          const records = completedRows.map(d => ({
             id: d.id,
             testId: d.test_id,
             testCode: d.code,
@@ -1322,11 +1598,22 @@
         isNowBookmarked = false;
 
         if (window.authService.isCloudConnected()) {
+          emitSyncStatus('saving', 'Updating bookmark');
           try {
             await supabaseClient
               .from('bookmarks')
               .delete()
               .match({ user_id: userId, test_id: testId, question_id: String(question.id) });
+          } catch (e) {}
+          try {
+            await supabaseClient
+              .from('question_notes_and_mistakes')
+              .update({
+                is_bookmarked: false,
+                updated_at: new Date().toISOString()
+              })
+              .match({ user_id: userId, question_id: String(uniqueKey) });
+            emitSyncStatus('saved', 'Saved');
           } catch (e) {}
         }
       } else {
@@ -1352,6 +1639,7 @@
         isNowBookmarked = true;
 
         if (window.authService.isCloudConnected()) {
+          emitSyncStatus('saving', 'Saving bookmark');
           try {
             await supabaseClient.from('bookmarks').upsert({
               user_id: userId,
@@ -1364,6 +1652,35 @@
               personal_note: question.personalNote || null,
               created_at: new Date().toISOString()
             });
+          } catch (e) {}
+          try {
+            await supabaseClient.from('question_notes_and_mistakes').upsert({
+              user_id: userId,
+              question_id: String(uniqueKey),
+              test_id: testId,
+              subject: question.subject || 'General',
+              chapter_id: question.chapterId || question.chapter_id || null,
+              question_data: {
+                id: question.id,
+                uniqueKey,
+                testId,
+                testCode: question.testCode || 'PTA 04',
+                subject: question.subject || 'General',
+                section: question.section || '',
+                type: question.type || 'Single Correct',
+                question: question.question || '',
+                images: question.images || [],
+                options: question.options || [],
+                answer: question.answer,
+                explanation: question.explanation || '',
+                solution: question.solution || question.explanation || ''
+              },
+              is_bookmarked: true,
+              is_mistake: Boolean(question.mistakeTag || question.isMistake),
+              personal_note: question.personalNote || '',
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id,question_id' });
+            emitSyncStatus('saved', 'Saved');
           } catch (e) {}
         }
       }
@@ -1386,6 +1703,7 @@
         } catch (e) {}
 
         if (window.authService.isCloudConnected()) {
+          emitSyncStatus('saving', 'Saving note');
           try {
             await supabaseClient
               .from('bookmarks')
@@ -1394,6 +1712,31 @@
                 personal_note: personalNote || item.personalNote
               })
               .match({ user_id: userId, test_id: item.testId, question_id: String(item.id) });
+          } catch (e) {}
+          try {
+            await supabaseClient.from('question_notes_and_mistakes').upsert({
+              user_id: userId,
+              question_id: String(uniqueKey),
+              test_id: item.testId || null,
+              subject: item.subject || 'General',
+              question_data: {
+                id: item.id,
+                uniqueKey,
+                testId: item.testId,
+                testCode: item.testCode,
+                subject: item.subject,
+                question: item.question,
+                options: item.options,
+                answer: item.answer,
+                solution: item.solution || item.explanation,
+                mistakeTag: tag
+              },
+              is_bookmarked: true,
+              is_mistake: Boolean(tag),
+              personal_note: personalNote !== undefined ? personalNote : (item.personalNote || ''),
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id,question_id' });
+            emitSyncStatus('saved', 'Saved');
           } catch (e) {}
         }
       }
@@ -2136,10 +2479,19 @@
       }
       const isPhone = Boolean(session.user.email && session.user.email.endsWith('@phone.nelovportal.local'));
       let role = 'student';
-      let fullName = session.user.user_metadata?.full_name || (isPhone ? 'Student Aspirant' : session.user.email.split('@')[0]);
+      let fullName = session.user.user_metadata?.full_name || session.user.user_metadata?.name || (isPhone ? 'Student Aspirant' : (session.user.email ? session.user.email.split('@')[0] : 'Student Aspirant'));
       let contactNumber = session.user.user_metadata?.contact_number || null;
-      let authMethod = isPhone ? 'phone' : (session.user.app_metadata?.provider === 'google' ? 'google' : 'gmail');
+      let authMethod = isPhone ? 'phone' : (session.user.app_metadata?.provider === 'google' ? 'google' : (isGmail(session.user.email) ? 'gmail' : 'email'));
       let displayEmail = isPhone ? null : session.user.email;
+      let targetExam = session.user.user_metadata?.preferred_exam || session.user.user_metadata?.target_exam || 'JEE 2027';
+      let avatarUrl = session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture || null;
+      let localGoal = 30;
+      try {
+        const lp = JSON.parse(localStorage.getItem(`nelov_${session.user.id}_daily_planner_v1`) || 'null');
+        if (lp?.dailyTarget) localGoal = Number(lp.dailyTarget);
+      } catch (e) {}
+      let dailyQuestionGoal = Number(session.user.user_metadata?.daily_question_goal || localGoal || 30);
+      let currentStreak = 0;
       const localConsent = typeof window !== 'undefined' ? localStorage.getItem(`consent_v2026_11_${session.user.id}`) : null;
       let acceptedTermsAt = session.user.user_metadata?.accepted_terms_at || localConsent || new Date().toISOString();
       let acceptedTermsVersion = session.user.user_metadata?.accepted_terms_version || '2026-11';
@@ -2148,14 +2500,22 @@
       try {
         const { data: profile } = await supabaseClient
           .from('profiles')
-          .select('full_name, email, contact_number, auth_method, role, accepted_terms_at, accepted_terms_version, parental_consent_confirmed')
+          .select('*')
           .eq('id', session.user.id)
-          .single();
+          .maybeSingle();
         if (profile) {
-          if (profile.role === 'admin') role = 'admin';
+          role = profile.role === 'admin' ? 'admin' : 'student';
           if (profile.full_name) fullName = profile.full_name;
           if (profile.contact_number) contactNumber = profile.contact_number;
           if (profile.auth_method) authMethod = profile.auth_method;
+          if (profile.target_exam) {
+            targetExam = (profile.target_exam === 'Both' && session.user.user_metadata?.preferred_exam)
+              ? session.user.user_metadata.preferred_exam
+              : profile.target_exam;
+          }
+          if (profile.avatar_url) avatarUrl = profile.avatar_url;
+          if (profile.daily_question_goal) dailyQuestionGoal = Number(profile.daily_question_goal);
+          if (profile.current_streak !== undefined && profile.current_streak !== null) currentStreak = Number(profile.current_streak) || 0;
           if (profile.email && !profile.email.includes('@phone.nelovportal.local')) displayEmail = profile.email;
           if (profile.accepted_terms_at) acceptedTermsAt = profile.accepted_terms_at;
           if (profile.accepted_terms_version) acceptedTermsVersion = profile.accepted_terms_version;
@@ -2164,36 +2524,28 @@
           }
         }
 
-        if (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) {
-          role = 'admin';
-          acceptedTermsAt = acceptedTermsAt || '2026-11-20T00:00:00.000Z';
-          acceptedTermsVersion = acceptedTermsVersion || '2026-11';
-          parentalConsentConfirmed = true;
-        }
-
         if (acceptedTermsAt && typeof window !== 'undefined') {
           try {
             localStorage.setItem(`consent_v2026_11_${session.user.id}`, acceptedTermsAt);
           } catch (e) {}
         }
 
-        const targetRole = (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) ? 'admin' : role;
-        if (targetRole === 'admin') role = 'admin';
-
         if (!profile) {
+          const safeExam = targetExam === 'JEE 2027' ? 'Both' : targetExam;
+          const safeMethod = (authMethod === 'email') ? 'gmail' : authMethod;
           await supabaseClient.from('profiles').upsert({
             id: session.user.id,
             full_name: fullName,
             email: displayEmail,
             contact_number: contactNumber,
-            auth_method: authMethod,
-            target_exam: session.user.user_metadata?.target_exam || 'JEE Advanced',
-            role: targetRole,
+            auth_method: safeMethod,
+            target_exam: safeExam,
+            role: 'student',
             accepted_terms_at: acceptedTermsAt,
             accepted_terms_version: acceptedTermsVersion,
             parental_consent_confirmed: parentalConsentConfirmed,
             last_login_at: new Date().toISOString()
-          }, { onConflict: 'id' });
+          }, { onConflict: 'id', ignoreDuplicates: true });
         } else if (!profile.accepted_terms_at) {
           await supabaseClient.from('profiles').update({
             accepted_terms_at: acceptedTermsAt,
@@ -2205,20 +2557,16 @@
         console.warn('Profile sync notice on login:', e);
       }
 
-      if (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) {
-        role = 'admin';
-        acceptedTermsAt = acceptedTermsAt || '2026-11-20T00:00:00.000Z';
-        acceptedTermsVersion = acceptedTermsVersion || '2026-11';
-        parentalConsentConfirmed = true;
-      }
-
       const user = {
         id: session.user.id,
         name: fullName,
         email: displayEmail,
         contactNumber,
         authMethod,
-        targetExam: session.user.user_metadata?.target_exam || 'JEE Advanced',
+        targetExam,
+        avatarUrl,
+        dailyQuestionGoal,
+        currentStreak,
         role,
         acceptedTermsAt,
         acceptedTermsVersion,
@@ -2226,7 +2574,11 @@
         createdAt: session.user.created_at
       };
       window.authService.setActiveSession(user);
-      if (window.studentStorage?.syncLocalAttemptsToSupabase) {
+      if (window.cloudSyncEngine?.hydrateAndMigrateOnLogin) {
+        window.cloudSyncEngine.hydrateAndMigrateOnLogin(user).catch(err => {
+          console.warn('[Sync] Cloud hydration notice on login:', err);
+        });
+      } else if (window.studentStorage?.syncLocalAttemptsToSupabase) {
         window.studentStorage.syncLocalAttemptsToSupabase().catch(err => {
           console.warn('[Sync] Auto-recovery sync notice on login:', err);
         });
@@ -2246,10 +2598,20 @@
 
     // Handle all auth state events
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        if (session) await processSession(session);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('nelov_password_recovery', { detail: { session } }));
+          if (!String(window.location.hash || '').includes('recovery=1')) {
+            window.location.hash = '#/login?recovery=1';
+          }
+        }
+        return;
+      }
       if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') && session) {
         await processSession(session);
       } else if (event === 'SIGNED_OUT') {
-        window.authService.logOut();
+        window.authService.logOut({ skipSupabaseSignOut: true });
       }
     });
   }
@@ -2430,21 +2792,40 @@
         const { data: sessData } = await supabaseClient.auth.getSession();
         if (!sessData?.session?.user) return;
 
+        emitSyncStatus('saving', 'Saving chapter progress');
+        const subLower = data.subject.toLowerCase();
+        const slugLower = data.chapterSlug.toLowerCase();
+        const chk = data.checklist || {};
         const payload = {
           user_id: uId,
-          subject: data.subject.toLowerCase(),
-          chapter_slug: data.chapterSlug.toLowerCase(),
-          checklist: data.checklist,
+          subject: subLower,
+          chapter_slug: slugLower,
+          chapter_id: `${subLower}:${slugLower}`,
+          checklist: chk,
+          theory_completed: Boolean(chk.notes || chk.formula),
+          exercises_completed: Boolean(chk.pyqs || chk.tests),
           progress_percent: data.progressPercent,
           updated_at: data.updatedAt || new Date().toISOString()
         };
 
-        const { error } = await supabaseClient
+        let { error } = await supabaseClient
           .from('chapter_progress')
           .upsert(payload, { onConflict: 'user_id,subject,chapter_slug' });
 
+        if (error && (error.status === 400 || error.code === '42703' || /column|schema cache/i.test(error.message || ''))) {
+          delete payload.chapter_id;
+          delete payload.theory_completed;
+          delete payload.exercises_completed;
+          const retryRes = await supabaseClient
+            .from('chapter_progress')
+            .upsert(payload, { onConflict: 'user_id,subject,chapter_slug' });
+          error = retryRes.error;
+        }
+
         if (error) {
           console.warn('[ChapterProgress] Supabase sync warning:', error.message);
+        } else {
+          emitSyncStatus('saved', 'Saved');
         }
       } catch (e) {
         console.warn('[ChapterProgress] Supabase sync exception:', e);
@@ -2618,7 +2999,10 @@
       return base;
     },
 
-    saveStore(store, userId) {
+    _cloudSyncTimer: null,
+    _dirtyDateKeys: new Set(),
+
+    saveStore(store, userId, changedDateKey) {
       const uId = this._resolveUserId(userId);
       try {
         localStorage.setItem(`nelov_${uId}_daily_planner_v1`, JSON.stringify(store));
@@ -2629,19 +3013,103 @@
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent(DAILY_PLANNER_EVENT, { detail: store }));
       }
-      this.syncCloudIfAuthenticated(store, uId);
+      if (changedDateKey) this._dirtyDateKeys.add(changedDateKey);
+      this.syncCloudIfAuthenticated(store, uId, changedDateKey);
       return store;
     },
 
-    async syncCloudIfAuthenticated(store, userId) {
-      if (!isConfigured || !supabaseClient || !userId || userId === 'guest') return;
-      try {
-        const { data: sessData } = await supabaseClient.auth.getSession();
-        if (!sessData?.session?.user) return;
-        await supabaseClient.auth.updateUser({
-          data: { nelov_daily_planner_v1: store }
-        });
-      } catch (e) {}
+    async syncCloudIfAuthenticated(store, userId, changedDateKey) {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!isConfigured || !supabaseClient || !userId || userId === 'guest' || !uuidRegex.test(String(userId))) {
+        emitSyncStatus('saved', 'Saved locally');
+        return;
+      }
+
+      emitSyncStatus('saving', 'Syncing study plan');
+      if (this._cloudSyncTimer) clearTimeout(this._cloudSyncTimer);
+      this._cloudSyncTimer = setTimeout(async () => {
+        try {
+          const { data: sessData } = await supabaseClient.auth.getSession();
+          const authUid = sessData?.session?.user?.id;
+          if (!authUid || !uuidRegex.test(authUid)) return;
+
+          const latestStore = this.getStore(authUid);
+          const keysToSync = this._dirtyDateKeys.size > 0
+            ? Array.from(this._dirtyDateKeys)
+            : (changedDateKey ? [changedDateKey] : [toLocalDateKey(new Date())]);
+          this._dirtyDateKeys.clear();
+
+          const customActs = latestStore.customActivities || [];
+          const upserts = keysToSync.map((dKey) => {
+            const dPlan = (latestStore.days && latestStore.days[dKey]) || {};
+            return {
+              user_id: authUid,
+              plan_date: dKey,
+              topics: Array.isArray(dPlan.topics) ? dPlan.topics : [],
+              timetable_blocks: dPlan.slots && typeof dPlan.slots === 'object' ? dPlan.slots : {},
+              custom_activities: customActs,
+              questions_solved_today: Number(dPlan.manualSolvedCount || 0),
+              updated_at: dPlan.updatedAt || new Date().toISOString()
+            };
+          });
+
+          let usedMetadataFallback = false;
+          if (upserts.length > 0 && !this._dailyPlansMissing) {
+            const { error: dpErr } = await supabaseClient
+              .from('daily_plans')
+              .upsert(upserts, { onConflict: 'user_id,plan_date' });
+            if (dpErr) {
+              if (dpErr.status === 404 || dpErr.code === '42P01' || /daily_plans|schema cache|not find/i.test(dpErr.message || '')) {
+                this._dailyPlansMissing = true;
+                usedMetadataFallback = true;
+              }
+            }
+          } else if (this._dailyPlansMissing) {
+            usedMetadataFallback = true;
+          }
+
+          const todayKey = toLocalDateKey(new Date());
+          const computedStreak = this.getStreak(todayKey, authUid);
+          if (!this._profileGoalColMissing) {
+            const { error: pErr } = await supabaseClient.from('profiles').update({
+              daily_question_goal: Number(latestStore.dailyTarget || 30),
+              current_streak: computedStreak,
+              last_active_date: todayKey,
+              updated_at: new Date().toISOString()
+            }).eq('id', authUid);
+            if (pErr && (pErr.status === 400 || pErr.code === '42703' || /column|schema cache/i.test(pErr.message || ''))) {
+              this._profileGoalColMissing = true;
+              usedMetadataFallback = true;
+            }
+          } else {
+            usedMetadataFallback = true;
+          }
+
+          if (usedMetadataFallback) {
+            await supabaseClient.auth.updateUser({
+              data: {
+                nelov_daily_planner_v1: latestStore,
+                daily_question_goal: Number(latestStore.dailyTarget || 30)
+              }
+            });
+          }
+
+          const curUser = window.authService?.getCurrentUser?.();
+          if (curUser && curUser.id === authUid) {
+            if (curUser.dailyQuestionGoal !== latestStore.dailyTarget || curUser.currentStreak !== computedStreak) {
+              curUser.dailyQuestionGoal = latestStore.dailyTarget;
+              curUser.currentStreak = computedStreak;
+              try {
+                localStorage.setItem(SESSION_KEY, JSON.stringify(curUser));
+              } catch (e) {}
+            }
+          }
+
+          emitSyncStatus('saved', 'Saved to cloud');
+        } catch (e) {
+          emitSyncStatus('offline', e?.message || 'Cloud sync queued');
+        }
+      }, 650);
     },
 
     getAllActivities(userId) {
@@ -2683,7 +3151,7 @@
         ...updated,
         updatedAt: new Date().toISOString()
       };
-      this.saveStore(st, userId);
+      this.saveStore(st, userId, dateKey);
       return st.days[dateKey];
     },
 
@@ -2691,7 +3159,7 @@
       const num = Math.max(1, Math.min(500, Math.round(Number(target) || 30)));
       const st = this.getStore(userId);
       st.dailyTarget = num;
-      this.saveStore(st, userId);
+      this.saveStore(st, userId, toLocalDateKey(new Date()));
       return num;
     },
 
@@ -2901,6 +3369,474 @@
         }
       }
       return streak;
+    }
+  };
+
+  // ============================================================================
+  // CLOUD SYNC ENGINE & FIRST-LOGIN GUEST MIGRATION
+  // ============================================================================
+  window.cloudSyncEngine = {
+    SYNC_EVENT: SYNC_STATUS_EVENT,
+
+    getSyncStatus() {
+      return { ...syncStatusState };
+    },
+
+    subscribeSyncStatus(listener) {
+      if (typeof window === 'undefined' || typeof listener !== 'function') return () => {};
+      const handler = (e) => listener(e.detail || syncStatusState);
+      window.addEventListener(SYNC_STATUS_EVENT, handler);
+      return () => window.removeEventListener(SYNC_STATUS_EVENT, handler);
+    },
+
+    migrateGuestLocalData(userId) {
+      if (!userId || userId === 'guest') return false;
+      const migratedFlagKey = `nelov_guest_migrated_${userId}`;
+      let changedAny = false;
+
+      // 1. Merge Guest Daily Planner (topics, timetable slots, customActivities, manualSolvedCount, dailyTarget)
+      try {
+        const guestRaw = localStorage.getItem('nelov_guest_daily_planner_v1') || localStorage.getItem('nelov_daily_planner_v1');
+        if (guestRaw) {
+          const guestPlan = JSON.parse(guestRaw);
+          const userPlanKey = `nelov_${userId}_daily_planner_v1`;
+          const existingRaw = localStorage.getItem(userPlanKey);
+          const userPlan = existingRaw
+            ? JSON.parse(existingRaw)
+            : { dailyTarget: 30, customActivities: [], days: {} };
+
+          if (guestPlan && typeof guestPlan === 'object') {
+            if (!existingRaw && guestPlan.dailyTarget) {
+              userPlan.dailyTarget = guestPlan.dailyTarget;
+            }
+            const existingActIds = new Set((userPlan.customActivities || []).map(a => a.id));
+            (guestPlan.customActivities || []).forEach(a => {
+              if (a && !existingActIds.has(a.id)) {
+                userPlan.customActivities = [...(userPlan.customActivities || []), a];
+                existingActIds.add(a.id);
+                changedAny = true;
+              }
+            });
+            const guestDays = guestPlan.days || {};
+            Object.keys(guestDays).forEach(dKey => {
+              const gDay = guestDays[dKey] || {};
+              const uDay = userPlan.days?.[dKey];
+              if (!uDay) {
+                if (!userPlan.days) userPlan.days = {};
+                userPlan.days[dKey] = gDay;
+                changedAny = true;
+              } else {
+                const seenTopIds = new Set((uDay.topics || []).map(t => t.id));
+                const seenTopText = new Set((uDay.topics || []).map(t => String(t.text || '').trim().toLowerCase()));
+                const mergedTopics = [...(uDay.topics || [])];
+                (gDay.topics || []).forEach(t => {
+                  const txt = String(t.text || '').trim().toLowerCase();
+                  if (!seenTopIds.has(t.id) && !seenTopText.has(txt)) {
+                    mergedTopics.push(t);
+                    changedAny = true;
+                  }
+                });
+                const mergedSlots = { ...(gDay.slots || {}), ...(uDay.slots || {}) };
+                const mergedManual = Math.max(Number(uDay.manualSolvedCount || 0), Number(gDay.manualSolvedCount || 0));
+                if (Object.keys(mergedSlots).length !== Object.keys(uDay.slots || {}).length || mergedManual > Number(uDay.manualSolvedCount || 0)) {
+                  changedAny = true;
+                }
+                userPlan.days[dKey] = {
+                  ...uDay,
+                  topics: mergedTopics,
+                  slots: mergedSlots,
+                  manualSolvedCount: mergedManual,
+                  updatedAt: uDay.updatedAt || gDay.updatedAt || new Date().toISOString()
+                };
+              }
+            });
+            localStorage.setItem(userPlanKey, JSON.stringify(userPlan));
+            localStorage.removeItem('nelov_guest_daily_planner_v1');
+            localStorage.removeItem('nelov_daily_planner_v1');
+          }
+        }
+      } catch (e) {}
+
+      // 2. Merge Guest Chapter Progress
+      try {
+        const guestCpRaw = localStorage.getItem('nelov_guest_chapter_progress');
+        if (guestCpRaw) {
+          const guestCp = JSON.parse(guestCpRaw);
+          const userCpKey = `nelov_${userId}_chapter_progress`;
+          const userCp = JSON.parse(localStorage.getItem(userCpKey) || '{}');
+          Object.keys(guestCp || {}).forEach(k => {
+            if (!userCp[k] || (guestCp[k].progressPercent || 0) > (userCp[k].progressPercent || 0)) {
+              userCp[k] = guestCp[k];
+              changedAny = true;
+            }
+          });
+          localStorage.setItem(userCpKey, JSON.stringify(userCp));
+          localStorage.removeItem('nelov_guest_chapter_progress');
+        }
+      } catch (e) {}
+
+      // 3. Merge Guest Bookmarks & Mistakes
+      try {
+        const gBmRaw = localStorage.getItem('nelov_guest_bookmarks');
+        if (gBmRaw) {
+          const gBm = JSON.parse(gBmRaw);
+          const uBmKey = `nelov_${userId}_bookmarks`;
+          const uBm = JSON.parse(localStorage.getItem(uBmKey) || '[]');
+          const seen = new Set(uBm.map(b => b.uniqueKey));
+          (gBm || []).forEach(b => {
+            if (b && !seen.has(b.uniqueKey)) {
+              uBm.push(b);
+              seen.add(b.uniqueKey);
+              changedAny = true;
+            }
+          });
+          localStorage.setItem(uBmKey, JSON.stringify(uBm));
+          localStorage.removeItem('nelov_guest_bookmarks');
+        }
+      } catch (e) {}
+
+      // 4. Merge Guest Test Attempts & In-Progress Sessions
+      try {
+        const gAttRaw = localStorage.getItem('nelov_guest_attempts');
+        if (gAttRaw) {
+          const gAtt = JSON.parse(gAttRaw);
+          const uAttKey = `nelov_${userId}_attempts`;
+          const uAtt = JSON.parse(localStorage.getItem(uAttKey) || '[]');
+          const seenAtt = new Set(uAtt.map(a => a.id));
+          (gAtt || []).forEach(a => {
+            if (a && !seenAtt.has(a.id)) {
+              uAtt.push({ ...a, userId });
+              seenAtt.add(a.id);
+              changedAny = true;
+            }
+          });
+          localStorage.setItem(uAttKey, JSON.stringify(uAtt));
+          localStorage.removeItem('nelov_guest_attempts');
+        }
+
+        const sessionKeys = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith('nelov_guest_session_')) sessionKeys.push(k);
+        }
+        sessionKeys.forEach(k => {
+          const testId = k.slice('nelov_guest_session_'.length);
+          const targetKey = `nelov_${userId}_session_${testId}`;
+          if (!localStorage.getItem(targetKey)) {
+            localStorage.setItem(targetKey, localStorage.getItem(k));
+            changedAny = true;
+          }
+          localStorage.removeItem(k);
+        });
+      } catch (e) {}
+
+      try {
+        localStorage.setItem(migratedFlagKey, new Date().toISOString());
+      } catch (e) {}
+
+      if (changedAny && typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent(DAILY_PLANNER_EVENT, { detail: window.dailyPlannerStore?.getStore?.(userId) }));
+        window.dispatchEvent(new CustomEvent(CHAPTER_PROGRESS_EVENT, { detail: window.chapterProgressStore?.getAllProgress?.(userId) }));
+      }
+      return changedAny;
+    },
+
+    async syncQuestionNoteOrMistake(userId, entry) {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!userId || !entry || !entry.questionId) return;
+      const bookmarks = window.studentStorage.getBookmarks(userId);
+      const uKey = entry.uniqueKey || `${entry.testId || 'general'}_${entry.questionId}`;
+      let item = bookmarks.find(b => b.uniqueKey === uKey || String(b.id) === String(entry.questionId));
+      if (!item) {
+        item = {
+          id: entry.questionId,
+          uniqueKey: uKey,
+          testId: entry.testId || 'general',
+          testCode: entry.testCode || '',
+          subject: entry.subject || 'General',
+          chapterId: entry.chapterId || null,
+          question: entry.question || entry.questionData?.question || '',
+          options: entry.options || entry.questionData?.options || [],
+          answer: entry.answer ?? entry.questionData?.answer,
+          solution: entry.solution || entry.questionData?.solution || '',
+          isMistake: Boolean(entry.isMistake),
+          isRevised: Boolean(entry.isRevised),
+          isBookmarked: entry.isBookmarked !== false,
+          personalNote: entry.personalNote || '',
+          mistakeTag: entry.mistakeTag || (entry.isMistake ? 'Mistake' : null),
+          addedAt: new Date().toISOString()
+        };
+        bookmarks.unshift(item);
+      } else {
+        if (entry.isMistake !== undefined) item.isMistake = Boolean(entry.isMistake);
+        if (entry.isRevised !== undefined) item.isRevised = Boolean(entry.isRevised);
+        if (entry.isBookmarked !== undefined) item.isBookmarked = Boolean(entry.isBookmarked);
+        if (entry.personalNote !== undefined) item.personalNote = entry.personalNote;
+        if (entry.mistakeTag !== undefined) item.mistakeTag = entry.mistakeTag;
+      }
+      try {
+        localStorage.setItem(`nelov_${userId}_bookmarks`, JSON.stringify(bookmarks));
+      } catch (e) {}
+
+      if (window.authService?.isCloudConnected() && supabaseClient && uuidRegex.test(String(userId))) {
+        emitSyncStatus('saving', 'Syncing mistake notebook');
+        try {
+          const { error } = await supabaseClient.from('question_notes_and_mistakes').upsert({
+            user_id: userId,
+            question_id: String(uKey),
+            test_id: item.testId || null,
+            subject: item.subject || 'General',
+            chapter_id: item.chapterId || null,
+            question_data: entry.questionData || {
+              id: item.id,
+              uniqueKey: item.uniqueKey,
+              testId: item.testId,
+              testCode: item.testCode,
+              subject: item.subject,
+              question: item.question,
+              options: item.options,
+              answer: item.answer,
+              solution: item.solution,
+              mistakeTag: item.mistakeTag
+            },
+            is_mistake: Boolean(item.isMistake),
+            is_revised: Boolean(item.isRevised),
+            is_bookmarked: Boolean(item.isBookmarked),
+            personal_note: item.personalNote || '',
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id,question_id' });
+          if (!error) emitSyncStatus('saved', 'Saved');
+        } catch (e) {}
+      }
+    },
+
+    async hydrateFromCloud(user) {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!user || !user.id || !uuidRegex.test(String(user.id)) || !isConfigured || !supabaseClient) return;
+
+      emitSyncStatus('saving', 'Syncing workspace');
+      const uId = user.id;
+
+      // 1. Hydrate daily_plans + user_metadata fallback
+      try {
+        const localPlan = window.dailyPlannerStore.getStore(uId);
+        let planChanged = false;
+        let metaGoal = null;
+        try {
+          const { data: userRes } = await supabaseClient.auth.getUser();
+          const uMeta = userRes?.user?.user_metadata || {};
+          if (uMeta.daily_question_goal) metaGoal = Number(uMeta.daily_question_goal);
+          if (uMeta.nelov_daily_planner_v1 && typeof uMeta.nelov_daily_planner_v1 === 'object') {
+            const mp = uMeta.nelov_daily_planner_v1;
+            if (mp.dailyTarget && (!localPlan.dailyTarget || localPlan.dailyTarget === 30)) {
+              localPlan.dailyTarget = Number(mp.dailyTarget);
+              planChanged = true;
+            }
+            Object.keys(mp.days || {}).forEach(dKey => {
+              const gDay = mp.days[dKey] || {};
+              const lDay = localPlan.days?.[dKey];
+              const gTs = gDay.updatedAt ? new Date(gDay.updatedAt).getTime() : 0;
+              const lTs = lDay?.updatedAt ? new Date(lDay.updatedAt).getTime() : 0;
+              if (!lDay || gTs > lTs) {
+                if (!localPlan.days) localPlan.days = {};
+                localPlan.days[dKey] = gDay;
+                planChanged = true;
+              }
+            });
+          }
+        } catch (e) {}
+
+        const explicitGoal = metaGoal || (user.dailyQuestionGoal && user.dailyQuestionGoal !== 30 ? Number(user.dailyQuestionGoal) : null);
+        if (explicitGoal && explicitGoal !== localPlan.dailyTarget) {
+          localPlan.dailyTarget = explicitGoal;
+          planChanged = true;
+        }
+
+        if (!window.dailyPlannerStore._dailyPlansMissing) {
+          const { data: planRows, error: dpErr } = await supabaseClient
+            .from('daily_plans')
+            .select('plan_date, topics, timetable_blocks, custom_activities, questions_solved_today, updated_at')
+            .eq('user_id', uId)
+            .order('plan_date', { ascending: false })
+            .limit(90);
+
+          if (dpErr && (dpErr.status === 404 || dpErr.code === '42P01' || /daily_plans|schema cache/i.test(dpErr.message || ''))) {
+            window.dailyPlannerStore._dailyPlansMissing = true;
+          } else if (Array.isArray(planRows) && planRows.length > 0) {
+            const actMap = new Map((localPlan.customActivities || []).map(a => [a.id, a]));
+            planRows.forEach(row => {
+              (row.custom_activities || []).forEach(a => {
+                if (a && a.id && !actMap.has(a.id)) {
+                  actMap.set(a.id, a);
+                  planChanged = true;
+                }
+              });
+              const dKey = String(row.plan_date || '').slice(0, 10);
+              if (!dKey) return;
+              const localDay = localPlan.days?.[dKey];
+              const cloudTs = row.updated_at ? new Date(row.updated_at).getTime() : 0;
+              const localTs = localDay?.updatedAt ? new Date(localDay.updatedAt).getTime() : 0;
+              if (!localDay || cloudTs >= localTs) {
+                if (!localPlan.days) localPlan.days = {};
+                localPlan.days[dKey] = {
+                  topics: Array.isArray(row.topics) ? row.topics : [],
+                  slots: row.timetable_blocks && typeof row.timetable_blocks === 'object' ? row.timetable_blocks : {},
+                  manualSolvedCount: Number(row.questions_solved_today || 0),
+                  updatedAt: row.updated_at || new Date().toISOString()
+                };
+                planChanged = true;
+              }
+            });
+            localPlan.customActivities = Array.from(actMap.values());
+          }
+        }
+        if (planChanged) {
+          localStorage.setItem(`nelov_${uId}_daily_planner_v1`, JSON.stringify(localPlan));
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent(DAILY_PLANNER_EVENT, { detail: localPlan }));
+          }
+        }
+      } catch (e) {}
+
+      // 2. Hydrate question_notes_and_mistakes into local bookmarks & mistakes cache
+      try {
+        if (!this._notesTableMissing) {
+          const { data: noteRows, error: noteErr } = await supabaseClient
+            .from('question_notes_and_mistakes')
+            .select('*')
+            .eq('user_id', uId)
+            .order('updated_at', { ascending: false });
+
+          if (noteErr && (noteErr.status === 404 || noteErr.code === '42P01' || /question_notes_and_mistakes|schema cache/i.test(noteErr.message || ''))) {
+            this._notesTableMissing = true;
+          } else if (Array.isArray(noteRows) && noteRows.length > 0) {
+            const localBms = window.studentStorage.getBookmarks(uId);
+            const bmMap = new Map(localBms.map(b => [b.uniqueKey, b]));
+            noteRows.forEach(row => {
+              const qd = row.question_data || {};
+              const uKey = String(row.question_id);
+              const existing = bmMap.get(uKey) || {};
+              bmMap.set(uKey, {
+                ...existing,
+                id: qd.id || existing.id || uKey,
+                uniqueKey: uKey,
+                testId: row.test_id || qd.testId || existing.testId || 'general',
+                testCode: qd.testCode || existing.testCode || '',
+                subject: row.subject || qd.subject || existing.subject || 'General',
+                chapterId: row.chapter_id || existing.chapterId || null,
+                question: qd.question || existing.question || '',
+                images: qd.images || existing.images || [],
+                options: qd.options || existing.options || [],
+                answer: qd.answer ?? existing.answer,
+                explanation: qd.explanation || existing.explanation || '',
+                solution: qd.solution || qd.explanation || existing.solution || '',
+                isMistake: Boolean(row.is_mistake),
+                isRevised: Boolean(row.is_revised),
+                isBookmarked: row.is_bookmarked !== false,
+                personalNote: row.personal_note || existing.personalNote || '',
+                mistakeTag: qd.mistakeTag || existing.mistakeTag || (row.is_mistake ? 'Mistake' : null),
+                updatedAt: row.updated_at || existing.updatedAt
+              });
+            });
+            localStorage.setItem(`nelov_${uId}_bookmarks`, JSON.stringify(Array.from(bmMap.values())));
+          }
+        }
+      } catch (e) {}
+
+      // 3. Hydrate test_attempts (completed history + in_progress CBT resume drafts)
+      try {
+        const { data: attemptRows } = await supabaseClient
+          .from('test_attempts')
+          .select('*')
+          .eq('user_id', uId)
+          .order('submitted_at', { ascending: false });
+
+        if (Array.isArray(attemptRows)) {
+          const inProgress = attemptRows.filter(r => r.status === 'in_progress');
+          inProgress.forEach(draft => {
+            if (!draft.test_id) return;
+            const sessKey = `nelov_${uId}_session_${draft.test_id}`;
+            const localRaw = localStorage.getItem(sessKey);
+            const localObj = localRaw ? JSON.parse(localRaw) : null;
+            const cloudTs = draft.updated_at ? new Date(draft.updated_at).getTime() : 0;
+            const localTs = localObj?.updatedAt ? new Date(localObj.updatedAt).getTime() : 0;
+            if (!localObj || cloudTs > localTs) {
+              localStorage.setItem(sessKey, JSON.stringify({
+                cloudDraftId: draft.id,
+                testId: draft.test_id,
+                testCode: draft.code,
+                responses: draft.responses || {},
+                markedForReview: draft.marked_for_review || [],
+                timeLeftSeconds: draft.time_remaining_seconds,
+                timeRemainingSeconds: draft.time_remaining_seconds,
+                timeSpentSeconds: draft.time_spent_seconds || 0,
+                questionTimings: draft.time_per_question || {},
+                updatedAt: draft.updated_at || new Date().toISOString()
+              }));
+            }
+          });
+          await window.studentStorage.fetchAttemptsFromCloud(uId);
+        }
+      } catch (e) {}
+
+      // 4. Hydrate chapter_progress
+      try {
+        await window.chapterProgressStore.fetchProgressFromSupabase(uId);
+      } catch (e) {}
+
+      emitSyncStatus('saved', 'All data synced');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('nelov_cloud_hydrated', { detail: { userId: uId } }));
+      }
+    },
+
+    async hydrateAndMigrateOnLogin(user) {
+      if (!user || !user.id) return;
+      const hadGuestChanges = this.migrateGuestLocalData(user.id);
+      if (hadGuestChanges) {
+        // Push migrated guest data up cleanly before pulling cloud records
+        const planStore = window.dailyPlannerStore?.getStore?.(user.id);
+        if (planStore && planStore.days) {
+          Object.keys(planStore.days).forEach(dKey => {
+            window.dailyPlannerStore?._dirtyDateKeys?.add(dKey);
+          });
+          await window.dailyPlannerStore?.syncCloudIfAuthenticated?.(planStore, user.id);
+        }
+        const cpAll = window.chapterProgressStore?.getAllProgress?.(user.id) || {};
+        for (const k of Object.keys(cpAll)) {
+          await window.chapterProgressStore?.syncChapterToSupabase?.(cpAll[k], user.id);
+        }
+        const localAtts = window.studentStorage?.getAttempts?.(user.id) || [];
+        if (localAtts.length > 0) {
+          try {
+            const qKey = 'nelov_pending_sync_attempts';
+            const existingQ = JSON.parse(localStorage.getItem(qKey) || '[]');
+            const seenQ = new Set(existingQ.map(i => i.id));
+            localAtts.forEach(a => { if (!seenQ.has(a.id)) existingQ.push({ ...a, userId: user.id }); });
+            localStorage.setItem(qKey, JSON.stringify(existingQ));
+          } catch (e) {}
+        }
+        const localBms = window.studentStorage?.getBookmarks?.(user.id) || [];
+        for (const bm of localBms.slice(0, 50)) {
+          await this.syncQuestionNoteOrMistake(user.id, {
+            questionId: bm.id,
+            uniqueKey: bm.uniqueKey,
+            testId: bm.testId,
+            testCode: bm.testCode,
+            subject: bm.subject,
+            chapterId: bm.chapterId,
+            questionData: bm,
+            isBookmarked: bm.isBookmarked !== false,
+            isMistake: Boolean(bm.isMistake || bm.mistakeTag),
+            personalNote: bm.personalNote || '',
+            mistakeTag: bm.mistakeTag
+          });
+        }
+      }
+      if (window.studentStorage?.syncLocalAttemptsToSupabase) {
+        await window.studentStorage.syncLocalAttemptsToSupabase().catch(() => {});
+      }
+      await this.hydrateFromCloud(user);
     }
   };
 

@@ -1,118 +1,75 @@
-# Supabase Setup & Production Deployment Guide
-**Platform:** [NelovMallickIITD CBT Platform](https://github.com/NEEL-IITD/nelovmallickiitd-cbt)  
+# Supabase Setup & Cloud Sync Guide
+**Platform:** [NelovMallickIITD JEE CBT & Study Portal](https://github.com/NEEL-IITD/nelovmallickiitd-cbt)  
 **Author & Mentor:** Nelov Mallick (IIT Delhi)  
 **License:** 100% Free Forever · Zero Pricing
 
 ---
 
-This guide walks you through connecting your **Supabase (Free Tier)** database, configuring one-click **"Continue with Google"** authentication, and granting your personal account **Admin Access** to the `/admin` dashboard.
+This guide explains how to connect **Supabase (PostgreSQL + Auth + Row Level Security)** so students can sign in with **Google OAuth** or **Email/Password** and automatically sync their daily goals, streaks, 24-hour timetable blocks, in-progress/completed test attempts, scores, mistake notebooks, and 83-chapter progress across phone and laptop.
 
 > [!NOTE]
-> The platform is designed with an automatic local fallback mode. If Supabase keys are not set yet, the platform runs offline seamlessly via Web Crypto SHA-256 and client-side storage so that you and students can always test and practice without downtime.
+> If Supabase environment variables are not configured locally yet, the app automatically falls back to browser `localStorage` with a subtle non-blocking banner. Once a student signs in on a Supabase-connected deployment, guest `localStorage` data is automatically merged and synced to Postgres.
 
 ---
 
-## Step 1: Create a Supabase Project
+## Step 1: Run `supabase/schema.sql` in Supabase SQL Editor
 
-1. Go to [supabase.com](https://supabase.com) and sign in (or create a free account).
-2. Click **New Project**.
-3. Choose an organization, enter a project name (e.g., `nelovmallickiitd-cbt`), and set a secure database password.
-4. Select your preferred region (e.g. `South Asia (Mumbai)` or closest to your users) and choose the **Free Tier**.
-5. Wait 1–2 minutes for the database to provision.
-
----
-
-## Step 2: Run the Database Schema
-
-1. In your Supabase dashboard, open the **SQL Editor** from the left navigation.
-2. Click **+ New Query**.
-3. Open `supabase/schema.sql` from this repository, copy its entire contents, and paste them into the SQL Editor.
-4. Click **Run** (or press `Ctrl+Enter` / `Cmd+Enter`).
-5. You should see `Success. No rows returned`.
-6. Open **Table Editor** to verify the following tables were created:
-   - `profiles` (with automatic `handle_new_user()` trigger on signup)
-   - `test_configs` (pre-seeded with PTA 01 to PTA 10 for JEE Mains and JEE Advanced)
-   - `test_attempts` (scores, detailed responses, mistake tags)
-   - `bookmarks` (personal Revision Notebook)
-   - `error_reports` (student error submissions)
+1. Open your project in the [Supabase Dashboard](https://supabase.com/dashboard).
+2. Navigate to **SQL Editor** → **+ New Query**.
+3. Open [supabase/schema.sql](supabase/schema.sql) (or [supabase/migrations/2026_supabase_cloud_sync_and_auth.sql](supabase/migrations/2026_supabase_cloud_sync_and_auth.sql) if your base schema is already deployed), copy the SQL contents, and click **Run**.
+4. Open **Table Editor** & **Authentication → Policies** to confirm Row Level Security (`RLS`) is enabled across:
+   - `public.profiles` (auto-created on signup via `handle_new_user()` trigger; stores `role`, `target_exam`, `daily_question_goal`, `current_streak`, `avatar_url`)
+   - `public.daily_plans` (`user_id, plan_date` unique; stores daily topics, 24h `timetable_blocks`, custom activities, `questions_solved_today`)
+   - `public.test_attempts` (stores `in_progress` cross-device resume drafts + `completed` scorecards, percentiles, `question_timings`)
+   - `public.question_notes_and_mistakes` (`user_id, question_id` unique; stores `is_mistake`, `is_revised`, `is_bookmarked`, `personal_note`)
+   - `public.chapter_progress` (`user_id, subject, chapter_slug` unique; stores 83-chapter `theory_completed`, `exercises_completed`, milestones)
 
 ---
 
-## Step 3: Configure Google OAuth ("Continue with Google")
+## Step 2: Enable Google OAuth, Email Auth & Redirect URLs
 
-To enable one-click Google Login:
+### A. Authentication Providers
+1. Go to **Authentication** → **Providers**:
+   - **Email:** Ensure **Email** is enabled. *(For smoother student onboarding, you can optionally toggle email confirmations according to your preference).*
+   - **Google:** Toggle **Google** enabled and paste your OAuth **Client ID** and **Client Secret** from [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
+     - Add this Authorized Redirect URI in Google Cloud Console:
+       ```
+       https://<YOUR-PROJECT-REF>.supabase.co/auth/v1/callback
+       ```
 
-### A. Create Google Cloud Credentials
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
-2. Create a new project (e.g., `NelovMallickIITD-CBT`).
-3. Navigate to **APIs & Services** > **OAuth consent screen**:
-   - Choose **External** and click **Create**.
-   - App name: `NelovMallickIITD CBT`
-   - User support email: your email.
-   - Developer contact email: your email.
-   - Click **Save and Continue** through Scopes and Test Users.
-4. Navigate to **APIs & Services** > **Credentials**:
-   - Click **+ Create Credentials** > **OAuth client ID**.
-   - Application type: **Web application**.
-   - Name: `Supabase Web Client`.
-   - Under **Authorized redirect URIs**, add your Supabase Auth callback URL:
+### B. URL Configuration (Critical for OAuth & Password Reset!)
+1. Go to **Authentication** → **URL Configuration**:
+   - **Site URL:** Set to your production URL (e.g. `https://your-domain.vercel.app`) or `http://localhost:3000` for local testing.
+   - **Redirect URLs:** Add every allowed callback origin:
      ```
-     https://<YOUR-PROJECT-REF>.supabase.co/auth/v1/callback
+     http://localhost:3000
+     http://localhost:3000/**
+     https://your-domain.vercel.app
+     https://your-domain.vercel.app/**
      ```
-     *(You can copy this exact URL from Supabase Dashboard > Authentication > Providers > Google)*.
-   - Click **Create**.
-   - Copy the generated **Client ID** and **Client Secret**.
-
-### B. Enable Google in Supabase
-1. In the Supabase Dashboard, go to **Authentication** > **Providers**.
-2. Click **Google** and toggle it **Enabled**.
-3. Paste your **Client ID** and **Client Secret**.
-4. Click **Save**.
 
 ---
 
-## Step 4: Add Environment Variables
+## Step 3: Add Environment Variables & Promote Admin Role
 
-1. In the Supabase Dashboard, go to **Project Settings** (gear icon) > **API**.
-2. Copy the **Project URL** and the **`anon` `public` key**.
-3. In the project root, create a file named `.env` by copying `.env.example`:
+1. Copy your **Project URL** and **anon public key** from **Project Settings** → **API**.
+2. Locally, copy `.env.example` to `.env`:
    ```bash
    cp .env.example .env
    ```
-4. Paste your values into `.env`:
+   Fill in:
    ```ini
-   VITE_SUPABASE_URL=https://your-project-id.supabase.co
-   VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   VITE_SUPABASE_URL=https://<YOUR-PROJECT-REF>.supabase.co
+   VITE_SUPABASE_ANON_KEY=<YOUR-ANON-PUBLIC-KEY>
    ```
-5. When deploying to **Vercel**, **Netlify**, or **Cloudflare Pages**, add these two variables in the hosting dashboard under **Environment Variables**.
-
----
-
-## Step 5: Promote Your Account to Admin (`/admin`)
-
-The private **Admin Dashboard** (`/admin`) is strictly protected and checks `profile.role === 'admin'`. No passwords or secret keys are hardcoded in the frontend.
-
-To elevate your account to Admin:
-1. First, sign up on the platform with your email (via Email/Password or "Continue with Google").
-2. In Supabase Dashboard, go to **SQL Editor** and run:
-   ```sql
-   UPDATE public.profiles
-   SET role = 'admin'
-   WHERE email = 'your-email@example.com';
-   ```
-3. Refresh the platform. You will now see:
-   - An **"Admin Panel"** link in your user profile dropdown in the top navbar.
-   - Full access to `http://localhost:3000/#/admin` (or `https://your-site.com/#/admin`).
-   - Powers to toggle tests between **Live Now** and **Coming Soon**, review error reports, view student attempt logs, and inspect platform KPIs.
-
----
-
-## Step 6: Verify Everything Works
-
-1. Start the platform:
-   ```bash
-   node server.js
-   ```
-2. Open `http://localhost:3000`.
-3. Try clicking **"Continue with Google"** on the Sign In modal.
-4. Attempt a test, bookmark a question, submit an error report, and check the `/admin` portal.
+   *(If deploying on a Next.js-style host or sharing keys, `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are also supported).*
+3. In **Vercel / Netlify** project settings → **Environment Variables**, add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`, then redeploy.
+4. **Promote Your Admin Account (`role = 'admin'`):**
+   - Sign up or log in on the site using `mallicknelov@gmail.com`.
+   - Run in Supabase **SQL Editor**:
+     ```sql
+     UPDATE public.profiles
+     SET role = 'admin'
+     WHERE LOWER(email) = 'mallicknelov@gmail.com';
+     ```
+   - Refresh the site cleanly: Admin tools (`Upload JSON / Upload PDF` & `#/admin`) only unlock when `profiles.role === 'admin'` on your verified Supabase session.

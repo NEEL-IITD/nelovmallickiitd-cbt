@@ -1,8 +1,8 @@
 export type ExamType = 'jee' | 'neet' | 'JEE Mains' | 'JEE Advanced';
 
-export type TargetExam = 'JEE Mains' | 'JEE Advanced' | 'Both';
+export type TargetExam = 'JEE 2027' | 'JEE Mains' | 'JEE Advanced' | 'Both';
 export type UserRole = 'student' | 'admin';
-export type AuthMethod = 'google' | 'gmail' | 'phone' | 'email_with_phone';
+export type AuthMethod = 'google' | 'gmail' | 'email' | 'phone' | 'email_with_phone';
 
 export interface User {
   id: string;
@@ -11,6 +11,10 @@ export interface User {
   contactNumber?: string | null;
   authMethod?: AuthMethod;
   targetExam: TargetExam;
+  avatarUrl?: string | null;
+  dailyQuestionGoal?: number;
+  currentStreak?: number;
+  needsEmailConfirmation?: boolean;
   role: UserRole;
   createdAt: string;
   lastLoginAt?: string;

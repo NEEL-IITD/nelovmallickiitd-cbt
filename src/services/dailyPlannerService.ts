@@ -5,6 +5,7 @@
 
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { authService } from './authService';
+import { cloudSyncService } from './cloudSyncService';
 import { studentStorage } from '../utils/studentStorage';
 
 export interface PlannerActivity {
@@ -141,7 +142,10 @@ export const dailyPlannerService = {
     return base;
   },
 
-  saveStore(store: DailyPlannerStoreData, userId?: string | null): DailyPlannerStoreData {
+  _cloudTimer: null as any,
+  _dirtyDates: new Set<string>(),
+
+  saveStore(store: DailyPlannerStoreData, userId?: string | null, changedDateKey?: string): DailyPlannerStoreData {
     const uId = this._resolveUserId(userId);
     try {
       localStorage.setItem(`nelov_${uId}_daily_planner_v1`, JSON.stringify(store));
@@ -152,17 +156,63 @@ export const dailyPlannerService = {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent(DAILY_PLANNER_EVENT, { detail: store }));
     }
-    this.syncCloudIfAuthenticated(store, uId);
+    if (changedDateKey) this._dirtyDates.add(changedDateKey);
+    this.syncCloudIfAuthenticated(store, uId, changedDateKey);
     return store;
   },
 
-  async syncCloudIfAuthenticated(store: DailyPlannerStoreData, userId?: string | null): Promise<void> {
-    if (!isSupabaseConfigured || !supabase || !userId || userId === 'guest') return;
-    try {
-      const { data: sessData } = await supabase.auth.getSession();
-      if (!sessData?.session?.user) return;
-      await supabase.auth.updateUser({ data: { nelov_daily_planner_v1: store } });
-    } catch {}
+  async syncCloudIfAuthenticated(_store: DailyPlannerStoreData, userId?: string | null, changedDateKey?: string): Promise<void> {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!isSupabaseConfigured || !supabase || !userId || userId === 'guest' || !uuidRegex.test(userId)) {
+      cloudSyncService.emitSyncStatus('saved', 'Saved locally');
+      return;
+    }
+
+    cloudSyncService.emitSyncStatus('saving', 'Syncing study plan');
+    if (this._cloudTimer) clearTimeout(this._cloudTimer);
+    this._cloudTimer = setTimeout(async () => {
+      try {
+        const { data: sessData } = await supabase!.auth.getSession();
+        const authUid = sessData?.session?.user?.id;
+        if (!authUid || !uuidRegex.test(authUid)) return;
+
+        const latest = this.getStore(authUid);
+        const keysToSync = this._dirtyDates.size > 0
+          ? Array.from(this._dirtyDates)
+          : (changedDateKey ? [changedDateKey] : [toLocalDateKey(new Date())]);
+        this._dirtyDates.clear();
+
+        const upserts = keysToSync.map((dKey) => {
+          const dPlan = latest.days?.[dKey] || { topics: [], slots: {}, manualSolvedCount: 0 };
+          return {
+            user_id: authUid,
+            plan_date: dKey,
+            topics: dPlan.topics || [],
+            timetable_blocks: dPlan.slots || {},
+            custom_activities: latest.customActivities || [],
+            questions_solved_today: Number(dPlan.manualSolvedCount || 0),
+            updated_at: dPlan.updatedAt || new Date().toISOString(),
+          };
+        });
+
+        if (upserts.length > 0) {
+          await supabase!.from('daily_plans').upsert(upserts, { onConflict: 'user_id,plan_date' });
+        }
+
+        const todayKey = toLocalDateKey(new Date());
+        const computedStreak = this.getStreak(todayKey, authUid);
+        await supabase!.from('profiles').update({
+          daily_question_goal: Number(latest.dailyTarget || 30),
+          current_streak: computedStreak,
+          last_active_date: todayKey,
+          updated_at: new Date().toISOString(),
+        }).eq('id', authUid);
+
+        cloudSyncService.emitSyncStatus('saved', 'Saved to cloud');
+      } catch (e: any) {
+        cloudSyncService.emitSyncStatus('offline', e?.message || 'Cloud sync queued');
+      }
+    }, 650);
   },
 
   getAllActivities(userId?: string | null): PlannerActivity[] {
@@ -205,7 +255,7 @@ export const dailyPlannerService = {
       manualSolvedCount: cur.manualSolvedCount
     });
     st.days[dateKey] = { ...next, updatedAt: new Date().toISOString() };
-    this.saveStore(st, userId);
+    this.saveStore(st, userId, dateKey);
     return st.days[dateKey];
   },
 
@@ -213,7 +263,7 @@ export const dailyPlannerService = {
     const num = Math.max(1, Math.min(500, Math.round(Number(target) || 30)));
     const st = this.getStore(userId);
     st.dailyTarget = num;
-    this.saveStore(st, userId);
+    this.saveStore(st, userId, toLocalDateKey(new Date()));
     return num;
   },
 

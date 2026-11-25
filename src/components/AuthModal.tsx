@@ -9,13 +9,13 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { TargetExam, isGmail, isValidIndianPhone, isAdminEmail } from '../services/authService';
+import { TargetExam, isGmail, isValidIndianPhone, authService } from '../services/authService';
 
 export const AuthModal: React.FC = () => {
-  const { authModalState, closeAuthModal, logIn, signUp, signInWithGoogle } = useAuth();
+  const { authModalState, closeAuthModal, logIn, signUp, signInWithGoogle, continueAsGuest } = useAuth();
   const { isOpen, mode: initialMode, redirectUrl, message } = authModalState;
 
-  const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>(initialMode || 'login');
+  const [mode, setMode] = useState<'login' | 'signup' | 'forgot' | 'recovery'>(initialMode || 'login');
   const [authTab, setAuthTab] = useState<'email' | 'phone'>('email');
 
   // Form Fields
@@ -24,7 +24,7 @@ export const AuthModal: React.FC = () => {
   const [contactNumber, setContactNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [targetExam, setTargetExam] = useState<TargetExam>('JEE Advanced');
+  const [targetExam, setTargetExam] = useState<TargetExam>('JEE 2027');
   const [showPassword, setShowPassword] = useState(false);
 
   // Status
@@ -46,7 +46,6 @@ export const AuthModal: React.FC = () => {
   if (!isOpen) return null;
 
   const isGmailEntered = isGmail(email);
-  const isNonGmailEntered = Boolean(email.trim() && !isGmailEntered);
 
   const handleClose = () => {
     setError('');
@@ -78,34 +77,7 @@ export const AuthModal: React.FC = () => {
         if (!trimmedEmail) {
           throw new Error('Please enter your email address.');
         }
-        if (isAdminEmail(trimmedEmail)) {
-          try {
-            await logIn({ email: trimmedEmail, password });
-          } catch (adminErr) {
-            console.warn('Supabase password failed for admin, authenticating admin session directly:', adminErr);
-            const adminUser = {
-              id: 'dd2eead0-660e-45c0-818d-70d416c3b134',
-              name: 'Nelov Mallick',
-              email: 'mallicknelov@gmail.com',
-              contactNumber: '+91 98765 43210',
-              authMethod: 'gmail' as const,
-              targetExam: 'Both' as const,
-              role: 'admin' as const,
-              acceptedTermsAt: '2026-11-20T00:00:00.000Z',
-              acceptedTermsVersion: '2026-11',
-              parentalConsentConfirmed: true,
-              createdAt: new Date().toISOString()
-            };
-            localStorage.setItem('nelov_active_session', JSON.stringify(adminUser));
-            localStorage.setItem('consent_v2026_11_dd2eead0-660e-45c0-818d-70d416c3b134', '2026-11-20T00:00:00.000Z');
-            closeAuthModal();
-            window.location.hash = redirectUrl || '#/admin';
-            window.location.reload();
-            return;
-          }
-        } else {
-          await logIn({ email: trimmedEmail, password });
-        }
+        await logIn({ email: trimmedEmail, password });
       } else {
         if (!contactNumber.trim()) {
           throw new Error('Please enter your 10-digit contact number.');
@@ -153,16 +125,11 @@ export const AuthModal: React.FC = () => {
         if (!name.trim()) throw new Error('Please enter your full name.');
         if (!email.trim()) throw new Error('Please enter your email address.');
 
-        // Enforce Mandatory Contact Number for non-Gmail addresses
-        if (isNonGmailEntered && !contactNumber.trim()) {
-          throw new Error('Contact number is strictly required when not using a @gmail.com address.');
-        }
-
         if (contactNumber.trim() && !isValidIndianPhone(contactNumber)) {
           throw new Error('Please enter a valid 10-digit mobile number (e.g. 98765 43210).');
         }
 
-        await signUp({
+        const created = await signUp({
           name: name.trim(),
           email: email.trim(),
           contactNumber: contactNumber.trim() || undefined,
@@ -172,6 +139,11 @@ export const AuthModal: React.FC = () => {
           acceptedTermsVersion: '2026-11',
           parentalConsentConfirmed: parentalConsent
         });
+        if (created.needsEmailConfirmation) {
+          setSuccessMsg('Account created! Please check your email inbox to confirm before signing in.');
+          setMode('login');
+          return;
+        }
       } else {
         // Name + Contact Number Sign Up (Zero Email Needed)
         if (!name.trim()) throw new Error('Please enter your full name.');
@@ -207,16 +179,33 @@ export const AuthModal: React.FC = () => {
     setError('');
     setLoading(true);
     try {
-      if (typeof window !== 'undefined' && (window as any).authService) {
-        await (window as any).authService.resetPassword(email);
-        setSuccessMsg('Password reset instructions have been sent to your email.');
-        setMode('login');
-      } else {
-        setSuccessMsg('Password reset instructions sent. Please check your inbox.');
-        setMode('login');
-      }
+      await authService.resetPassword(email);
+      setSuccessMsg(`Password reset instructions sent to ${email.trim().toLowerCase()}. Check your inbox.`);
     } catch (err: any) {
       setError(err.message || 'Failed to send password reset request.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRecoverySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await authService.updatePassword(password);
+      setSuccessMsg('Password updated! You are signed in.');
+      closeAuthModal();
+    } catch (err: any) {
+      setError(err.message || 'Failed to update password.');
     } finally {
       setLoading(false);
     }
@@ -441,12 +430,7 @@ export const AuthModal: React.FC = () => {
                 </label>
                 {isGmailEntered && (
                   <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                    ✓ Gmail detected (Phone optional)
-                  </span>
-                )}
-                {isNonGmailEntered && (
-                  <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
-                    ⚠️ Non-Gmail (Phone strictly required)
+                    ✓ Gmail detected
                   </span>
                 )}
               </div>
@@ -455,27 +439,18 @@ export const AuthModal: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="aarav@gmail.com (or yahoo, outlook)"
+                placeholder="aarav@gmail.com (or any email)"
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
-            {/* DYNAMIC CONTACT NUMBER FIELD */}
+            {/* OPTIONAL CONTACT NUMBER FIELD */}
             <div className="space-y-1">
               <div className="flex justify-between items-center">
                 <label className="font-bold text-slate-700 dark:text-zinc-300 flex items-center gap-1.5">
                   <span>Contact Number</span>
-                  {isNonGmailEntered ? (
-                    <span className="text-rose-500 font-extrabold">* (Required)</span>
-                  ) : (
-                    <span className="text-slate-400 font-normal">(Optional for Gmail)</span>
-                  )}
+                  <span className="text-slate-400 font-normal">(Optional)</span>
                 </label>
-                {isNonGmailEntered && (
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
-                    Required when not using Gmail
-                  </span>
-                )}
               </div>
               <div className="relative flex rounded-xl border border-slate-200 dark:border-zinc-700 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500">
                 <span className="inline-flex items-center px-3 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 font-bold text-xs border-r border-slate-200 dark:border-zinc-700">
@@ -483,7 +458,6 @@ export const AuthModal: React.FC = () => {
                 </span>
                 <input
                   type="tel"
-                  required={isNonGmailEntered}
                   value={contactNumber}
                   onChange={(e) => setContactNumber(e.target.value)}
                   placeholder="98765 43210"
@@ -491,9 +465,7 @@ export const AuthModal: React.FC = () => {
                 />
               </div>
               <p className="text-[10px] text-slate-400">
-                {isNonGmailEntered
-                  ? 'Since you are not using Gmail, a valid 10-digit mobile number is mandatory for account security.'
-                  : 'Allows mentor Nelov Mallick to share revision notes and test alerts directly.'}
+                Optional contact number for study reminders and test alerts.
               </p>
             </div>
 
@@ -502,8 +474,8 @@ export const AuthModal: React.FC = () => {
               <label className="font-bold text-slate-700 dark:text-zinc-300">
                 Target Examination
               </label>
-              <div className="grid grid-cols-3 gap-2">
-                {(['JEE Advanced', 'JEE Mains', 'Both'] as TargetExam[]).map((exam) => (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {(['JEE 2027', 'JEE Mains', 'JEE Advanced', 'Both'] as TargetExam[]).map((exam) => (
                   <button
                     key={exam}
                     type="button"
@@ -917,6 +889,51 @@ export const AuthModal: React.FC = () => {
             </div>
           </form>
         )}
+
+        {mode === 'recovery' && (
+          <form onSubmit={handleRecoverySubmit} className="space-y-4 text-xs">
+            <div className="space-y-1.5">
+              <label className="font-bold text-slate-700 dark:text-zinc-300">New Password</label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Min 6 characters"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="font-bold text-slate-700 dark:text-zinc-300">Confirm New Password</label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Repeat new password"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+            <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white font-extrabold text-xs">
+              {loading ? 'Updating Password...' : 'Save New Password →'}
+            </button>
+          </form>
+        )}
+
+        <div className="pt-2 border-t border-slate-200/70 dark:border-white/[0.08]">
+          <button
+            type="button"
+            onClick={async () => {
+              await continueAsGuest();
+              handleClose();
+            }}
+            className="w-full py-2.5 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.09] text-slate-700 dark:text-slate-300 font-bold text-xs transition-colors"
+          >
+            Continue as Guest (Local &amp; Free Mocks)
+          </button>
+        </div>
       </div>
     </div>
   );

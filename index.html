@@ -3910,7 +3910,7 @@ function PhysicsCbtTestShellModal({
 
 function VaultContentManagerView({ onLaunchTest, onClose }) {
   const currentSessionUser = window.authService?.getCurrentUser ? window.authService.getCurrentUser() : null;
-  const isStrictAdmin = Boolean(currentSessionUser) && currentSessionUser.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+  const isStrictAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (currentSessionUser && currentSessionUser.role === 'admin'));
   if (!isStrictAdmin) return null;
 
   const [activeTab, setActiveTab] = useState('upload-json');
@@ -5192,7 +5192,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
     // Supports 3 Sub-Topic Tabs for Maths C18 (Applications of Derivative)
     // ==============================================================================
     function Level3SubjectChapterDetailView({ subject = 'physics', chapterSlug, setView, currentUser }) {
-      const isStrictAdmin = Boolean(currentUser) && currentUser.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+      const isStrictAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (currentUser && currentUser.role === 'admin'));
       const [activeExerciseForTest, setActiveExerciseForTest] = useState(null);
       const [showTheoryModal, setShowTheoryModal] = useState(false);
       const [activeSubTopicIndex, setActiveSubTopicIndex] = useState(0);
@@ -7935,7 +7935,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
     }
 
 
-    // COMPONENT: Free User Authentication Modal (Log In / Sign Up / Forgot Password)
+    // COMPONENT: Free User Authentication Modal (Log In / Sign Up / Forgot Password / Recovery)
     function AuthModalDialog({ isOpen, mode: initialMode, redirectUrl, message, onClose, onAuthSuccess }) {
       const [authMode, setAuthMode] = useState(initialMode || 'login');
       const [authTab, setAuthTab] = useState('email');
@@ -7944,7 +7944,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [contactNumber, setContactNumber] = useState('');
       const [password, setPassword] = useState('');
       const [confirmPassword, setConfirmPassword] = useState('');
-      const [targetExam, setTargetExam] = useState('JEE Advanced');
+      const [targetExam, setTargetExam] = useState('JEE 2027');
       const [showPassword, setShowPassword] = useState(false);
       const [error, setError] = useState('');
       const [successMsg, setSuccessMsg] = useState('');
@@ -7961,7 +7961,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       if (!isOpen) return null;
 
       const isGmail = (email || '').trim().toLowerCase().endsWith('@gmail.com');
-      const isNonGmailEntered = Boolean(email.trim() && !isGmail);
+      const isCloudReady = Boolean(window.authService?.isCloudConnected?.());
 
       const isValidPhone = (num) => {
         const clean = (num || '').replace(/[\s\-\(\)\+]/g, '');
@@ -7972,46 +7972,20 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const handleLoginSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setSuccessMsg('');
         setLoading(true);
         try {
           let user;
           const trimmedEmail = (email || '').trim().toLowerCase();
           if (authTab === 'email') {
             if (!trimmedEmail) throw new Error('Please enter your email address.');
-            if (trimmedEmail === 'mallicknelov@gmail.com' || (window.authService && window.authService.isAdminEmail && window.authService.isAdminEmail(trimmedEmail))) {
-              try {
-                user = await window.authService.logIn({ email: trimmedEmail, password });
-              } catch (adminErr) {
-                console.warn('Supabase password failed for admin, authenticating admin session directly:', adminErr);
-                user = {
-                  id: 'dd2eead0-660e-45c0-818d-70d416c3b134',
-                  name: 'Nelov Mallick',
-                  email: 'mallicknelov@gmail.com',
-                  contactNumber: '+91 98765 43210',
-                  authMethod: 'gmail',
-                  targetExam: 'Both',
-                  role: 'admin',
-                  acceptedTermsAt: '2026-11-20T00:00:00.000Z',
-                  acceptedTermsVersion: '2026-11',
-                  parentalConsentConfirmed: true,
-                  createdAt: new Date().toISOString()
-                };
-                if (window.authService && window.authService.setActiveSession) {
-                  window.authService.setActiveSession(user);
-                } else {
-                  localStorage.setItem('nelov_active_session', JSON.stringify(user));
-                }
-                localStorage.setItem('consent_v2026_11_dd2eead0-660e-45c0-818d-70d416c3b134', '2026-11-20T00:00:00.000Z');
-              }
-            } else {
-              user = await window.authService.logIn({ email: trimmedEmail, password });
-            }
+            user = await window.authService.logIn({ email: trimmedEmail, password });
           } else {
             if (!contactNumber.trim()) throw new Error('Please enter your 10-digit contact number.');
             if (!isValidPhone(contactNumber)) throw new Error('Please enter a valid 10-digit mobile number.');
             user = await window.authService.logIn({ contactNumber: contactNumber.trim(), password });
           }
-          setSuccessMsg('Logged in successfully!');
+          setSuccessMsg('Signed in! Syncing your study workspace...');
           onAuthSuccess(user, redirectUrl);
         } catch (err) {
           setError(err.message || 'Login failed. Please check your credentials.');
@@ -8023,6 +7997,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const handleSignUpSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setSuccessMsg('');
         if (!acceptedTerms) {
           setError('You must read and accept the Terms of Service and Privacy Policy to create a free account.');
           return;
@@ -8041,9 +8016,6 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           if (authTab === 'email') {
             if (!name.trim()) throw new Error('Please enter your full name.');
             if (!email.trim()) throw new Error('Please enter your email address.');
-            if (isNonGmailEntered && !contactNumber.trim()) {
-              throw new Error('Contact number is strictly required when not using a @gmail.com address.');
-            }
             if (contactNumber.trim() && !isValidPhone(contactNumber)) {
               throw new Error('Please enter a valid 10-digit mobile number (e.g. 98765 43210).');
             }
@@ -8073,8 +8045,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               parentalConsentConfirmed: parentalConsent
             });
           }
-          setSuccessMsg('Free account created successfully!');
-          onAuthSuccess(user, redirectUrl);
+          if (user?.needsEmailConfirmation) {
+            setSuccessMsg('Account created! Please check your email inbox to confirm your address before signing in.');
+            setAuthMode('login');
+          } else {
+            setSuccessMsg('Free account created! Cloud sync activated.');
+            onAuthSuccess(user, redirectUrl);
+          }
         } catch (err) {
           setError(err.message || 'Failed to create account.');
         } finally {
@@ -8085,53 +8062,87 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const handleForgotSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setSuccessMsg('');
+        setLoading(true);
+        try {
+          const res = await window.authService.resetPassword(email);
+          setSuccessMsg(res?.message || 'Password reset email sent! Check your inbox.');
+        } catch (err) {
+          setError(err.message || 'Failed to send reset instructions.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const handleRecoverySubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccessMsg('');
+        if (password.length < 6) {
+          setError('New password must be at least 6 characters.');
+          return;
+        }
         if (password !== confirmPassword) {
           setError('Passwords do not match.');
           return;
         }
         setLoading(true);
         try {
-          await window.authService.resetPassword(email, password);
-          setSuccessMsg('Password reset successfully! You can now log in.');
-          setAuthMode('login');
+          await window.authService.updatePassword(password);
+          setSuccessMsg('Password updated! You are signed in.');
           setPassword('');
           setConfirmPassword('');
+          const cur = window.authService?.getCurrentUser();
+          if (cur) onAuthSuccess(cur, redirectUrl);
         } catch (err) {
-          setError(err.message || 'Failed to reset password.');
+          setError(err.message || 'Failed to update password.');
         } finally {
           setLoading(false);
         }
       };
 
+      const handleContinueAsGuest = async () => {
+        try {
+          await window.authService?.continueAsGuest?.();
+        } catch (e) {}
+        onClose();
+      };
+
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-md rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 sm:p-8 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080B14]/80 backdrop-blur-md animate-in fade-in">
+          <div className="relative w-full max-w-md rounded-3xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-gradient-to-br dark:from-[#12172A] dark:to-[#171D35] p-6 sm:p-8 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
               aria-label="Close"
             >
               ✕
             </button>
 
             <div className="text-center space-y-1.5">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold text-sm flex items-center justify-center mx-auto shadow-md shadow-indigo-600/30">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#6366F1] to-[#7C3AED] text-white font-black text-sm flex items-center justify-center mx-auto shadow-lg shadow-indigo-600/35">
                 NM
               </div>
-              <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-zinc-50 tracking-tight">
-                {authMode === 'login' && 'Student Log In'}
-                {authMode === 'signup' && 'Create Free Account'}
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-[#F8FAFC] tracking-tight">
+                {authMode === 'login' && 'Welcome Back, Aspirant'}
+                {authMode === 'signup' && 'Create Free Cloud Account'}
                 {authMode === 'forgot' && 'Reset Password'}
+                {authMode === 'recovery' && 'Set New Password'}
               </h3>
-              <p className="text-xs text-slate-500 dark:text-zinc-400">
+              <p className="text-xs text-slate-500 dark:text-[#94A3B8]">
                 {message || (authMode === 'login'
-                  ? 'Sign in to attempt CBT live tests, view solutions & track rank'
-                  : '100% Free Forever · No payment or credit card required')}
+                  ? 'Sign in with Google or Email to sync your Daily Goals, Streaks, Timetable & CBT tests across phone and laptop.'
+                  : '100% Free Forever · Auto-syncs progress across all devices')}
               </p>
-              <div className="pt-1">
-                <span className="inline-flex px-3 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                  ✓ 100% Free Access · Mentored by Nelov Mallick (IIT Delhi)
+              <div className="pt-1 flex items-center justify-center gap-2 flex-wrap">
+                <span className="inline-flex px-3 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">
+                  ✓ 100% Free · Nelov Mallick (IIT Delhi)
                 </span>
+                {!isCloudReady && (
+                  <span className="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
+                    Offline Local Mode
+                  </span>
+                )}
               </div>
             </div>
 
@@ -8317,46 +8328,35 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   <div className="flex justify-between items-center">
                     <label className="font-bold text-slate-700 dark:text-zinc-300">Email Address <span className="text-rose-500">*</span></label>
                     {isGmail && <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">✓ Gmail detected</span>}
-                    {isNonGmailEntered && <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">⚠️ Phone strictly required</span>}
                   </div>
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="student@gmail.com (or other email)"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="student@gmail.com (or any email)"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0E1322] text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
 
-                {/* DYNAMIC CONTACT NUMBER FOR EMAIL SIGNUP */}
+                {/* OPTIONAL CONTACT NUMBER FOR EMAIL SIGNUP */}
                 <div className="space-y-1">
                   <div className="flex justify-between items-center">
                     <label className="font-bold text-slate-700 dark:text-zinc-300 flex items-center gap-1.5">
                       <span>Contact Number</span>
-                      {isNonGmailEntered ? (
-                        <span className="text-rose-500 font-extrabold">* (Required)</span>
-                      ) : (
-                        <span className="text-slate-400 font-normal">(Optional for Gmail)</span>
-                      )}
+                      <span className="text-slate-400 font-normal">(Optional)</span>
                     </label>
-                    {isNonGmailEntered && (
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
-                        Required when not using Gmail
-                      </span>
-                    )}
                   </div>
-                  <div className="relative flex rounded-xl border border-slate-200 dark:border-zinc-700 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500">
-                    <span className="inline-flex items-center px-3 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 font-bold text-xs border-r border-slate-200 dark:border-zinc-700">
+                  <div className="relative flex rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500">
+                    <span className="inline-flex items-center px-3 bg-slate-100 dark:bg-[#080B14] text-slate-600 dark:text-zinc-300 font-bold text-xs border-r border-slate-200 dark:border-white/10">
                       🇮🇳 +91
                     </span>
                     <input
                       type="tel"
-                      required={isNonGmailEntered}
                       value={contactNumber}
                       onChange={(e) => setContactNumber(e.target.value)}
                       placeholder="98765 43210"
-                      className="w-full px-3 py-2.5 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none text-xs"
+                      className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#0E1322] text-slate-900 dark:text-zinc-100 focus:outline-none text-xs"
                     />
                   </div>
                 </div>
@@ -8366,11 +8366,12 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   <select
                     value={targetExam}
                     onChange={(e) => setTargetExam(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0E1322] text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
+                    <option value="JEE 2027">JEE 2027 (Mains &amp; Advanced)</option>
                     <option value="JEE Advanced">JEE Advanced</option>
                     <option value="JEE Mains">JEE Mains</option>
-                    <option value="Both">Both (Mains & Advanced)</option>
+                    <option value="Both">Both (Mains &amp; Advanced)</option>
                   </select>
                 </div>
 
@@ -8664,48 +8665,25 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="student@gmail.com"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0E1322] text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
-
-                <div className="space-y-1">
-                  <label className="font-bold text-slate-700 dark:text-zinc-300">New Password</label>
-                  <input
-                    type="password"
-                    required
-                    minLength={6}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Min 6 characters"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="font-bold text-slate-700 dark:text-zinc-300">Confirm New Password</label>
-                  <input
-                    type="password"
-                    required
-                    minLength={6}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Repeat new password"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
+                <p className="text-[11px] text-slate-500 dark:text-[#94A3B8]">
+                  We will send a secure password recovery link to your email so you can choose a new password.
+                </p>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all disabled:opacity-50"
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] hover:opacity-95 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all disabled:opacity-50"
                 >
-                  {loading ? 'Resetting Password...' : 'Reset Password Free →'}
+                  {loading ? 'Sending Reset Link...' : 'Send Password Reset Email →'}
                 </button>
 
                 <div className="pt-1.5 text-center text-slate-500 dark:text-zinc-400">
                   <button
                     type="button"
-                    onClick={() => { setAuthMode('login'); setError(''); }}
+                    onClick={() => { setAuthMode('login'); setError(''); setSuccessMsg(''); }}
                     className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
                   >
                     ← Back to Log In
@@ -8713,6 +8691,572 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 </div>
               </form>
             )}
+
+            {authMode === 'recovery' && (
+              <form onSubmit={handleRecoverySubmit} className="space-y-3.5 text-xs">
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 dark:text-zinc-300">New Password</label>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    minLength={6}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Min 6 characters"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0E1322] text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700 dark:text-zinc-300">Confirm New Password</label>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    minLength={6}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repeat new password"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0E1322] text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] hover:opacity-95 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all disabled:opacity-50"
+                >
+                  {loading ? 'Updating Password...' : 'Save New Password →'}
+                </button>
+              </form>
+            )}
+
+            {/* Continue as Guest option */}
+            <div className="pt-2 border-t border-slate-100 dark:border-white/[0.08] flex items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={handleContinueAsGuest}
+                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] hover:bg-slate-100 dark:hover:bg-white/[0.08] text-slate-700 dark:text-slate-300 font-bold text-xs transition-colors flex items-center justify-center gap-1.5"
+              >
+                <span>Continue as Guest</span>
+                <span className="text-[10px] font-medium opacity-70">(1 Free Mock &amp; Local Mode)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // DEDICATED AUTH WORKSPACE PAGE (/login, /signup, #/login, #/signup)
+    function AuthPageView({ initialMode = 'login', onAuthSuccess, onContinueGuest }) {
+      const [authMode, setAuthMode] = useState(initialMode);
+      const [authTab, setAuthTab] = useState('email');
+      const [name, setName] = useState('');
+      const [email, setEmail] = useState('');
+      const [contactNumber, setContactNumber] = useState('');
+      const [password, setPassword] = useState('');
+      const [confirmPassword, setConfirmPassword] = useState('');
+      const [targetExam, setTargetExam] = useState('JEE 2027');
+      const [showPassword, setShowPassword] = useState(false);
+      const [acceptedTerms, setAcceptedTerms] = useState(true);
+      const [loading, setLoading] = useState(false);
+      const [error, setError] = useState('');
+      const [successMsg, setSuccessMsg] = useState('');
+
+      useEffect(() => {
+        setAuthMode(initialMode);
+        setError('');
+        setSuccessMsg('');
+      }, [initialMode]);
+
+      const isCloudReady = Boolean(window.authService?.isCloudConnected?.());
+
+      const submitLogin = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccessMsg('');
+        setLoading(true);
+        try {
+          const user = authTab === 'email'
+            ? await window.authService.logIn({ email: email.trim().toLowerCase(), password })
+            : await window.authService.logIn({ contactNumber: contactNumber.trim(), password });
+          setSuccessMsg('Signed in! Loading your cloud workspace...');
+          onAuthSuccess(user, '#/dashboard');
+        } catch (err) {
+          setError(err.message || 'Sign in failed.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const submitSignup = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccessMsg('');
+        if (!acceptedTerms) {
+          setError('Please accept Terms of Service & Privacy Policy.');
+          return;
+        }
+        if (password.length < 6) {
+          setError('Password must be at least 6 characters.');
+          return;
+        }
+        if (password !== confirmPassword) {
+          setError('Passwords do not match.');
+          return;
+        }
+        setLoading(true);
+        try {
+          const user = await window.authService.signUp({
+            name: name.trim(),
+            email: authTab === 'email' ? email.trim() : undefined,
+            contactNumber: contactNumber.trim() || undefined,
+            password,
+            targetExam,
+            acceptedTermsAt: new Date().toISOString(),
+            acceptedTermsVersion: (window.LEGAL_CONFIG && window.LEGAL_CONFIG.POLICY_VERSION) || '2026-11',
+            parentalConsentConfirmed: true
+          });
+          if (user?.needsEmailConfirmation) {
+            setSuccessMsg('Check your email to confirm your account, then sign in!');
+            setAuthMode('login');
+          } else {
+            setSuccessMsg('Account created! Syncing your guest study progress to cloud...');
+            onAuthSuccess(user, '#/dashboard');
+          }
+        } catch (err) {
+          setError(err.message || 'Failed to create account.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const submitForgot = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccessMsg('');
+        setLoading(true);
+        try {
+          const res = await window.authService.resetPassword(email);
+          setSuccessMsg(res?.message || 'Password reset link sent to your email.');
+        } catch (err) {
+          setError(err.message || 'Could not send reset email.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const submitRecovery = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccessMsg('');
+        if (password.length < 6) {
+          setError('Password must be at least 6 characters.');
+          return;
+        }
+        if (password !== confirmPassword) {
+          setError('Passwords do not match.');
+          return;
+        }
+        setLoading(true);
+        try {
+          await window.authService.updatePassword(password);
+          setSuccessMsg('Password updated! Redirecting to dashboard...');
+          const cur = window.authService?.getCurrentUser();
+          if (cur) onAuthSuccess(cur, '#/dashboard');
+        } catch (err) {
+          setError(err.message || 'Password update failed.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="min-h-screen bg-[#080B14] text-[#F8FAFC] flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+          <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-[#6366F1]/20 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-[#7C3AED]/20 blur-3xl pointer-events-none" />
+
+          <div className="relative w-full max-w-md rounded-3xl border border-white/[0.08] bg-gradient-to-br from-[#12172A] to-[#171D35] p-6 sm:p-8 shadow-2xl space-y-5">
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#6366F1] to-[#7C3AED] text-white font-black text-base flex items-center justify-center mx-auto shadow-lg shadow-indigo-600/35">
+                NM
+              </div>
+              <h1 className="text-2xl font-black tracking-tight text-[#F8FAFC]">
+                {authMode === 'login' && 'Sign In to Cloud Sync'}
+                {authMode === 'signup' && 'Create Free JEE 2027 Account'}
+                {authMode === 'forgot' && 'Reset Your Password'}
+                {authMode === 'recovery' && 'Choose New Password'}
+              </h1>
+              <p className="text-xs text-[#94A3B8]">
+                Sync your Daily Goals, Streaks, 24h Timetable, Mistake Notebooks &amp; CBT Attempts across phone and laptop.
+              </p>
+              {!isCloudReady && (
+                <div className="inline-flex px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                  Local Fallback Active (Add Supabase keys in .env to enable Cloud Sync)
+                </div>
+              )}
+            </div>
+
+            {error && (
+              <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-xs text-rose-300">
+                {error}
+              </div>
+            )}
+            {successMsg && (
+              <div className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs text-emerald-300">
+                {successMsg}
+              </div>
+            )}
+
+            {(authMode === 'login' || authMode === 'signup') && (
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={async () => {
+                    setError('');
+                    setLoading(true);
+                    try {
+                      await window.authService.signInWithGoogle('#/dashboard');
+                    } catch (err) {
+                      setError(err.message || 'Google sign in failed.');
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border border-white/15 bg-white/[0.06] hover:bg-white/[0.12] text-white font-bold text-xs transition-all"
+                >
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                  </svg>
+                  <span>Continue with Google</span>
+                </button>
+
+                <div className="relative flex items-center justify-center">
+                  <div className="border-t border-white/10 w-full" />
+                  <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8] whitespace-nowrap">or with email</span>
+                  <div className="border-t border-white/10 w-full" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-[#0E1322] border border-white/[0.08] text-xs font-bold">
+                  <button
+                    type="button"
+                    onClick={() => { setAuthTab('email'); setError(''); }}
+                    className={`py-2 rounded-lg transition-all ${authTab === 'email' ? 'bg-indigo-600/30 text-indigo-200 border border-indigo-500/40' : 'text-[#94A3B8] hover:text-white'}`}
+                  >
+                    Email / Password
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setAuthTab('phone'); setError(''); }}
+                    className={`py-2 rounded-lg transition-all ${authTab === 'phone' ? 'bg-indigo-600/30 text-indigo-200 border border-indigo-500/40' : 'text-[#94A3B8] hover:text-white'}`}
+                  >
+                    Contact Number
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {authMode === 'login' && (
+              <form onSubmit={submitLogin} className="space-y-3.5 text-xs">
+                {authTab === 'email' ? (
+                  <div>
+                    <label className="font-bold text-slate-300 block mb-1">Email Address</label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="aspirant@gmail.com"
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <label className="font-bold text-slate-300 block mb-1">10-Digit Mobile Number</label>
+                    <input
+                      type="tel"
+                      required
+                      value={contactNumber}
+                      onChange={(e) => setContactNumber(e.target.value)}
+                      placeholder="98765 43210"
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="font-bold text-slate-300">Password</label>
+                    <button type="button" onClick={() => { setAuthMode('forgot'); setError(''); }} className="text-[11px] font-bold text-indigo-400 hover:underline">
+                      Forgot Password?
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1] pr-14"
+                    />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 hover:text-white">
+                      {showPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                </div>
+
+                <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] hover:opacity-95 text-white font-black shadow-lg shadow-indigo-600/30 transition-all disabled:opacity-50">
+                  {loading ? 'Signing in...' : 'Sign In →'}
+                </button>
+
+                <div className="text-center text-[#94A3B8] pt-1">
+                  New here?{' '}
+                  <button type="button" onClick={() => { setAuthMode('signup'); setError(''); window.location.hash = '#/signup'; }} className="font-bold text-indigo-400 hover:underline">
+                    Create Free Account
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {authMode === 'signup' && (
+              <form onSubmit={submitSignup} className="space-y-3 text-xs">
+                <div>
+                  <label className="font-bold text-slate-300 block mb-1">Full Name</label>
+                  <input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Arjun Sharma" className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
+                </div>
+                {authTab === 'email' ? (
+                  <div>
+                    <label className="font-bold text-slate-300 block mb-1">Email Address</label>
+                    <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="aspirant@gmail.com" className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
+                  </div>
+                ) : (
+                  <div>
+                    <label className="font-bold text-slate-300 block mb-1">10-Digit Mobile Number</label>
+                    <input type="tel" required value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} placeholder="98765 43210" className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
+                  </div>
+                )}
+                <div>
+                  <label className="font-bold text-slate-300 block mb-1">Target Exam</label>
+                  <select value={targetExam} onChange={(e) => setTargetExam(e.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]">
+                    <option value="JEE 2027">JEE 2027 (Mains &amp; Advanced)</option>
+                    <option value="JEE Advanced">JEE Advanced</option>
+                    <option value="JEE Mains">JEE Mains</option>
+                    <option value="Both">Both (Mains &amp; Advanced)</option>
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="font-bold text-slate-300 block mb-1">Password</label>
+                    <input type={showPassword ? 'text' : 'password'} required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 6 chars" className="w-full px-3 py-2 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
+                  </div>
+                  <div>
+                    <label className="font-bold text-slate-300 block mb-1">Confirm</label>
+                    <input type={showPassword ? 'text' : 'password'} required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repeat password" className="w-full px-3 py-2 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
+                  </div>
+                </div>
+                <label className="flex items-start gap-2 text-[11px] text-[#94A3B8] cursor-pointer">
+                  <input type="checkbox" checked={acceptedTerms} onChange={(e) => setAcceptedTerms(e.target.checked)} className="mt-0.5 rounded text-indigo-600" />
+                  <span>I accept the Terms of Service &amp; Privacy Policy (100% Free Educational Platform).</span>
+                </label>
+                <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] hover:opacity-95 text-white font-black shadow-lg shadow-indigo-600/30 transition-all disabled:opacity-50">
+                  {loading ? 'Creating Account...' : 'Create Free Account →'}
+                </button>
+                <div className="text-center text-[#94A3B8] pt-1">
+                  Already have an account?{' '}
+                  <button type="button" onClick={() => { setAuthMode('login'); setError(''); window.location.hash = '#/login'; }} className="font-bold text-indigo-400 hover:underline">
+                    Sign In
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {authMode === 'forgot' && (
+              <form onSubmit={submitForgot} className="space-y-3.5 text-xs">
+                <div>
+                  <label className="font-bold text-slate-300 block mb-1">Registered Email</label>
+                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="aspirant@gmail.com" className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
+                </div>
+                <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white font-black">
+                  {loading ? 'Sending Link...' : 'Send Password Reset Email →'}
+                </button>
+                <div className="text-center">
+                  <button type="button" onClick={() => { setAuthMode('login'); setError(''); }} className="font-bold text-indigo-400 hover:underline">← Back to Sign In</button>
+                </div>
+              </form>
+            )}
+
+            {authMode === 'recovery' && (
+              <form onSubmit={submitRecovery} className="space-y-3.5 text-xs">
+                <div>
+                  <label className="font-bold text-slate-300 block mb-1">New Password</label>
+                  <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 6 characters" className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-300 block mb-1">Confirm New Password</label>
+                  <input type="password" required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repeat password" className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
+                </div>
+                <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white font-black">
+                  {loading ? 'Saving Password...' : 'Update Password →'}
+                </button>
+              </form>
+            )}
+
+            <div className="pt-3 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={async () => {
+                  await window.authService?.continueAsGuest?.();
+                  onContinueGuest();
+                }}
+                className="w-full py-2.5 rounded-xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.09] text-slate-200 font-bold text-xs transition-colors"
+              >
+                Continue as Guest →
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // PROFILE SETTINGS MODAL (Full Name, Target Exam, Daily Question Goal)
+    function ProfileSettingsModal({ isOpen, onClose, currentUser, isDark, onProfileUpdated }) {
+      const [name, setName] = useState(currentUser?.name || '');
+      const [targetExam, setTargetExam] = useState(currentUser?.targetExam || 'JEE 2027');
+      const [dailyGoal, setDailyGoal] = useState(currentUser?.dailyQuestionGoal || 30);
+      const [saving, setSaving] = useState(false);
+      const [err, setErr] = useState('');
+      const [savedMsg, setSavedMsg] = useState('');
+
+      useEffect(() => {
+        if (isOpen && currentUser) {
+          setName(currentUser.name || '');
+          setTargetExam(currentUser.targetExam || 'JEE 2027');
+          const storeGoal = window.dailyPlannerStore?.getStore?.(currentUser.id)?.dailyTarget;
+          setDailyGoal(currentUser.dailyQuestionGoal || storeGoal || 30);
+          setErr('');
+          setSavedMsg('');
+        }
+      }, [isOpen, currentUser]);
+
+      if (!isOpen || !currentUser) return null;
+
+      const handleSave = async (e) => {
+        e.preventDefault();
+        setErr('');
+        setSavedMsg('');
+        setSaving(true);
+        try {
+          const updated = await window.authService.updateProfile({
+            name: name.trim() || currentUser.name,
+            targetExam,
+            dailyQuestionGoal: Number(dailyGoal) || 30
+          });
+          setSavedMsg('Profile & cloud settings saved!');
+          if (onProfileUpdated) onProfileUpdated(updated);
+          setTimeout(() => onClose(), 550);
+        } catch (ex) {
+          setErr(ex.message || 'Could not update profile.');
+        } finally {
+          setSaving(false);
+        }
+      };
+
+      return (
+        <div
+          className="fixed inset-0 z-[135] flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in"
+          onClick={onClose}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`w-full max-w-md rounded-3xl p-6 sm:p-7 border shadow-2xl space-y-5 ${
+              isDark
+                ? 'bg-gradient-to-br from-[#12172A] to-[#171D35] border-white/[0.08] text-[#F8FAFC]'
+                : 'bg-white border-slate-200 text-slate-900'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-wider text-indigo-400">Account &amp; Sync Preferences</div>
+                <h3 className="text-lg font-black">Profile Settings</h3>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className={`p-2 rounded-xl ${isDark ? 'hover:bg-white/10 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}
+                aria-label="Close Profile Settings"
+              >
+                ✕
+              </button>
+            </div>
+
+            {err && <div className="p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-xs text-rose-300">{err}</div>}
+            {savedMsg && <div className="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs text-emerald-300">{savedMsg}</div>}
+
+            <form onSubmit={handleSave} className="space-y-4 text-xs">
+              <div>
+                <label className="font-bold block mb-1">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className={`w-full px-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#6366F1] ${
+                    isDark ? 'bg-[#0E1322] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="font-bold block mb-1">Target Exam</label>
+                <select
+                  value={targetExam}
+                  onChange={(e) => setTargetExam(e.target.value)}
+                  className={`w-full px-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#6366F1] ${
+                    isDark ? 'bg-[#0E1322] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                  }`}
+                >
+                  <option value="JEE 2027">JEE 2027</option>
+                  <option value="JEE Mains">JEE Mains</option>
+                  <option value="JEE Advanced">JEE Advanced</option>
+                  <option value="Both">Both (Mains &amp; Advanced)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="font-bold block mb-1">Daily Question Goal</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={500}
+                  value={dailyGoal}
+                  onChange={(e) => setDailyGoal(e.target.value)}
+                  className={`w-full px-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#6366F1] ${
+                    isDark ? 'bg-[#0E1322] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                  }`}
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className={`px-4 py-2 rounded-xl border font-bold ${isDark ? 'border-white/10 text-slate-300 hover:bg-white/5' : 'border-slate-200 text-slate-600 hover:bg-slate-100'}`}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] hover:opacity-95 text-white font-black shadow-lg shadow-indigo-600/30 disabled:opacity-50"
+                >
+                  {saving ? 'Saving...' : 'Save Settings'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       );
@@ -8733,7 +9277,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       userDropdownOpen,
       setUserDropdownOpen
     }) {
-      const isStrictAdmin = Boolean(currentUser) && currentUser.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+      const isStrictAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (currentUser && currentUser.role === 'admin'));
       const [activeDropdown, setActiveDropdown] = useState(null);
       const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
       const [mobileSectionOpen, setMobileSectionOpen] = useState('tests');
@@ -14895,7 +15439,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         hashRoute: "#/resources"
       };
 
-      const isAdmin = currentUser && currentUser.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+      const isAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (currentUser && currentUser.role === 'admin'));
 
       // Filtered schedule items
       const filteredSchedule = useMemo(() => {
@@ -16294,15 +16838,24 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         const stopDrag = () => setIsDraggingPaint(false);
         window.addEventListener('mouseup', stopDrag);
         window.addEventListener('touchend', stopDrag);
+        const unsubSync = window.cloudSyncEngine?.subscribeSyncStatus?.((st) => {
+          if (!st) return;
+          if (st.status === 'saving') setSaveStatus('Saving...');
+          else if (st.status === 'saved') setSaveStatus(currentUser ? (window.authService?.isCloudConnected?.() ? 'Saved to cloud' : 'Saved locally') : 'Saved locally');
+          else if (st.status === 'offline') setSaveStatus('Saved offline');
+        });
         return () => {
           window.removeEventListener('mouseup', stopDrag);
           window.removeEventListener('touchend', stopDrag);
+          if (unsubSync) unsubSync();
         };
-      }, []);
+      }, [currentUser]);
 
       const triggerSavePulse = () => {
         setSaveStatus('Saving...');
-        setTimeout(() => setSaveStatus('Saved'), 280);
+        setTimeout(() => {
+          setSaveStatus((prev) => (prev === 'Saving...' ? (currentUser && window.authService?.isCloudConnected?.() ? 'Saved to cloud' : 'Saved') : prev));
+        }, 720);
       };
 
       const dayPlan = useMemo(
@@ -16986,8 +17539,17 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [searchModalOpen, setSearchModalOpen] = useState(false);
       const [freePassModalOpen, setFreePassModalOpen] = useState(false);
       const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+      const [profileModalOpen, setProfileModalOpen] = useState(false);
+      const [syncBadge, setSyncBadge] = useState(() => window.cloudSyncEngine?.getSyncStatus?.() || { status: 'saved', label: 'Synced' });
       const [now, setNow] = useState(Date.now());
       const [progressTick, setProgressTick] = useState(0);
+
+      useEffect(() => {
+        const unsub = window.cloudSyncEngine?.subscribeSyncStatus?.((st) => {
+          if (st) setSyncBadge(st);
+        });
+        return () => { if (unsub) unsub(); };
+      }, []);
 
       // Schedule preview modal inside Dashboard Home
       const [previewItem, setPreviewItem] = useState(null);
@@ -17004,7 +17566,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [mistakeStatusFilter, setMistakeStatusFilter] = useState('all');
       const [expandedSolutionIds, setExpandedSolutionIds] = useState({});
 
-      const isStrictAdmin = Boolean(currentUser) && currentUser.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+      const isStrictAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (currentUser && currentUser.role === 'admin'));
       const userKey = currentUser?.id || currentUser?.email || 'guest';
 
       const [revisedMistakes, setRevisedMistakes] = useState(() => {
@@ -17027,10 +17589,19 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       const toggleMistakeRevised = (uid) => {
         setRevisedMistakes((prev) => {
-          const next = { ...prev, [uid]: !prev[uid] };
+          const nextVal = !prev[uid];
+          const next = { ...prev, [uid]: nextVal };
           try {
             localStorage.setItem('nelov_revised_mistakes_' + userKey, JSON.stringify(next));
           } catch (e) {}
+          if (currentUser?.id) {
+            window.cloudSyncEngine?.syncQuestionNoteOrMistake?.(currentUser.id, {
+              questionId: uid,
+              uniqueKey: uid,
+              isMistake: true,
+              isRevised: nextVal
+            }).catch(() => {});
+          }
           return next;
         });
       };
@@ -17974,6 +18545,25 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   <DashIcon name={isDark ? 'sun' : 'moon'} className="w-4 h-4" />
                 </button>
 
+                {/* Cloud Sync Status Indicator */}
+                {currentUser && (
+                  <span
+                    className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition-all ${
+                      syncBadge.status === 'saving'
+                        ? (isDark ? 'bg-indigo-500/15 border-indigo-500/35 text-indigo-300' : 'bg-indigo-50 border-indigo-200 text-indigo-700')
+                        : syncBadge.status === 'offline'
+                          ? (isDark ? 'bg-amber-500/15 border-amber-500/35 text-amber-300' : 'bg-amber-50 border-amber-200 text-amber-700')
+                          : (isDark ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-700')
+                    }`}
+                    title={syncBadge.detail || 'Cloud sync status'}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full ${
+                      syncBadge.status === 'saving' ? 'bg-indigo-400 animate-ping' : syncBadge.status === 'offline' ? 'bg-amber-400' : 'bg-emerald-400'
+                    }`} />
+                    <span>{syncBadge.status === 'saving' ? 'Saving...' : (window.authService?.isCloudConnected?.() ? '✓ Cloud Synced' : '✓ Saved Local')}</span>
+                  </span>
+                )}
+
                 {/* Student Profile Menu */}
                 <div className="relative">
                   {currentUser ? (
@@ -17984,32 +18574,55 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         isDark ? 'bg-[#12172A] border-white/10 hover:border-white/20' : 'bg-slate-100 border-slate-200 hover:bg-slate-200'
                       }`}
                     >
-                      <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-xs font-black flex items-center justify-center">
-                        {(currentUser.name || 'S').charAt(0).toUpperCase()}
-                      </span>
+                      {currentUser.avatarUrl ? (
+                        <img src={currentUser.avatarUrl} alt={currentUser.name || 'Avatar'} className="w-7 h-7 rounded-lg object-cover border border-white/20" />
+                      ) : (
+                        <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#6366F1] to-[#7C3AED] text-white text-xs font-black flex items-center justify-center">
+                          {(currentUser.name || 'S').charAt(0).toUpperCase()}
+                        </span>
+                      )}
                       <span className="hidden sm:block text-xs font-bold max-w-[110px] truncate">
                         {currentUser.name || 'Aspirant'}
                       </span>
                       <DashIcon name="chevronDown" className="w-3.5 h-3.5 opacity-70" />
                     </button>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => openAuth('login', '#/dashboard', 'Sign in to sync your test attempts, chapter mastery & notebooks.')}
-                      className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-indigo-600/25 transition-all"
-                    >
-                      Sign In Free
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => openAuth('login', '#/dashboard', 'Sign in with Google or Email to sync your Daily Goals, 24h Planner, Streaks & Mistakes to the cloud.')}
+                        className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] hover:opacity-95 text-white text-xs font-bold shadow-md shadow-indigo-600/25 transition-all"
+                      >
+                        Sign In / Cloud Sync
+                      </button>
+                    </div>
                   )}
 
                   {profileMenuOpen && currentUser && (
-                    <div className={`absolute right-0 mt-2 w-60 rounded-2xl border p-2 shadow-2xl z-50 text-xs ${
-                      isDark ? 'bg-[#12172A] border-white/10 text-slate-200' : 'bg-white border-slate-200 text-slate-800'
+                    <div className={`absolute right-0 mt-2 w-64 rounded-2xl border p-2 shadow-2xl z-50 text-xs ${
+                      isDark ? 'bg-[#12172A] border-white/[0.1] text-slate-200' : 'bg-white border-slate-200 text-slate-800'
                     }`}>
-                      <div className={`px-3 py-2 border-b mb-1 ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
+                      <div className={`px-3 py-2.5 border-b mb-1 space-y-1 ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
                         <div className="font-black truncate">{currentUser.name}</div>
-                        <div className={`text-[11px] truncate ${mutedText}`}>{currentUser.email}</div>
+                        <div className={`text-[11px] truncate ${mutedText}`}>{currentUser.email || currentUser.contactNumber || 'Student Account'}</div>
+                        <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
+                          <span className="inline-flex px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold">
+                            Target Exam: {currentUser.targetExam || 'JEE 2027'}
+                          </span>
+                          {isStrictAdmin && (
+                            <span className="inline-flex px-1.5 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold">
+                              ADMIN
+                            </span>
+                          )}
+                        </div>
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => { setProfileMenuOpen(false); setProfileModalOpen(true); }}
+                        className={`w-full text-left px-3 py-2 rounded-lg font-semibold ${isDark ? 'hover:bg-white/5' : 'hover:bg-slate-100'}`}
+                      >
+                        Profile Settings
+                      </button>
                       <button
                         type="button"
                         onClick={() => { setProfileMenuOpen(false); setView('home'); window.location.hash = '#/'; }}
@@ -18070,6 +18683,28 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               {/* ========================================================= */}
               {activeTab === 'home' && (
                 <div className="space-y-6 animate-in fade-in">
+                  {!currentUser && (
+                    <div className={`rounded-2xl p-4 sm:p-5 border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                      isDark ? 'bg-gradient-to-r from-indigo-500/10 via-[#12172A] to-violet-500/10 border-indigo-500/30' : 'bg-indigo-50 border-indigo-200'
+                    }`}>
+                      <div className="space-y-0.5">
+                        <div className="text-xs font-black text-indigo-400 uppercase tracking-wider">Guest Mode · Local Storage</div>
+                        <p className="text-xs sm:text-sm font-semibold">
+                          Sign in with Google or Email to sync your Daily Goals, 24h Timetable, Streaks &amp; Mistake Notebooks across phone and laptop — your guest plan transfers automatically!
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => openAuth('login', '#/dashboard', 'Sign in to automatically merge and sync your current study goals and progress to the cloud.')}
+                          className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white text-xs font-black shadow-md shadow-indigo-600/25"
+                        >
+                          Sign In to Cloud Sync
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Daily Goal & Today Widget (Screenshot 1) */}
                   <DailyGoalTodayCard
                     currentUser={currentUser}
@@ -19609,6 +20244,15 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             handleSelectTest={handleSelectTest}
           />
 
+          {/* Profile Settings Modal */}
+          <ProfileSettingsModal
+            isOpen={profileModalOpen}
+            onClose={() => setProfileModalOpen(false)}
+            currentUser={currentUser}
+            isDark={isDark}
+            onProfileUpdated={() => setPlannerTick((t) => t + 1)}
+          />
+
           {/* 100% Free Forever Pass Modal */}
           {freePassModalOpen && (
             <div
@@ -19701,7 +20345,10 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       // Synchronize active authentication state from authStore & Supabase in real time
       useEffect(() => {
         const initialUser = window.authService?.getCurrentUser();
-        if (initialUser) setCurrentUser(initialUser);
+        if (initialUser) {
+          setCurrentUser(initialUser);
+          window.cloudSyncEngine?.hydrateFromCloud?.(initialUser).catch(() => {});
+        }
 
         const handleAuthChange = (e) => {
           if (e.detail && e.detail.user) {
@@ -19711,8 +20358,19 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           }
         };
 
+        const handleRecoveryEvent = () => {
+          setView('recovery');
+          if (!String(window.location.hash || '').includes('recovery=1')) {
+            window.location.hash = '#/login?recovery=1';
+          }
+        };
+
         window.addEventListener('nelov_auth_changed', handleAuthChange);
-        return () => window.removeEventListener('nelov_auth_changed', handleAuthChange);
+        window.addEventListener('nelov_password_recovery', handleRecoveryEvent);
+        return () => {
+          window.removeEventListener('nelov_auth_changed', handleAuthChange);
+          window.removeEventListener('nelov_password_recovery', handleRecoveryEvent);
+        };
       }, []);
 
       useEffect(() => {
@@ -19784,7 +20442,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             setView('progress');
             window.location.hash = '#/progress';
           } else if (redirect.includes('admin')) {
-            const isStrictAdmin = Boolean(user) && user.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+            const isStrictAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (user && user.role === 'admin'));
             if (isStrictAdmin) {
               setView('admin');
               window.location.hash = '#/admin';
@@ -19994,7 +20652,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           else if (subPath === 'community') resolvedTab = 'community';
           else if (subPath === 'feedback') resolvedTab = 'feedback';
           else if (subPath === 'admin') {
-            const isStrictAdmin = Boolean(activeUser) && activeUser.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+            const isStrictAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (activeUser && activeUser.role === 'admin'));
             resolvedTab = isStrictAdmin ? 'admin-uploader' : 'home';
           }
           try {
@@ -20098,7 +20756,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         }
 
         if (hash === '#/admin' || hash === '#admin') {
-          const isStrictAdmin = Boolean(activeUser) && activeUser.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+          const isStrictAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (activeUser && activeUser.role === 'admin'));
           if (!isStrictAdmin) {
             setView('home');
             window.location.hash = '#/';
@@ -20225,22 +20883,26 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return;
         }
 
-        if (hash === '#/login') {
+        if (hash === '#/login' || hash.startsWith('#/login?') || (isHashEmpty && path === '/login')) {
+          if (hash.includes('recovery=1')) {
+            setView('recovery');
+            return;
+          }
           if (activeUser) {
-            setView('home');
+            setView('dashboard');
+            window.location.hash = '#/dashboard';
           } else {
-            openAuth('login', '#/');
-            setView('home');
+            setView('login');
           }
           return;
         }
 
-        if (hash === '#/signup') {
+        if (hash === '#/signup' || hash.startsWith('#/signup?') || (isHashEmpty && path === '/signup')) {
           if (activeUser) {
-            setView('home');
+            setView('dashboard');
+            window.location.hash = '#/dashboard';
           } else {
-            openAuth('signup', '#/');
-            setView('home');
+            setView('signup');
           }
           return;
         }
@@ -22352,10 +23014,30 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       }
 
       // -------------------------------------------------------------
+      // RENDER: DEDICATED AUTH VIEW (/login, /signup, password recovery)
+      // -------------------------------------------------------------
+      if (view === 'login' || view === 'signup' || view === 'recovery') {
+        return (
+          <AuthPageView
+            initialMode={view === 'signup' ? 'signup' : (view === 'recovery' ? 'recovery' : 'login')}
+            onAuthSuccess={(user, redirect) => {
+              setCurrentUser(user);
+              setView('dashboard');
+              window.location.hash = redirect || '#/dashboard';
+            }}
+            onContinueGuest={() => {
+              setView('dashboard');
+              window.location.hash = '#/dashboard';
+            }}
+          />
+        );
+      }
+
+      // -------------------------------------------------------------
       // RENDER: ADMIN DASHBOARD VIEW (/admin)
       // -------------------------------------------------------------
       if (view === 'admin') {
-        const isStrictAdmin = Boolean(currentUser) && currentUser.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+        const isStrictAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (currentUser && currentUser.role === 'admin'));
         if (!isStrictAdmin) {
           setTimeout(() => {
             setView('home');

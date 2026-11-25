@@ -6,13 +6,15 @@
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-// Retrieve environment variables with safe fallbacks for both Vite & browser runtimes
-const envUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) ||
-  (typeof window !== 'undefined' && (window as any).__ENV__?.VITE_SUPABASE_URL) ||
+// Retrieve environment variables with safe fallbacks for Vite (VITE_* / NEXT_PUBLIC_*) & runtime env
+const envUrl =
+  (typeof import.meta !== 'undefined' && (import.meta.env?.VITE_SUPABASE_URL || import.meta.env?.NEXT_PUBLIC_SUPABASE_URL)) ||
+  (typeof window !== 'undefined' && ((window as any).__ENV__?.VITE_SUPABASE_URL || (window as any).__ENV__?.NEXT_PUBLIC_SUPABASE_URL)) ||
   '';
 
-const envAnonKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) ||
-  (typeof window !== 'undefined' && (window as any).__ENV__?.VITE_SUPABASE_ANON_KEY) ||
+const envAnonKey =
+  (typeof import.meta !== 'undefined' && (import.meta.env?.VITE_SUPABASE_ANON_KEY || import.meta.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY)) ||
+  (typeof window !== 'undefined' && ((window as any).__ENV__?.VITE_SUPABASE_ANON_KEY || (window as any).__ENV__?.NEXT_PUBLIC_SUPABASE_ANON_KEY)) ||
   '';
 
 // Validate that credentials are set and not placeholder defaults

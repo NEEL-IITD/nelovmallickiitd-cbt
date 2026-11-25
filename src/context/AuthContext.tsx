@@ -5,12 +5,13 @@
 // ==============================================================================
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, authService, LogInParams, SignUpParams, isAdminEmail } from '../services/authService';
+import { User, authService, LogInParams, SignUpParams, TargetExam } from '../services/authService';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { cloudSyncService } from '../services/cloudSyncService';
 
 export interface AuthModalState {
   isOpen: boolean;
-  mode: 'login' | 'signup' | 'forgot';
+  mode: 'login' | 'signup' | 'forgot' | 'recovery';
   redirectUrl?: string;
   message?: string;
 }
@@ -25,9 +26,11 @@ interface AuthContextType {
   signUp: (params: SignUpParams) => Promise<User>;
   signInWithGoogle: (redirectTo?: string) => Promise<void>;
   logOut: () => Promise<void>;
+  updateProfile: (updates: { name?: string; targetExam?: TargetExam; dailyQuestionGoal?: number; avatarUrl?: string | null }) => Promise<User>;
+  continueAsGuest: () => Promise<void>;
   acceptTerms: (version?: string, parentalConsent?: boolean) => Promise<User | null>;
   deleteMyAccount: () => Promise<void>;
-  openAuthModal: (mode?: 'login' | 'signup' | 'forgot', redirectUrl?: string, message?: string) => void;
+  openAuthModal: (mode?: 'login' | 'signup' | 'forgot' | 'recovery', redirectUrl?: string, message?: string) => void;
   closeAuthModal: () => void;
   authModalState: AuthModalState;
 }
@@ -69,16 +72,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             try {
               const { data: profile } = await supabase
                 .from('profiles')
-                .select('full_name, email, contact_number, auth_method, target_exam, role, accepted_terms_at, accepted_terms_version, parental_consent_confirmed')
+                .select('*')
                 .eq('id', session.user.id)
-                .single();
+                .maybeSingle();
 
               if (profile) {
                 if (profile.role === 'admin') role = 'admin';
                 if (profile.full_name) fullName = profile.full_name;
                 if (profile.contact_number) contactNumber = profile.contact_number;
                 if (profile.auth_method) authMethod = profile.auth_method;
-                if (profile.target_exam) targetExam = profile.target_exam;
+                if (profile.target_exam) {
+                  targetExam = (profile.target_exam === 'Both' && session.user.user_metadata?.preferred_exam)
+                    ? session.user.user_metadata.preferred_exam
+                    : profile.target_exam;
+                }
                 if (profile.accepted_terms_at) acceptedTermsAt = profile.accepted_terms_at;
                 if (profile.accepted_terms_version) acceptedTermsVersion = profile.accepted_terms_version;
                 if (profile.parental_consent_confirmed !== undefined && profile.parental_consent_confirmed !== null) {
@@ -96,8 +103,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 } catch (e) {}
               }
 
-              // Self-healing: If profile was missing in Supabase, upsert it silently in background
-              const targetRole = (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) ? 'admin' : role;
+              // Self-healing: ensure profile row exists without escalating role from client email
+              const targetRole = role;
               if (targetRole === 'admin') role = 'admin';
 
               if (!profile) {
@@ -106,14 +113,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   full_name: fullName,
                   email: displayEmail,
                   contact_number: contactNumber,
-                  auth_method: authMethod,
-                  target_exam: targetExam,
-                  role: targetRole,
+                  auth_method: authMethod === 'email' ? 'gmail' : authMethod,
+                  target_exam: targetExam === 'JEE 2027' ? 'Both' : targetExam,
+                  role: 'student',
                   accepted_terms_at: acceptedTermsAt,
                   accepted_terms_version: acceptedTermsVersion,
                   parental_consent_confirmed: parentalConsentConfirmed,
                   last_login_at: new Date().toISOString()
-                }, { onConflict: 'id' })).catch(() => {});
+                }, { onConflict: 'id', ignoreDuplicates: true })).catch(() => {});
               } else if (!profile.accepted_terms_at) {
                 Promise.resolve(supabase.from('profiles').update({
                   accepted_terms_at: acceptedTermsAt,
@@ -125,11 +132,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               console.warn('Profile fetch/sync error:', err);
             }
 
-            // Auto Admin Recognition
-            if (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) {
-              role = 'admin';
-            }
-
             const currentUser: User = {
               id: session.user.id,
               name: fullName,
@@ -137,6 +139,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               contactNumber,
               authMethod: authMethod as any,
               targetExam,
+              dailyQuestionGoal: Number(session.user.user_metadata?.daily_question_goal || 30),
               role,
               acceptedTermsAt,
               acceptedTermsVersion,
@@ -146,6 +149,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             setUser(currentUser);
             localStorage.setItem('nelov_active_session', JSON.stringify(currentUser));
+            cloudSyncService.hydrateAndMigrateOnLogin(currentUser).catch(() => {});
 
             // Check if there was an OAuth redirect destination
             const savedRedirect = sessionStorage.getItem('nelov_auth_redirect');
@@ -178,7 +182,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (isSupabaseConfigured && supabase) {
       const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (!mounted) return;
-        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') && session?.user) {
+        const isPasswordRecovery = event === 'PASSWORD_RECOVERY';
+        if ((isPasswordRecovery || event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') && session?.user) {
           const isPhone = Boolean(session.user.email?.endsWith('@phone.nelovportal.local'));
           let role: 'student' | 'admin' = 'student';
           let fullName = session.user.user_metadata?.full_name || (isPhone ? 'Student Aspirant' : session.user.email?.split('@')[0]) || 'Student';
@@ -197,16 +202,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (supabase) {
               const { data: profile } = await supabase
                 .from('profiles')
-                .select('full_name, email, contact_number, auth_method, target_exam, role, accepted_terms_at, accepted_terms_version, parental_consent_confirmed')
+                .select('*')
                 .eq('id', session.user.id)
-                .single();
+                .maybeSingle();
 
               if (profile) {
                 if (profile.role === 'admin') role = 'admin';
                 if (profile.full_name) fullName = profile.full_name;
                 if (profile.contact_number) contactNumber = profile.contact_number;
                 if (profile.auth_method) authMethod = profile.auth_method;
-                if (profile.target_exam) targetExam = profile.target_exam;
+                if (profile.target_exam) {
+                  targetExam = (profile.target_exam === 'Both' && session.user.user_metadata?.preferred_exam)
+                    ? session.user.user_metadata.preferred_exam
+                    : profile.target_exam;
+                }
                 if (profile.accepted_terms_at) acceptedTermsAt = profile.accepted_terms_at;
                 if (profile.accepted_terms_version) acceptedTermsVersion = profile.accepted_terms_version;
                 if (profile.parental_consent_confirmed !== undefined && profile.parental_consent_confirmed !== null) {
@@ -224,7 +233,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 } catch (e) {}
               }
 
-              const targetRole = (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) ? 'admin' : role;
+              const targetRole = role;
               if (targetRole === 'admin') role = 'admin';
 
               if (!profile) {
@@ -233,14 +242,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                   full_name: fullName,
                   email: displayEmail,
                   contact_number: contactNumber,
-                  auth_method: authMethod,
-                  target_exam: targetExam,
-                  role: targetRole,
+                  auth_method: authMethod === 'email' ? 'gmail' : authMethod,
+                  target_exam: targetExam === 'JEE 2027' ? 'Both' : targetExam,
+                  role: 'student',
                   accepted_terms_at: acceptedTermsAt,
                   accepted_terms_version: acceptedTermsVersion,
                   parental_consent_confirmed: parentalConsentConfirmed,
                   last_login_at: new Date().toISOString()
-                }, { onConflict: 'id' })).catch(() => {});
+                }, { onConflict: 'id', ignoreDuplicates: true })).catch(() => {});
               } else if (!profile.accepted_terms_at) {
                 Promise.resolve(supabase.from('profiles').update({
                   accepted_terms_at: acceptedTermsAt,
@@ -253,14 +262,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.warn('Profile fetch/sync error on auth state change:', err);
           }
 
-          // Auto Admin Recognition
-          if (isAdminEmail(session.user.email) || isAdminEmail(displayEmail)) {
-            role = 'admin';
-            acceptedTermsAt = acceptedTermsAt || '2026-11-20T00:00:00.000Z';
-            acceptedTermsVersion = acceptedTermsVersion || '2026-11';
-            parentalConsentConfirmed = true;
-          }
-
           const loggedInUser: User = {
             id: session.user.id,
             name: fullName,
@@ -268,6 +269,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             contactNumber,
             authMethod: authMethod as any,
             targetExam,
+            dailyQuestionGoal: Number(session.user.user_metadata?.daily_question_goal || 30),
+            avatarUrl: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture || null,
             role,
             acceptedTermsAt,
             acceptedTermsVersion,
@@ -277,6 +280,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           setUser(loggedInUser);
           localStorage.setItem('nelov_active_session', JSON.stringify(loggedInUser));
+          cloudSyncService.hydrateAndMigrateOnLogin(loggedInUser).catch(() => {});
+
+          if (isPasswordRecovery) {
+            window.location.hash = '#/login?recovery=1';
+            return;
+          }
 
           const savedRedirect = sessionStorage.getItem('nelov_auth_redirect');
           if (savedRedirect) {
@@ -404,8 +413,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
+  const updateProfile = async (updates: {
+    name?: string;
+    targetExam?: TargetExam;
+    dailyQuestionGoal?: number;
+    avatarUrl?: string | null;
+  }): Promise<User> => {
+    const updated = await authService.updateProfile(updates);
+    setUser(updated);
+    return updated;
+  };
+
+  const continueAsGuest = async (): Promise<void> => {
+    await authService.continueAsGuest();
+    setUser(null);
+  };
+
   const openAuthModal = (
-    mode: 'login' | 'signup' | 'forgot' = 'login',
+    mode: 'login' | 'signup' | 'forgot' | 'recovery' = 'login',
     redirectUrl?: string,
     message?: string
   ) => {
@@ -421,18 +446,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAuthModalState((prev) => ({ ...prev, isOpen: false }));
   };
 
+  const verifiedAdmin = !isLoading && Boolean(user && user.role === 'admin') &&
+    (!authService.isCloudConnected() || /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(String(user?.id || '')));
+
   return (
     <AuthContext.Provider
       value={{
         user,
         isAuthenticated: !!user,
-        isAdmin: !isLoading && !!user && (user?.role === 'admin' || isAdminEmail(user?.email)) && user?.email?.trim().toLowerCase() === 'mallicknelov@gmail.com',
+        isAdmin: verifiedAdmin,
         isLoading,
         isCloudConnected: authService.isCloudConnected(),
         logIn,
         signUp,
         signInWithGoogle,
         logOut,
+        updateProfile,
+        continueAsGuest,
         acceptTerms,
         deleteMyAccount,
         openAuthModal,

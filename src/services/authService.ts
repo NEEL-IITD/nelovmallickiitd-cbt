@@ -6,6 +6,7 @@
 
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { User, TargetExam, UserRole, AuthMethod } from '../types';
+import { cloudSyncService } from './cloudSyncService';
 export type { User, TargetExam, UserRole, AuthMethod };
 
 export interface StoredUser extends User {
@@ -174,30 +175,27 @@ export const authService = {
       formattedContact = formatIndianPhone(contactNumber!);
     }
 
-    // Determine Mode & Enforce Mandatory Rules:
+    // Determine Mode:
     if (!hasEmail) {
-      // Option B: Name + Contact Number (no email)
       if (!hasContact) {
-        throw new Error('Please enter your 10-digit contact number.');
+        throw new Error('Please enter your email or 10-digit contact number.');
       }
       authMethod = 'phone';
       authEmail = getSyntheticPhoneEmail(contactNumber!);
     } else if (isGmail(trimmedEmail)) {
-      // Option A.1: Gmail address -> Contact number is optional
       authMethod = 'gmail';
       authEmail = trimmedEmail;
     } else {
-      // Option A.2: Non-Gmail address -> Contact number is STRICTLY MANDATORY!
-      if (!hasContact) {
-        throw new Error('Contact number is strictly required when not using a @gmail.com address.');
-      }
-      authMethod = 'email_with_phone';
+      authMethod = hasContact ? 'email_with_phone' : 'email';
       authEmail = trimmedEmail;
     }
 
+    const resolvedTargetExam: TargetExam = targetExam || 'JEE 2027';
+    const compatAuthMethod = !hasEmail ? 'phone' : (hasContact && !isGmail(trimmedEmail) ? 'email_with_phone' : 'gmail');
+    const compatTargetExam = resolvedTargetExam === 'JEE 2027' ? 'Both' : resolvedTargetExam;
+
     // 1. Supabase Cloud Sign Up
     if (this.isCloudConnected() && supabase) {
-      // Check for duplicate contact number if provided
       if (formattedContact) {
         try {
           const { data: existingPhone } = await supabase
@@ -224,11 +222,13 @@ export const authService = {
         email: authEmail,
         password,
         options: {
+          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : undefined,
           data: {
             full_name: trimmedName,
             contact_number: formattedContact,
-            auth_method: authMethod,
-            target_exam: targetExam,
+            auth_method: compatAuthMethod,
+            target_exam: compatTargetExam,
+            preferred_exam: resolvedTargetExam,
             accepted_terms_at: termsTimestamp,
             accepted_terms_version: termsVer,
             parental_consent_confirmed: parentalBool
@@ -251,24 +251,40 @@ export const authService = {
         throw new Error('Signup failed. Please try again.');
       }
 
-      const userRole: UserRole = isAdminEmail(hasEmail ? trimmedEmail : null) ? 'admin' : 'student';
+      let verifiedRole: UserRole = 'student';
+      try {
+        if (data.session) {
+          const { data: profRow } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', data.user.id)
+            .maybeSingle();
+          if (profRow?.role === 'admin') verifiedRole = 'admin';
+        }
+      } catch {}
 
       const user: User = {
         id: data.user.id,
         name: trimmedName,
-        email: authMethod === 'phone' ? null : trimmedEmail, // Never expose synthetic email in UI
+        email: authMethod === 'phone' ? null : trimmedEmail,
         contactNumber: formattedContact,
         authMethod,
-        targetExam,
-        role: userRole,
+        targetExam: resolvedTargetExam,
+        dailyQuestionGoal: 30,
+        currentStreak: 0,
+        avatarUrl: data.user.user_metadata?.avatar_url || null,
+        needsEmailConfirmation: !data.session,
+        role: verifiedRole,
         acceptedTermsAt: termsTimestamp,
         acceptedTermsVersion: termsVer,
         parentalConsentConfirmed: parentalBool,
         createdAt: data.user.created_at || new Date().toISOString()
       };
 
-      if (typeof window !== 'undefined') {
+      if (data.session && typeof window !== 'undefined') {
+        localStorage.removeItem('nelov_guest_mode');
         localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
+        cloudSyncService.hydrateAndMigrateOnLogin(user).catch(() => {});
       }
       return user;
     }
@@ -284,7 +300,7 @@ export const authService = {
     }
 
     const passwordHash = await hashPassword(password);
-    const role: UserRole = isAdminEmail(hasEmail ? trimmedEmail : null) ? 'admin' : 'student';
+    const role: UserRole = 'student';
 
     const newUser: StoredUser = {
       id: 'usr_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
@@ -292,7 +308,9 @@ export const authService = {
       email: authMethod === 'phone' ? null : trimmedEmail,
       contactNumber: formattedContact,
       authMethod,
-      targetExam,
+      targetExam: resolvedTargetExam,
+      dailyQuestionGoal: 30,
+      currentStreak: 0,
       role,
       createdAt: new Date().toISOString(),
       passwordHash
@@ -356,27 +374,6 @@ export const authService = {
       });
 
       if (error) {
-        if (isAdminEmail(authEmail)) {
-          console.warn('Supabase password login failed for admin, authenticating admin session directly:', error.message);
-          const adminUser: User = {
-            id: 'dd2eead0-660e-45c0-818d-70d416c3b134',
-            name: 'Nelov Mallick',
-            email: 'mallicknelov@gmail.com',
-            contactNumber: '+91 98765 43210',
-            authMethod: 'gmail',
-            targetExam: 'Both',
-            role: 'admin',
-            acceptedTermsAt: '2026-11-20T00:00:00.000Z',
-            acceptedTermsVersion: '2026-11',
-            parentalConsentConfirmed: true,
-            createdAt: new Date().toISOString()
-          };
-          if (typeof window !== 'undefined') {
-            localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(adminUser));
-            localStorage.setItem(`consent_v2026_11_${adminUser.id}`, '2026-11-20T00:00:00.000Z');
-          }
-          return adminUser;
-        }
         if (isPhoneLogin) {
           throw new Error('Incorrect contact number or password/PIN.');
         }
@@ -387,13 +384,16 @@ export const authService = {
         throw new Error('Login failed. Please check your credentials.');
       }
 
-      // Fetch profile row to get role and metadata
+      // Fetch profile row strictly from Supabase profiles.role
       let role: UserRole = 'student';
       let fullName = data.user.user_metadata?.full_name || (isPhoneLogin ? 'Student Aspirant' : authEmail.split('@')[0]);
-      let targetExam: TargetExam = data.user.user_metadata?.target_exam || 'JEE Advanced';
+      let targetExam: TargetExam = data.user.user_metadata?.target_exam || 'JEE 2027';
       let userContact: string | null = formattedPhone || data.user.user_metadata?.contact_number || null;
-      let authMethod: AuthMethod = isPhoneLogin ? 'phone' : (isGmail(authEmail) ? 'gmail' : 'email_with_phone');
+      let authMethod: AuthMethod = isPhoneLogin ? 'phone' : (isGmail(authEmail) ? 'gmail' : 'email');
       let displayEmail: string | null = isPhoneLogin ? null : authEmail;
+      let avatarUrl: string | null = data.user.user_metadata?.avatar_url || data.user.user_metadata?.picture || null;
+      let dailyQuestionGoal = 30;
+      let currentStreak = 0;
       let acceptedTermsAt: string | null = data.user.user_metadata?.accepted_terms_at || null;
       let acceptedTermsVersion: string | null = data.user.user_metadata?.accepted_terms_version || null;
       let parentalConsentConfirmed: boolean = Boolean(data.user.user_metadata?.parental_consent_confirmed);
@@ -401,30 +401,34 @@ export const authService = {
       try {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('full_name, email, contact_number, auth_method, target_exam, role, accepted_terms_at, accepted_terms_version, parental_consent_confirmed')
+          .select('*')
           .eq('id', data.user.id)
-          .single();
+          .maybeSingle();
 
         if (profile) {
-          if (profile.role === 'admin') role = 'admin';
+          role = profile.role === 'admin' ? 'admin' : 'student';
           if (profile.full_name) fullName = profile.full_name;
           if (profile.contact_number) userContact = profile.contact_number;
           if (profile.auth_method) authMethod = profile.auth_method as AuthMethod;
-          if (profile.target_exam) targetExam = profile.target_exam as TargetExam;
+          if (profile.target_exam) {
+            targetExam = (profile.target_exam === 'Both' && data.user.user_metadata?.preferred_exam)
+              ? (data.user.user_metadata.preferred_exam as TargetExam)
+              : (profile.target_exam as TargetExam);
+          }
+          if (profile.avatar_url) avatarUrl = profile.avatar_url;
+          if (profile.daily_question_goal) dailyQuestionGoal = Number(profile.daily_question_goal) || 30;
+          if (profile.current_streak !== undefined && profile.current_streak !== null) currentStreak = Number(profile.current_streak) || 0;
           if (profile.accepted_terms_at) acceptedTermsAt = profile.accepted_terms_at;
           if (profile.accepted_terms_version) acceptedTermsVersion = profile.accepted_terms_version;
           if (profile.parental_consent_confirmed) parentalConsentConfirmed = Boolean(profile.parental_consent_confirmed);
           if (profile.email && !profile.email.includes('@phone.nelovportal.local')) {
             displayEmail = profile.email;
           }
+        } else if (data.user.user_metadata?.daily_question_goal) {
+          dailyQuestionGoal = Number(data.user.user_metadata.daily_question_goal) || 30;
         }
       } catch (e) {
         console.warn('Could not fetch user profile details:', e);
-      }
-
-      // Admin Email Auto-Promotion
-      if (isAdminEmail(displayEmail) || isAdminEmail(data.user.email)) {
-        role = 'admin';
       }
 
       const user: User = {
@@ -434,6 +438,9 @@ export const authService = {
         contactNumber: userContact,
         authMethod,
         targetExam,
+        avatarUrl,
+        dailyQuestionGoal,
+        currentStreak,
         role,
         acceptedTermsAt,
         acceptedTermsVersion,
@@ -442,7 +449,9 @@ export const authService = {
       };
 
       if (typeof window !== 'undefined') {
+        localStorage.removeItem('nelov_guest_mode');
         localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
+        cloudSyncService.hydrateAndMigrateOnLogin(user).catch(() => {});
       }
       return user;
     }
@@ -468,10 +477,7 @@ export const authService = {
       throw new Error('Incorrect password / PIN. Please try again.');
     }
 
-    let role: UserRole = userMatch.role || 'student';
-    if (isAdminEmail(userMatch.email)) {
-      role = 'admin';
-    }
+    const role: UserRole = userMatch.role === 'admin' ? 'admin' : 'student';
 
     const user: User = {
       id: userMatch.id,
@@ -479,13 +485,17 @@ export const authService = {
       email: userMatch.email,
       contactNumber: userMatch.contactNumber,
       authMethod: userMatch.authMethod,
-      targetExam: userMatch.targetExam,
+      targetExam: userMatch.targetExam || 'JEE 2027',
+      dailyQuestionGoal: userMatch.dailyQuestionGoal || 30,
+      currentStreak: userMatch.currentStreak || 0,
       role,
       createdAt: userMatch.createdAt
     };
 
     if (typeof window !== 'undefined') {
+      localStorage.removeItem('nelov_guest_mode');
       localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
+      cloudSyncService.migrateGuestLocalData(user.id);
     }
     return user;
   },
@@ -560,8 +570,11 @@ export const authService = {
    */
   isAdmin(): boolean {
     const user = this.getCurrentUser();
-    if (!user) return false;
-    return (user.role === 'admin' || isAdminEmail(user.email)) && user.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+    if (!user || user.role !== 'admin') return false;
+    if (this.isCloudConnected()) {
+      return typeof user.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(user.id);
+    }
+    return true;
   },
 
   /**
@@ -592,7 +605,7 @@ export const authService = {
 
     if (this.isCloudConnected() && supabase) {
       const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
-        redirectTo: window.location.origin + '#/login'
+        redirectTo: `${window.location.origin}${window.location.pathname}#/login?recovery=1`
       });
       if (error) {
         throw new Error(error.message);
@@ -600,10 +613,98 @@ export const authService = {
       return;
     }
 
-    const users = getStoredUsers();
-    const userMatch = users.find((u) => u.email === trimmedEmail);
-    if (!userMatch) {
-      throw new Error('No account found with this email.');
+    throw new Error('Email password reset requires Supabase Cloud connection.');
+  },
+
+  async updatePassword(newPassword: string): Promise<void> {
+    if (!newPassword || newPassword.length < 6) {
+      throw new Error('Password must be at least 6 characters long.');
+    }
+    if (!this.isCloudConnected() || !supabase) {
+      throw new Error('Updating password requires an active Supabase recovery session.');
+    }
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw new Error(error.message);
+  },
+
+  async updateProfile(updates: {
+    name?: string;
+    targetExam?: TargetExam;
+    dailyQuestionGoal?: number;
+    avatarUrl?: string | null;
+  }): Promise<User> {
+    const current = this.getCurrentUser();
+    if (!current) throw new Error('Sign in required to update profile settings.');
+    const nextGoal = updates.dailyQuestionGoal !== undefined
+      ? Math.max(1, Math.min(500, Math.round(Number(updates.dailyQuestionGoal) || 30)))
+      : (current.dailyQuestionGoal || 30);
+
+    const updatedUser: User = {
+      ...current,
+      name: updates.name !== undefined ? (updates.name.trim() || current.name) : current.name,
+      targetExam: updates.targetExam || current.targetExam || 'JEE 2027',
+      dailyQuestionGoal: nextGoal,
+      avatarUrl: updates.avatarUrl !== undefined ? updates.avatarUrl : (current.avatarUrl || null),
+    };
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updatedUser));
+    }
+
+    if (this.isCloudConnected() && supabase && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(updatedUser.id)) {
+      cloudSyncService.emitSyncStatus('saving', 'Updating profile');
+      try {
+        await supabase.auth.updateUser({
+          data: {
+            full_name: updatedUser.name,
+            preferred_exam: updatedUser.targetExam,
+            daily_question_goal: nextGoal,
+          }
+        });
+      } catch {}
+      const safeExam = updatedUser.targetExam === 'JEE 2027' ? 'Both' : updatedUser.targetExam;
+      let { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: updatedUser.name,
+          target_exam: updatedUser.targetExam,
+          daily_question_goal: nextGoal,
+          avatar_url: updatedUser.avatarUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', updatedUser.id);
+      if (error && (error.code === '23514' || /target_exam|column|schema cache/i.test(error.message || ''))) {
+        const retryRes = await supabase
+          .from('profiles')
+          .update({
+            full_name: updatedUser.name,
+            target_exam: safeExam
+          })
+          .eq('id', updatedUser.id);
+        error = retryRes.error;
+      }
+      if (error) {
+        cloudSyncService.emitSyncStatus('offline', error.message);
+        throw new Error(error.message);
+      }
+      cloudSyncService.emitSyncStatus('saved', 'Profile updated');
+    } else {
+      const users = getStoredUsers();
+      const idx = users.findIndex((u) => u.id === updatedUser.id);
+      if (idx !== -1) {
+        users[idx] = { ...users[idx], name: updatedUser.name, targetExam: updatedUser.targetExam, dailyQuestionGoal: nextGoal };
+        saveStoredUsers(users);
+      }
+    }
+    return updatedUser;
+  },
+
+  async continueAsGuest(): Promise<void> {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('nelov_guest_mode', '1');
+    }
+    if (this.getCurrentUser()) {
+      await this.logOut();
     }
   },
 

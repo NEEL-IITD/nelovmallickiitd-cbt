@@ -38,6 +38,8 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { TargetExam } from '../types';
+import { cloudSyncService, CloudSyncStatusPayload } from '../services/cloudSyncService';
 import { studentStorage, TestAttemptRecord, BookmarkedQuestion } from '../utils/studentStorage';
 import { chapterProgressService, PROGRESS_UPDATED_EVENT, ChapterChecklist } from '../services/chapterProgressService';
 import { physicsChaptersData } from '../data/physicsChapters';
@@ -191,9 +193,30 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigate,
   onSelectTest
 }) => {
-  const { user, logOut, openAuthModal } = useAuth();
-  const isStrictAdmin = Boolean(user) && user?.email?.trim().toLowerCase() === 'mallicknelov@gmail.com';
+  const { user, isAdmin: isStrictAdmin, logOut, updateProfile, openAuthModal } = useAuth();
   const activeTab = useMemo(() => resolveDashboardTabFromHash(currentHash, isStrictAdmin), [currentHash, isStrictAdmin]);
+
+  const [profileSettingsOpen, setProfileSettingsOpen] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editTargetExam, setEditTargetExam] = useState<TargetExam>('JEE 2027');
+  const [editDailyGoal, setEditDailyGoal] = useState<number>(30);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileMsg, setProfileMsg] = useState('');
+  const [syncBadge, setSyncBadge] = useState<CloudSyncStatusPayload>(() => cloudSyncService.getSyncStatus());
+
+  useEffect(() => {
+    return cloudSyncService.subscribeSyncStatus((st) => setSyncBadge(st));
+  }, []);
+
+  useEffect(() => {
+    if (profileSettingsOpen && user) {
+      setEditName(user.name || '');
+      setEditTargetExam((user.targetExam as TargetExam) || 'JEE 2027');
+      const goal = dailyPlannerService.getStore(user.id).dailyTarget || user.dailyQuestionGoal || 30;
+      setEditDailyGoal(goal);
+      setProfileMsg('');
+    }
+  }, [profileSettingsOpen, user]);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -891,6 +914,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
 
+            {user && (
+              <span
+                className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[11px] font-bold ${
+                  syncBadge.status === 'saving'
+                    ? (isDark ? 'bg-indigo-500/15 border-indigo-500/35 text-indigo-300' : 'bg-indigo-50 border-indigo-200 text-indigo-700')
+                    : (isDark ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-700')
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${syncBadge.status === 'saving' ? 'bg-indigo-400 animate-ping' : 'bg-emerald-400'}`} />
+                <span>{syncBadge.status === 'saving' ? 'Saving...' : '✓ Saved'}</span>
+              </span>
+            )}
+
             <div className="relative">
               {user ? (
                 <button
@@ -898,28 +934,38 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   onClick={() => setProfileOpen((p) => !p)}
                   className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl border ${isDark ? 'bg-[#12172A] border-white/10' : 'bg-slate-100 border-slate-200'}`}
                 >
-                  <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-xs font-black flex items-center justify-center">
-                    {(user.name || 'S').charAt(0).toUpperCase()}
-                  </span>
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt={user.name} className="w-7 h-7 rounded-lg object-cover border border-white/20" />
+                  ) : (
+                    <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#6366F1] to-[#7C3AED] text-white text-xs font-black flex items-center justify-center">
+                      {(user.name || 'S').charAt(0).toUpperCase()}
+                    </span>
+                  )}
                   <span className="hidden sm:block text-xs font-bold max-w-[110px] truncate">{user.name}</span>
                   <ChevronDown className="w-3.5 h-3.5 opacity-70" />
                 </button>
               ) : (
                 <button
                   type="button"
-                  onClick={() => openAuthModal('login', '#/dashboard', 'Sign in to sync your progress and bookmarks.')}
-                  className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold"
+                  onClick={() => openAuthModal('login', '#/dashboard', 'Sign in with Google or Email to sync your progress and bookmarks.')}
+                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] hover:opacity-95 text-white text-xs font-bold"
                 >
                   Sign In Free
                 </button>
               )}
 
               {profileOpen && user && (
-                <div className={`absolute right-0 mt-2 w-56 rounded-2xl border p-2 shadow-2xl z-50 text-xs ${isDark ? 'bg-[#12172A] border-white/10' : 'bg-white border-slate-200'}`}>
-                  <div className={`px-3 py-2 border-b mb-1 ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
+                <div className={`absolute right-0 mt-2 w-64 rounded-2xl border p-2 shadow-2xl z-50 text-xs ${isDark ? 'bg-[#12172A] border-white/10' : 'bg-white border-slate-200'}`}>
+                  <div className={`px-3 py-2 border-b mb-1 space-y-1 ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
                     <div className="font-black truncate">{user.name}</div>
-                    <div className={`text-[11px] truncate ${mutedText}`}>{user.email}</div>
+                    <div className={`text-[11px] truncate ${mutedText}`}>{user.email || user.contactNumber}</div>
+                    <span className="inline-flex px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold">
+                      Target Exam: {user.targetExam || 'JEE 2027'}
+                    </span>
                   </div>
+                  <button type="button" onClick={() => { setProfileOpen(false); setProfileSettingsOpen(true); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 font-semibold">
+                    Profile Settings
+                  </button>
                   <button type="button" onClick={() => { setProfileOpen(false); onNavigate('#/'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 font-semibold">
                     Main Website
                   </button>
@@ -1438,6 +1484,84 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <h3 className="text-xl font-black">100% Free Forever for Every Aspirant</h3>
             <p className={`text-xs leading-relaxed ${mutedText}`}>Curated by Nelov Mallick (IIT Delhi) — all 83 chapters, PTM/PTA mocks, Time-Sink analytics, and mistake logs are permanently unlocked at ₹0.</p>
             <button type="button" onClick={() => setFreePassOpen(false)} className="w-full py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-black">Continue Studying Free</button>
+          </div>
+        </div>
+      )}
+
+      {profileSettingsOpen && user && (
+        <div className="fixed inset-0 z-[135] flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm" onClick={() => setProfileSettingsOpen(false)}>
+          <div onClick={(e) => e.stopPropagation()} className={`w-full max-w-md rounded-3xl p-6 border space-y-4 ${cardCls}`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-[11px] font-bold uppercase text-indigo-400">Account Preferences</div>
+                <h3 className="text-lg font-black">Profile Settings</h3>
+              </div>
+              <button type="button" onClick={() => setProfileSettingsOpen(false)} className="p-2 rounded-xl hover:bg-white/10">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            {profileMsg && <div className="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs text-emerald-300">{profileMsg}</div>}
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setSavingProfile(true);
+                try {
+                  await updateProfile({
+                    name: editName,
+                    targetExam: editTargetExam,
+                    dailyQuestionGoal: editDailyGoal
+                  });
+                  dailyPlannerService.setDailyTarget(editDailyGoal, user.id);
+                  setPlannerTick((t) => t + 1);
+                  setProfileMsg('Profile saved!');
+                  setTimeout(() => setProfileSettingsOpen(false), 500);
+                } finally {
+                  setSavingProfile(false);
+                }
+              }}
+              className="space-y-3.5 text-xs"
+            >
+              <div>
+                <label className="font-bold block mb-1">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className={`w-full px-3.5 py-2.5 rounded-xl border ${isDark ? 'bg-[#0E1322] border-white/10 text-white' : 'bg-slate-50 border-slate-200'}`}
+                />
+              </div>
+              <div>
+                <label className="font-bold block mb-1">Target Exam</label>
+                <select
+                  value={editTargetExam}
+                  onChange={(e) => setEditTargetExam(e.target.value as TargetExam)}
+                  className={`w-full px-3.5 py-2.5 rounded-xl border ${isDark ? 'bg-[#0E1322] border-white/10 text-white' : 'bg-slate-50 border-slate-200'}`}
+                >
+                  <option value="JEE 2027">JEE 2027</option>
+                  <option value="JEE Mains">JEE Mains</option>
+                  <option value="JEE Advanced">JEE Advanced</option>
+                  <option value="Both">Both (Mains &amp; Advanced)</option>
+                </select>
+              </div>
+              <div>
+                <label className="font-bold block mb-1">Daily Question Goal</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={500}
+                  value={editDailyGoal}
+                  onChange={(e) => setEditDailyGoal(Number(e.target.value))}
+                  className={`w-full px-3.5 py-2.5 rounded-xl border ${isDark ? 'bg-[#0E1322] border-white/10 text-white' : 'bg-slate-50 border-slate-200'}`}
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-1">
+                <button type="button" onClick={() => setProfileSettingsOpen(false)} className="px-4 py-2 rounded-xl border border-white/10 font-bold">Cancel</button>
+                <button type="submit" disabled={savingProfile} className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white font-black">
+                  {savingProfile ? 'Saving...' : 'Save Settings'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
