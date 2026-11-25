@@ -31,6 +31,7 @@ import { LecturePlayer } from './components/LecturePlayer';
 import { LecturesSection } from './components/LecturesSection';
 import { LeaderboardHub } from './components/LeaderboardHub';
 import { ScheduleView } from './components/ScheduleView';
+import { DashboardView } from './components/DashboardView';
 import { StudyResourcesVaultShowcase } from './components/vault/StudyResourcesVaultShowcase';
 import { SubjectResourcesHub } from './components/vault/SubjectResourcesHub';
 import { PrivacyPolicy } from './components/legal/PrivacyPolicy';
@@ -45,11 +46,19 @@ export const AppContent: React.FC = () => {
 
   // Global State
   const [exam, setExam] = useState<ExamType>('jee');
-  const [isDark, setIsDark] = useState<boolean>(false);
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('nelov_theme') === 'dark';
+    } catch {
+      return false;
+    }
+  });
   const [examModalOpen, setExamModalOpen] = useState<boolean>(false);
   const [questionPaperOpen, setQuestionPaperOpen] = useState<boolean>(false);
   const [currentHash, setCurrentHash] = useState<string>(window.location.hash || '#/');
   const [dismissBanner, setDismissBanner] = useState<boolean>(false);
+
+  const isDashboardRoute = currentHash.toLowerCase() === '#/dashboard' || currentHash.toLowerCase().startsWith('#/dashboard/');
 
   // Sync dark class on document element
   useEffect(() => {
@@ -61,6 +70,18 @@ export const AppContent: React.FC = () => {
     }
   }, [isDark]);
 
+  // Default /dashboard to Obsidian dark-mode-first unless manually toggled
+  useEffect(() => {
+    if (isDashboardRoute) {
+      try {
+        if (!localStorage.getItem('nelov_theme_user_set')) {
+          setIsDark(true);
+          localStorage.setItem('nelov_theme', 'dark');
+        }
+      } catch {}
+    }
+  }, [isDashboardRoute]);
+
   // Listen to hash changes for SPA routing
   useEffect(() => {
     const handleHashChange = () => {
@@ -71,13 +92,42 @@ export const AppContent: React.FC = () => {
   }, []);
 
   const toggleTheme = () => {
-    setIsDark((prev) => !prev);
+    setIsDark((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('nelov_theme', next ? 'dark' : 'light');
+        localStorage.setItem('nelov_theme_user_set', 'true');
+      } catch {}
+      return next;
+    });
   };
 
   const handleNavigate = (hash: string) => {
     window.location.hash = hash;
     setCurrentHash(hash);
   };
+
+  if (isDashboardRoute) {
+    return (
+      <>
+        <DashboardView
+          currentHash={currentHash}
+          isDark={isDark}
+          toggleTheme={toggleTheme}
+          onNavigate={handleNavigate}
+          onSelectTest={(testId) => {
+            if (testId.startsWith('jee-mains-')) {
+              handleNavigate(`#/test/jee-mains/${testId.replace('jee-mains-', '')}`);
+            } else {
+              handleNavigate(`#/test/jee-advanced/${testId.replace('jee-advanced-', '')}`);
+            }
+          }}
+        />
+        <AuthModal />
+        <StorageNotice />
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">

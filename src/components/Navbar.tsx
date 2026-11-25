@@ -408,8 +408,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               {activeDropdown === 'dashboard' && (
                 <div className="absolute left-0 mt-1.5 w-64 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#111218] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
                   <div className="px-3 py-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
-                    Personal Study Tools
+                    Unified JEE Workspace
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={() => navigateTo('#/dashboard')}
+                    className="w-full flex items-center gap-2.5 p-2.5 mb-1 rounded-xl bg-gradient-to-r from-indigo-600/10 via-blue-600/10 to-violet-600/10 hover:from-indigo-600/20 hover:to-violet-600/20 border border-indigo-500/25 text-left transition-all"
+                  >
+                    <span className="text-base">🚀</span>
+                    <div>
+                      <div className="font-black text-indigo-600 dark:text-indigo-400">Student Dashboard</div>
+                      <p className="text-[11px] text-slate-500 dark:text-zinc-400">Sidebar workspace, 83 trackers &amp; mistakes</p>
+                    </div>
+                  </button>
 
                   <button
                     type="button"
@@ -830,6 +842,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               {mobileSectionOpen === 'study' && (
                 <div className="p-2 space-y-1 bg-white dark:bg-[#111218]">
+                  <button
+                    type="button"
+                    onClick={() => navigateTo('#/dashboard')}
+                    className="w-full text-left py-2 px-3 rounded-lg text-xs font-black text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 flex items-center gap-2"
+                  >
+                    <span>🚀</span> Student Dashboard (New)
+                  </button>
                   <button
                     type="button"
                     onClick={() => navigateTo('#/progress', true, 'Sign in or create a free account to track your test history.')}
