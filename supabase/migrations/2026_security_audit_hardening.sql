@@ -215,82 +215,55 @@ REVOKE ALL ON FUNCTION public.delete_my_account() FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.delete_my_account() TO authenticated;
 
 -- 4. Tighten RLS policies on Bookmarks, Lecture Progress, Physics Progress & Error Reports
-DROP POLICY IF EXISTS "bookmarks_select_policy" ON public.bookmarks;
-CREATE POLICY "bookmarks_select_policy" ON public.bookmarks
-  FOR SELECT TO authenticated
-  USING ((SELECT auth.uid()) = user_id OR public.is_admin());
+DO $$
+BEGIN
+  IF to_regclass('public.bookmarks') IS NOT NULL THEN
+    EXECUTE 'DROP POLICY IF EXISTS "bookmarks_select_policy" ON public.bookmarks';
+    EXECUTE 'CREATE POLICY "bookmarks_select_policy" ON public.bookmarks FOR SELECT TO authenticated USING ((SELECT auth.uid()) = user_id OR public.is_admin())';
+    EXECUTE 'DROP POLICY IF EXISTS "bookmarks_insert_policy" ON public.bookmarks';
+    EXECUTE 'CREATE POLICY "bookmarks_insert_policy" ON public.bookmarks FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id)';
+    EXECUTE 'DROP POLICY IF EXISTS "bookmarks_update_policy" ON public.bookmarks';
+    EXECUTE 'CREATE POLICY "bookmarks_update_policy" ON public.bookmarks FOR UPDATE TO authenticated USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id)';
+    EXECUTE 'DROP POLICY IF EXISTS "bookmarks_delete_policy" ON public.bookmarks';
+    EXECUTE 'CREATE POLICY "bookmarks_delete_policy" ON public.bookmarks FOR DELETE TO authenticated USING ((SELECT auth.uid()) = user_id)';
+  END IF;
 
-DROP POLICY IF EXISTS "bookmarks_insert_policy" ON public.bookmarks;
-CREATE POLICY "bookmarks_insert_policy" ON public.bookmarks
-  FOR INSERT TO authenticated
-  WITH CHECK ((SELECT auth.uid()) = user_id);
+  IF to_regclass('public.lecture_progress') IS NOT NULL THEN
+    EXECUTE 'DROP POLICY IF EXISTS "lecture_progress_select_policy" ON public.lecture_progress';
+    EXECUTE 'CREATE POLICY "lecture_progress_select_policy" ON public.lecture_progress FOR SELECT TO authenticated USING ((SELECT auth.uid()) = user_id OR public.is_admin())';
+    EXECUTE 'DROP POLICY IF EXISTS "lecture_progress_insert_policy" ON public.lecture_progress';
+    EXECUTE 'CREATE POLICY "lecture_progress_insert_policy" ON public.lecture_progress FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id)';
+    EXECUTE 'DROP POLICY IF EXISTS "lecture_progress_update_policy" ON public.lecture_progress';
+    EXECUTE 'CREATE POLICY "lecture_progress_update_policy" ON public.lecture_progress FOR UPDATE TO authenticated USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id)';
+    EXECUTE 'DROP POLICY IF EXISTS "lecture_progress_delete_policy" ON public.lecture_progress';
+    EXECUTE 'CREATE POLICY "lecture_progress_delete_policy" ON public.lecture_progress FOR DELETE TO authenticated USING ((SELECT auth.uid()) = user_id)';
+  END IF;
 
-DROP POLICY IF EXISTS "bookmarks_update_policy" ON public.bookmarks;
-CREATE POLICY "bookmarks_update_policy" ON public.bookmarks
-  FOR UPDATE TO authenticated
-  USING ((SELECT auth.uid()) = user_id)
-  WITH CHECK ((SELECT auth.uid()) = user_id);
+  IF to_regclass('public.physics_progress') IS NOT NULL THEN
+    EXECUTE 'DROP POLICY IF EXISTS "Users can view own physics progress" ON public.physics_progress';
+    EXECUTE 'CREATE POLICY "Users can view own physics progress" ON public.physics_progress FOR SELECT TO authenticated USING ((SELECT auth.uid()) = user_id OR public.is_admin())';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can insert own physics progress" ON public.physics_progress';
+    EXECUTE 'CREATE POLICY "Users can insert own physics progress" ON public.physics_progress FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id)';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can update own physics progress" ON public.physics_progress';
+    EXECUTE 'CREATE POLICY "Users can update own physics progress" ON public.physics_progress FOR UPDATE TO authenticated USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id)';
+  END IF;
 
-DROP POLICY IF EXISTS "bookmarks_delete_policy" ON public.bookmarks;
-CREATE POLICY "bookmarks_delete_policy" ON public.bookmarks
-  FOR DELETE TO authenticated
-  USING ((SELECT auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "lecture_progress_select_policy" ON public.lecture_progress;
-CREATE POLICY "lecture_progress_select_policy" ON public.lecture_progress
-  FOR SELECT TO authenticated
-  USING ((SELECT auth.uid()) = user_id OR public.is_admin());
-
-DROP POLICY IF EXISTS "lecture_progress_insert_policy" ON public.lecture_progress;
-CREATE POLICY "lecture_progress_insert_policy" ON public.lecture_progress
-  FOR INSERT TO authenticated
-  WITH CHECK ((SELECT auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "lecture_progress_update_policy" ON public.lecture_progress;
-CREATE POLICY "lecture_progress_update_policy" ON public.lecture_progress
-  FOR UPDATE TO authenticated
-  USING ((SELECT auth.uid()) = user_id)
-  WITH CHECK ((SELECT auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "lecture_progress_delete_policy" ON public.lecture_progress;
-CREATE POLICY "lecture_progress_delete_policy" ON public.lecture_progress
-  FOR DELETE TO authenticated
-  USING ((SELECT auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "Users can view own physics progress" ON public.physics_progress;
-CREATE POLICY "Users can view own physics progress" ON public.physics_progress
-  FOR SELECT TO authenticated
-  USING ((SELECT auth.uid()) = user_id OR public.is_admin());
-
-DROP POLICY IF EXISTS "Users can insert own physics progress" ON public.physics_progress;
-CREATE POLICY "Users can insert own physics progress" ON public.physics_progress
-  FOR INSERT TO authenticated
-  WITH CHECK ((SELECT auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "Users can update own physics progress" ON public.physics_progress;
-CREATE POLICY "Users can update own physics progress" ON public.physics_progress
-  FOR UPDATE TO authenticated
-  USING ((SELECT auth.uid()) = user_id)
-  WITH CHECK ((SELECT auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "Users can view own physics exercise attempts" ON public.physics_exercise_attempts;
-CREATE POLICY "Users can view own physics exercise attempts" ON public.physics_exercise_attempts
-  FOR SELECT TO authenticated
-  USING ((SELECT auth.uid()) = user_id OR public.is_admin());
-
-DROP POLICY IF EXISTS "Users can insert own physics exercise attempts" ON public.physics_exercise_attempts;
-CREATE POLICY "Users can insert own physics exercise attempts" ON public.physics_exercise_attempts
-  FOR INSERT TO authenticated
-  WITH CHECK ((SELECT auth.uid()) = user_id);
+  IF to_regclass('public.physics_exercise_attempts') IS NOT NULL THEN
+    EXECUTE 'DROP POLICY IF EXISTS "Users can view own physics exercise attempts" ON public.physics_exercise_attempts';
+    EXECUTE 'CREATE POLICY "Users can view own physics exercise attempts" ON public.physics_exercise_attempts FOR SELECT TO authenticated USING ((SELECT auth.uid()) = user_id OR public.is_admin())';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can insert own physics exercise attempts" ON public.physics_exercise_attempts';
+    EXECUTE 'CREATE POLICY "Users can insert own physics exercise attempts" ON public.physics_exercise_attempts FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id)';
+  END IF;
+END $$;
 
 -- Error Reports: Enforce user_id ownership, bounds, and DB-level spam rate limiting
 ALTER TABLE public.error_reports DROP CONSTRAINT IF EXISTS error_reports_issue_type_check;
 ALTER TABLE public.error_reports ADD CONSTRAINT error_reports_issue_type_check
-  CHECK (char_length(issue_type) BETWEEN 1 AND 120);
+  CHECK (char_length(issue_type) BETWEEN 1 AND 120) NOT VALID;
 
 ALTER TABLE public.error_reports DROP CONSTRAINT IF EXISTS error_reports_description_len_check;
 ALTER TABLE public.error_reports ADD CONSTRAINT error_reports_description_len_check
-  CHECK (char_length(description) BETWEEN 1 AND 2000);
+  CHECK (char_length(description) BETWEEN 1 AND 2000) NOT VALID;
 
 DROP POLICY IF EXISTS "error_reports_insert_policy" ON public.error_reports;
 CREATE POLICY "error_reports_insert_policy" ON public.error_reports
