@@ -358,7 +358,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Step A: Save to Supabase Auth metadata (always works even without custom DB columns)
     if (isSupabaseConfigured && supabase) {
       try {
-        console.log('[AuthContext] Saving legal consent to Supabase Auth metadata...');
         await supabase.auth.updateUser({
           data: {
             accepted_terms_at: now,
@@ -372,7 +371,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Step B: Resilient upsert into public.profiles
       try {
-        console.log('[AuthContext] Syncing legal consent to public.profiles...');
         await supabase
           .from('profiles')
           .upsert({

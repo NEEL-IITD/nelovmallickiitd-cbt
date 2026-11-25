@@ -77,6 +77,40 @@
     return `${normalizeStr(subject)}_${normalizeStr(chapterId)}`;
   }
 
+  function isSafePdfUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    const raw = url.trim();
+    if (!raw || /[\x00-\x1f\x7f]/.test(raw) || /^\s*(javascript|vbscript|file):/i.test(raw)) return false;
+    if (/^\/(?!\/)[a-zA-Z0-9._\-\/]+$/.test(raw)) return true;
+    if (/^data:application\/pdf;base64,[A-Za-z0-9+/=]+$/i.test(raw)) return true;
+    try {
+      const parsed = new URL(raw);
+      if (parsed.protocol !== 'https:') return false;
+      const host = parsed.hostname.toLowerCase();
+      if (/^(localhost|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|0\.|\[::1\])/.test(host)) return false;
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function isSafeImageUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    const raw = url.trim();
+    if (!raw || /[\x00-\x1f\x7f]/.test(raw) || /^\s*(javascript|vbscript|data:text\/html|data:image\/svg\+xml)/i.test(raw)) return false;
+    if (/^\/(?!\/)[a-zA-Z0-9._\-\/]+$/.test(raw)) return true;
+    if (/^data:image\/(png|jpeg|jpg|webp|gif);base64,[A-Za-z0-9+/=]+$/i.test(raw)) return true;
+    try {
+      const parsed = new URL(raw);
+      if (parsed.protocol !== 'https:') return false;
+      const host = parsed.hostname.toLowerCase();
+      if (/^(localhost|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|0\.|\[::1\])/.test(host)) return false;
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   const vaultStorage = {
     // --------------------------------------------------------------------------
     // Initializer & Pre-seeding
@@ -86,7 +120,7 @@
         const stored = localStorage.getItem(STORAGE_KEY_EXERCISES);
         let exercisesMap = stored ? JSON.parse(stored) : {};
         
-        // Ensure rotational motion exercise 1 is seeded if empty
+        // 1. Ensure rotational motion exercise 1 is seeded if empty
         const seedKey = makeExerciseKey(SEED_ROTATIONAL_MOTION_EX1.subject, SEED_ROTATIONAL_MOTION_EX1.chapterId, SEED_ROTATIONAL_MOTION_EX1.exerciseId);
         if (!exercisesMap[seedKey]) {
           exercisesMap[seedKey] = {
@@ -95,14 +129,76 @@
             totalMarks: SEED_ROTATIONAL_MOTION_EX1.questions.length * 4,
             updatedAt: new Date().toISOString()
           };
-          // Also alias for common chapter code variants (C8, c8)
           const aliasKey1 = makeExerciseKey('physics', 'C8', 'c8-ex1');
           const aliasKey2 = makeExerciseKey('physics', 'c8', 'ex-1');
           exercisesMap[aliasKey1] = exercisesMap[seedKey];
           exercisesMap[aliasKey2] = exercisesMap[seedKey];
-
-          localStorage.setItem(STORAGE_KEY_EXERCISES, JSON.stringify(exercisesMap));
         }
+
+        // 2. Pre-seed Kinematics C4 Theory Notes
+        const theoryStore = localStorage.getItem(STORAGE_KEY_THEORY);
+        let theoryMap = theoryStore ? JSON.parse(theoryStore) : {};
+        const c4TheoryKey = makeTheoryKey('physics', 'C4');
+        if (!theoryMap[c4TheoryKey] || !theoryMap[c4TheoryKey].pdfUrl) {
+          theoryMap[c4TheoryKey] = {
+            subject: 'physics',
+            chapterId: 'C4',
+            chapterName: 'Kinematics',
+            title: 'C4 - Kinematics Theory Notes (49 Pages)',
+            pdfUrl: '/resources/physics/c04-kinematics/Kinematics_Theory_Clean.pdf',
+            fileName: 'Kinematics_Theory_Clean.pdf',
+            fileSizeBytes: 4594238,
+            pageCount: 49,
+            status: 'ready',
+            updatedAt: new Date().toISOString()
+          };
+          theoryMap[makeTheoryKey('physics', 'C04')] = theoryMap[c4TheoryKey];
+          theoryMap[makeTheoryKey('physics', 'c4')] = theoryMap[c4TheoryKey];
+          localStorage.setItem(STORAGE_KEY_THEORY, JSON.stringify(theoryMap));
+        }
+
+        localStorage.setItem(STORAGE_KEY_EXERCISES, JSON.stringify(exercisesMap));
+
+        // 3. Asynchronously load Kinematics static JSON exercises into memory & storage
+        window.builtInExercises = window.builtInExercises || {};
+        const kinematicsFiles = [
+          { file: '/data/physics/c04-kinematics/exercise-1.json', exId: 'c4-ex1', alias: 'ex-1' },
+          { file: '/data/physics/c04-kinematics/exercise-2.json', exId: 'c4-ex2', alias: 'ex-2' },
+          { file: '/data/physics/c04-kinematics/exercise-3.json', exId: 'c4-ex3', alias: 'ex-3' },
+          { file: '/data/physics/c04-kinematics/exercise-4.json', exId: 'c4-ex4', alias: 'ex-4' },
+          { file: '/data/physics/c04-kinematics/exercise-5.json', exId: 'c4-ex5', alias: 'ex-5' },
+          { file: '/data/physics/c04-kinematics/short-answers.json', exId: 'c4-sa', alias: 'short-answers' }
+        ];
+
+        kinematicsFiles.forEach(async item => {
+          try {
+            const res = await fetch(item.file);
+            if (res.ok) {
+              const data = await res.json();
+              window.builtInExercises[`physics_c4_${item.exId}`] = data;
+              window.builtInExercises[`physics_c04_${item.alias}`] = data;
+              window.builtInExercises[`physics_c4_${item.alias}`] = data;
+              window.builtInExercises[`physics_c04_${item.exId}`] = data;
+              
+              const currentStored = localStorage.getItem(STORAGE_KEY_EXERCISES);
+              const mapNow = currentStored ? JSON.parse(currentStored) : {};
+              const k1 = makeExerciseKey('physics', 'C4', item.exId);
+              const k2 = makeExerciseKey('physics', 'C04', item.alias);
+              mapNow[k1] = {
+                ...data,
+                chapterId: 'C4',
+                exerciseId: item.exId,
+                totalQuestions: data.questions ? data.questions.length : (data.itemCount || 0),
+                totalMarks: (data.questions ? data.questions.length : (data.itemCount || 0)) * (data.defaultMarking?.correct || 4),
+                updatedAt: new Date().toISOString()
+              };
+              mapNow[k2] = mapNow[k1];
+              localStorage.setItem(STORAGE_KEY_EXERCISES, JSON.stringify(mapNow));
+            }
+          } catch (e) {
+            // ignore network/file err in init
+          }
+        });
       } catch (e) {
         console.warn('[vaultStorage] Failed to initialize seed data:', e);
       }
@@ -154,18 +250,35 @@
       }
 
       const durationMinutes = Number(data.durationMinutes) || 60;
+      if (durationMinutes < 1 || durationMinutes > 300) {
+        errors.push('"durationMinutes" must be between 1 and 300');
+      }
       const defaultMarking = data.defaultMarking || { correct: 4, incorrect: -1, unattempted: 0 };
 
       if (!Array.isArray(data.questions) || data.questions.length === 0) {
         errors.push('"questions" must be a non-empty array of question objects');
       } else {
+        if (data.questions.length > 300) {
+          errors.push('Maximum 300 questions allowed per exercise');
+        }
+        data.questions.forEach((q, qi) => {
+          const imgs = Array.isArray(q && q.images) ? q.images : ((q && q.image) ? [q.image] : []);
+          imgs.forEach((src) => {
+            if (src && !isSafeImageUrl(src)) {
+              errors.push(`Question #${qi + 1}: unsafe image URL rejected`);
+            }
+          });
+          if (q && q.solutionImage && !isSafeImageUrl(q.solutionImage)) {
+            errors.push(`Question #${qi + 1}: unsafe solutionImage URL rejected`);
+          }
+        });
         data.questions.forEach((q, idx) => {
           const qNum = q.number || idx + 1;
           if (!q.id) {
             errors.push(`Question #${qNum}: missing "id"`);
           }
-          if (!q.type || !['single_correct', 'multi_correct', 'numerical'].includes(q.type)) {
-            errors.push(`Question #${qNum}: "type" must be 'single_correct', 'multi_correct', or 'numerical'`);
+          if (!q.type || !['single_correct', 'multi_correct', 'numerical', 'subjective', 'conceptual_flashcard'].includes(q.type)) {
+            errors.push(`Question #${qNum}: "type" must be 'single_correct', 'multi_correct', 'numerical', 'subjective', or 'conceptual_flashcard'`);
           }
           if (!q.question || typeof q.question !== 'string') {
             errors.push(`Question #${qNum}: missing or empty "question" text`);
@@ -189,10 +302,14 @@
             if (q.correctAnswer === undefined || isNaN(Number(q.correctAnswer))) {
               errors.push(`Question #${qNum}: "correctAnswer" must be a numeric value`);
             }
+          } else if (q.type === 'subjective') {
+            if (q.correctAnswer === undefined || q.correctAnswer === null) {
+              errors.push(`Question #${qNum}: "correctAnswer" must be provided for subjective problem`);
+            }
           }
 
-          if (!q.solution || typeof q.solution !== 'string') {
-            errors.push(`Question #${qNum}: "solution" text is required`);
+          if ((!q.solution || typeof q.solution !== 'string') && (!q.answer || typeof q.answer !== 'string')) {
+            errors.push(`Question #${qNum}: "solution" or "answer" text is required`);
           }
         });
       }
@@ -235,6 +352,9 @@
     // Exercises CRUD
     // --------------------------------------------------------------------------
     async saveExercise(exerciseInput) {
+      if (!window.authService?.isAdmin?.()) {
+        return { ok: false, error: 'Admin access (mallicknelov@gmail.com) required to upload exercises.' };
+      }
       const val = this.validateExerciseJson(exerciseInput);
       if (!val.isValid || !val.data) {
         return { ok: false, error: val.errors.join('; ') };
@@ -287,31 +407,43 @@
     getExercise(subject, chapterId, exerciseId) {
       if (!subject || !chapterId || !exerciseId) return null;
       try {
-        const stored = localStorage.getItem(STORAGE_KEY_EXERCISES);
-        if (!stored) return null;
-        const map = JSON.parse(stored);
-
-        // Try direct key
-        const directKey = makeExerciseKey(subject, chapterId, exerciseId);
-        if (map[directKey]) return map[directKey];
-
-        // Flexible search across all saved keys
         const normSubject = normalizeStr(subject);
         const normChapter = normalizeStr(chapterId);
         const normEx = normalizeStr(exerciseId);
 
-        for (const [key, item] of Object.entries(map)) {
-          if (!item) continue;
-          const sMatch = normalizeStr(item.subject) === normSubject;
-          const cMatch = normalizeStr(item.chapterId) === normChapter ||
-                         normChapter.endsWith(normalizeStr(item.chapterId)) ||
-                         normalizeStr(item.chapterId).endsWith(normChapter);
-          const eMatch = normalizeStr(item.exerciseId) === normEx ||
-                         normEx.endsWith(normalizeStr(item.exerciseId)) ||
-                         normalizeStr(item.exerciseId).endsWith(normEx);
+        // 1. Check in-memory builtInExercises first
+        if (window.builtInExercises) {
+          const directKey1 = `${normSubject}_${normChapter}_${normEx}`;
+          if (window.builtInExercises[directKey1]) return window.builtInExercises[directKey1];
+          for (const [k, v] of Object.entries(window.builtInExercises)) {
+            const parts = k.split('_');
+            if (parts.length >= 3 && parts[0] === normSubject &&
+               (parts[1] === normChapter || normChapter.endsWith(parts[1]) || parts[1].endsWith(normChapter)) &&
+               (parts[2] === normEx || normEx.endsWith(parts[2]) || parts[2].endsWith(normEx))) {
+              return v;
+            }
+          }
+        }
 
-          if (sMatch && cMatch && eMatch) {
-            return item;
+        const stored = localStorage.getItem(STORAGE_KEY_EXERCISES);
+        if (stored) {
+          const map = JSON.parse(stored);
+          const directKey = makeExerciseKey(subject, chapterId, exerciseId);
+          if (map[directKey]) return map[directKey];
+
+          for (const [key, item] of Object.entries(map)) {
+            if (!item) continue;
+            const sMatch = normalizeStr(item.subject) === normSubject;
+            const cMatch = normalizeStr(item.chapterId) === normChapter ||
+                           normChapter.endsWith(normalizeStr(item.chapterId)) ||
+                           normalizeStr(item.chapterId).endsWith(normChapter);
+            const eMatch = normalizeStr(item.exerciseId) === normEx ||
+                           normEx.endsWith(normalizeStr(item.exerciseId)) ||
+                           normalizeStr(item.exerciseId).endsWith(normEx);
+
+            if (sMatch && cMatch && eMatch) {
+              return item;
+            }
           }
         }
       } catch (e) {
@@ -340,6 +472,7 @@
     },
 
     deleteExercise(subject, chapterId, exerciseId) {
+      if (!window.authService?.isAdmin?.()) return false;
       try {
         const stored = localStorage.getItem(STORAGE_KEY_EXERCISES);
         if (!stored) return false;
@@ -374,8 +507,17 @@
     // Theory Notes CRUD
     // --------------------------------------------------------------------------
     async saveTheoryNotes(theoryInput) {
+      if (!window.authService?.isAdmin?.()) {
+        return { ok: false, error: 'Admin access (mallicknelov@gmail.com) required to upload theory notes.' };
+      }
       if (!theoryInput || !theoryInput.subject || !theoryInput.chapterId || !theoryInput.pdfUrl) {
         return { ok: false, error: 'subject, chapterId, and pdfUrl are required' };
+      }
+      if (!isSafePdfUrl(theoryInput.pdfUrl)) {
+        return { ok: false, error: 'Unsafe or invalid PDF URL rejected.' };
+      }
+      if (Number(theoryInput.fileSizeBytes || 0) > 15 * 1024 * 1024) {
+        return { ok: false, error: 'PDF file size exceeds maximum limit of 15 MB.' };
       }
 
       const key = makeTheoryKey(theoryInput.subject, theoryInput.chapterId);
@@ -425,6 +567,26 @@
     getTheoryNotes(subject, chapterId) {
       if (!subject || !chapterId) return null;
       try {
+        const normSubject = normalizeStr(subject);
+        const normChapter = normalizeStr(chapterId);
+
+        // Built-in Kinematics C4 Theory Notes
+        if (normSubject === 'physics' && (normChapter === 'c4' || normChapter === 'c04')) {
+          return {
+            id: makeTheoryKey('physics', 'C4'),
+            subject: 'physics',
+            chapterId: 'C4',
+            chapterName: 'Kinematics',
+            title: 'C4 - Kinematics Theory Notes (49 Pages)',
+            pdfUrl: '/resources/physics/c04-kinematics/Kinematics_Theory_Clean.pdf',
+            fileName: 'Kinematics_Theory_Clean.pdf',
+            fileSizeBytes: 4594238,
+            pageCount: 49,
+            status: 'ready',
+            updatedAt: new Date().toISOString()
+          };
+        }
+
         const stored = localStorage.getItem(STORAGE_KEY_THEORY);
         if (!stored) return null;
         const map = JSON.parse(stored);
@@ -432,8 +594,6 @@
         if (map[key]) return map[key];
 
         // Flexible search
-        const normSubject = normalizeStr(subject);
-        const normChapter = normalizeStr(chapterId);
         for (const item of Object.values(map)) {
           if (item && normalizeStr(item.subject) === normSubject &&
              (normalizeStr(item.chapterId) === normChapter ||
@@ -460,6 +620,7 @@
     },
 
     deleteTheoryNotes(subject, chapterId) {
+      if (!window.authService?.isAdmin?.()) return false;
       try {
         const stored = localStorage.getItem(STORAGE_KEY_THEORY);
         if (!stored) return false;

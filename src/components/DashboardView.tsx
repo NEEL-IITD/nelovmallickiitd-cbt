@@ -55,6 +55,7 @@ import { VaultContentManager } from './vault/VaultContentManager';
 import { DailyGoalTodayCard } from './DailyGoalTodayCard';
 import { DailyStudyPlannerView } from './DailyStudyPlannerView';
 import { dailyPlannerService, DAILY_PLANNER_EVENT } from '../services/dailyPlannerService';
+import { errorReportSchema, personalNoteSchema } from '../utils/validationSchemas';
 
 export type DashboardTabId =
   | 'home'
@@ -311,6 +312,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [feedbackMsg, setFeedbackMsg] = useState('');
   const [feedbackRating, setFeedbackRating] = useState(5);
   const [feedbackDone, setFeedbackDone] = useState(false);
+  const [feedbackError, setFeedbackError] = useState('');
 
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 1000);
@@ -605,8 +607,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   const handleAddNote = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!noteTitle.trim() || !noteBody.trim()) return;
-    const updated = [{ id: `note_${Date.now()}`, title: noteTitle.trim(), subject: noteSubject, body: noteBody.trim() }, ...personalNotes];
+    const parsed = personalNoteSchema.safeParse({
+      title: noteTitle,
+      subject: noteSubject || 'General',
+      body: noteBody
+    });
+    if (!parsed.success) return;
+    const updated = [{ id: `note_${Date.now()}`, title: parsed.data.title, subject: parsed.data.subject, body: parsed.data.body }, ...personalNotes];
     setPersonalNotes(updated);
     try {
       localStorage.setItem(`nelov_personal_notes_${userKey}`, JSON.stringify(updated));
@@ -617,24 +624,36 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   const handleSubmitFeedback = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!feedbackMsg.trim()) return;
+    setFeedbackError('');
+    setFeedbackDone(false);
+    const parsed = errorReportSchema.safeParse({
+      testId: feedbackRef || 'General Portal',
+      issueType: `${feedbackCat} (${feedbackRating}/5)`,
+      description: feedbackMsg
+    });
+    if (!parsed.success) {
+      setFeedbackError(parsed.error.issues[0]?.message || 'Please enter at least 5 characters of feedback.');
+      return;
+    }
     try {
       await studentStorage.submitErrorReport({
         userId: user?.id || 'guest',
         reporterName: user?.name || 'Guest Aspirant',
         reporterEmail: user?.email || 'guest@nelovmallick.local',
-        testId: feedbackRef,
+        testId: parsed.data.testId,
         examType: 'Dashboard Feedback',
-        testCode: feedbackRef,
+        testCode: parsed.data.testId,
         questionId: '0',
         questionNumber: 0,
-        issueType: `${feedbackCat} (${feedbackRating}/5)`,
-        description: feedbackMsg.trim()
+        issueType: parsed.data.issueType,
+        description: parsed.data.description
       });
-    } catch {}
-    setFeedbackDone(true);
-    setFeedbackMsg('');
-    setTimeout(() => setFeedbackDone(false), 3500);
+      setFeedbackDone(true);
+      setFeedbackMsg('');
+      setTimeout(() => setFeedbackDone(false), 3500);
+    } catch (err: any) {
+      setFeedbackError(err?.message || 'Unable to submit feedback right now.');
+    }
   };
 
   const renderSidebar = () => (
@@ -1412,6 +1431,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <form onSubmit={handleSubmitFeedback} className={`max-w-2xl rounded-3xl p-6 space-y-4 ${cardCls}`}>
               <h3 className="text-lg font-black">Feedback &amp; Issue Reporter</h3>
               {feedbackDone && <div className="p-3 rounded-xl bg-emerald-500/20 text-emerald-400 text-xs font-bold">Feedback submitted!</div>}
+              {feedbackError && <div className="p-3 rounded-xl bg-rose-500/20 text-rose-400 text-xs font-bold">{feedbackError}</div>}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <select value={feedbackCat} onChange={(e) => setFeedbackCat(e.target.value)} className={`px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#080B14] border-white/10' : 'bg-white border-slate-200'}`}>
                   <option value="Feature Suggestion">Feature Suggestion</option>

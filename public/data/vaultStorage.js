@@ -77,6 +77,40 @@
     return `${normalizeStr(subject)}_${normalizeStr(chapterId)}`;
   }
 
+  function isSafePdfUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    const raw = url.trim();
+    if (!raw || /[\x00-\x1f\x7f]/.test(raw) || /^\s*(javascript|vbscript|file):/i.test(raw)) return false;
+    if (/^\/(?!\/)[a-zA-Z0-9._\-\/]+$/.test(raw)) return true;
+    if (/^data:application\/pdf;base64,[A-Za-z0-9+/=]+$/i.test(raw)) return true;
+    try {
+      const parsed = new URL(raw);
+      if (parsed.protocol !== 'https:') return false;
+      const host = parsed.hostname.toLowerCase();
+      if (/^(localhost|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|0\.|\[::1\])/.test(host)) return false;
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function isSafeImageUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    const raw = url.trim();
+    if (!raw || /[\x00-\x1f\x7f]/.test(raw) || /^\s*(javascript|vbscript|data:text\/html|data:image\/svg\+xml)/i.test(raw)) return false;
+    if (/^\/(?!\/)[a-zA-Z0-9._\-\/]+$/.test(raw)) return true;
+    if (/^data:image\/(png|jpeg|jpg|webp|gif);base64,[A-Za-z0-9+/=]+$/i.test(raw)) return true;
+    try {
+      const parsed = new URL(raw);
+      if (parsed.protocol !== 'https:') return false;
+      const host = parsed.hostname.toLowerCase();
+      if (/^(localhost|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|0\.|\[::1\])/.test(host)) return false;
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   const vaultStorage = {
     // --------------------------------------------------------------------------
     // Initializer & Pre-seeding
@@ -216,11 +250,28 @@
       }
 
       const durationMinutes = Number(data.durationMinutes) || 60;
+      if (durationMinutes < 1 || durationMinutes > 300) {
+        errors.push('"durationMinutes" must be between 1 and 300');
+      }
       const defaultMarking = data.defaultMarking || { correct: 4, incorrect: -1, unattempted: 0 };
 
       if (!Array.isArray(data.questions) || data.questions.length === 0) {
         errors.push('"questions" must be a non-empty array of question objects');
       } else {
+        if (data.questions.length > 300) {
+          errors.push('Maximum 300 questions allowed per exercise');
+        }
+        data.questions.forEach((q, qi) => {
+          const imgs = Array.isArray(q && q.images) ? q.images : ((q && q.image) ? [q.image] : []);
+          imgs.forEach((src) => {
+            if (src && !isSafeImageUrl(src)) {
+              errors.push(`Question #${qi + 1}: unsafe image URL rejected`);
+            }
+          });
+          if (q && q.solutionImage && !isSafeImageUrl(q.solutionImage)) {
+            errors.push(`Question #${qi + 1}: unsafe solutionImage URL rejected`);
+          }
+        });
         data.questions.forEach((q, idx) => {
           const qNum = q.number || idx + 1;
           if (!q.id) {
@@ -301,6 +352,9 @@
     // Exercises CRUD
     // --------------------------------------------------------------------------
     async saveExercise(exerciseInput) {
+      if (!window.authService?.isAdmin?.()) {
+        return { ok: false, error: 'Admin access (mallicknelov@gmail.com) required to upload exercises.' };
+      }
       const val = this.validateExerciseJson(exerciseInput);
       if (!val.isValid || !val.data) {
         return { ok: false, error: val.errors.join('; ') };
@@ -418,6 +472,7 @@
     },
 
     deleteExercise(subject, chapterId, exerciseId) {
+      if (!window.authService?.isAdmin?.()) return false;
       try {
         const stored = localStorage.getItem(STORAGE_KEY_EXERCISES);
         if (!stored) return false;
@@ -452,8 +507,17 @@
     // Theory Notes CRUD
     // --------------------------------------------------------------------------
     async saveTheoryNotes(theoryInput) {
+      if (!window.authService?.isAdmin?.()) {
+        return { ok: false, error: 'Admin access (mallicknelov@gmail.com) required to upload theory notes.' };
+      }
       if (!theoryInput || !theoryInput.subject || !theoryInput.chapterId || !theoryInput.pdfUrl) {
         return { ok: false, error: 'subject, chapterId, and pdfUrl are required' };
+      }
+      if (!isSafePdfUrl(theoryInput.pdfUrl)) {
+        return { ok: false, error: 'Unsafe or invalid PDF URL rejected.' };
+      }
+      if (Number(theoryInput.fileSizeBytes || 0) > 15 * 1024 * 1024) {
+        return { ok: false, error: 'PDF file size exceeds maximum limit of 15 MB.' };
       }
 
       const key = makeTheoryKey(theoryInput.subject, theoryInput.chapterId);
@@ -556,6 +620,7 @@
     },
 
     deleteTheoryNotes(subject, chapterId) {
+      if (!window.authService?.isAdmin?.()) return false;
       try {
         const stored = localStorage.getItem(STORAGE_KEY_THEORY);
         if (!stored) return false;

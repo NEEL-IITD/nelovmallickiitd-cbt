@@ -11,6 +11,8 @@ import {
   VaultValidationResult,
   VaultSubjectType
 } from '../types';
+import { authService } from './authService';
+import { isSafeImageUrl, isSafePdfUrl, sanitizeUploadFilename, vaultExerciseSchema } from '../utils/validationSchemas';
 
 const STORAGE_KEY_EXERCISES = 'nelov_vault_exercises';
 const STORAGE_KEY_THEORY = 'nelov_vault_theory';
@@ -252,12 +254,43 @@ class VaultService {
   public async saveExercise(
     exerciseInput: any
   ): Promise<{ ok: boolean; key?: string; exercise?: VaultExercise; error?: string }> {
+    if (!authService.isAdmin()) {
+      return { ok: false, error: 'Admin privileges (mallicknelov@gmail.com) are required to publish exercises.' };
+    }
     const val = this.validateExerciseJson(exerciseInput);
     if (!val.isValid || !val.data) {
       return { ok: false, error: val.errors.join('; ') };
     }
-
     const exerciseData = val.data;
+    if (Array.isArray(exerciseData.questions) && exerciseData.questions.length > 300) {
+      return { ok: false, error: 'Maximum 300 questions allowed per exercise.' };
+    }
+    if (Number(exerciseData.durationMinutes || 60) < 1 || Number(exerciseData.durationMinutes || 60) > 300) {
+      return { ok: false, error: 'durationMinutes must be between 1 and 300.' };
+    }
+    for (let i = 0; i < (exerciseData.questions || []).length; i++) {
+      const q: any = exerciseData.questions[i];
+      const imgs = Array.isArray(q?.images) ? q.images : (q?.image ? [q.image] : []);
+      if (imgs.some((src: string) => src && !isSafeImageUrl(src)) || (q?.solutionImage && !isSafeImageUrl(q.solutionImage))) {
+        return { ok: false, error: `Question #${i + 1}: unsafe image URL rejected.` };
+      }
+    }
+    const zodCheck = vaultExerciseSchema.safeParse({
+      subject: String(exerciseData.subject || '').toLowerCase(),
+      chapterId: String(exerciseData.chapterId || ''),
+      exerciseId: String(exerciseData.exerciseId || ''),
+      title: String(exerciseData.title || ''),
+      durationMinutes: Number(exerciseData.durationMinutes || 60),
+      questions: (exerciseData.questions || []).map((q: any) => ({
+        ...q,
+        type: String(q?.type || 'single_correct'),
+        question: String(q?.question || ''),
+        images: Array.isArray(q?.images) ? q.images : (q?.image ? [q.image] : undefined)
+      }))
+    });
+    if (!zodCheck.success) {
+      return { ok: false, error: zodCheck.error.issues[0]?.message || 'Exercise failed Zod schema validation.' };
+    }
     const primaryKey = makeExerciseKey(exerciseData.subject, exerciseData.chapterId, exerciseData.exerciseId);
 
     // Save to localStorage
@@ -364,6 +397,7 @@ class VaultService {
   }
 
   public deleteExercise(subject: string, chapterId: string, exerciseId: string): boolean {
+    if (!authService.isAdmin()) return false;
     try {
       const stored = localStorage.getItem(STORAGE_KEY_EXERCISES);
       if (!stored) return false;
@@ -408,20 +442,30 @@ class VaultService {
   public async saveTheoryNotes(
     theoryInput: any
   ): Promise<{ ok: boolean; key?: string; theory?: VaultTheoryNote; error?: string }> {
+    if (!authService.isAdmin()) {
+      return { ok: false, error: 'Admin privileges (mallicknelov@gmail.com) are required to upload theory notes.' };
+    }
     if (!theoryInput || !theoryInput.subject || !theoryInput.chapterId || !theoryInput.pdfUrl) {
       return { ok: false, error: 'subject, chapterId, and pdfUrl are required' };
+    }
+    if (!isSafePdfUrl(theoryInput.pdfUrl)) {
+      return { ok: false, error: 'Unsafe or invalid PDF URL rejected.' };
+    }
+    const estimatedBytes = theoryInput.fileSizeBytes || Math.round(String(theoryInput.pdfUrl).length * 0.75);
+    if (Number(estimatedBytes) > 15 * 1024 * 1024) {
+      return { ok: false, error: 'PDF exceeds maximum allowed size of 15 MB.' };
     }
 
     const key = makeTheoryKey(theoryInput.subject, theoryInput.chapterId);
     const theoryRecord: VaultTheoryNote = {
       id: key,
-      subject: theoryInput.subject.toLowerCase() as VaultSubjectType,
-      chapterId: theoryInput.chapterId,
-      chapterName: theoryInput.chapterName || '',
-      title: theoryInput.title || `${theoryInput.chapterId} Theory Notes`,
+      subject: String(theoryInput.subject).toLowerCase() as VaultSubjectType,
+      chapterId: String(theoryInput.chapterId).slice(0, 64),
+      chapterName: String(theoryInput.chapterName || '').slice(0, 200),
+      title: String(theoryInput.title || `${theoryInput.chapterId} Theory Notes`).slice(0, 200),
       pdfUrl: theoryInput.pdfUrl,
-      fileName: theoryInput.fileName || 'Theory_Notes.pdf',
-      fileSizeBytes: theoryInput.fileSizeBytes || Math.round(theoryInput.pdfUrl.length * 0.75),
+      fileName: sanitizeUploadFilename(theoryInput.fileName || 'Theory_Notes.pdf'),
+      fileSizeBytes: estimatedBytes,
       updatedAt: new Date().toISOString()
     };
 
@@ -499,6 +543,7 @@ class VaultService {
   }
 
   public deleteTheoryNotes(subject: string, chapterId: string): boolean {
+    if (!authService.isAdmin()) return false;
     try {
       const stored = localStorage.getItem(STORAGE_KEY_THEORY);
       if (!stored) return false;

@@ -17,6 +17,7 @@ import {
   TestConfigItem
 } from '../types';
 import { authService } from '../services/authService';
+import { checkClientRateLimit, errorReportSchema } from '../utils/validationSchemas';
 
 export interface TestAttemptRecord {
   id: string;
@@ -189,7 +190,6 @@ export const studentStorage = {
         if (sess) {
           const expMs = sess.expires_at ? sess.expires_at * 1000 : 0;
           if (expMs > 0 && expMs < Date.now() + 120000) {
-            console.log('[Supabase] Refreshing active session before test attempt save...');
             const { data: refData } = await supabase.auth.refreshSession();
             if (refData?.session?.user?.id && uuidRegex.test(refData.session.user.id)) {
               effectiveUserId = refData.session.user.id;
@@ -269,7 +269,6 @@ export const studentStorage = {
                 delete (payload as any).question_timings;
               }
               if ((error as any).status === 401 || error.message?.includes('JWT') || error.message?.includes('token') || error.message?.includes('expired') || error.message?.includes('auth')) {
-                console.log('[Supabase] Refreshing token on 401 during retry...');
                 try {
                   const { data: refData } = await supabase.auth.refreshSession();
                   if (refData?.session?.user?.id && uuidRegex.test(refData.session.user.id)) {
@@ -280,7 +279,6 @@ export const studentStorage = {
               }
             } else {
               savedCloud = true;
-              console.log('[Supabase] Successfully saved test attempt to cloud (201 Created):', attemptUuid);
               break;
             }
           } catch (err) {
@@ -492,7 +490,6 @@ export const studentStorage = {
       }
     } catch (e) {}
 
-    console.log(`[Supabase] syncLocalAttemptsToSupabase finished. Synced ${syncedCount} attempts.`);
     return { synced: syncedCount, pending: candidates.length - syncedCount };
   },
 
@@ -697,10 +694,24 @@ export const studentStorage = {
     issueType: ErrorIssueType | string;
     description: string;
   }): Promise<void> {
+    const rl = checkClientRateLimit('error_report_submit', 5, 15 * 60 * 1000);
+    if (!rl.allowed) {
+      throw new Error(`Please wait ${rl.retryAfterSec}s before submitting another report.`);
+    }
+    const parsed = errorReportSchema.safeParse({
+      testId: String(report.testId || 'General'),
+      issueType: String(report.issueType || 'other'),
+      description: String(report.description || '')
+    });
+    if (!parsed.success) {
+      throw new Error(parsed.error.issues[0]?.message || 'Invalid report details.');
+    }
+
     const reportItem: ErrorReportItem = {
       id: 'rep_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
       ...report,
-      issueType: report.issueType as ErrorIssueType,
+      description: parsed.data.description,
+      issueType: parsed.data.issueType as ErrorIssueType,
       status: 'open',
       createdAt: new Date().toISOString()
     };
@@ -710,17 +721,17 @@ export const studentStorage = {
       try {
         const { error } = await supabase.from('error_reports').insert({
           id: reportItem.id.startsWith('rep_') ? undefined : reportItem.id,
-          user_id: report.userId || null,
-          reporter_name: report.reporterName,
-          reporter_email: report.reporterEmail,
-          reporter_contact_number: report.reporterContactNumber || null,
-          test_id: report.testId,
-          exam_type: report.examType,
-          test_code: report.testCode,
-          question_id: report.questionId,
-          question_number: report.questionNumber,
-          issue_type: report.issueType,
-          description: report.description,
+          user_id: report.userId && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(report.userId) ? report.userId : null,
+          reporter_name: String(report.reporterName || 'Aspirant').slice(0, 120),
+          reporter_email: String(report.reporterEmail || '').slice(0, 160),
+          reporter_contact_number: report.reporterContactNumber ? String(report.reporterContactNumber).slice(0, 30) : null,
+          test_id: parsed.data.testId,
+          exam_type: String(report.examType || 'General').slice(0, 80),
+          test_code: String(report.testCode || 'General').slice(0, 80),
+          question_id: String(report.questionId || '0').slice(0, 80),
+          question_number: Number(report.questionNumber) || 0,
+          issue_type: parsed.data.issueType,
+          description: parsed.data.description,
           status: 'open',
           created_at: reportItem.createdAt
         });

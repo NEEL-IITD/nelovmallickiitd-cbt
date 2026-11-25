@@ -11,6 +11,7 @@ import { chemistryChaptersData } from '../../data/chemistryChapters';
 import { mathsChaptersData } from '../../data/mathsChapters';
 import { vaultService } from '../../services/vaultService';
 import { VaultExercise, VaultValidationResult } from '../../types';
+import { isSafePdfUrl, sanitizeUploadFilename, verifyPdfMagicBytes } from '../../utils/validationSchemas';
 
 interface VaultContentManagerProps {
   onLaunchTest?: (exercise: VaultExercise) => void;
@@ -33,7 +34,8 @@ const MathSpan: React.FC<{ text: string; className?: string }> = ({ text, classN
             { left: '\\(', right: '\\)', display: false },
             { left: '\\[', right: '\\]', display: true }
           ],
-          throwOnError: false
+          throwOnError: false,
+          trust: false
         });
       } catch (err) {
         console.warn('KaTeX rendering error:', err);
@@ -176,8 +178,13 @@ export const VaultContentManager: React.FC<VaultContentManagerProps> = ({
   };
 
   const processJsonFile = (file: File) => {
-    if (!file.name.endsWith('.json')) {
+    const safeName = sanitizeUploadFilename(file.name);
+    if (!safeName.toLowerCase().endsWith('.json')) {
       setSaveErrorMsg('Please upload a valid .json file');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setSaveErrorMsg('JSON file exceeds maximum size limit of 2 MB.');
       return;
     }
     const reader = new FileReader();
@@ -192,7 +199,7 @@ export const VaultContentManager: React.FC<VaultContentManagerProps> = ({
         if (parsed.title) setCustomTitle(parsed.title);
         handleValidateJson(text);
       } catch (err: any) {
-        setSaveErrorMsg(`JSON parse error in ${file.name}: ${err.message}`);
+        setSaveErrorMsg(`JSON parse error in ${safeName}: ${err.message}`);
       }
     };
     reader.readAsText(file);
@@ -233,19 +240,34 @@ export const VaultContentManager: React.FC<VaultContentManagerProps> = ({
     }
   };
 
-  const processPdfFile = (file: File) => {
-    if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
+  const processPdfFile = async (file: File) => {
+    const safeName = sanitizeUploadFilename(file.name);
+    if (!safeName.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
       setPdfErrorMsg('Please upload a valid .pdf document');
       return;
     }
-    setPdfFileName(file.name);
+    if (file.size > 15 * 1024 * 1024) {
+      setPdfErrorMsg('PDF file exceeds maximum size limit of 15 MB.');
+      return;
+    }
+    const hasMagic = await verifyPdfMagicBytes(file);
+    if (!hasMagic) {
+      setPdfErrorMsg('Invalid PDF signature (%PDF- header missing).');
+      return;
+    }
+    setPdfFileName(safeName);
     setPdfFileSize(file.size);
-    setPdfTitle(file.name.replace(/\.pdf$/i, '').replace(/[-_]/g, ' '));
+    setPdfTitle(safeName.replace(/\.pdf$/i, '').replace(/[-_]/g, ' '));
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      setPdfDataUrl(event.target?.result as string);
-      setPdfSuccessMsg(`Loaded "${file.name}" (${(file.size / (1024 * 1024)).toFixed(2)} MB)`);
+      const resultUrl = String(event.target?.result || '');
+      if (!isSafePdfUrl(resultUrl)) {
+        setPdfErrorMsg('PDF payload failed safety validation.');
+        return;
+      }
+      setPdfDataUrl(resultUrl);
+      setPdfSuccessMsg(`Loaded "${safeName}" (${(file.size / (1024 * 1024)).toFixed(2)} MB)`);
     };
     reader.readAsDataURL(file);
   };
@@ -696,7 +718,7 @@ export const VaultContentManager: React.FC<VaultContentManagerProps> = ({
                 </button>
               </div>
               <iframe
-                src={pdfDataUrl}
+                src={isSafePdfUrl(pdfDataUrl) ? pdfDataUrl : ''}
                 title="PDF Preview"
                 className="w-full h-96 rounded-xl border border-slate-200 dark:border-zinc-800"
               />
@@ -825,7 +847,7 @@ export const VaultContentManager: React.FC<VaultContentManagerProps> = ({
                       )}
                       {item.itemType === 'theory' && (
                         <a
-                          href={item.pdfUrl}
+                          href={isSafePdfUrl(item.pdfUrl) ? item.pdfUrl : '#'}
                           download={item.fileName || 'theory.pdf'}
                           className="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 transition-colors"
                         >

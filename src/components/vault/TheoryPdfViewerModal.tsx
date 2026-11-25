@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { vaultService } from '../../services/vaultService';
 import { VaultTheoryNote } from '../../types';
 import { useAuth } from '../../context/AuthContext';
+import { isSafePdfUrl } from '../../utils/validationSchemas';
 
 interface TheoryPdfViewerModalProps {
   isOpen: boolean;
@@ -25,7 +26,8 @@ export const TheoryPdfViewerModal: React.FC<TheoryPdfViewerModalProps> = ({
     return vaultService.getTheoryNotes(subject, chapter.code || chapter.id);
   }, [subject, chapter]);
 
-  const hasPdf = Boolean(theoryData && theoryData.pdfUrl);
+  const safePdfUrl = theoryData?.pdfUrl && isSafePdfUrl(theoryData.pdfUrl) ? theoryData.pdfUrl : null;
+  const hasPdf = Boolean(safePdfUrl);
 
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 animate-in fade-in">
@@ -52,9 +54,9 @@ export const TheoryPdfViewerModal: React.FC<TheoryPdfViewerModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {hasPdf && theoryData?.pdfUrl && (
+            {hasPdf && safePdfUrl && theoryData && (
               <a
-                href={theoryData.pdfUrl}
+                href={safePdfUrl}
                 download={theoryData.fileName || 'Theory_Notes.pdf'}
                 className="hidden sm:inline-flex px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-bold hover:bg-emerald-100 transition-colors"
               >
@@ -73,10 +75,10 @@ export const TheoryPdfViewerModal: React.FC<TheoryPdfViewerModalProps> = ({
 
         {/* Content Body */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50 dark:bg-[#0c0d12]">
-          {hasPdf && theoryData?.pdfUrl ? (
+          {hasPdf && safePdfUrl && theoryData ? (
             <div className="space-y-3">
               <iframe
-                src={theoryData.pdfUrl}
+                src={safePdfUrl}
                 title="Theory Notes Document"
                 className="w-full h-[65vh] rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white shadow-inner"
               />
@@ -86,7 +88,7 @@ export const TheoryPdfViewerModal: React.FC<TheoryPdfViewerModalProps> = ({
                   {((theoryData.fileSizeBytes || 0) / (1024 * 1024)).toFixed(2)} MB)
                 </span>
                 <a
-                  href={theoryData.pdfUrl}
+                  href={safePdfUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline"

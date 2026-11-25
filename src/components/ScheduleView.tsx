@@ -10,17 +10,14 @@ import { useAuth } from '../context/AuthContext';
 import { studentStorage } from '../utils/studentStorage';
 import { jeeMainsTests } from '../data/testsIndex';
 import { TestMetadata } from '../data/testTypes';
+import { sanitizeRichMathHtml } from '../utils/validationSchemas';
 
 // Rich KaTeX, Markdown bold (**...**), and HTML subscript/superscript renderer for syllabus entries
 const RichSyllabusText: React.FC<{ text: string; className?: string }> = ({ text, className = '' }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const formattedHtml = useMemo(() => {
-    if (!text) return '';
-    return String(text)
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900 dark:text-zinc-100">$1</strong>')
-      .replace(/\n\n/g, '<div class="h-2.5"></div>')
-      .replace(/\n/g, '<br/>');
+    return sanitizeRichMathHtml(text || '');
   }, [text]);
 
   useEffect(() => {
@@ -34,11 +31,10 @@ const RichSyllabusText: React.FC<{ text: string; className?: string }> = ({ text
             { left: '\\[', right: '\\]', display: true },
             { left: '\\(', right: '\\)', display: false }
           ],
-          throwOnError: false
+          throwOnError: false,
+          trust: false
         });
-      } catch (e) {
-        console.error('KaTeX rendering error:', e);
-      }
+      } catch (e) {}
     }
   }, [formattedHtml]);
 
@@ -193,6 +189,11 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
 
   const handleAction = (item: ScheduleTestItem) => {
     const ready = isTestReady(item.id);
+
+    if (!hasStarted(item.startIso) && !isAdmin) {
+      openPreview(item, 'syllabus');
+      return;
+    }
 
     if (!user) {
       openAuthModal('login', item.hashRoute, `Sign in or create a free account to attempt ${item.code}.`);

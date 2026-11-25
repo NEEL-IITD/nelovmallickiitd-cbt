@@ -7,6 +7,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { authService } from './authService';
 import { cloudSyncService } from './cloudSyncService';
 import { studentStorage } from '../utils/studentStorage';
+import { dailyGoalSchema, topicSchema } from '../utils/validationSchemas';
 
 export interface PlannerActivity {
   id: string;
@@ -221,13 +222,14 @@ export const dailyPlannerService = {
   },
 
   addCustomActivity(label: string, color: string, isStudy: boolean, userId?: string | null): PlannerActivity | null {
-    const clean = label.trim();
+    const clean = String(label || '').trim().slice(0, 40);
     if (!clean) return null;
+    const safeColor = /^#[0-9a-fA-F]{6}$/.test(String(color || '').trim()) ? String(color).trim() : '#8B5CF6';
     const st = this.getStore(userId);
     const act: PlannerActivity = {
       id: `act_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 5)}`,
       label: clean,
-      color: color || '#8B5CF6',
+      color: safeColor,
       isStudy
     };
     st.customActivities = [...(st.customActivities || []), act];
@@ -260,7 +262,9 @@ export const dailyPlannerService = {
   },
 
   setDailyTarget(target: number, userId?: string | null): number {
-    const num = Math.max(1, Math.min(500, Math.round(Number(target) || 30)));
+    const rounded = Math.round(Number(target) || 30);
+    const parsed = dailyGoalSchema.safeParse(rounded);
+    const num = parsed.success ? parsed.data : Math.max(1, Math.min(500, rounded));
     const st = this.getStore(userId);
     st.dailyTarget = num;
     this.saveStore(st, userId, toLocalDateKey(new Date()));
@@ -268,13 +272,14 @@ export const dailyPlannerService = {
   },
 
   addTopic(dateKey: string, text: string, stage = 'No stage', userId?: string | null): PlannerTopic | null {
-    const clean = text.trim();
-    if (!clean) return null;
+    const parsed = topicSchema.safeParse(text);
+    if (!parsed.success) return null;
+    const safeStage = DAILY_PLANNER_STAGES.includes(stage) ? stage : 'No stage';
     const item: PlannerTopic = {
       id: `top_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 5)}`,
-      text: clean,
-      stage: stage || 'No stage',
-      done: stage === 'Completed',
+      text: parsed.data,
+      stage: safeStage,
+      done: safeStage === 'Completed',
       createdAt: new Date().toISOString()
     };
     this._mutateDay(dateKey, (day) => ({ ...day, topics: [...day.topics, item] }), userId);

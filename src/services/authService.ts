@@ -7,6 +7,7 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { User, TargetExam, UserRole, AuthMethod } from '../types';
 import { cloudSyncService } from './cloudSyncService';
+import { checkClientRateLimit, isSafeImageUrl, sanitizeHashRedirect, validateStrongPassword } from '../utils/validationSchemas';
 export type { User, TargetExam, UserRole, AuthMethod };
 
 export interface StoredUser extends User {
@@ -78,28 +79,75 @@ export function getSyntheticPhoneEmail(phoneDigits: string): string {
   return `91${digits}@phone.nelovportal.local`;
 }
 
+async function legacySha256(password: string): Promise<string> {
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
+    const msgUint8 = new TextEncoder().encode(password);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8);
+    return Array.from(new Uint8Array(hashBuffer)).map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+  return '';
+}
+
 /**
- * Hash password securely using Web Crypto API SHA-256 with robust fallback.
+ * Hash password securely using Web Crypto PBKDF2-SHA256 (120,000 iterations + 16-byte random salt).
  */
 export async function hashPassword(password: string): Promise<string> {
   if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
     try {
-      const msgUint8 = new TextEncoder().encode(password);
-      const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+      const salt = new Uint8Array(16);
+      window.crypto.getRandomValues(salt);
+      const keyMaterial = await window.crypto.subtle.importKey(
+        'raw',
+        new TextEncoder().encode(password),
+        'PBKDF2',
+        false,
+        ['deriveBits']
+      );
+      const derivedBits = await window.crypto.subtle.deriveBits(
+        { name: 'PBKDF2', salt, iterations: 120000, hash: 'SHA-256' },
+        keyMaterial,
+        256
+      );
+      const saltHex = Array.from(salt).map((b) => b.toString(16).padStart(2, '0')).join('');
+      const hashHex = Array.from(new Uint8Array(derivedBits)).map((b) => b.toString(16).padStart(2, '0')).join('');
+      return `pbkdf2$${saltHex}$${hashHex}`;
     } catch (e) {
-      console.warn('Web Crypto API failed, using fallback hash', e);
+      console.warn('Web Crypto PBKDF2 failed, trying SHA-256 fallback', e);
     }
   }
-  // Fallback hash
-  let hash = 0;
-  for (let i = 0; i < password.length; i++) {
-    const char = password.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash |= 0;
+  return await legacySha256(password);
+}
+
+export async function verifyPasswordHash(password: string, storedHash: string): Promise<boolean> {
+  if (!storedHash || !password) return false;
+  if (storedHash.startsWith('pbkdf2$') && typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
+    const parts = storedHash.split('$');
+    if (parts.length !== 3) return false;
+    const saltMatches = parts[1].match(/.{1,2}/g);
+    if (!saltMatches) return false;
+    const salt = new Uint8Array(saltMatches.map((h) => parseInt(h, 16)));
+    const keyMaterial = await window.crypto.subtle.importKey(
+      'raw',
+      new TextEncoder().encode(password),
+      'PBKDF2',
+      false,
+      ['deriveBits']
+    );
+    const derivedBits = await window.crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt, iterations: 120000, hash: 'SHA-256' },
+      keyMaterial,
+      256
+    );
+    const computedHex = Array.from(new Uint8Array(derivedBits)).map((b) => b.toString(16).padStart(2, '0')).join('');
+    if (computedHex.length !== parts[2].length) return false;
+    let diff = 0;
+    for (let i = 0; i < computedHex.length; i++) {
+      diff |= computedHex.charCodeAt(i) ^ parts[2].charCodeAt(i);
+    }
+    return diff === 0;
   }
-  return 'fb_' + Math.abs(hash).toString(16);
+  const sha = await legacySha256(password);
+  return Boolean(sha && storedHash === sha);
 }
 
 function getStoredUsers(): StoredUser[] {
@@ -145,13 +193,14 @@ export const authService = {
     acceptedTermsVersion,
     parentalConsentConfirmed
   }: SignUpParams): Promise<User> {
-    const trimmedName = (name || '').trim();
-    if (!trimmedName) {
-      throw new Error('Please enter your full name.');
+    const trimmedName = (name || '').trim().slice(0, 100);
+    if (trimmedName.length < 2) {
+      throw new Error('Please enter your full name (at least 2 characters).');
     }
 
-    if (!password || password.length < 6) {
-      throw new Error('Password / PIN must be at least 6 characters long.');
+    const passwordError = validateStrongPassword(password);
+    if (passwordError) {
+      throw new Error(passwordError);
     }
 
     const trimmedEmail = (email || '').trim().toLowerCase();
@@ -457,6 +506,10 @@ export const authService = {
     }
 
     // 2. Local Fallback Mode
+    const rlLocal = checkClientRateLimit(`local_login_${isPhoneLogin ? formattedPhone : trimmedEmail}`, 5, 60 * 1000);
+    if (!rlLocal.allowed) {
+      throw new Error(`Too many login attempts. Please wait ${rlLocal.retryAfterSec}s before trying again.`);
+    }
     const users = getStoredUsers();
     let userMatch: StoredUser | undefined;
 
@@ -472,12 +525,19 @@ export const authService = {
       }
     }
 
-    const passwordHash = await hashPassword(password);
-    if (userMatch.passwordHash !== passwordHash) {
+    const passwordValid = await verifyPasswordHash(password, userMatch.passwordHash);
+    if (!passwordValid) {
       throw new Error('Incorrect password / PIN. Please try again.');
     }
+    // Seamlessly upgrade legacy SHA-256 hash to salted PBKDF2-SHA256 on successful login
+    if (!String(userMatch.passwordHash || '').startsWith('pbkdf2$')) {
+      try {
+        userMatch.passwordHash = await hashPassword(password);
+        saveStoredUsers(users);
+      } catch {}
+    }
 
-    const role: UserRole = userMatch.role === 'admin' ? 'admin' : 'student';
+    const role: UserRole = (userMatch.role === 'admin' && isAdminEmail(userMatch.email)) ? 'admin' : 'student';
 
     const user: User = {
       id: userMatch.id,
@@ -504,7 +564,7 @@ export const authService = {
    * One-Click "Continue with Google" OAuth Login
    */
   async signInWithGoogle(redirectTo?: string): Promise<void> {
-    const destination = redirectTo || window.location.hash || '#/';
+    const destination = sanitizeHashRedirect(redirectTo || window.location.hash || '#/');
     if (typeof window !== 'undefined') {
       sessionStorage.setItem(REDIRECT_STORAGE_KEY, destination);
     }
@@ -572,9 +632,9 @@ export const authService = {
     const user = this.getCurrentUser();
     if (!user || user.role !== 'admin') return false;
     if (this.isCloudConnected()) {
-      return typeof user.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(user.id);
+      return typeof user.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(user.id) && isAdminEmail(user.email);
     }
-    return true;
+    return isAdminEmail(user.email);
   },
 
   /**
@@ -590,6 +650,7 @@ export const authService = {
     }
     if (typeof window !== 'undefined') {
       localStorage.removeItem(SESSION_STORAGE_KEY);
+      localStorage.removeItem('nelov_test_student_override');
       sessionStorage.removeItem(REDIRECT_STORAGE_KEY);
     }
   },
@@ -598,8 +659,12 @@ export const authService = {
    * Request password reset
    */
   async resetPassword(email: string): Promise<void> {
+    const rl = checkClientRateLimit('password_reset', 3, 5 * 60 * 1000);
+    if (!rl.allowed) {
+      throw new Error(`Please wait ${rl.retryAfterSec}s before requesting another reset email.`);
+    }
     const trimmedEmail = (email || '').trim().toLowerCase();
-    if (!trimmedEmail) {
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       throw new Error('Please enter your registered email address.');
     }
 
@@ -617,8 +682,9 @@ export const authService = {
   },
 
   async updatePassword(newPassword: string): Promise<void> {
-    if (!newPassword || newPassword.length < 6) {
-      throw new Error('Password must be at least 6 characters long.');
+    const pwErr = validateStrongPassword(newPassword);
+    if (pwErr) {
+      throw new Error(pwErr);
     }
     if (!this.isCloudConnected() || !supabase) {
       throw new Error('Updating password requires an active Supabase recovery session.');
@@ -638,13 +704,27 @@ export const authService = {
     const nextGoal = updates.dailyQuestionGoal !== undefined
       ? Math.max(1, Math.min(500, Math.round(Number(updates.dailyQuestionGoal) || 30)))
       : (current.dailyQuestionGoal || 30);
+    const nextNameRaw = updates.name !== undefined ? String(updates.name || '').trim().slice(0, 100) : current.name;
+    if (updates.name !== undefined && nextNameRaw.length < 2) {
+      throw new Error('Display name must be at least 2 characters.');
+    }
+    const nextTargetExam = (updates.targetExam ? String(updates.targetExam).trim().slice(0, 50) : (current.targetExam || 'JEE 2027')) as TargetExam;
+    const rawAvatar = updates.avatarUrl !== undefined ? updates.avatarUrl : (current.avatarUrl || null);
+    let nextAvatar: string | null = null;
+    if (rawAvatar) {
+      const avStr = String(rawAvatar).trim();
+      if (!isSafeImageUrl(avStr)) {
+        throw new Error('Invalid or unsafe avatar URL.');
+      }
+      nextAvatar = avStr.slice(0, 200000);
+    }
 
     const updatedUser: User = {
       ...current,
-      name: updates.name !== undefined ? (updates.name.trim() || current.name) : current.name,
-      targetExam: updates.targetExam || current.targetExam || 'JEE 2027',
+      name: nextNameRaw || current.name,
+      targetExam: nextTargetExam,
       dailyQuestionGoal: nextGoal,
-      avatarUrl: updates.avatarUrl !== undefined ? updates.avatarUrl : (current.avatarUrl || null),
+      avatarUrl: nextAvatar,
     };
 
     if (typeof window !== 'undefined') {
@@ -712,15 +792,16 @@ export const authService = {
    * Set user role (admin utility in fallback mode)
    */
   setUserRole(userId: string, role: UserRole): void {
+    const safeRole: UserRole = role === 'admin' ? 'student' : 'student';
     const currentUser = this.getCurrentUser();
     if (currentUser && currentUser.id === userId) {
-      currentUser.role = role;
+      currentUser.role = isAdminEmail(currentUser.email) ? role : safeRole;
       localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(currentUser));
     }
     const users = getStoredUsers();
     const idx = users.findIndex((u) => u.id === userId);
     if (idx !== -1) {
-      users[idx].role = role;
+      users[idx].role = isAdminEmail(users[idx].email) ? role : safeRole;
       saveStoredUsers(users);
     }
   },
@@ -749,7 +830,6 @@ export const authService = {
     if (this.isCloudConnected() && supabase) {
       // 2. Step A: Supabase Auth user metadata update (always works without custom table migrations)
       try {
-        console.log('[authService] Updating user metadata with legal consent...');
         await supabase.auth.updateUser({
           data: {
             accepted_terms_at: now,
@@ -763,7 +843,6 @@ export const authService = {
 
       // 3. Step B: Sync to public.profiles via resilient upsert
       try {
-        console.log('[authService] Upserting consent to public.profiles...');
         await supabase
           .from('profiles')
           .upsert({

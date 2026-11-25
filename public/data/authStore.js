@@ -59,24 +59,75 @@
     }
   }
 
-  async function hashPassword(password) {
-    if (window.crypto && window.crypto.subtle) {
-      try {
-        const msgUint8 = new TextEncoder().encode(password);
-        const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      } catch (e) {
-        console.warn('Web Crypto subtle digest failed, using fallback', e);
+  function checkRateLimit(bucket, maxRequests, windowMs) {
+    try {
+      if (window.nelovSecurity?.checkRateLimit) {
+        return window.nelovSecurity.checkRateLimit(bucket, maxRequests, windowMs);
       }
+      const key = 'nelov_rl_' + bucket;
+      const now = Date.now();
+      const arr = JSON.parse(localStorage.getItem(key) || '[]').filter(ts => typeof ts === 'number' && (now - ts) < windowMs);
+      if (arr.length >= maxRequests) {
+        const oldest = Math.min(...arr);
+        return { allowed: false, retryAfterSec: Math.max(1, Math.ceil((windowMs - (now - oldest)) / 1000)) };
+      }
+      arr.push(now);
+      localStorage.setItem(key, JSON.stringify(arr));
+      return { allowed: true, retryAfterSec: 0 };
+    } catch (e) {
+      return { allowed: true, retryAfterSec: 0 };
     }
-    let hash = 0;
-    for (let i = 0; i < password.length; i++) {
-      const char = password.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash |= 0;
+  }
+
+  function sanitizeHashRedirect(raw) {
+    const str = String(raw || '').trim();
+    if (!str || !str.startsWith('#') || str.includes('javascript:') || str.includes('//')) {
+      return '#/';
     }
-    return 'fb_' + Math.abs(hash).toString(16);
+    return str.slice(0, 200);
+  }
+
+  async function hashPassword(password) {
+    if (!window.crypto || !window.crypto.subtle) {
+      throw new Error('Secure Web Crypto API is required for password hashing.');
+    }
+    const salt = new Uint8Array(16);
+    window.crypto.getRandomValues(salt);
+    const enc = new TextEncoder();
+    const keyMaterial = await window.crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+    const bits = await window.crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt, iterations: 120000, hash: 'SHA-256' },
+      keyMaterial,
+      256
+    );
+    const saltHex = Array.from(salt).map(b => b.toString(16).padStart(2, '0')).join('');
+    const hashHex = Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join('');
+    return `pbkdf2$${saltHex}$${hashHex}`;
+  }
+
+  async function verifyPasswordHash(password, storedHash) {
+    if (!storedHash || !window.crypto || !window.crypto.subtle) return false;
+    if (String(storedHash).startsWith('pbkdf2$')) {
+      const parts = String(storedHash).split('$');
+      if (parts.length !== 3) return false;
+      const saltHex = parts[1];
+      const expectedHex = parts[2];
+      const saltBytes = new Uint8Array(saltHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+      const enc = new TextEncoder();
+      const keyMaterial = await window.crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+      const bits = await window.crypto.subtle.deriveBits(
+        { name: 'PBKDF2', salt: saltBytes, iterations: 120000, hash: 'SHA-256' },
+        keyMaterial,
+        256
+      );
+      const actualHex = Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join('');
+      return actualHex === expectedHex;
+    }
+    // Legacy SHA-256 migration support for previously registered offline accounts
+    const msgUint8 = new TextEncoder().encode(password);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8);
+    const legacyHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    return legacyHex === storedHash;
   }
 
   function getStoredUsers() {
@@ -128,34 +179,6 @@
     return norm === 'mallicknelov@gmail.com';
   }
 
-  // Testing helper: auto-switch to regular student Aarav Sharma if URL includes #/test-student-login or ?student_session=aarav
-  try {
-    const locHash = (typeof window !== 'undefined' && window.location.hash) || '';
-    const locSearch = (typeof window !== 'undefined' && window.location.search) || '';
-    if (locHash.includes('student_session=aarav') || locSearch.includes('student_session=aarav') || locHash.startsWith('#/test-student-login')) {
-      const studentSession = {
-        id: 'd9b7367c-9b78-433b-8f19-33aa96112d4a',
-        name: 'Aarav Sharma',
-        email: 'aarav.sharma.test2027@gmail.com',
-        contactNumber: '+91 98765 43210',
-        role: 'student',
-        targetExam: 'JEE Mains',
-        acceptedTermsAt: '2026-11-20T00:00:00.000Z',
-        acceptedTermsVersion: '2026-11',
-        parentalConsentConfirmed: true,
-        createdAt: '2026-11-20T00:00:00.000Z'
-      };
-      localStorage.setItem('nelov_test_student_override', '1');
-      localStorage.removeItem('nelov_supabase_auth_token');
-      localStorage.removeItem('sb-lyzmismtmtsvlqpzdruy-auth-token');
-      localStorage.setItem(SESSION_KEY, JSON.stringify(studentSession));
-      localStorage.setItem('consent_v2026_11_d9b7367c-9b78-433b-8f19-33aa96112d4a', '2026-11-20T00:00:00.000Z');
-      if (locHash.startsWith('#/test-student-login')) {
-        window.location.hash = '#/schedule';
-      }
-    }
-  } catch (e) {}
-
   // ============================================================================
   // AUTH SERVICE
   // ============================================================================
@@ -176,10 +199,15 @@
     },
 
     async signUp({ name, email, contactNumber, password, targetExam, acceptedTermsAt, acceptedTermsVersion, parentalConsentConfirmed }) {
-      const trimmedName = (name || '').trim();
-      if (!trimmedName) throw new Error('Please enter your full name.');
-      if (!password || password.length < 6) {
-        throw new Error('Password must be at least 6 characters long.');
+      const trimmedName = (name || '').trim().slice(0, 100);
+      if (trimmedName.length < 2) throw new Error('Please enter your full name (at least 2 characters).');
+      const pw = String(password || '');
+      const trivialPasswords = ['password', '12345678', '123456789', '1234567890', '00000000', '11111111', 'qwertyui', 'qwerty123', 'abc12345'];
+      if (pw.length < 8) {
+        throw new Error('Password must be at least 8 characters long.');
+      }
+      if (trivialPasswords.includes(pw.toLowerCase()) || (/^(.)\1+$/.test(pw)) || !(/[A-Za-z]/.test(pw) && /[0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pw))) {
+        throw new Error('Please choose a stronger password using at least 8 characters with letters and a number or symbol.');
       }
 
       const trimmedEmail = (email || '').trim().toLowerCase();
@@ -489,9 +517,18 @@
         if (!user) throw new Error('No account found with this email. Please sign up for free.');
       }
 
-      const inputHash = await hashPassword(password);
-      if (user.passwordHash !== inputHash) {
+      const rlLogin = checkRateLimit('login_attempts', 12, 5 * 60 * 1000);
+      if (!rlLogin.allowed) {
+        throw new Error(`Too many login attempts. Please wait ${rlLogin.retryAfterSec}s before trying again.`);
+      }
+
+      const valid = await verifyPasswordHash(password, user.passwordHash);
+      if (!valid) {
         throw new Error('Incorrect password / PIN. Please verify your credentials and try again.');
+      }
+      if (!String(user.passwordHash || '').startsWith('pbkdf2$')) {
+        user.passwordHash = await hashPassword(password);
+        saveStoredUsers(users);
       }
 
       // Security: Never auto-grant admin in offline/local mode
@@ -518,7 +555,7 @@
     },
 
     async signInWithGoogle(redirectTo) {
-      const destination = redirectTo || window.location.hash || '#/';
+      const destination = sanitizeHashRedirect(redirectTo || window.location.hash || '#/');
       sessionStorage.setItem(REDIRECT_KEY, destination);
 
       if (this.isCloudConnected()) {
@@ -531,7 +568,7 @@
         });
         if (error) throw new Error(error.message);
       } else {
-        // Fast local mock for Google login in offline test mode
+        // Offline local fallback mode
         const googleUser = {
           id: 'usr_g_' + Date.now().toString(36),
           name: 'Aspirant Google User',
@@ -546,6 +583,10 @@
     },
 
     async resetPassword(email) {
+      const rlReset = checkRateLimit('password_reset', 3, 5 * 60 * 1000);
+      if (!rlReset.allowed) {
+        throw new Error(`Please wait ${rlReset.retryAfterSec}s before requesting another reset email.`);
+      }
       const trimmedEmail = (email || '').trim().toLowerCase();
       if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
         throw new Error('Please enter a valid email address.');
@@ -569,8 +610,13 @@
     },
 
     async updatePassword(newPassword) {
-      if (!newPassword || newPassword.length < 6) {
-        throw new Error('Password must be at least 6 characters long.');
+      const pw = String(newPassword || '');
+      const trivialPasswords = ['password', '12345678', '123456789', '1234567890', '00000000', '11111111', 'qwertyui', 'qwerty123', 'abc12345'];
+      if (pw.length < 8) {
+        throw new Error('Password must be at least 8 characters long.');
+      }
+      if (trivialPasswords.includes(pw.toLowerCase()) || (/^(.)\1+$/.test(pw)) || !(/[A-Za-z]/.test(pw) && /[0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pw))) {
+        throw new Error('Please choose a stronger password using at least 8 characters with letters and a number or symbol.');
       }
       if (!this.isCloudConnected() || !supabaseClient) {
         throw new Error('Password recovery update requires active Supabase session.');
@@ -584,12 +630,23 @@
       const current = this.getCurrentUser();
       if (!current) throw new Error('Sign in required to update profile settings.');
 
-      const nextName = updates.name !== undefined ? String(updates.name || '').trim() : current.name;
-      const nextTargetExam = updates.targetExam !== undefined ? String(updates.targetExam || 'JEE 2027').trim() : (current.targetExam || 'JEE 2027');
+      const nextNameRaw = updates.name !== undefined ? String(updates.name || '').trim().slice(0, 100) : current.name;
+      if (updates.name !== undefined && nextNameRaw.length < 2) {
+        throw new Error('Display name must be at least 2 characters.');
+      }
+      const nextName = nextNameRaw || current.name;
+      const nextTargetExam = updates.targetExam !== undefined ? String(updates.targetExam || 'JEE 2027').trim().slice(0, 50) : (current.targetExam || 'JEE 2027');
       const nextGoal = updates.dailyQuestionGoal !== undefined
         ? Math.max(1, Math.min(500, Math.round(Number(updates.dailyQuestionGoal) || 30)))
         : (current.dailyQuestionGoal || 30);
-      const nextAvatar = updates.avatarUrl !== undefined ? updates.avatarUrl : (current.avatarUrl || null);
+      const rawAvatar = updates.avatarUrl !== undefined ? updates.avatarUrl : (current.avatarUrl || null);
+      let nextAvatar = null;
+      if (rawAvatar) {
+        const avStr = String(rawAvatar).trim();
+        const isSafeAv = /^https:\/\/[^\s]+$/i.test(avStr) || /^\/images\/[^\s]+$/.test(avStr) || /^data:image\/(png|jpeg|jpg|webp|gif);base64,[A-Za-z0-9+/=]+$/i.test(avStr);
+        if (!isSafeAv) throw new Error('Invalid avatar URL format.');
+        nextAvatar = avStr.slice(0, 200000);
+      }
 
       const updatedUser = {
         ...current,
@@ -748,6 +805,7 @@
       }
       try {
         localStorage.removeItem(SESSION_KEY);
+        localStorage.removeItem('nelov_test_student_override');
         sessionStorage.removeItem(REDIRECT_KEY);
         window.dispatchEvent(new CustomEvent('nelov_auth_changed', { detail: { user: null } }));
       } catch (e) {}
@@ -963,7 +1021,6 @@
           if (sess) {
             const expMs = sess.expires_at ? sess.expires_at * 1000 : 0;
             if (expMs > 0 && expMs < Date.now() + 120000) {
-              console.log('[Supabase] Refreshing active session before test attempt save...');
               const { data: refData } = await supabaseClient.auth.refreshSession();
               if (refData?.session?.user?.id && uuidRegex.test(refData.session.user.id)) {
                 effectiveUserId = refData.session.user.id;
@@ -1059,7 +1116,6 @@
               }
               // Handle 401 JWT expiration on long 3-hour tests by refreshing session and retrying
               if (error.status === 401 || error.message?.includes('JWT') || error.message?.includes('token') || error.message?.includes('expired') || error.message?.includes('auth')) {
-                console.log('[Supabase] Re-authenticating / refreshing session for retry...');
                 try {
                   const { data: refData } = await supabaseClient.auth.refreshSession();
                   if (refData?.session?.user?.id && uuidRegex.test(refData.session.user.id)) {
@@ -1071,7 +1127,6 @@
             } else {
               savedCloud = true;
               emitSyncStatus('saved', 'Test attempt saved');
-              console.log('[Supabase] Successfully saved test attempt to cloud (201 Created):', attemptUuid);
               // Clean up any leftover in_progress draft row for this test
               supabaseClient
                 .from('test_attempts')
@@ -1290,7 +1345,7 @@
         }
       } catch (e) {}
 
-      console.log(`[Supabase] syncLocalAttemptsToSupabase finished. Synced ${syncedCount} attempts.`);
+      return syncedCount;
       return { synced: syncedCount, existing: existingIds.size };
     },
 
@@ -1746,18 +1801,28 @@
     // ERROR REPORTS WORKFLOW
     // --------------------------------------------------------------------------
     async submitErrorReport(report) {
+      const rl = checkRateLimit('error_report', 5, 15 * 60 * 1000);
+      if (!rl.allowed) {
+        throw new Error(`Too many submissions. Please wait ${rl.retryAfterSec}s before submitting again.`);
+      }
+      const cleanDesc = String(report.description || '').trim();
+      if (cleanDesc.length < 5 || cleanDesc.length > 2000) {
+        throw new Error('Description must be between 5 and 2000 characters.');
+      }
+      const allowedTypes = ['typo', 'broken_equation', 'wrong_answer_key', 'missing_diagram', 'other'];
+      const cleanType = allowedTypes.includes(report.issueType) ? report.issueType : 'other';
       const item = {
         id: 'rep_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
         userId: report.userId || null,
-        reporterName: report.reporterName || 'Anonymous Aspirant',
-        reporterEmail: report.reporterEmail || '',
-        testId: report.testId || '',
-        examType: report.examType || '',
-        testCode: report.testCode || '',
-        questionId: String(report.questionId || ''),
+        reporterName: String(report.reporterName || 'Anonymous Aspirant').trim().slice(0, 120),
+        reporterEmail: String(report.reporterEmail || '').trim().slice(0, 160),
+        testId: String(report.testId || '').trim().slice(0, 80),
+        examType: String(report.examType || '').trim().slice(0, 60),
+        testCode: String(report.testCode || '').trim().slice(0, 40),
+        questionId: String(report.questionId || '').slice(0, 64),
         questionNumber: Number(report.questionNumber || 1),
-        issueType: report.issueType || 'other',
-        description: report.description || '',
+        issueType: cleanType,
+        description: cleanDesc,
         status: 'open',
         adminNote: '',
         createdAt: new Date().toISOString()
@@ -2398,7 +2463,7 @@
       if (this.isCloudConnected() && supabaseClient) {
         // Step A: Supabase Auth metadata
         try {
-          console.log('[authStore] Saving consent to Supabase Auth metadata...');
+          // Save consent to Supabase Auth metadata
           await supabaseClient.auth.updateUser({
             data: {
               accepted_terms_at: now,
@@ -2412,7 +2477,7 @@
 
         // Step B: Resilient upsert to public.profiles
         try {
-          console.log('[authStore] Upserting consent to public.profiles...');
+          // Upsert consent to public.profiles
           await supabaseClient
             .from('profiles')
             .upsert({
@@ -2473,10 +2538,6 @@
   if (supabaseClient) {
     const processSession = async (session) => {
       if (!session || !session.user) return;
-      if (typeof window !== 'undefined' && localStorage.getItem('nelov_test_student_override') === '1') {
-        console.log('[Auth] Student test override active, preserving Aarav Sharma session.');
-        return;
-      }
       const isPhone = Boolean(session.user.email && session.user.email.endsWith('@phone.nelovportal.local'));
       let role = 'student';
       let fullName = session.user.user_metadata?.full_name || session.user.user_metadata?.name || (isPhone ? 'Student Aspirant' : (session.user.email ? session.user.email.split('@')[0] : 'Student Aspirant'));
@@ -3171,7 +3232,7 @@
     },
 
     addTopic(dateKey, text, stage = 'No stage', userId) {
-      const clean = String(text || '').trim();
+      const clean = String(text || '').trim().slice(0, 200);
       if (!clean) return null;
       const item = {
         id: 'top_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 5),

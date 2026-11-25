@@ -83,39 +83,9 @@
   <script src="/data/jee-advanced/pta06.js"></script>
   <script src="/data/jee-mains/ptm01.js"></script>
   <script src="/data/jee-mains/ptm02.js"></script>
-  <script src="/data/jee-mains/ptm03.js"></script>
+  <!-- Note: Future scheduled test scripts (e.g. ptm03.js) are lazy-loaded only after scheduled go-live or verified Admin preview -->
   <script src="/data/rankPredictor.js"></script>
   <script src="/data/authStore.js"></script>
-  <script>
-    (function() {
-      try {
-        var h = window.location.hash || '';
-        var s = window.location.search || '';
-        if (h.indexOf('student_session=aarav') !== -1 || s.indexOf('student_session=aarav') !== -1 || h.indexOf('#/test-student-login') === 0) {
-          var student = {
-            id: 'd9b7367c-9b78-433b-8f19-33aa96112d4a',
-            name: 'Aarav Sharma',
-            email: 'aarav.sharma.test2027@gmail.com',
-            contactNumber: '+91 98765 43210',
-            role: 'student',
-            targetExam: 'JEE Mains',
-            acceptedTermsAt: '2026-11-20T00:00:00.000Z',
-            acceptedTermsVersion: '2026-11',
-            parentalConsentConfirmed: true,
-            createdAt: '2026-11-20T00:00:00.000Z'
-          };
-          localStorage.setItem('nelov_test_student_override', '1');
-          localStorage.removeItem('nelov_supabase_auth_token');
-          localStorage.removeItem('sb-lyzmismtmtsvlqpzdruy-auth-token');
-          localStorage.setItem('nelov_active_session', JSON.stringify(student));
-          localStorage.setItem('consent_v2026_11_d9b7367c-9b78-433b-8f19-33aa96112d4a', '2026-11-20T00:00:00.000Z');
-          if (h.indexOf('#/test-student-login') === 0) {
-            window.location.hash = '#/schedule';
-          }
-        }
-      } catch (e) {}
-    })();
-  </script>
   <script src="/data/resourcesIndex.js"></script>
   <script src="/data/lecturesIndex.js"></script>
   <script src="/data/physicsChapters.js"></script>
@@ -223,6 +193,7 @@
                 { left: '\\[', right: '\\]', display: true },
                 { left: '\\(', right: '\\)', display: false }
               ],
+              trust: false,
               throwOnError: false
             });
           } catch (e) {
@@ -234,6 +205,98 @@
       return <span ref={containerRef} className={className}>{text}</span>;
     }
 
+    // Security Helpers: XSS escaping, URL/SSRF hygiene, File upload magic bytes & Rate limiting
+    (function initNelovSecurity() {
+      const PRIVATE_HOST_RX = /^(?:localhost|127\.|0\.0\.0\.0|10\.|192\.168\.|169\.254\.|172\.(?:1[6-9]|2\d|3[01])\.|\[::1\])/i;
+      window.nelovSecurity = {
+        sanitizeRichMathHtml(rawText) {
+          if (!rawText) return '';
+          let escaped = String(rawText)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+          escaped = escaped
+            .replace(/&lt;sub&gt;/gi, '<sub>')
+            .replace(/&lt;\/sub&gt;/gi, '</sub>')
+            .replace(/&lt;sup&gt;/gi, '<sup>')
+            .replace(/&lt;\/sup&gt;/gi, '</sup>')
+            .replace(/&lt;b&gt;/gi, '<b>')
+            .replace(/&lt;\/b&gt;/gi, '</b>');
+          return escaped
+            .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900 dark:text-zinc-100">$1</strong>')
+            .replace(/\n\n/g, '<div class="h-2.5"></div>')
+            .replace(/\n/g, '<br/>');
+        },
+        isSafePdfUrl(url) {
+          if (!url || typeof url !== 'string') return false;
+          const trimmed = url.trim();
+          if (trimmed.startsWith('/') && !trimmed.startsWith('//') && !trimmed.includes('..')) return true;
+          if (/^data:application\/pdf;base64,[A-Za-z0-9+/=]+$/i.test(trimmed)) return true;
+          try {
+            const parsed = new URL(trimmed);
+            if (parsed.protocol !== 'https:') return false;
+            if (PRIVATE_HOST_RX.test(parsed.hostname)) return false;
+            return true;
+          } catch (e) {
+            return false;
+          }
+        },
+        isSafeImageUrl(url) {
+          if (!url || typeof url !== 'string') return false;
+          const trimmed = url.trim();
+          if (trimmed.startsWith('/images/') && !trimmed.includes('..')) return true;
+          if (/^data:image\/(?:png|jpeg|jpg|webp|gif);base64,[A-Za-z0-9+/=]+$/i.test(trimmed)) return true;
+          try {
+            const parsed = new URL(trimmed);
+            if (parsed.protocol !== 'https:') return false;
+            if (PRIVATE_HOST_RX.test(parsed.hostname)) return false;
+            return true;
+          } catch (e) {
+            return false;
+          }
+        },
+        sanitizeFilename(name) {
+          const base = String(name || 'document.pdf').replace(/[/\\]/g, '_').replace(/\.\.+/g, '.');
+          return base.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 120) || 'upload.pdf';
+        },
+        async verifyPdfMagicBytes(file) {
+          try {
+            const buf = new Uint8Array(await file.slice(0, 8).arrayBuffer());
+            return buf.length >= 5 && buf[0] === 0x25 && buf[1] === 0x50 && buf[2] === 0x44 && buf[3] === 0x46 && buf[4] === 0x2d;
+          } catch (e) {
+            return false;
+          }
+        },
+        checkRateLimit(bucket, maxRequests, windowMs) {
+          try {
+            const key = 'nelov_rl_' + bucket;
+            const now = Date.now();
+            const arr = JSON.parse(localStorage.getItem(key) || '[]').filter(ts => typeof ts === 'number' && (now - ts) < windowMs);
+            if (arr.length >= maxRequests) {
+              const oldest = Math.min(...arr);
+              return { allowed: false, retryAfterSec: Math.max(1, Math.ceil((windowMs - (now - oldest)) / 1000)) };
+            }
+            arr.push(now);
+            localStorage.setItem(key, JSON.stringify(arr));
+            return { allowed: true, retryAfterSec: 0 };
+          } catch (e) {
+            return { allowed: true, retryAfterSec: 0 };
+          }
+        },
+        validateStrongPassword(password) {
+          const pw = String(password || '');
+          const trivial = ['password', '12345678', '123456789', '1234567890', '00000000', '11111111', 'qwertyui', 'qwerty123', 'abc12345'];
+          if (pw.length < 8) return 'Password must be at least 8 characters long.';
+          if (trivial.includes(pw.toLowerCase()) || /^(.)\1+$/.test(pw) || !(/[A-Za-z]/.test(pw) && /[0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pw))) {
+            return 'Please choose a stronger password using at least 8 characters with letters and a number or symbol.';
+          }
+          return null;
+        }
+      };
+    })();
+
     // Helper: Format seconds to HH:MM:SS
     function formatTime(seconds) {
       const hrs = Math.floor(seconds / 3600);
@@ -242,16 +305,15 @@
       return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     }
 
-    // Helper: Rich KaTeX & Markdown formatted container
+    // Helper: Rich KaTeX & Markdown formatted container (XSS-Sanitized)
     function RichMathContent({ text, className = '' }) {
       const containerRef = useRef(null);
 
       const formattedHtml = useMemo(() => {
         if (!text) return '';
-        return String(text)
-          .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900 dark:text-zinc-100">$1</strong>')
-          .replace(/\n\n/g, '<div class="h-2.5"></div>')
-          .replace(/\n/g, '<br/>');
+        return window.nelovSecurity?.sanitizeRichMathHtml
+          ? window.nelovSecurity.sanitizeRichMathHtml(text)
+          : String(text);
       }, [text]);
 
       useEffect(() => {
@@ -264,6 +326,7 @@
                 { left: '\\[', right: '\\]', display: true },
                 { left: '\\(', right: '\\)', display: false }
               ],
+              trust: false,
               throwOnError: false
             });
           } catch (e) {
@@ -3530,8 +3593,8 @@ function PhysicsCbtTestShellModal({
                     </button>
 
                     <a
-                      href={theoryData.pdfUrl}
-                      download={theoryData.fileName || 'Theory_Notes.pdf'}
+                      href={window.nelovSecurity?.isSafePdfUrl(theoryData.pdfUrl) ? theoryData.pdfUrl : '#'}
+                      download={window.nelovSecurity?.sanitizeFilename(theoryData.fileName || 'Theory_Notes.pdf')}
                       className="hidden sm:inline-flex px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-bold hover:bg-emerald-100"
                     >
                       📥 Download PDF
@@ -3551,7 +3614,7 @@ function PhysicsCbtTestShellModal({
 
             {/* Content Body */}
             <div className="flex-1 overflow-y-auto p-3 sm:p-5 bg-slate-100 dark:bg-[#0c0d12]">
-              {hasPdf ? (
+              {hasPdf && window.nelovSecurity?.isSafePdfUrl(theoryData.pdfUrl) ? (
                 <div className="h-full flex flex-col space-y-2">
                   <iframe
                     src={`${theoryData.pdfUrl}#zoom=${zoomLevel}`}
@@ -4035,23 +4098,28 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
   };
 
   const processJsonFile = (file) => {
-    if (!file.name.endsWith('.json')) {
+    const safeName = window.nelovSecurity?.sanitizeFilename ? window.nelovSecurity.sanitizeFilename(file.name) : file.name;
+    if (!safeName.toLowerCase().endsWith('.json')) {
       setSaveErrorMsg('Please upload a valid .json file');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setSaveErrorMsg('JSON file exceeds 2 MB maximum limit.');
       return;
     }
     const reader = new FileReader();
     reader.onload = (event) => {
-      const text = event.target.result;
+      const text = String(event.target.result || '');
       setJsonText(text);
       try {
         const parsed = JSON.parse(text);
-        if (parsed.subject) setSubject(parsed.subject.toLowerCase());
-        if (parsed.chapterId) setSelectedChapterCode(parsed.chapterId);
-        if (parsed.exerciseId) setExerciseId(parsed.exerciseId);
-        if (parsed.title) setCustomTitle(parsed.title);
+        if (parsed.subject) setSubject(String(parsed.subject).toLowerCase());
+        if (parsed.chapterId) setSelectedChapterCode(String(parsed.chapterId));
+        if (parsed.exerciseId) setExerciseId(String(parsed.exerciseId));
+        if (parsed.title) setCustomTitle(String(parsed.title));
         handleValidateJson(text);
       } catch (err) {
-        setSaveErrorMsg(`JSON parse error in ${file.name}: ${err.message}`);
+        setSaveErrorMsg(`JSON parse error in ${safeName}: ${err.message}`);
       }
     };
     reader.readAsText(file);
@@ -4098,19 +4166,37 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
     }
   };
 
-  const processPdfFile = (file) => {
-    if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
-      setPdfErrorMsg('Please upload a valid .pdf document');
+  const processPdfFile = async (file) => {
+    setPdfErrorMsg('');
+    const safeName = window.nelovSecurity?.sanitizeFilename ? window.nelovSecurity.sanitizeFilename(file.name) : file.name;
+    if (!safeName.toLowerCase().endsWith('.pdf') || (file.type && file.type !== 'application/pdf' && file.type !== '')) {
+      setPdfErrorMsg('Please upload a valid .pdf document.');
       return;
     }
-    setPdfFileName(file.name);
+    if (file.size <= 0 || file.size > 15 * 1024 * 1024) {
+      setPdfErrorMsg('PDF file must be under 15 MB.');
+      return;
+    }
+    const isPdfSignature = window.nelovSecurity?.verifyPdfMagicBytes
+      ? await window.nelovSecurity.verifyPdfMagicBytes(file)
+      : true;
+    if (!isPdfSignature) {
+      setPdfErrorMsg('Invalid PDF signature (%PDF- magic header missing).');
+      return;
+    }
+    setPdfFileName(safeName);
     setPdfFileSize(file.size);
-    setPdfTitle(file.name.replace(/\.pdf$/i, '').replace(/[-_]/g, ' '));
+    setPdfTitle(safeName.replace(/\.pdf$/i, '').replace(/[-_]/g, ' '));
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      setPdfDataUrl(event.target.result);
-      setPdfSuccessMsg(`Loaded "${file.name}" (${(file.size / (1024 * 1024)).toFixed(2)} MB)`);
+      const resUrl = String(event.target.result || '');
+      if (window.nelovSecurity?.isSafePdfUrl && !window.nelovSecurity.isSafePdfUrl(resUrl)) {
+        setPdfErrorMsg('Blocked unsafe PDF data URI.');
+        return;
+      }
+      setPdfDataUrl(resUrl);
+      setPdfSuccessMsg(`Loaded "${safeName}" (${(file.size / (1024 * 1024)).toFixed(2)} MB)`);
     };
     reader.readAsDataURL(file);
   };
@@ -4680,8 +4766,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       )}
                       {item.itemType === 'theory' && (
                         <a
-                          href={item.pdfUrl}
-                          download={item.fileName || 'theory.pdf'}
+                          href={window.nelovSecurity?.isSafePdfUrl(item.pdfUrl) ? item.pdfUrl : '#'}
+                          download={window.nelovSecurity?.sanitizeFilename(item.fileName || 'theory.pdf')}
                           className="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100"
                         >
                           📥 Download PDF
@@ -8006,8 +8092,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           setError('Passwords do not match. Please verify and re-enter.');
           return;
         }
-        if (password.length < 6) {
-          setError('Password / PIN must be at least 6 characters long.');
+        const pwErr = window.nelovSecurity?.validateStrongPassword
+          ? window.nelovSecurity.validateStrongPassword(password)
+          : (password.length < 8 ? 'Password must be at least 8 characters long.' : null);
+        if (pwErr) {
+          setError(pwErr);
           return;
         }
         setLoading(true);
@@ -8078,8 +8167,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         e.preventDefault();
         setError('');
         setSuccessMsg('');
-        if (password.length < 6) {
-          setError('New password must be at least 6 characters.');
+        const pwErr = window.nelovSecurity?.validateStrongPassword
+          ? window.nelovSecurity.validateStrongPassword(password)
+          : (password.length < 8 ? 'Password must be at least 8 characters long.' : null);
+        if (pwErr) {
+          setError(pwErr);
           return;
         }
         if (password !== confirmPassword) {
@@ -8796,8 +8888,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           setError('Please accept Terms of Service & Privacy Policy.');
           return;
         }
-        if (password.length < 6) {
-          setError('Password must be at least 6 characters.');
+        const pwErr = window.nelovSecurity?.validateStrongPassword
+          ? window.nelovSecurity.validateStrongPassword(password)
+          : (password.length < 8 ? 'Password must be at least 8 characters long.' : null);
+        if (pwErr) {
+          setError(pwErr);
           return;
         }
         if (password !== confirmPassword) {
@@ -8849,8 +8944,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         e.preventDefault();
         setError('');
         setSuccessMsg('');
-        if (password.length < 6) {
-          setError('Password must be at least 6 characters.');
+        const pwErr = window.nelovSecurity?.validateStrongPassword
+          ? window.nelovSecurity.validateStrongPassword(password)
+          : (password.length < 8 ? 'Password must be at least 8 characters long.' : null);
+        if (pwErr) {
+          setError(pwErr);
           return;
         }
         if (password !== confirmPassword) {
@@ -17774,10 +17872,24 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [feedbackMessage, setFeedbackMessage] = useState('');
       const [feedbackRating, setFeedbackRating] = useState(5);
       const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+      const [feedbackErrorMsg, setFeedbackErrorMsg] = useState('');
 
       const handleFeedbackSubmit = async (e) => {
         e.preventDefault();
-        if (!feedbackMessage.trim()) return;
+        setFeedbackErrorMsg('');
+        setFeedbackSubmitted(false);
+        const msg = feedbackMessage.trim();
+        if (msg.length < 5 || msg.length > 2000) {
+          setFeedbackErrorMsg('Please enter between 5 and 2000 characters.');
+          return;
+        }
+        const rl = window.nelovSecurity?.checkRateLimit
+          ? window.nelovSecurity.checkRateLimit('dashboard_feedback', 5, 15 * 60 * 1000)
+          : { allowed: true, retryAfterSec: 0 };
+        if (!rl.allowed) {
+          setFeedbackErrorMsg(`Please wait ${rl.retryAfterSec}s before submitting more feedback.`);
+          return;
+        }
         try {
           if (window.studentStorage?.submitErrorReport) {
             await window.studentStorage.submitErrorReport({
@@ -17790,15 +17902,15 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               questionId: 0,
               questionNumber: 0,
               category: `${feedbackCategory} (${feedbackRating}/5★)`,
-              description: feedbackMessage.trim()
+              description: msg
             });
           }
+          setFeedbackSubmitted(true);
+          setFeedbackMessage('');
+          setTimeout(() => setFeedbackSubmitted(false), 4000);
         } catch (err) {
-          console.warn('Feedback save notice:', err);
+          setFeedbackErrorMsg(err?.message || 'Unable to submit feedback right now.');
         }
-        setFeedbackSubmitted(true);
-        setFeedbackMessage('');
-        setTimeout(() => setFeedbackSubmitted(false), 4000);
       };
 
       // Ticking timer & Ctrl+K global shortcut & progress listener
@@ -20136,6 +20248,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         Thank you! Your feedback has been logged cleanly.
                       </div>
                     )}
+                    {feedbackErrorMsg && (
+                      <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/35 text-rose-400 text-xs font-bold">
+                        {feedbackErrorMsg}
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1">
@@ -20570,7 +20687,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const advancedList = window.jeeAdvancedTests || [];
       const liveList = (window.allTests || []).filter(t => (testConfigs[t.id] || t.status) === 'live');
 
-      // Resolve Active Paper
+      // Resolve Active Paper & Strip Answer Keys / Solutions while Exam is Live
+      const [paperLoadTick, setPaperLoadTick] = useState(0);
       const currentPaper = useMemo(() => {
         if (!activeTestId) return window.pta04Data || null;
         const clean = activeTestId.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -20590,9 +20708,17 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return window.pta05Data || null;
         }
         return window.pta04Data || null;
-      }, [activeTestId]);
+      }, [activeTestId, paperLoadTick]);
 
-      const currentQuestions = currentPaper ? currentPaper.questions : [];
+      const rawQuestions = currentPaper ? currentPaper.questions : [];
+      const currentQuestions = useMemo(() => {
+        if (view !== 'exam') return rawQuestions;
+        // Security: Strip answer keys and solutions from active exam question objects in React state
+        return rawQuestions.map((q) => {
+          const { correctAnswer, solution, explanation, answer, ...safeQ } = q || {};
+          return safeQ;
+        });
+      }, [rawQuestions, view]);
       const currentQuestion = currentQuestions[currentQIndex] || null;
 
       // Dark mode sync
@@ -20652,7 +20778,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           else if (subPath === 'community') resolvedTab = 'community';
           else if (subPath === 'feedback') resolvedTab = 'feedback';
           else if (subPath === 'admin') {
-            const isStrictAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (activeUser && activeUser.role === 'admin'));
+            const isStrictAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (activeUser && activeUser.role === 'admin' && window.authService?.isAdminEmail?.(activeUser.email)));
             resolvedTab = isStrictAdmin ? 'admin-uploader' : 'home';
           }
           try {
@@ -20756,7 +20882,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         }
 
         if (hash === '#/admin' || hash === '#admin') {
-          const isStrictAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (activeUser && activeUser.role === 'admin'));
+          const isStrictAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (activeUser && activeUser.role === 'admin' && window.authService?.isAdminEmail?.(activeUser.email)));
           if (!isStrictAdmin) {
             setView('home');
             window.location.hash = '#/';
@@ -21065,7 +21191,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       }, [currentQIndex, currentQuestion]);
 
       // Start Test Flow with strict user authentication guard
-      const handleSelectTest = (testId, explicitUser = null) => {
+      const handleSelectTest = async (testId, explicitUser = null) => {
         const user = explicitUser || currentUser || window.authService?.getCurrentUser();
         if (!user) {
           const authReturnHash = testId.startsWith('jee-mains-')
@@ -21084,9 +21210,23 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         else if (testId.includes('pta-05') || testId.includes('pta05')) canonicalId = 'jee-advanced-pta-05';
         else if (testId.includes('pta-06') || testId.includes('pta06')) canonicalId = 'jee-advanced-pta-06';
 
-        // Check if test is ready / live
+        // Check if test is ready / live & enforce Scheduled Go-Live Start Window (blocks direct URL bypass)
         const all = window.allTests || [];
         const meta = window.getTestById ? window.getTestById(canonicalId) : all.find(t => t.id === canonicalId);
+        const schedItem = (window.JEE_MAINS_2027_SCHEDULE || []).find((s) => s.id === canonicalId);
+        const isStrictAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (user && user.role === 'admin'));
+
+        if (schedItem?.startIso && !isStrictAdmin) {
+          const startMs = new Date(schedItem.startIso).getTime();
+          if (!isNaN(startMs) && Date.now() < startMs) {
+            setNoticeModal({
+              title: `${schedItem.code} — Scheduled Window Locked`,
+              message: `This test paper is strictly locked until ${schedItem.dateStr} (${schedItem.windowStr}). It will unlock automatically at 00:00:00 on the countdown.`,
+              activeCategory: 'jee-mains'
+            });
+            return;
+          }
+        }
 
         const isVerifiedLive = canonicalId === 'jee-mains-ptm-03' || canonicalId === 'jee-mains-ptm-02' || canonicalId === 'jee-mains-ptm-01' || canonicalId.includes('pta-04') || canonicalId.includes('pta-05') || canonicalId.includes('pta-06');
         const configuredStatus = isVerifiedLive ? 'live' : (testConfigs[canonicalId] || (meta ? meta.status : 'coming_soon'));
@@ -21098,6 +21238,27 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             activeCategory: meta ? meta.examCategory : 'jee-mains'
           });
           return;
+        }
+
+        // Lazy-load PTM 03 script only after scheduled window starts (or admin preview)
+        if (canonicalId === 'jee-mains-ptm-03' && !window.ptm03Data) {
+          try {
+            await new Promise((resolve, reject) => {
+              const sc = document.createElement('script');
+              sc.src = '/data/jee-mains/ptm03.js';
+              sc.onload = resolve;
+              sc.onerror = reject;
+              document.head.appendChild(sc);
+            });
+            setPaperLoadTick((t) => t + 1);
+          } catch (loadErr) {
+            setNoticeModal({
+              title: 'PTM 03 — Paper Locked / Unavailable',
+              message: 'This scheduled paper could not be loaded before its official start time.',
+              activeCategory: 'jee-mains'
+            });
+            return;
+          }
         }
 
         setActiveTestId(canonicalId);

@@ -10,6 +10,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { TargetExam, isGmail, isValidIndianPhone, authService } from '../services/authService';
+import { validateStrongPassword } from '../utils/validationSchemas';
 
 export const AuthModal: React.FC = () => {
   const { authModalState, closeAuthModal, logIn, signUp, signInWithGoogle, continueAsGuest } = useAuth();
@@ -108,8 +109,9 @@ export const AuthModal: React.FC = () => {
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password / PIN must be at least 6 characters long.');
+    const pwErr = validateStrongPassword(password);
+    if (pwErr) {
+      setError(pwErr);
       return;
     }
 
@@ -191,8 +193,9 @@ export const AuthModal: React.FC = () => {
   const handleRecoverySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+    const pwErr = validateStrongPassword(password);
+    if (pwErr) {
+      setError(pwErr);
       return;
     }
     if (password !== confirmPassword) {
@@ -503,7 +506,7 @@ export const AuthModal: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min 6 chars"
+                  placeholder="Min 8+ chars (letter + num)"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs"
                 />
               </div>
@@ -754,7 +757,7 @@ export const AuthModal: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min 6 chars"
+                  placeholder="Min 8+ chars (letter + num)"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs"
                 />
               </div>
