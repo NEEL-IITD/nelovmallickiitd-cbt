@@ -64,7 +64,7 @@ export const Level2ChaptersGrid: React.FC<Level2ChaptersGridProps> = ({
   }, [searchQuery, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-slate-50/60 dark:bg-[#0a0a0c] py-8 sm:py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50/60 dark:bg-[#080B14] py-8 sm:py-12 relative overflow-hidden">
       
       {/* Background Ambience */}
       <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-indigo-500/5 dark:bg-indigo-500/10 blur-[130px] rounded-full pointer-events-none" />
@@ -121,7 +121,7 @@ export const Level2ChaptersGrid: React.FC<Level2ChaptersGridProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search chapters by number (e.g. C8, C13) or name (e.g. Rotational, Electrostatics, Optics)..."
-                className="w-full pl-12 pr-10 py-3.5 sm:py-4 rounded-2xl bg-white dark:bg-[#12131a] border border-slate-200/90 dark:border-zinc-800 text-slate-900 dark:text-zinc-100 placeholder-slate-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-all"
+                className="w-full pl-12 pr-10 py-3.5 sm:py-4 rounded-2xl bg-white dark:bg-[#12172A] border border-slate-200/90 dark:border-zinc-800 text-slate-900 dark:text-zinc-100 placeholder-slate-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-all"
               />
               {searchQuery && (
                 <button
@@ -147,7 +147,7 @@ export const Level2ChaptersGrid: React.FC<Level2ChaptersGridProps> = ({
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                     isSelected
                       ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25 scale-105'
-                      : 'bg-white dark:bg-[#12131a] text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-800'
+                      : 'bg-white dark:bg-[#12172A] text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-800'
                   }`}
                 >
                   {cat} {cat === 'All' ? `(28)` : ''}
@@ -197,7 +197,7 @@ export const Level2ChaptersGrid: React.FC<Level2ChaptersGridProps> = ({
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white dark:bg-[#12131a] rounded-3xl border border-slate-200 dark:border-zinc-800 p-8 space-y-4">
+          <div className="text-center py-16 bg-white dark:bg-[#12172A] rounded-3xl border border-slate-200 dark:border-zinc-800 p-8 space-y-4">
             <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-500 flex items-center justify-center mx-auto">
               <Search className="w-8 h-8" />
             </div>

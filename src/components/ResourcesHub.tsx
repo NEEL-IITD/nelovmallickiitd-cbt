@@ -160,7 +160,7 @@ export const ResourcesHub: React.FC<ResourcesHubProps> = ({ onBackToHome, onOpen
         </div>
 
         {/* Search & Filter Bar */}
-        <div className="bg-white dark:bg-[#12131a] rounded-2xl border border-slate-200 dark:border-zinc-800 p-5 sm:p-6 shadow-sm mb-10 space-y-5">
+        <div className="bg-white dark:bg-[#12172A] rounded-2xl border border-slate-200 dark:border-zinc-800 p-5 sm:p-6 shadow-sm mb-10 space-y-5">
           {/* Search Input */}
           <div className="relative">
             <svg
@@ -247,7 +247,7 @@ export const ResourcesHub: React.FC<ResourcesHubProps> = ({ onBackToHome, onOpen
 
         {/* Resources Grid */}
         {filteredResources.length === 0 ? (
-          <div className="text-center py-20 bg-white dark:bg-[#12131a] rounded-2xl border border-slate-200 dark:border-zinc-800">
+          <div className="text-center py-20 bg-white dark:bg-[#12172A] rounded-2xl border border-slate-200 dark:border-zinc-800">
             <span className="text-4xl">🔍</span>
             <h3 className="mt-4 text-lg font-bold text-slate-800 dark:text-zinc-200">No resources matched your criteria</h3>
             <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">Try clearing your search query or adjusting your filters.</p>

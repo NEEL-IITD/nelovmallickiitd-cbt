@@ -65,7 +65,7 @@ export const LecturesHub: React.FC<LecturesHubProps> = ({
   }, [currentUser, progressData]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-red-500 selection:text-white py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans selection:bg-red-500 selection:text-white py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-10">
         
         {/* Top Navigation Row */}

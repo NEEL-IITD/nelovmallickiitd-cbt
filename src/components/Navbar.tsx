@@ -94,7 +94,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="h-[2px] w-full bg-gradient-to-r from-indigo-600 via-violet-500 to-fuchsia-500" />
 
       {/* Main Single-Row Navigation Bar */}
-      <nav className="w-full backdrop-blur-md bg-white/95 dark:bg-[#0a0a0c]/95 border-b border-slate-200/80 dark:border-zinc-800/80 transition-colors duration-200">
+      <nav className="w-full backdrop-blur-md bg-white/95 dark:bg-[#080B14]/95 border-b border-slate-200/80 dark:border-zinc-800/80 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           
           {/* 1. Brand Logo */}
@@ -153,7 +153,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
 
               {activeDropdown === 'tests' && (
-                <div className="absolute left-0 mt-1.5 w-72 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#111218] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
+                <div className="absolute left-0 mt-1.5 w-72 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0E1322] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
                   <div className="px-3 py-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                     JEE Computer-Based Tests
                   </div>
@@ -305,7 +305,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
 
               {activeDropdown === 'resources' && (
-                <div className="absolute left-0 mt-1.5 w-72 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#111218] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
+                <div className="absolute left-0 mt-1.5 w-72 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0E1322] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
                   <div className="px-3 py-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                     Chapter Vaults &amp; Formula Books
                   </div>
@@ -406,7 +406,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
 
               {activeDropdown === 'dashboard' && (
-                <div className="absolute left-0 mt-1.5 w-64 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#111218] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
+                <div className="absolute left-0 mt-1.5 w-64 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0E1322] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
                   <div className="px-3 py-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                     Unified JEE Workspace
                   </div>
@@ -490,7 +490,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
 
               {activeDropdown === 'more' && (
-                <div className="absolute left-0 mt-1.5 w-60 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#111218] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
+                <div className="absolute left-0 mt-1.5 w-60 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0E1322] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
                   <div className="px-3 py-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                     Mentorship &amp; Community
                   </div>
@@ -702,7 +702,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>{mobileSectionOpen === 'tests' ? '▲' : '▼'}</span>
               </button>
               {mobileSectionOpen === 'tests' && (
-                <div className="p-2 space-y-1 bg-white dark:bg-[#111218]">
+                <div className="p-2 space-y-1 bg-white dark:bg-[#0E1322]">
                   <button
                     type="button"
                     onClick={() => navigateTo('#tests')}
@@ -769,7 +769,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={() => navigateTo('#/lectures')}
-              className="w-full text-left p-3 rounded-xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-[#111218] text-xs font-bold text-slate-800 dark:text-zinc-200 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-zinc-800"
+              className="w-full text-left p-3 rounded-xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-[#0E1322] text-xs font-bold text-slate-800 dark:text-zinc-200 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-zinc-800"
             >
               <span className="flex items-center gap-2">
                 <span>▶</span> Video Lectures &amp; Masterclasses
@@ -792,7 +792,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>{mobileSectionOpen === 'resources' ? '▲' : '▼'}</span>
               </button>
               {mobileSectionOpen === 'resources' && (
-                <div className="p-2 space-y-1 bg-white dark:bg-[#111218]">
+                <div className="p-2 space-y-1 bg-white dark:bg-[#0E1322]">
                   <button
                     type="button"
                     onClick={() => navigateTo('#/resources')}
@@ -841,7 +841,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>{mobileSectionOpen === 'study' ? '▲' : '▼'}</span>
               </button>
               {mobileSectionOpen === 'study' && (
-                <div className="p-2 space-y-1 bg-white dark:bg-[#111218]">
+                <div className="p-2 space-y-1 bg-white dark:bg-[#0E1322]">
                   <button
                     type="button"
                     onClick={() => navigateTo('#/dashboard')}
@@ -887,7 +887,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>{mobileSectionOpen === 'more' ? '▲' : '▼'}</span>
               </button>
               {mobileSectionOpen === 'more' && (
-                <div className="p-2 space-y-1 bg-white dark:bg-[#111218]">
+                <div className="p-2 space-y-1 bg-white dark:bg-[#0E1322]">
                   <button
                     type="button"
                     onClick={() => navigateTo('#mentorship')}

@@ -48,9 +48,9 @@ export const AppContent: React.FC = () => {
   const [exam, setExam] = useState<ExamType>('jee');
   const [isDark, setIsDark] = useState<boolean>(() => {
     try {
-      return localStorage.getItem('nelov_theme') === 'dark';
+      return localStorage.getItem('nelov_theme') !== 'light';
     } catch {
-      return false;
+      return true;
     }
   });
   const [examModalOpen, setExamModalOpen] = useState<boolean>(false);
@@ -130,7 +130,7 @@ export const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+    <div className="min-h-screen bg-white dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
       
       {/* Dev Mode Non-Intrusive Supabase Notice Banner */}
       {!isCloudConnected && !dismissBanner && (

@@ -53,7 +53,7 @@ export const PhysicsCard3D: React.FC<PhysicsCard3DProps> = ({
       onClick={onClick}
     >
       <div
-        className={`relative h-full flex flex-col justify-between rounded-2xl bg-white dark:bg-[#12131a] 
+        className={`relative h-full flex flex-col justify-between rounded-2xl bg-white dark:bg-[#12172A] 
           border border-slate-200/90 dark:border-zinc-800/90
           border-b-4 border-b-slate-300 dark:border-b-zinc-700
           hover:border-b-indigo-500 dark:hover:border-b-indigo-500

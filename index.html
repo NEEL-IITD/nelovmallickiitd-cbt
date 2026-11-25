@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -32,9 +32,15 @@
         extend: {
           colors: {
             primary: {
-              DEFAULT: '#4F46E5', // Indigo-600
-              hover: '#4338CA',   // Indigo-700
+              DEFAULT: '#6366F1', // Electric Indigo
+              hover: '#7C3AED',   // Vivid Violet
               light: '#EEF2FF',   // Indigo-50
+            },
+            obsidian: {
+              base: '#080B14',
+              secondary: '#0E1322',
+              card: '#12172A',
+              elevated: '#171D35',
             },
             cbt: {
               answered: '#22c55e',      // Green
@@ -119,8 +125,31 @@
   <script src="/data/legalConfig.js"></script>
 
   <style>
+    :root {
+      --bg-canvas: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-elevated: #f1f5f9;
+      --border-hairline: rgba(15, 23, 42, 0.08);
+    }
+    html.dark {
+      --bg-canvas: #080b14;
+      --bg-secondary: #0e1322;
+      --bg-card: #12172a;
+      --bg-card-elevated: #171d35;
+      --border-hairline: rgba(255, 255, 255, 0.08);
+    }
     body {
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+    html.dark body {
+      background-color: #080b14;
+      background-image: radial-gradient(ellipse 80% 50% at 50% -12%, rgba(99, 102, 241, 0.12), transparent);
+      color: #f8fafc;
+    }
+    .premium-indigo-surface {
+      background: linear-gradient(135deg, #12172a 0%, #171d35 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
     ::-webkit-scrollbar {
       width: 7px;
@@ -134,7 +163,7 @@
       border-radius: 4px;
     }
     .dark ::-webkit-scrollbar-thumb {
-      background: #334155;
+      background: #2a3352;
     }
     .katex-display {
       margin: 0.5em 0 !important;
@@ -145,15 +174,19 @@
     .katex {
       font-size: 1.05em;
     }
+    .planner-print-only {
+      display: none;
+    }
     @media print {
       header, nav, aside, footer, .no-print, button {
         display: none !important;
       }
       body, html {
         background: white !important;
+        background-image: none !important;
         color: black !important;
       }
-      .print-area {
+      .print-area, .planner-print-only {
         display: block !important;
         width: 100% !important;
         padding: 0 !important;
@@ -170,7 +203,7 @@
     }
   </style>
 </head>
-<body class="bg-white dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+<body class="bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-[#F8FAFC] antialiased selection:bg-[#6366F1] selection:text-white transition-colors duration-200">
   <div id="root"></div>
 
   <script type="text/babel">
@@ -589,10 +622,10 @@
 
       return (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/65 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
-          <div className="relative w-full max-w-4xl bg-white dark:bg-[#111218] rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+          <div className="relative w-full max-w-4xl bg-white dark:bg-[#0E1322] rounded-3xl border border-slate-200 dark:border-zinc-800 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
             
             {/* Header */}
-            <div className="sticky top-0 z-30 px-6 py-4 bg-white/95 dark:bg-[#111218]/95 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between">
+            <div className="sticky top-0 z-30 px-6 py-4 bg-white/95 dark:bg-[#0E1322]/95 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                   {resource.subject} · {resource.resourceType}
@@ -1042,7 +1075,7 @@
             </div>
 
             {/* Search & Filter Bar */}
-            <div className="bg-white dark:bg-[#12131a] rounded-2xl border border-slate-200 dark:border-zinc-800 p-5 sm:p-6 shadow-sm space-y-5">
+            <div className="bg-white dark:bg-[#12172A] rounded-2xl border border-slate-200 dark:border-zinc-800 p-5 sm:p-6 shadow-sm space-y-5">
               {/* Search Field */}
               <div className="relative">
                 <svg
@@ -1129,7 +1162,7 @@
 
             {/* Cards Grid */}
             {filtered.length === 0 ? (
-              <div className="text-center py-20 bg-white dark:bg-[#12131a] rounded-2xl border border-slate-200 dark:border-zinc-800">
+              <div className="text-center py-20 bg-white dark:bg-[#12172A] rounded-2xl border border-slate-200 dark:border-zinc-800">
                 <span className="text-4xl">🔍</span>
                 <h3 className="mt-4 text-lg font-bold text-slate-800 dark:text-zinc-200">No resources matched your criteria</h3>
                 <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">Try clearing your search query or adjusting your filters.</p>
@@ -1431,7 +1464,7 @@
             </div>
 
             {/* Bottom Banner */}
-            <div className="rounded-3xl border border-red-200/80 dark:border-red-900/50 bg-gradient-to-br from-red-50/50 via-white to-slate-50 dark:from-red-950/20 dark:via-[#121318] dark:to-[#0a0a0c] p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+            <div className="rounded-3xl border border-red-200/80 dark:border-red-900/50 bg-gradient-to-br from-red-50/50 via-white to-slate-50 dark:from-red-950/20 dark:via-[#121318] dark:to-[#080B14] p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
               <div className="flex items-center gap-4 text-center sm:text-left">
                 <div className="w-14 h-14 rounded-2xl bg-red-600 text-white flex items-center justify-center text-2xl flex-shrink-0 shadow-lg shadow-red-600/30">
                   ▶
@@ -1881,7 +1914,7 @@
       return (
         <div
           onClick={onClick}
-          className={'group cursor-pointer relative h-full flex flex-col justify-between rounded-2xl bg-white dark:bg-[#12131a] ' +
+          className={'group cursor-pointer relative h-full flex flex-col justify-between rounded-2xl bg-white dark:bg-[#12172A] ' +
             effectiveBorder +
             ' hover:-translate-y-1.5 transition-all duration-300 ease-out p-5 sm:p-6 select-none ' + className +
             (highlightBorder ? ' ring-2 ring-indigo-500/20' : '')
@@ -2789,7 +2822,7 @@ function PhysicsCbtTestShellModal({
                 return (
                   <div
                     key={q.id || rIdx}
-                    className="bg-white dark:bg-[#12131a] rounded-2xl border border-slate-200 dark:border-zinc-800 p-5 sm:p-7 shadow-sm space-y-4"
+                    className="bg-white dark:bg-[#12172A] rounded-2xl border border-slate-200 dark:border-zinc-800 p-5 sm:p-7 shadow-sm space-y-4"
                   >
                     {/* Header */}
                     <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
@@ -2971,7 +3004,7 @@ function PhysicsCbtTestShellModal({
               )}
 
               {/* Question Card Box */}
-              <div className="bg-white dark:bg-[#12131a] rounded-2xl border border-slate-200 dark:border-zinc-800 p-6 sm:p-7 shadow-sm space-y-6">
+              <div className="bg-white dark:bg-[#12172A] rounded-2xl border border-slate-200 dark:border-zinc-800 p-6 sm:p-7 shadow-sm space-y-6">
                 
                 {/* Question Info Bar */}
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-4">
@@ -3347,7 +3380,7 @@ function PhysicsCbtTestShellModal({
       {/* Submit Summary Modal */}
       {showSubmitModal && (
         <div className="fixed inset-0 z-60 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#12131a] rounded-3xl border border-slate-200 dark:border-zinc-800 max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-5">
+          <div className="bg-white dark:bg-[#12172A] rounded-3xl border border-slate-200 dark:border-zinc-800 max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-5">
             <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto text-2xl font-black shadow-sm">
               ✓
             </div>
@@ -3438,7 +3471,7 @@ function PhysicsCbtTestShellModal({
 
       return (
         <div className={`fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center ${isFullscreen ? 'p-0' : 'p-3 sm:p-5'}`}>
-          <div className={`bg-white dark:bg-[#12131a] border border-slate-200 dark:border-zinc-800 w-full flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 ${
+          <div className={`bg-white dark:bg-[#12172A] border border-slate-200 dark:border-zinc-800 w-full flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 ${
             isFullscreen ? 'h-screen max-h-screen rounded-none' : 'max-w-5xl max-h-[94vh] rounded-3xl'
           }`}>
             {/* Header */}
@@ -3632,7 +3665,7 @@ function PhysicsCbtTestShellModal({
 
       return (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-white dark:bg-[#12131a] rounded-3xl border border-slate-200 dark:border-zinc-800 max-w-4xl w-full max-h-[94vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95">
+          <div className="bg-white dark:bg-[#12172A] rounded-3xl border border-slate-200 dark:border-zinc-800 max-w-4xl w-full max-h-[94vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95">
             {/* Header */}
             <div className="px-5 py-4 border-b border-slate-100 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-slate-50/70 dark:bg-zinc-900/70">
               <div className="flex items-center gap-3">
@@ -4837,7 +4870,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       };
 
       return (
-        <div className={embedded ? "relative overflow-hidden py-1" : "min-h-screen bg-slate-50/60 dark:bg-[#0a0a0c] py-8 sm:py-12 relative overflow-hidden"}>
+        <div className={embedded ? "relative overflow-hidden py-1" : "min-h-screen bg-slate-50/60 dark:bg-[#080B14] py-8 sm:py-12 relative overflow-hidden"}>
           {!embedded && (
             <div
               className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[450px] blur-[130px] rounded-full pointer-events-none opacity-40 dark:opacity-20"
@@ -4961,7 +4994,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={'Search ' + cfg.name + ' chapters by code (e.g. C8, C13) or topic name...'}
-                    className="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-white dark:bg-[#12131a] border border-slate-200/90 dark:border-zinc-800 text-slate-900 dark:text-zinc-100 placeholder-slate-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all"
+                    className="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-white dark:bg-[#12172A] border border-slate-200/90 dark:border-zinc-800 text-slate-900 dark:text-zinc-100 placeholder-slate-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all"
                   />
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">🔍</span>
                   {searchQuery && (
@@ -4976,7 +5009,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 </div>
 
                 {/* Sort Dropdown */}
-                <div className="flex items-center gap-2 bg-white dark:bg-[#12131a] border border-slate-200/90 dark:border-zinc-800 rounded-2xl px-4 py-3 shadow-sm">
+                <div className="flex items-center gap-2 bg-white dark:bg-[#12172A] border border-slate-200/90 dark:border-zinc-800 rounded-2xl px-4 py-3 shadow-sm">
                   <label htmlFor="html-sort-dropdown" className="text-xs font-bold text-slate-500 dark:text-zinc-400 whitespace-nowrap">
                     Sort:
                   </label>
@@ -5004,7 +5037,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   className={'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ' +
                     (selectedWeightage === 'all'
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-md'
-                      : 'bg-white dark:bg-[#12131a] text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 hover:bg-slate-100')
+                      : 'bg-white dark:bg-[#12172A] text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 hover:bg-slate-100')
                   }
                 >
                   All ({allChapters.length})
@@ -5062,7 +5095,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       className={'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ' +
                         (isSelected
                           ? cfg.activeTabClass + ' scale-105'
-                          : 'bg-white dark:bg-[#12131a] text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-800')
+                          : 'bg-white dark:bg-[#12172A] text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-800')
                       }
                     >
                       {cat} {cat === 'All' ? '(' + cfg.totalCount + ')' : ''}
@@ -5121,7 +5154,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 bg-white dark:bg-[#12131a] rounded-3xl border border-slate-200 dark:border-zinc-800 p-8 space-y-4">
+              <div className="text-center py-16 bg-white dark:bg-[#12172A] rounded-3xl border border-slate-200 dark:border-zinc-800 p-8 space-y-4">
                 <span className="text-4xl">🔍</span>
                 <h3 className="font-bold text-lg text-slate-800 dark:text-zinc-200">
                   No {cfg.name} Chapters Found
@@ -5805,7 +5838,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const totalCompleted = Object.values(progressMap).filter(function(p) { return p && p.completed; }).length;
 
       return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-red-500 selection:text-white py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans selection:bg-red-500 selection:text-white py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto space-y-10">
             
             {/* Top Navigation Row */}
@@ -6100,7 +6133,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       if (!chapter) {
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 flex items-center justify-center p-6">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 flex items-center justify-center p-6">
             <div className="text-center space-y-4 max-w-md">
               <p className="text-4xl">⚠️</p>
               <h2 className="text-xl font-bold">Chapter not found</h2>
@@ -6182,7 +6215,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const completedCount = (chapter.lectures || []).filter(function(l) { return progressMap[l.videoId] && progressMap[l.videoId].completed; }).length;
 
       return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-red-500 selection:text-white py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans selection:bg-red-500 selection:text-white py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto space-y-6">
             
             {/* Navigation Breadcrumb */}
@@ -6794,7 +6827,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const maxVal = Math.max(...subjects.map(([_, d]) => Math.max(d.max || 60, d.scored || 0)), 60);
 
       return (
-        <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] p-6 shadow-sm space-y-4">
+        <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12172A] p-6 shadow-sm space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-zinc-800 pb-3">
             <div>
               <h4 className="text-sm font-extrabold text-slate-900 dark:text-zinc-50 flex items-center gap-1.5">
@@ -6973,7 +7006,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       });
 
       return (
-        <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] p-6 shadow-sm space-y-4">
+        <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12172A] p-6 shadow-sm space-y-4">
           <div className="border-b border-slate-100 dark:border-zinc-800 pb-3">
             <h4 className="text-sm font-extrabold text-slate-900 dark:text-zinc-50 flex items-center gap-1.5">
               <span>🎯</span> Attempt & Accuracy Breakdown
@@ -7067,7 +7100,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const totalSubjTime = subjEntries.reduce((acc, [_, d]) => acc + (d.timeSpent || 0), 0) || 1;
 
       return (
-        <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] p-6 shadow-sm space-y-4">
+        <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12172A] p-6 shadow-sm space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-zinc-800 pb-3">
             <div>
               <h4 className="text-sm font-extrabold text-slate-900 dark:text-zinc-50 flex items-center gap-1.5">
@@ -7260,7 +7293,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const sortedTimeSinks = [...criticalTimeSinks].sort((a, b) => (b.timeSpent || 0) - (a.timeSpent || 0));
 
       return (
-        <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12172A] p-6 sm:p-8 shadow-sm space-y-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-zinc-800 pb-4">
             <div>
@@ -7442,7 +7475,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         return (
                           <div
                             key={qObj.id}
-                            className="p-3 rounded-xl bg-white dark:bg-[#12131a] border border-rose-200/80 dark:border-rose-900/50 flex items-center justify-between gap-3 text-xs shadow-xs"
+                            className="p-3 rounded-xl bg-white dark:bg-[#12172A] border border-rose-200/80 dark:border-rose-900/50 flex items-center justify-between gap-3 text-xs shadow-xs"
                           >
                             <div className="flex items-center gap-2.5">
                               <span className="w-7 h-7 rounded-lg bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 font-bold flex items-center justify-center flex-shrink-0 text-xs">
@@ -7488,7 +7521,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
                 {/* Additional Pacing Badges (Overtime Correct & Rushed Mistakes) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                  <div className="p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] flex items-center justify-between text-xs">
+                  <div className="p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12172A] flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
                       <span className="text-base">⏳</span>
                       <div>
@@ -7501,7 +7534,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     </span>
                   </div>
 
-                  <div className="p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] flex items-center justify-between text-xs">
+                  <div className="p-3.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12172A] flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
                       <span className="text-base">⚡</span>
                       <div>
@@ -7528,7 +7561,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       if (entries.length === 0) return null;
 
       return (
-        <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] p-6 shadow-sm space-y-4">
+        <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12172A] p-6 shadow-sm space-y-4">
           <div className="border-b border-slate-100 dark:border-zinc-800 pb-3">
             <h4 className="text-sm font-extrabold text-slate-900 dark:text-zinc-50 flex items-center gap-1.5">
               <span>📋</span> Question-Type Performance & Accuracy
@@ -8776,7 +8809,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           <div className="h-[2px] w-full bg-gradient-to-r from-indigo-600 via-violet-500 to-fuchsia-500" />
 
           {/* Main Single-Row Navigation Bar */}
-          <nav className="w-full backdrop-blur-md bg-white/95 dark:bg-[#0a0a0c]/95 border-b border-slate-200/80 dark:border-zinc-800/80 transition-colors duration-200">
+          <nav className="w-full backdrop-blur-md bg-white/95 dark:bg-[#080B14]/95 border-b border-slate-200/80 dark:border-zinc-800/80 transition-colors duration-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
               
               {/* 1. Brand Logo */}
@@ -8835,7 +8868,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   </button>
 
                   {activeDropdown === 'tests' && (
-                    <div className="absolute left-0 mt-1.5 w-72 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#111218] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
+                    <div className="absolute left-0 mt-1.5 w-72 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0E1322] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
                       <div className="px-3 py-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                         JEE Computer-Based Tests
                       </div>
@@ -8990,7 +9023,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   </button>
 
                   {activeDropdown === 'resources' && (
-                    <div className="absolute left-0 mt-1.5 w-72 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#111218] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
+                    <div className="absolute left-0 mt-1.5 w-72 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0E1322] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
                       <div className="px-3 py-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                         Chapter Vaults &amp; Formula Books
                       </div>
@@ -9091,7 +9124,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   </button>
 
                   {activeDropdown === 'dashboard' && (
-                    <div className="absolute left-0 mt-1.5 w-64 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#111218] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
+                    <div className="absolute left-0 mt-1.5 w-64 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0E1322] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
                       <div className="px-3 py-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                         Unified JEE Workspace
                       </div>
@@ -9175,7 +9208,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   </button>
 
                   {activeDropdown === 'more' && (
-                    <div className="absolute left-0 mt-1.5 w-60 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#111218] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
+                    <div className="absolute left-0 mt-1.5 w-60 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0E1322] p-2 shadow-2xl z-50 text-xs animate-in fade-in slide-in-from-top-1">
                       <div className="px-3 py-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                         Mentorship &amp; Community
                       </div>
@@ -9389,7 +9422,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     <span>{mobileSectionOpen === 'tests' ? '▲' : '▼'}</span>
                   </button>
                   {mobileSectionOpen === 'tests' && (
-                    <div className="p-2 space-y-1 bg-white dark:bg-[#111218]">
+                    <div className="p-2 space-y-1 bg-white dark:bg-[#0E1322]">
                       <button
                         type="button"
                         onClick={() => { setActiveCategory('jee-advanced'); navigateTo('home', '#/tests/jee-advanced'); }}
@@ -9459,7 +9492,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 <button
                   type="button"
                   onClick={() => navigateTo('lectures', '#/lectures')}
-                  className="w-full text-left p-3 rounded-xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-[#111218] text-xs font-bold text-slate-800 dark:text-zinc-200 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-zinc-800"
+                  className="w-full text-left p-3 rounded-xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-[#0E1322] text-xs font-bold text-slate-800 dark:text-zinc-200 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-zinc-800"
                 >
                   <span className="flex items-center gap-2">
                     <span>▶</span> Video Lectures &amp; Masterclasses
@@ -9482,7 +9515,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     <span>{mobileSectionOpen === 'resources' ? '▲' : '▼'}</span>
                   </button>
                   {mobileSectionOpen === 'resources' && (
-                    <div className="p-2 space-y-1 bg-white dark:bg-[#111218]">
+                    <div className="p-2 space-y-1 bg-white dark:bg-[#0E1322]">
                       <button
                         type="button"
                         onClick={() => navigateTo('resources', '#/resources')}
@@ -9531,7 +9564,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     <span>{mobileSectionOpen === 'study' ? '▲' : '▼'}</span>
                   </button>
                   {mobileSectionOpen === 'study' && (
-                    <div className="p-2 space-y-1 bg-white dark:bg-[#111218]">
+                    <div className="p-2 space-y-1 bg-white dark:bg-[#0E1322]">
                       <button
                         type="button"
                         onClick={() => navigateTo('dashboard', '#/dashboard', false)}
@@ -9577,7 +9610,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     <span>{mobileSectionOpen === 'more' ? '▲' : '▼'}</span>
                   </button>
                   {mobileSectionOpen === 'more' && (
-                    <div className="p-2 space-y-1 bg-white dark:bg-[#111218]">
+                    <div className="p-2 space-y-1 bg-white dark:bg-[#0E1322]">
                       <a
                         href="#mentorship"
                         onClick={() => { setMobileMenuOpen(false); setView('home'); }}
@@ -10838,7 +10871,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const filteredReports = reports.filter(r => reportFilter === 'All' || r.status === reportFilter);
 
       return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 pb-20">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 pb-20">
           {/* Header */}
           <div className="border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#101116] sticky top-16 z-30 shadow-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -12186,7 +12219,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       render() {
         if (this.state.hasError) {
           return (
-            <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] flex items-center justify-center p-4">
+            <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] flex items-center justify-center p-4">
               <div className="w-full max-w-lg bg-white dark:bg-[#121318] border border-red-200 dark:border-red-900/60 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-5 animate-in fade-in">
                 <div className="w-16 h-16 rounded-2xl bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 text-3xl flex items-center justify-center mx-auto shadow-inner">
                   ⚠️
@@ -12254,7 +12287,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       };
 
       return (
-        <footer className="border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0a0a0c] text-slate-600 dark:text-zinc-400 text-xs">
+        <footer className="border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#080B14] text-slate-600 dark:text-zinc-400 text-xs">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
             
             {/* Main 5-Column Grid (TestonGo Style) */}
@@ -13733,7 +13766,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       };
 
       return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 py-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto space-y-8">
             
             {/* Header & Breadcrumb */}
@@ -14972,7 +15005,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       };
 
       return (
-        <div className={embedded ? "text-slate-900 dark:text-zinc-100 transition-colors duration-200" : "min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-100 transition-colors duration-200"}>
+        <div className={embedded ? "text-slate-900 dark:text-zinc-100 transition-colors duration-200" : "min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-100 transition-colors duration-200"}>
           
           {/* Printable Schedule Styles */}
           <style>{`
@@ -15672,6 +15705,26 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return <svg {...common}><path d="M18 4H6l6 8-6 8h12" /></svg>;
         case 'externalLink':
           return <svg {...common}><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>;
+        case 'arrowLeft':
+          return <svg {...common}><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>;
+        case 'chevronLeft':
+          return <svg {...common}><polyline points="15 18 9 12 15 6" /></svg>;
+        case 'calendar':
+          return <svg {...common}><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>;
+        case 'copy':
+          return <svg {...common}><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" /></svg>;
+        case 'download':
+          return <svg {...common}><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>;
+        case 'history':
+          return <svg {...common}><path d="M3 12a9 9 0 103-6.7L3 8" /><polyline points="3 3 3 8 8 8" /><polyline points="12 7 12 12 15 14" /></svg>;
+        case 'edit':
+          return <svg {...common}><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>;
+        case 'play':
+          return <svg {...common}><circle cx="12" cy="12" r="10" /><polygon points="10 8 16 12 10 16 10 8" /></svg>;
+        case 'eraser':
+          return <svg {...common}><path d="M20 20H7L3 16a2 2 0 010-2.83L13.17 3a2 2 0 012.83 0l5 5a2 2 0 010 2.83L12 20" /><path d="M6.5 13.5l5 5" /></svg>;
+        case 'check':
+          return <svg {...common}><polyline points="20 6 9 17 4 12" /></svg>;
         default:
           return <svg {...common}><circle cx="12" cy="12" r="9" /></svg>;
       }
@@ -15863,7 +15916,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             onClick={(e) => e.stopPropagation()}
             className={`w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl border ${
               isDark
-                ? 'bg-[#111827] border-white/10 text-slate-100 shadow-indigo-950/60'
+                ? 'bg-[#12172A] border-white/10 text-slate-100 shadow-indigo-950/60'
                 : 'bg-white border-slate-200 text-slate-900 shadow-slate-900/20'
             }`}
           >
@@ -15932,10 +15985,974 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             </div>
 
             <div className={`px-4 py-2.5 text-[11px] flex items-center justify-between border-t ${
-              isDark ? 'border-white/10 bg-[#0B0F19]/80 text-slate-400' : 'border-slate-200 bg-slate-50 text-slate-500'
+              isDark ? 'border-white/10 bg-[#080B14]/80 text-slate-400' : 'border-slate-200 bg-slate-50 text-slate-500'
             }`}>
               <span>Search across 83 Vault Chapters, 20 PTM Schedules &amp; Live PTA Papers</span>
               <span className="hidden sm:inline font-mono">↑↓ Navigate · ↵ Open</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ==============================================================================
+    // DAILY GOAL & TODAY HOME WIDGET (Screenshot 1)
+    // ==============================================================================
+    function DailyGoalTodayCard({
+      currentUser,
+      isDark,
+      plannerTick,
+      onOpenPlanner,
+      onResumeTest
+    }) {
+      const store = window.dailyPlannerStore;
+      const userId = currentUser?.id || 'guest';
+      const todayKey = store ? store.getLocalDateKey(new Date()) : '';
+      const dateInfo = store ? store.formatDisplayDate(todayKey) : { title: 'Today', relative: 'Today' };
+      const plannerData = store ? store.getStore(userId) : { dailyTarget: 30 };
+      const dayPlan = store ? store.getDayPlan(todayKey, userId) : { topics: [], slots: {}, manualSolvedCount: 0 };
+      const solvedToday = store ? store.getQuestionsSolvedOnDate(todayKey, userId) : 0;
+      const dailyTarget = plannerData.dailyTarget || 30;
+      const goalPct = dailyTarget > 0 ? Math.min(100, Math.round((solvedToday / dailyTarget) * 100)) : 0;
+      const topics = dayPlan.topics || [];
+      const doneTopics = topics.filter((t) => t.done).length;
+      const topicsPct = topics.length > 0 ? Math.round((doneTopics / topics.length) * 100) : 0;
+      const streak = store ? store.getStreak(todayKey, userId) : 0;
+
+      const [editingGoal, setEditingGoal] = useState(false);
+      const [goalDraft, setGoalDraft] = useState(String(dailyTarget));
+
+      useEffect(() => {
+        setGoalDraft(String(dailyTarget));
+      }, [dailyTarget, plannerTick]);
+
+      const handleSaveTarget = (e) => {
+        if (e) e.preventDefault();
+        if (store) {
+          store.setDailyTarget(goalDraft, userId);
+        }
+        setEditingGoal(false);
+      };
+
+      const muted = isDark ? 'text-[#94A3B8]' : 'text-slate-500';
+      const hairline = isDark ? 'border-white/[0.08]' : 'border-slate-200/90';
+
+      return (
+        <div className="space-y-3">
+          {/* Date Heading cleanly matching TestOnGo Home */}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className={`text-lg sm:text-xl font-black tracking-tight ${isDark ? 'text-[#F8FAFC]' : 'text-slate-900'}`}>
+              {dateInfo.title}
+            </h2>
+            <span className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+              isDark ? 'bg-[#12172A] border-white/[0.08] text-indigo-300' : 'bg-indigo-50 border-indigo-200 text-indigo-700'
+            }`}>
+              {dateInfo.relative}
+            </span>
+          </div>
+
+          <div
+            className={`relative overflow-hidden rounded-2xl sm:rounded-3xl p-5 sm:p-6 border transition-all ${
+              isDark
+                ? 'bg-gradient-to-br from-[#131936] via-[#12172A] to-[#171D35] border-white/[0.08] shadow-2xl shadow-indigo-950/35'
+                : 'bg-gradient-to-br from-indigo-50/80 via-white to-violet-50/70 border-indigo-200/80 shadow-md shadow-indigo-950/5'
+            }`}
+          >
+            <div className="absolute -top-24 -right-20 w-72 h-72 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+              {/* Left Column: DAILY GOAL + TOPICS DONE */}
+              <div className={`md:col-span-4 md:pr-6 md:border-r space-y-4 flex flex-col justify-center ${hairline}`}>
+                {/* Daily Goal Block */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className={`text-[11px] font-extrabold uppercase tracking-wider ${muted}`}>
+                      DAILY GOAL
+                    </span>
+                    {!editingGoal ? (
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => store?.adjustManualSolved(todayKey, 1, userId)}
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold border transition-colors ${
+                            isDark ? 'border-white/10 bg-white/5 hover:bg-indigo-500/20 text-indigo-300' : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                          }`}
+                          title="Log +1 question solved today"
+                        >
+                          +1 Q
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingGoal(true)}
+                          className={`text-xs font-semibold transition-colors ${isDark ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-indigo-700'}`}
+                        >
+                          Edit
+                        </button>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleSaveTarget} className="flex items-center gap-1.5">
+                        <input
+                          type="number"
+                          min="1"
+                          max="500"
+                          value={goalDraft}
+                          onChange={(e) => setGoalDraft(e.target.value)}
+                          className={`w-16 px-2 py-0.5 rounded-lg border text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#6366F1] ${
+                            isDark ? 'bg-[#080B14] border-white/15 text-white' : 'bg-white border-slate-300 text-slate-900'
+                          }`}
+                          autoFocus
+                        />
+                        <button
+                          type="submit"
+                          className="px-2 py-0.5 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white text-[11px] font-bold"
+                        >
+                          Save
+                        </button>
+                      </form>
+                    )}
+                  </div>
+
+                  <div className="flex items-baseline gap-1.5">
+                    <span className={`text-2xl sm:text-3xl font-black tracking-tight ${
+                      solvedToday >= dailyTarget ? 'text-[#10B981]' : (isDark ? 'text-[#F8FAFC]' : 'text-slate-900')
+                    }`}>
+                      {solvedToday}
+                    </span>
+                    <span className={`text-sm font-semibold ${muted}`}>/ {dailyTarget}</span>
+                  </div>
+
+                  <div className={`w-full h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-slate-200'}`}>
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        solvedToday >= dailyTarget
+                          ? 'bg-[#10B981]'
+                          : 'bg-gradient-to-r from-[#6366F1] to-[#7C3AED]'
+                      }`}
+                      style={{ width: `${goalPct}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className={`border-t ${hairline}`} />
+
+                {/* Topics Done Block */}
+                <div className="space-y-2">
+                  <div className={`text-[11px] font-extrabold uppercase tracking-wider ${muted}`}>
+                    TOPICS DONE
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className={`text-2xl font-black tracking-tight ${
+                      topics.length > 0 && doneTopics === topics.length ? 'text-[#10B981]' : (isDark ? 'text-[#F8FAFC]' : 'text-slate-900')
+                    }`}>
+                      {topicsPct}%
+                    </span>
+                    <span className={`text-xs font-bold ${muted}`}>{doneTopics}/{topics.length}</span>
+                  </div>
+                  <div className={`w-full h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-slate-200'}`}>
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-[#6366F1] via-[#7C3AED] to-[#10B981] transition-all duration-500"
+                      style={{ width: `${topicsPct}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: TODAY */}
+              <div className="md:col-span-8 flex flex-col justify-center space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className={`text-[11px] font-extrabold uppercase tracking-widest ${muted}`}>
+                    TODAY
+                  </span>
+                  {topics.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={onOpenPlanner}
+                      className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
+                    >
+                      + Add topic
+                    </button>
+                  )}
+                </div>
+
+                <h3 className={`text-lg sm:text-xl font-black tracking-tight ${isDark ? 'text-[#F8FAFC]' : 'text-slate-900'}`}>
+                  What are you studying today?
+                </h3>
+
+                {topics.length === 0 ? (
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={onOpenPlanner}
+                      className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-bold transition-all ${
+                        isDark
+                          ? 'bg-white/[0.08] hover:bg-gradient-to-r hover:from-[#6366F1] hover:to-[#7C3AED] border-white/15 text-[#F8FAFC] shadow-lg shadow-black/20'
+                          : 'bg-white hover:bg-indigo-600 border-indigo-200 text-indigo-700 hover:text-white shadow-sm'
+                      }`}
+                    >
+                      <span>+ Plan your day</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                    {topics.slice(0, 6).map((t) => (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => store?.toggleTopic(todayKey, t.id, userId)}
+                        className={`flex items-center justify-between gap-2 px-3 py-2 rounded-xl border text-left transition-all ${
+                          t.done
+                            ? (isDark ? 'bg-[#10B981]/10 border-[#10B981]/35 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800')
+                            : (isDark ? 'bg-[#080B14]/55 border-white/[0.08] hover:border-indigo-500/40 text-slate-200' : 'bg-white border-slate-200 hover:border-indigo-300 text-slate-800')
+                        }`}
+                      >
+                        <span className="flex items-center gap-2 min-w-0">
+                          <span className={`w-4 h-4 rounded flex items-center justify-center text-[10px] shrink-0 border ${
+                            t.done ? 'bg-[#10B981] border-[#10B981] text-white' : (isDark ? 'border-slate-500' : 'border-slate-400')
+                          }`}>
+                            {t.done ? '✓' : ''}
+                          </span>
+                          <span className={`text-xs font-bold truncate ${t.done ? 'line-through opacity-75' : ''}`}>
+                            {t.text}
+                          </span>
+                        </span>
+                        {t.stage && t.stage !== 'No stage' && (
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold shrink-0 ${
+                            isDark ? 'bg-white/10 text-indigo-300' : 'bg-indigo-50 text-indigo-700'
+                          }`}>
+                            {t.stage}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Bottom Footer Strip */}
+            <div className={`relative z-10 border-t ${hairline} mt-5 pt-3.5 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs`}>
+              <span className={`font-semibold flex items-center gap-1.5 ${
+                streak > 0 ? 'text-[#F59E0B] font-bold' : muted
+              }`}>
+                {streak > 0 ? `🔥 ${streak} day streak` : 'No streak yet'}
+              </span>
+
+              <button
+                type="button"
+                onClick={onResumeTest}
+                className={`inline-flex items-center gap-1.5 font-bold transition-colors ${
+                  isDark ? 'text-slate-200 hover:text-indigo-300' : 'text-slate-700 hover:text-indigo-700'
+                }`}
+              >
+                <DashIcon name="play" className="w-4 h-4 text-indigo-400" />
+                <span>Resume your test</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={onOpenPlanner}
+                className={`inline-flex items-center gap-1 font-bold transition-colors ${
+                  isDark ? 'text-slate-300 hover:text-white' : 'text-indigo-700 hover:underline'
+                }`}
+              >
+                <span>Edit plan →</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ==============================================================================
+    // FULL 24-HOUR DAILY STUDY PLANNER VIEW (/dashboard/trackers - Screenshot 2)
+    // ==============================================================================
+    function DailyStudyPlannerView({
+      currentUser,
+      isDark,
+      plannerTick,
+      onBackHome
+    }) {
+      const store = window.dailyPlannerStore;
+      const userId = currentUser?.id || 'guest';
+      const todayKey = store ? store.getLocalDateKey(new Date()) : '';
+
+      const [selectedDateKey, setSelectedDateKey] = useState(todayKey);
+      const [topicText, setTopicText] = useState('');
+      const [topicStage, setTopicStage] = useState('No stage');
+      const [activeBrush, setActiveBrush] = useState('sleep');
+      const [isDraggingPaint, setIsDraggingPaint] = useState(false);
+      const [saveStatus, setSaveStatus] = useState('Saved');
+      const [confirmClearOpen, setConfirmClearOpen] = useState(false);
+      const [copyMenuOpen, setCopyMenuOpen] = useState(false);
+      const [customActOpen, setCustomActOpen] = useState(false);
+      const [customActName, setCustomActName] = useState('');
+      const [customActColor, setCustomActColor] = useState('#8B5CF6');
+      const [customActIsStudy, setCustomActIsStudy] = useState(true);
+      const dateInputRef = useRef(null);
+
+      useEffect(() => {
+        const stopDrag = () => setIsDraggingPaint(false);
+        window.addEventListener('mouseup', stopDrag);
+        window.addEventListener('touchend', stopDrag);
+        return () => {
+          window.removeEventListener('mouseup', stopDrag);
+          window.removeEventListener('touchend', stopDrag);
+        };
+      }, []);
+
+      const triggerSavePulse = () => {
+        setSaveStatus('Saving...');
+        setTimeout(() => setSaveStatus('Saved'), 280);
+      };
+
+      const dayPlan = useMemo(
+        () => (store ? store.getDayPlan(selectedDateKey, userId) : { topics: [], slots: {}, manualSolvedCount: 0 }),
+        [selectedDateKey, userId, plannerTick]
+      );
+      const allActivities = useMemo(
+        () => (store ? store.getAllActivities(userId) : []),
+        [userId, plannerTick]
+      );
+      const actById = useMemo(() => {
+        const m = {};
+        allActivities.forEach((a) => { m[a.id] = a; });
+        return m;
+      }, [allActivities]);
+
+      const weekDates = useMemo(
+        () => (store ? store.getWeekDates(selectedDateKey) : []),
+        [selectedDateKey]
+      );
+      const displayDate = useMemo(
+        () => (store ? store.formatDisplayDate(selectedDateKey) : { title: selectedDateKey, relative: '' }),
+        [selectedDateKey]
+      );
+      const backlogItems = useMemo(
+        () => (store ? store.getBacklog(todayKey, userId) : []),
+        [todayKey, userId, plannerTick]
+      );
+      const savedDateKeys = useMemo(
+        () => (store ? store.getSavedDateKeys(userId).filter((k) => k !== selectedDateKey) : []),
+        [selectedDateKey, userId, plannerTick]
+      );
+      const breakdown = useMemo(
+        () => (store ? store.computeBreakdown(dayPlan.slots, userId) : { studyHours: 0, plannedHours: 0, freeHours: 24, segments: [] }),
+        [dayPlan.slots, userId, plannerTick]
+      );
+
+      const handleAddTopic = (e) => {
+        e.preventDefault();
+        if (!topicText.trim() || !store) return;
+        store.addTopic(selectedDateKey, topicText.trim(), topicStage, userId);
+        setTopicText('');
+        setTopicStage('No stage');
+        triggerSavePulse();
+      };
+
+      const paintSlot = (slotKey) => {
+        if (!store) return;
+        store.paintSlots(selectedDateKey, [slotKey], activeBrush === 'erase' ? null : activeBrush, userId);
+        triggerSavePulse();
+      };
+
+      const handleDownloadPdf = () => {
+        window.print();
+      };
+
+      const cardSurface = isDark
+        ? 'bg-gradient-to-br from-[#12172A] to-[#171D35] border border-white/[0.08] shadow-xl shadow-black/30'
+        : 'bg-white border border-slate-200/90 shadow-sm';
+      const subSurface = isDark
+        ? 'bg-[#0E1322] border border-white/[0.08]'
+        : 'bg-slate-50 border border-slate-200';
+      const muted = isDark ? 'text-[#94A3B8]' : 'text-slate-500';
+      const hairline = isDark ? 'border-white/[0.08]' : 'border-slate-200';
+
+      const formatHourLabel = (h) => {
+        if (h === 0) return '12 AM';
+        if (h < 12) return `${h} AM`;
+        if (h === 12) return '12 PM';
+        return `${h - 12} PM`;
+      };
+
+      const padHour = (h) => (h < 10 ? `0${h}` : String(h));
+
+      const formatHoursVal = (val) => {
+        if (Number.isInteger(val)) return `${val}h`;
+        return `${val.toFixed(1)}h`;
+      };
+
+      const renderHalfDayGrid = (startHour, endHour, title) => {
+        const hours = [];
+        for (let h = startHour; h < endHour; h++) hours.push(h);
+
+        return (
+          <div className={`rounded-2xl p-4 select-none ${cardSurface}`}>
+            <div className={`text-[11px] font-bold tracking-wider uppercase mb-3 ${muted}`}>
+              {title}
+            </div>
+            <div className={`border-t ${hairline}`}>
+              {hours.map((h) => {
+                const hh = padHour(h);
+                const s1 = `${hh}:00`;
+                const s2 = `${hh}:30`;
+                return (
+                  <div key={h} className={`flex items-stretch border-b ${hairline} min-h-[34px]`}>
+                    <div className={`w-12 shrink-0 pr-2 py-1 text-[10px] font-semibold flex items-center justify-end ${muted}`}>
+                      {formatHourLabel(h)}
+                    </div>
+                    <div className="flex-1 grid grid-cols-1 divide-y divide-white/[0.04]">
+                      {[s1, s2].map((sk) => {
+                        const actId = dayPlan.slots[sk];
+                        const act = actId ? actById[actId] : null;
+                        return (
+                          <div
+                            key={sk}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`Time slot ${sk} ${act ? act.label : 'empty'}`}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              setIsDraggingPaint(true);
+                              paintSlot(sk);
+                            }}
+                            onMouseEnter={() => {
+                              if (isDraggingPaint) paintSlot(sk);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                paintSlot(sk);
+                              }
+                            }}
+                            style={act ? {
+                              backgroundColor: `${act.color}28`,
+                              borderLeft: `3px solid ${act.color}`
+                            } : undefined}
+                            className={`h-[17px] px-2 flex items-center justify-between text-[10px] font-bold cursor-pointer transition-colors ${
+                              act
+                                ? (isDark ? 'text-white' : 'text-slate-900')
+                                : (isDark ? 'hover:bg-white/[0.05]' : 'hover:bg-indigo-50/70')
+                            }`}
+                          >
+                            {act && <span className="truncate leading-none">{act.label}</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      };
+
+      const brushColors = ['#6366F1', '#10B981', '#F59E0B', '#3B82F6', '#14B8A6', '#F43F5E', '#EC4899', '#8B5CF6'];
+
+      return (
+        <div className="space-y-5">
+          {/* Top Header Bar */}
+          <div className="no-print flex flex-wrap items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={onBackHome}
+              className={`inline-flex items-center gap-2 text-xs sm:text-sm font-bold transition-colors ${
+                isDark ? 'text-slate-300 hover:text-white' : 'text-slate-700 hover:text-indigo-700'
+              }`}
+            >
+              <DashIcon name="arrowLeft" className="w-4 h-4" />
+              <span>Trackers</span>
+            </button>
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold text-[#10B981]">
+                <DashIcon name="check" className="w-3.5 h-3.5" />
+                <span>{saveStatus}</span>
+              </span>
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setConfirmClearOpen((c) => !c)}
+                  aria-label="Clear Day"
+                  title="Clear selected day's topics and timetable"
+                  className={`p-2 rounded-xl border transition-colors ${
+                    isDark ? 'bg-[#12172A] border-white/[0.08] text-slate-300 hover:text-rose-400 hover:border-rose-500/40' : 'bg-white border-slate-200 text-slate-600 hover:text-rose-600'
+                  }`}
+                >
+                  <DashIcon name="trash" className="w-4 h-4" />
+                </button>
+                {confirmClearOpen && (
+                  <div className={`absolute right-0 mt-2 w-60 rounded-2xl p-3 border shadow-2xl z-40 space-y-2.5 ${cardSurface}`}>
+                    <p className="text-xs font-bold">Clear all topics &amp; blocks for {displayDate.title}?</p>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          store?.clearDayPlan(selectedDateKey, userId);
+                          setConfirmClearOpen(false);
+                          triggerSavePulse();
+                        }}
+                        className="flex-1 py-1.5 rounded-lg bg-[#F43F5E] text-white text-xs font-bold"
+                      >
+                        Confirm Clear
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmClearOpen(false)}
+                        className={`flex-1 py-1.5 rounded-lg border text-xs font-semibold ${hairline}`}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleDownloadPdf}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] hover:opacity-95 text-white text-xs font-black shadow-lg shadow-indigo-600/30 transition-all"
+              >
+                <DashIcon name="download" className="w-4 h-4" />
+                <span>Download PDF</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Weekly Calendar Strip */}
+          <div className={`no-print rounded-2xl p-4 sm:p-5 space-y-4 ${cardSurface}`}>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => store && setSelectedDateKey(store.shiftDateKey(selectedDateKey, -7))}
+                  aria-label="Previous week"
+                  className={`p-2 rounded-xl border transition-colors ${subSurface} hover:border-indigo-500/40`}
+                >
+                  <DashIcon name="chevronLeft" className="w-4 h-4" />
+                </button>
+                <div>
+                  <h2 className="text-base sm:text-lg font-black tracking-tight">{displayDate.title}</h2>
+                  <p className={`text-xs font-semibold ${muted}`}>{displayDate.relative}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 relative">
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setCopyMenuOpen((o) => !o)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-colors ${subSurface} hover:border-indigo-500/40`}
+                  >
+                    <DashIcon name="copy" className="w-3.5 h-3.5" />
+                    <span>Copy from</span>
+                  </button>
+                  {copyMenuOpen && (
+                    <div className={`absolute right-0 mt-2 w-60 rounded-2xl p-2 border shadow-2xl z-40 space-y-1 text-xs ${cardSurface}`}>
+                      <div className={`px-2 py-1 text-[10px] font-bold uppercase ${muted}`}>Copy schedule &amp; topics from:</div>
+                      {store && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            store.copyDayPlan(store.shiftDateKey(selectedDateKey, -1), selectedDateKey, userId);
+                            setCopyMenuOpen(false);
+                            triggerSavePulse();
+                          }}
+                          className={`w-full text-left px-2.5 py-2 rounded-lg font-semibold ${isDark ? 'hover:bg-white/10' : 'hover:bg-slate-100'}`}
+                        >
+                          Previous Day ({store.shiftDateKey(selectedDateKey, -1)})
+                        </button>
+                      )}
+                      {savedDateKeys.slice(0, 5).map((dk) => (
+                        <button
+                          key={dk}
+                          type="button"
+                          onClick={() => {
+                            store?.copyDayPlan(dk, selectedDateKey, userId);
+                            setCopyMenuOpen(false);
+                            triggerSavePulse();
+                          }}
+                          className={`w-full text-left px-2.5 py-2 rounded-lg font-semibold ${isDark ? 'hover:bg-white/10' : 'hover:bg-slate-100'}`}
+                        >
+                          {store?.formatDisplayDate(dk).title || dk}
+                        </button>
+                      ))}
+                      {savedDateKeys.length === 0 && (
+                        <div className={`px-2.5 py-1.5 text-[11px] ${muted}`}>Paint slots on another day first to copy.</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <label
+                  className={`p-2 rounded-xl border cursor-pointer transition-colors relative ${subSurface} hover:border-indigo-500/40`}
+                  title="Pick any date"
+                >
+                  <DashIcon name="calendar" className="w-4 h-4" />
+                  <input
+                    ref={dateInputRef}
+                    type="date"
+                    value={selectedDateKey}
+                    onChange={(e) => {
+                      if (e.target.value) setSelectedDateKey(e.target.value);
+                    }}
+                    className="sr-only"
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() => store && setSelectedDateKey(store.shiftDateKey(selectedDateKey, 7))}
+                  aria-label="Next week"
+                  className={`p-2 rounded-xl border transition-colors ${subSurface} hover:border-indigo-500/40`}
+                >
+                  <DashIcon name="chevronRight" className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* 7-day horizontal strip SUN - SAT */}
+            <div className="grid grid-cols-7 gap-2">
+              {weekDates.map((wd) => {
+                const isActive = wd.dateKey === selectedDateKey;
+                const dData = store ? store.getDayPlan(wd.dateKey, userId) : { topics: [], slots: {} };
+                const hasActivity = (dData.topics?.length > 0) || (Object.keys(dData.slots || {}).length > 0);
+                return (
+                  <button
+                    key={wd.dateKey}
+                    type="button"
+                    onClick={() => setSelectedDateKey(wd.dateKey)}
+                    className={`rounded-xl py-2.5 px-1 flex flex-col items-center justify-center gap-0.5 border transition-all ${
+                      isActive
+                        ? 'bg-gradient-to-br from-[#6366F1] to-[#7C3AED] border-indigo-400/50 text-white shadow-lg shadow-indigo-600/30'
+                        : `${subSurface} hover:border-indigo-500/40`
+                    }`}
+                  >
+                    <span className={`text-[10px] font-bold tracking-wider uppercase ${isActive ? 'text-indigo-100' : muted}`}>
+                      {wd.weekday}
+                    </span>
+                    <span className="text-sm sm:text-base font-black">{wd.dayNum}</span>
+                    <span className={`w-1.5 h-1.5 rounded-full ${hasActivity ? (isActive ? 'bg-white' : 'bg-[#6366F1]') : 'bg-transparent'}`} />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Middle Two-Column Section: What are you studying? + Backlog */}
+          <div className="no-print grid grid-cols-1 lg:grid-cols-12 gap-4">
+            {/* Left Card: Topics Planner */}
+            <div className={`lg:col-span-8 rounded-2xl p-5 space-y-4 ${cardSurface}`}>
+              <div className="flex items-center gap-2 text-sm font-black">
+                <DashIcon name="checkSquare" className="w-4 h-4 text-[#6366F1]" />
+                <span>What are you studying?</span>
+              </div>
+
+              <form onSubmit={handleAddTopic} className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  value={topicText}
+                  onChange={(e) => setTopicText(e.target.value)}
+                  placeholder="What are you studying?"
+                  className={`flex-1 px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1] ${
+                    isDark ? 'bg-[#080B14] border-white/[0.08] text-white placeholder-slate-400' : 'bg-slate-50 border-slate-200 text-slate-900'
+                  }`}
+                />
+                <select
+                  value={topicStage}
+                  onChange={(e) => setTopicStage(e.target.value)}
+                  className={`px-3 py-2.5 rounded-xl border text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#6366F1] ${
+                    isDark ? 'bg-[#0E1322] border-white/[0.08] text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'
+                  }`}
+                >
+                  {(store?.STAGES || ['No stage', 'Theory', 'Practice', 'Revision', 'PYQs', 'Completed']).map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] hover:opacity-95 text-white text-xs font-black shadow-md shadow-indigo-600/25 shrink-0"
+                >
+                  + Add
+                </button>
+              </form>
+
+              {dayPlan.topics.length === 0 ? (
+                <div className={`py-8 text-center text-xs font-semibold ${muted}`}>
+                  Nothing planned yet
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {dayPlan.topics.map((t) => (
+                    <div
+                      key={t.id}
+                      className={`flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl border transition-all ${
+                        t.done
+                          ? (isDark ? 'bg-[#10B981]/10 border-[#10B981]/30' : 'bg-emerald-50 border-emerald-200')
+                          : subSurface
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => { store?.toggleTopic(selectedDateKey, t.id, userId); triggerSavePulse(); }}
+                        className="flex items-center gap-2.5 min-w-0 flex-1 text-left"
+                      >
+                        <span className={`w-4 h-4 rounded flex items-center justify-center text-[10px] border shrink-0 ${
+                          t.done ? 'bg-[#10B981] border-[#10B981] text-white' : (isDark ? 'border-slate-500' : 'border-slate-400')
+                        }`}>
+                          {t.done ? '✓' : ''}
+                        </span>
+                        <span className={`text-xs sm:text-sm font-bold truncate ${t.done ? 'line-through opacity-70' : ''}`}>
+                          {t.text}
+                        </span>
+                      </button>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <select
+                          value={t.stage || 'No stage'}
+                          onChange={(e) => { store?.updateTopicStage(selectedDateKey, t.id, e.target.value, userId); triggerSavePulse(); }}
+                          className={`px-2 py-1 rounded-lg border text-[11px] font-bold ${
+                            isDark ? 'bg-[#080B14] border-white/10 text-indigo-300' : 'bg-white border-slate-200 text-indigo-700'
+                          }`}
+                        >
+                          {(store?.STAGES || ['No stage', 'Theory', 'Practice', 'Revision', 'PYQs', 'Completed']).map((s) => (
+                            <option key={s} value={s}>{s}</option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => { store?.deleteTopic(selectedDateKey, t.id, userId); triggerSavePulse(); }}
+                          className={`p-1 rounded-lg ${isDark ? 'text-slate-400 hover:text-rose-400 hover:bg-white/5' : 'text-slate-400 hover:text-rose-600'}`}
+                          aria-label="Remove topic"
+                        >
+                          <DashIcon name="x" className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right Card: Backlog */}
+            <div className={`lg:col-span-4 rounded-2xl p-5 space-y-4 ${cardSurface}`}>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-sm font-black">
+                  <DashIcon name="history" className="w-4 h-4 text-[#F59E0B]" />
+                  <span>Backlog</span>
+                </div>
+                <span className={`px-2 py-0.5 rounded-full text-xs font-black ${
+                  backlogItems.length > 0 ? 'bg-[#F59E0B]/20 text-[#F59E0B]' : muted
+                }`}>
+                  {backlogItems.length}
+                </span>
+              </div>
+
+              {backlogItems.length === 0 ? (
+                <div className={`py-8 text-center text-xs font-semibold ${muted}`}>
+                  Nothing pending
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                  {backlogItems.map((b) => (
+                    <div key={`${b.dateKey}_${b.id}`} className={`p-3 rounded-xl space-y-2 ${subSurface}`}>
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="text-xs font-bold leading-snug">{b.text}</span>
+                        <span className="text-[10px] font-mono text-[#F59E0B] shrink-0">{b.dateKey}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => { store?.moveBacklogToDate(b.dateKey, b.id, selectedDateKey, userId); triggerSavePulse(); }}
+                          className="px-2.5 py-1 rounded-lg bg-[#6366F1]/20 hover:bg-[#6366F1]/30 text-indigo-300 text-[10px] font-bold"
+                        >
+                          → Move to Day
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { store?.toggleTopic(b.dateKey, b.id, userId); triggerSavePulse(); }}
+                          className="px-2.5 py-1 rounded-lg bg-[#10B981]/20 hover:bg-[#10B981]/30 text-emerald-300 text-[10px] font-bold"
+                        >
+                          ✓ Done
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Color-Coded Activity Brush Bar */}
+          <div className="no-print flex flex-wrap items-center gap-2">
+            {allActivities.map((act) => {
+              const isSelected = activeBrush === act.id;
+              return (
+                <button
+                  key={act.id}
+                  type="button"
+                  onClick={() => setActiveBrush(act.id)}
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all ${
+                    isSelected
+                      ? (isDark ? 'bg-white text-slate-900 border-white shadow-lg shadow-white/10' : 'bg-slate-900 text-white border-slate-900 shadow-md')
+                      : `${subSurface} hover:border-indigo-400/50`
+                  }`}
+                >
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: act.color }} />
+                  <span>{act.label}</span>
+                </button>
+              );
+            })}
+
+            <button
+              type="button"
+              onClick={() => setCustomActOpen((o) => !o)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-dashed text-xs font-bold transition-colors ${
+                isDark ? 'border-white/20 text-slate-300 hover:border-indigo-400 hover:text-white' : 'border-slate-300 text-slate-600 hover:border-indigo-500'
+              }`}
+            >
+              <span>+ Activity</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveBrush('erase')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all ${
+                activeBrush === 'erase'
+                  ? 'bg-[#F43F5E]/20 border-[#F43F5E] text-rose-300 shadow-md'
+                  : `${subSurface} hover:border-rose-400/50`
+              }`}
+            >
+              <DashIcon name="eraser" className="w-3.5 h-3.5" />
+              <span>Erase</span>
+            </button>
+          </div>
+
+          {customActOpen && (
+            <div className={`no-print rounded-2xl p-4 flex flex-wrap items-center gap-3 ${cardSurface}`}>
+              <input
+                type="text"
+                value={customActName}
+                onChange={(e) => setCustomActName(e.target.value)}
+                placeholder="Custom activity (e.g. Mock Analysis)"
+                className={`px-3 py-1.5 rounded-xl border text-xs ${
+                  isDark ? 'bg-[#080B14] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                }`}
+              />
+              <div className="flex items-center gap-1.5">
+                {brushColors.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setCustomActColor(c)}
+                    style={{ backgroundColor: c }}
+                    className={`w-5 h-5 rounded-full ${customActColor === c ? 'ring-2 ring-white ring-offset-2 ring-offset-[#12172A]' : ''}`}
+                    aria-label={`Color ${c}`}
+                  />
+                ))}
+              </div>
+              <label className="inline-flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={customActIsStudy}
+                  onChange={(e) => setCustomActIsStudy(e.target.checked)}
+                />
+                <span>Counts as Study Time</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  const created = store?.addCustomActivity(customActName, customActColor, customActIsStudy, userId);
+                  if (created) {
+                    setActiveBrush(created.id);
+                    setCustomActName('');
+                    setCustomActOpen(false);
+                  }
+                }}
+                className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white text-xs font-black"
+              >
+                Save Activity
+              </button>
+            </div>
+          )}
+
+          {/* Bottom Two-Column Section: 24-Hour Time-Blocking Grid + Live Breakdown */}
+          <div className="no-print grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
+            <div className="xl:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {renderHalfDayGrid(0, 12, '12 AM — 12 PM')}
+              {renderHalfDayGrid(12, 24, '12 PM — 12 AM')}
+            </div>
+
+            {/* Right Live Time Breakdown Panel */}
+            <div className={`xl:col-span-3 rounded-2xl p-4 space-y-3 ${cardSurface}`}>
+              <div className={`rounded-xl px-4 py-3 flex items-center justify-between ${subSurface}`}>
+                <span className="text-xl font-black text-[#818CF8]">{formatHoursVal(breakdown.studyHours)}</span>
+                <span className={`text-[10px] font-extrabold uppercase tracking-widest ${muted}`}>STUDY</span>
+              </div>
+
+              <div className={`rounded-xl px-4 py-3 flex items-center justify-between ${subSurface}`}>
+                <span className={`text-xl font-black ${isDark ? 'text-[#F8FAFC]' : 'text-slate-900'}`}>{formatHoursVal(breakdown.plannedHours)}</span>
+                <span className={`text-[10px] font-extrabold uppercase tracking-widest ${muted}`}>PLANNED</span>
+              </div>
+
+              <div className={`rounded-xl px-4 py-3 flex items-center justify-between ${subSurface}`}>
+                <span className="text-xl font-black text-[#F59E0B]">{formatHoursVal(breakdown.freeHours)}</span>
+                <span className={`text-[10px] font-extrabold uppercase tracking-widest ${muted}`}>FREE</span>
+              </div>
+
+              {/* Horizontal Color-Coded Progress Bar */}
+              <div className="pt-1 space-y-2">
+                <div className={`w-full h-2 rounded-full overflow-hidden flex ${isDark ? 'bg-white/10' : 'bg-slate-200'}`}>
+                  {breakdown.segments.map((seg) => (
+                    <div
+                      key={seg.id}
+                      title={`${seg.label}: ${formatHoursVal(seg.hours)}`}
+                      style={{ width: `${Math.max(2, (seg.hours / 24) * 100)}%`, backgroundColor: seg.color }}
+                      className="h-full"
+                    />
+                  ))}
+                </div>
+                {breakdown.segments.length > 0 && (
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {breakdown.segments.map((seg) => (
+                      <span key={seg.id} className={`inline-flex items-center gap-1 text-[10px] font-bold ${muted}`}>
+                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: seg.color }} />
+                        {seg.label} ({formatHoursVal(seg.hours)})
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Printable Clean PDF Export Sheet */}
+          <div className="planner-print-only p-6 space-y-4">
+            <h1 className="text-2xl font-black">Nelov Mallick JEE 2027 Study Plan — {displayDate.title}</h1>
+            <p className="text-sm">Study: {formatHoursVal(breakdown.studyHours)} · Planned: {formatHoursVal(breakdown.plannedHours)} · Free: {formatHoursVal(breakdown.freeHours)}</p>
+            <div className="border-t pt-3">
+              <h2 className="text-base font-bold mb-2">Planned Topics ({dayPlan.topics.length})</h2>
+              {dayPlan.topics.map((t) => (
+                <div key={t.id} className="text-sm py-0.5">
+                  [{t.done ? '✓' : ' '}] {t.text} ({t.stage || 'No stage'})
+                </div>
+              ))}
+            </div>
+            <div className="border-t pt-3">
+              <h2 className="text-base font-bold mb-2">24-Hour Timetable</h2>
+              <div className="grid grid-cols-2 gap-1 text-xs">
+                {(store?.ALL_SLOT_KEYS || []).map((sk) => {
+                  const act = dayPlan.slots[sk] ? actById[dayPlan.slots[sk]] : null;
+                  if (!act) return null;
+                  return (
+                    <div key={sk} className="border p-1">
+                      <strong>{sk}</strong> — {act.label}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -15978,6 +16995,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       // Sub-tab / Interactive state
       const [resourceSubTab, setResourceSubTab] = useState('hub'); // 'hub' | 'physics' | 'chemistry' | 'mathematics' | 'formulas'
+      const [trackersMode, setTrackersMode] = useState('planner'); // 'planner' | 'syllabus'
+      const [plannerTick, setPlannerTick] = useState(0);
       const [trackerSubject, setTrackerSubject] = useState('all'); // 'all' | 'physics' | 'chemistry' | 'mathematics'
       const [trackerWeightage, setTrackerWeightage] = useState('all');
       const [trackerQuery, setTrackerQuery] = useState('');
@@ -16219,14 +17238,17 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       useEffect(() => {
         const onProgressUpdate = () => setProgressTick((p) => p + 1);
+        const onPlannerUpdate = () => setPlannerTick((p) => p + 1);
         window.addEventListener('nelov:chapter-progress-updated', onProgressUpdate);
         window.addEventListener('nelov_attempt_saved', onProgressUpdate);
+        window.addEventListener('nelov:daily-planner-updated', onPlannerUpdate);
         if (window.chapterProgressStore?.fetchProgressFromSupabase) {
           window.chapterProgressStore.fetchProgressFromSupabase().then(() => setProgressTick((p) => p + 1));
         }
         return () => {
           window.removeEventListener('nelov:chapter-progress-updated', onProgressUpdate);
           window.removeEventListener('nelov_attempt_saved', onProgressUpdate);
+          window.removeEventListener('nelov:daily-planner-updated', onPlannerUpdate);
         };
       }, []);
 
@@ -16470,19 +17492,40 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       };
 
-      // Theme classes
-      const shellBg = isDark ? 'bg-[#0B0F19] text-slate-100' : 'bg-slate-50 text-slate-900';
-      const sidebarBg = isDark ? 'bg-[#0E1320]/95 border-white/[0.08]' : 'bg-white border-slate-200';
-      const topBarBg = isDark ? 'bg-[#0E1320]/85 border-white/[0.08]' : 'bg-white/90 border-slate-200';
+      const handleResumeLastTest = () => {
+        if (!currentUser) {
+          openAuth('login', '#/dashboard', 'Sign in to resume or attempt live JEE mock tests.');
+          return;
+        }
+        const latestSess = window.studentStorage?.getLatestInProgressSession
+          ? window.studentStorage.getLatestInProgressSession(currentUser.id)
+          : null;
+        if (latestSess && latestSess.testId && handleSelectTest) {
+          handleSelectTest(latestSess.testId);
+          return;
+        }
+        const liveReady = schedule.filter((s) => hasStarted(s.startIso) && isTestReady(s.id));
+        const fallbackId = liveReady.length > 0 ? liveReady[liveReady.length - 1].id : 'jee-mains-ptm-02';
+        if (handleSelectTest) {
+          handleSelectTest(fallbackId);
+        } else {
+          switchTab('tests', '#/dashboard/tests');
+        }
+      };
+
+      // Theme classes (Unified Deep Obsidian & Rich Indigo-Tinted Charcoal Palette)
+      const shellBg = isDark ? 'bg-[#080B14] text-[#F8FAFC]' : 'bg-slate-50 text-slate-900';
+      const sidebarBg = isDark ? 'bg-[#0E1322]/95 border-white/[0.08]' : 'bg-white border-slate-200';
+      const topBarBg = isDark ? 'bg-[#0E1322]/85 border-white/[0.08]' : 'bg-white/90 border-slate-200';
       const cardCls = isDark
-        ? 'bg-[#111827]/90 border border-white/[0.08] shadow-xl shadow-black/25'
+        ? 'bg-gradient-to-br from-[#12172A] to-[#171D35] border border-white/[0.08] shadow-xl shadow-black/30'
         : 'bg-white border border-slate-200/90 shadow-sm shadow-slate-900/5';
       const subCardCls = isDark
-        ? 'bg-[#0B0F19]/75 border border-white/[0.07]'
+        ? 'bg-[#0E1322]/90 border border-white/[0.08]'
         : 'bg-slate-50/90 border border-slate-200/80';
-      const mutedText = isDark ? 'text-slate-400' : 'text-slate-500';
+      const mutedText = isDark ? 'text-[#94A3B8]' : 'text-slate-500';
       const activePillCls = isDark
-        ? 'bg-gradient-to-r from-indigo-500/20 via-indigo-500/10 to-transparent text-indigo-300 border border-indigo-500/40 shadow-[0_0_24px_-6px_rgba(99,102,241,0.55)] font-bold'
+        ? 'bg-gradient-to-r from-[#6366F1]/25 via-[#7C3AED]/15 to-transparent text-indigo-200 border border-[#6366F1]/45 shadow-[0_0_24px_-6px_rgba(99,102,241,0.55)] font-bold'
         : 'bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-sm font-bold';
       const inactivePillCls = isDark
         ? 'text-slate-300/90 border border-transparent hover:bg-white/[0.05] hover:text-white font-medium'
@@ -16783,7 +17826,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           </nav>
 
           {/* Bottom Pinned Section (Admin Mode STRICTLY for mallicknelov@gmail.com + Free Pass Badge) */}
-          <div className={`p-3 border-t space-y-2 shrink-0 ${isDark ? 'border-white/[0.08] bg-[#0B0F19]/40' : 'border-slate-200 bg-slate-50/70'}`}>
+          <div className={`p-3 border-t space-y-2 shrink-0 ${isDark ? 'border-white/[0.08] bg-[#080B14]/40' : 'border-slate-200 bg-slate-50/70'}`}>
             {isStrictAdmin && (
               <button
                 type="button"
@@ -16874,7 +17917,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   onClick={() => setSearchModalOpen(true)}
                   className={`flex items-center justify-between gap-2 min-w-0 flex-1 max-w-md px-3 sm:px-3.5 py-2 rounded-xl border text-left transition-all ${
                     isDark
-                      ? 'bg-[#111827] border-white/10 text-slate-400 hover:border-indigo-500/50 hover:text-slate-200'
+                      ? 'bg-[#12172A] border-white/10 text-slate-400 hover:border-indigo-500/50 hover:text-slate-200'
                       : 'bg-slate-100/80 border-slate-200 text-slate-500 hover:border-indigo-300 hover:bg-white'
                   }`}
                 >
@@ -16922,7 +17965,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   onClick={onToggleTheme}
                   className={`p-2 rounded-xl border transition-colors ${
                     isDark
-                      ? 'bg-[#111827] border-white/10 text-amber-300 hover:bg-white/10'
+                      ? 'bg-[#12172A] border-white/10 text-amber-300 hover:bg-white/10'
                       : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
                   }`}
                   title={isDark ? 'Switch to Crisp Light Mode' : 'Switch to Obsidian Dark Mode'}
@@ -16938,7 +17981,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       type="button"
                       onClick={() => setProfileMenuOpen((p) => !p)}
                       className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl border transition-colors ${
-                        isDark ? 'bg-[#111827] border-white/10 hover:border-white/20' : 'bg-slate-100 border-slate-200 hover:bg-slate-200'
+                        isDark ? 'bg-[#12172A] border-white/10 hover:border-white/20' : 'bg-slate-100 border-slate-200 hover:bg-slate-200'
                       }`}
                     >
                       <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-xs font-black flex items-center justify-center">
@@ -16961,7 +18004,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
                   {profileMenuOpen && currentUser && (
                     <div className={`absolute right-0 mt-2 w-60 rounded-2xl border p-2 shadow-2xl z-50 text-xs ${
-                      isDark ? 'bg-[#111827] border-white/10 text-slate-200' : 'bg-white border-slate-200 text-slate-800'
+                      isDark ? 'bg-[#12172A] border-white/10 text-slate-200' : 'bg-white border-slate-200 text-slate-800'
                     }`}>
                       <div className={`px-3 py-2 border-b mb-1 ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
                         <div className="font-black truncate">{currentUser.name}</div>
@@ -17013,7 +18056,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     type="button"
                     onClick={() => { setView('home'); window.location.hash = '#/'; }}
                     className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-colors flex items-center gap-1.5 ${
-                      isDark ? 'border-white/10 bg-[#111827] text-slate-300 hover:bg-white/5' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'
+                      isDark ? 'border-white/10 bg-[#12172A] text-slate-300 hover:bg-white/5' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'
                     }`}
                   >
                     <span>Main Site</span>
@@ -17027,10 +18070,22 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               {/* ========================================================= */}
               {activeTab === 'home' && (
                 <div className="space-y-6 animate-in fade-in">
+                  {/* Daily Goal & Today Widget (Screenshot 1) */}
+                  <DailyGoalTodayCard
+                    currentUser={currentUser}
+                    isDark={isDark}
+                    plannerTick={plannerTick}
+                    onOpenPlanner={() => {
+                      setTrackersMode('planner');
+                      switchTab('trackers', '#/dashboard/trackers');
+                    }}
+                    onResumeTest={handleResumeLastTest}
+                  />
+
                   {/* Welcome Banner */}
                   <div className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 border ${
                     isDark
-                      ? 'bg-gradient-to-br from-indigo-950/80 via-[#111827] to-[#0B0F19] border-indigo-500/25'
+                      ? 'bg-gradient-to-br from-indigo-950/80 via-[#12172A] to-[#080B14] border-indigo-500/25'
                       : 'bg-gradient-to-br from-indigo-600 via-blue-700 to-violet-700 border-indigo-500 text-white'
                   }`}>
                     <div className="absolute -right-24 -top-24 w-72 h-72 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none" />
@@ -17191,7 +18246,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           subtitle: '28 Chapters · Mechanics, E&M, Optics, Modern',
                           icon: 'atom',
                           data: chaptersSnapshot.physics,
-                          gradient: isDark ? 'from-blue-600/20 via-indigo-600/10 to-[#111827] border-blue-500/35 hover:border-blue-400/70' : 'from-blue-50 to-white border-blue-200 hover:border-blue-400',
+                          gradient: isDark ? 'from-blue-600/20 via-indigo-600/10 to-[#12172A] border-blue-500/35 hover:border-blue-400/70' : 'from-blue-50 to-white border-blue-200 hover:border-blue-400',
                           badge: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
                           bar: 'from-blue-500 to-indigo-500',
                           btn: 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/25'
@@ -17202,7 +18257,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           subtitle: '29 Chapters · Physical, Organic, Inorganic',
                           icon: 'flask',
                           data: chaptersSnapshot.chemistry,
-                          gradient: isDark ? 'from-emerald-600/20 via-teal-600/10 to-[#111827] border-emerald-500/35 hover:border-emerald-400/70' : 'from-emerald-50 to-white border-emerald-200 hover:border-emerald-400',
+                          gradient: isDark ? 'from-emerald-600/20 via-teal-600/10 to-[#12172A] border-emerald-500/35 hover:border-emerald-400/70' : 'from-emerald-50 to-white border-emerald-200 hover:border-emerald-400',
                           badge: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
                           bar: 'from-emerald-500 to-teal-500',
                           btn: 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25'
@@ -17213,7 +18268,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           subtitle: '26 Chapters · Calculus, Algebra, Conics, Vectors',
                           icon: 'sigma',
                           data: chaptersSnapshot.mathematics,
-                          gradient: isDark ? 'from-violet-600/20 via-amber-500/10 to-[#111827] border-violet-500/35 hover:border-violet-400/70' : 'from-violet-50 to-white border-violet-200 hover:border-violet-400',
+                          gradient: isDark ? 'from-violet-600/20 via-amber-500/10 to-[#12172A] border-violet-500/35 hover:border-violet-400/70' : 'from-violet-50 to-white border-violet-200 hover:border-violet-400',
                           badge: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
                           bar: 'from-violet-500 to-amber-500',
                           btn: 'bg-violet-600 hover:bg-violet-500 text-white shadow-violet-600/25'
@@ -17872,10 +18927,45 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               )}
 
               {/* ========================================================= */}
-              {/* TAB: TRACKERS (83-Chapter Syllabus & Milestone Checklist) */}
+              {/* TAB: TRACKERS (Daily 24h Study Planner + 83-Ch Syllabus)  */}
               {/* ========================================================= */}
               {activeTab === 'trackers' && (
                 <div className="space-y-5 animate-in fade-in">
+                  {/* Trackers View Switcher */}
+                  <div className="no-print flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setTrackersMode('planner')}
+                      className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
+                        trackersMode === 'planner'
+                          ? 'bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white shadow-lg shadow-indigo-600/25'
+                          : `${subCardCls} ${isDark ? 'text-slate-300 hover:text-white' : 'text-slate-700 hover:bg-slate-100'}`
+                      }`}
+                    >
+                      Daily Study Planner (24h Timetable)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTrackersMode('syllabus')}
+                      className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
+                        trackersMode === 'syllabus'
+                          ? 'bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white shadow-lg shadow-indigo-600/25'
+                          : `${subCardCls} ${isDark ? 'text-slate-300 hover:text-white' : 'text-slate-700 hover:bg-slate-100'}`
+                      }`}
+                    >
+                      83-Chapter Syllabus Checklist ({chaptersSnapshot.masteredTotal}/83)
+                    </button>
+                  </div>
+
+                  {trackersMode === 'planner' ? (
+                    <DailyStudyPlannerView
+                      currentUser={currentUser}
+                      isDark={isDark}
+                      plannerTick={plannerTick}
+                      onBackHome={() => switchTab('home', '#/dashboard')}
+                    />
+                  ) : (
+                  <div className="space-y-5">
                   {/* Top Subject Progress Summary Cards */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {[
@@ -17945,7 +19035,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         onChange={(e) => setTrackerQuery(e.target.value)}
                         placeholder="Filter chapters..."
                         className={`px-3 py-1.5 rounded-xl border text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                          isDark ? 'bg-[#0B0F19] border-white/10 text-white placeholder-slate-400' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          isDark ? 'bg-[#080B14] border-white/10 text-white placeholder-slate-400' : 'bg-slate-50 border-slate-200 text-slate-900'
                         }`}
                       />
                     </div>
@@ -18014,6 +19104,21 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
                           <button
                             type="button"
+                            onClick={() => {
+                              if (window.dailyPlannerStore) {
+                                const tKey = window.dailyPlannerStore.getLocalDateKey(new Date());
+                                window.dailyPlannerStore.addTopic(tKey, `${ch.subjectName}: ${ch.name}`, 'Practice', currentUser?.id || 'guest');
+                                setTrackersMode('planner');
+                              }
+                            }}
+                            className="px-2.5 py-1.5 rounded-xl bg-[#6366F1]/15 hover:bg-[#6366F1]/25 text-indigo-300 text-xs font-bold"
+                            title="Add to Today's Study Plan"
+                          >
+                            + Plan Today
+                          </button>
+
+                          <button
+                            type="button"
                             onClick={() => navigateToChapterVault(ch.subjectKey, ch.id)}
                             className="px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-400 text-xs font-bold"
                           >
@@ -18023,6 +19128,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       </div>
                     ))}
                   </div>
+                  </div>
+                  )}
                 </div>
               )}
 
@@ -18038,7 +19145,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       className={`px-4 py-2 rounded-xl text-xs font-black ${
                         notebookSection === 'bookmarks'
                           ? 'bg-indigo-600 text-white'
-                          : (isDark ? 'bg-[#111827] border border-white/10 text-slate-300' : 'bg-white border border-slate-200 text-slate-700')
+                          : (isDark ? 'bg-[#12172A] border border-white/10 text-slate-300' : 'bg-white border border-slate-200 text-slate-700')
                       }`}
                     >
                       Bookmarked Questions ({bookmarks.length})
@@ -18049,7 +19156,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       className={`px-4 py-2 rounded-xl text-xs font-black ${
                         notebookSection === 'notes'
                           ? 'bg-indigo-600 text-white'
-                          : (isDark ? 'bg-[#111827] border border-white/10 text-slate-300' : 'bg-white border border-slate-200 text-slate-700')
+                          : (isDark ? 'bg-[#12172A] border border-white/10 text-slate-300' : 'bg-white border border-slate-200 text-slate-700')
                       }`}
                     >
                       Personal Revision Notes ({personalNotes.length})
@@ -18117,14 +19224,14 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           placeholder="e.g. Rotational MOI Shortcut"
                           required
                           className={`w-full px-3 py-2 rounded-xl border text-xs ${
-                            isDark ? 'bg-[#0B0F19] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                            isDark ? 'bg-[#080B14] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                           }`}
                         />
                         <select
                           value={newNoteSubject}
                           onChange={(e) => setNewNoteSubject(e.target.value)}
                           className={`w-full px-3 py-2 rounded-xl border text-xs ${
-                            isDark ? 'bg-[#0B0F19] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                            isDark ? 'bg-[#080B14] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                           }`}
                         >
                           <option value="Physics">Physics</option>
@@ -18139,7 +19246,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           placeholder="Write formula, reaction condition, or mistake takeaway..."
                           required
                           className={`w-full px-3 py-2 rounded-xl border text-xs ${
-                            isDark ? 'bg-[#0B0F19] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                            isDark ? 'bg-[#080B14] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                           }`}
                         />
                         <button type="submit" className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black">
@@ -18197,7 +19304,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
                           resourceSubTab === t.id
                             ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md'
-                            : (isDark ? 'bg-[#111827] border border-white/10 text-slate-300 hover:bg-white/5' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100')
+                            : (isDark ? 'bg-[#12172A] border border-white/10 text-slate-300 hover:bg-white/5' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100')
                         }`}
                       >
                         {t.label}
@@ -18265,7 +19372,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           className={`px-3 py-1.5 rounded-xl text-xs font-bold ${
                             communitySubject === sub
                               ? 'bg-indigo-600 text-white'
-                              : (isDark ? 'bg-[#111827] border border-white/10 text-slate-300' : 'bg-white border border-slate-200 text-slate-700')
+                              : (isDark ? 'bg-[#12172A] border border-white/10 text-slate-300' : 'bg-white border border-slate-200 text-slate-700')
                           }`}
                         >
                           {sub}
@@ -18318,7 +19425,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                             onChange={(e) => setReplyDrafts((prev) => ({ ...prev, [post.id]: e.target.value }))}
                             placeholder="Write a helpful reply..."
                             className={`flex-1 px-3 py-1.5 rounded-xl border text-xs ${
-                              isDark ? 'bg-[#0B0F19] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                              isDark ? 'bg-[#080B14] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                             }`}
                           />
                           <button
@@ -18341,7 +19448,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       value={communityPostSubject}
                       onChange={(e) => setCommunityPostSubject(e.target.value)}
                       className={`w-full px-3 py-2 rounded-xl border text-xs ${
-                        isDark ? 'bg-[#0B0F19] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        isDark ? 'bg-[#080B14] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                       }`}
                     >
                       <option value="Physics">Physics</option>
@@ -18356,7 +19463,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       placeholder="Short clear topic title"
                       required
                       className={`w-full px-3 py-2 rounded-xl border text-xs ${
-                        isDark ? 'bg-[#0B0F19] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        isDark ? 'bg-[#080B14] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                       }`}
                     />
                     <textarea
@@ -18366,7 +19473,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       placeholder="Describe your doubt or tip clearly..."
                       required
                       className={`w-full px-3 py-2 rounded-xl border text-xs ${
-                        isDark ? 'bg-[#0B0F19] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        isDark ? 'bg-[#080B14] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                       }`}
                     />
                     <button type="submit" className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs font-black">
@@ -18402,7 +19509,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           value={feedbackCategory}
                           onChange={(e) => setFeedbackCategory(e.target.value)}
                           className={`w-full px-3 py-2 rounded-xl border text-xs ${
-                            isDark ? 'bg-[#0B0F19] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                            isDark ? 'bg-[#080B14] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                           }`}
                         >
                           <option value="Feature Suggestion">Feature Suggestion</option>
@@ -18419,7 +19526,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           onChange={(e) => setFeedbackTestCode(e.target.value)}
                           placeholder="e.g. PTM 03 Q42 or Dashboard"
                           className={`w-full px-3 py-2 rounded-xl border text-xs ${
-                            isDark ? 'bg-[#0B0F19] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                            isDark ? 'bg-[#080B14] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                           }`}
                         />
                       </div>
@@ -18454,7 +19561,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         onChange={(e) => setFeedbackMessage(e.target.value)}
                         placeholder="Describe any question error, formula improvement, or feature idea..."
                         className={`w-full px-3 py-2.5 rounded-xl border text-xs ${
-                          isDark ? 'bg-[#0B0F19] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          isDark ? 'bg-[#080B14] border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                         }`}
                       />
                     </div>
@@ -18511,7 +19618,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               <div
                 onClick={(e) => e.stopPropagation()}
                 className={`w-full max-w-md rounded-3xl p-6 sm:p-8 border shadow-2xl space-y-5 ${
-                  isDark ? 'bg-[#111827] border-emerald-500/35 text-slate-100' : 'bg-white border-emerald-200 text-slate-900'
+                  isDark ? 'bg-[#12172A] border-emerald-500/35 text-slate-100' : 'bg-white border-emerald-200 text-slate-900'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -18752,14 +19859,14 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [dashboardTab, setDashboardTab] = useState('home');
       const [isDark, setIsDark] = useState(() => {
         try {
-          return localStorage.getItem('nelov_theme') === 'dark';
+          return localStorage.getItem('nelov_theme') !== 'light';
         } catch (e) {
-          return false;
+          return true;
         }
       });
       const handleToggleTheme = (nextVal) => {
         setIsDark((prev) => {
-          const resolved = typeof nextVal === 'boolean' ? nextVal : !prev;
+          const resolved = typeof nextVal === 'function' ? nextVal(prev) : (typeof nextVal === 'boolean' ? nextVal : !prev);
           try {
             localStorage.setItem('nelov_theme', resolved ? 'dark' : 'light');
             localStorage.setItem('nelov_theme_user_set', 'true');
@@ -19768,7 +20875,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           <CBTErrorBoundary onReturnHome={() => { setView('home'); window.location.hash = '#/'; }}>
           <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0c0d12] text-slate-900 dark:text-zinc-100 select-none">
             {/* Top Examination Hall Banner */}
-            <header className="bg-white dark:bg-[#12131a] border-b border-slate-200 dark:border-zinc-800 px-4 py-2.5 sticky top-0 z-40 shadow-sm">
+            <header className="bg-white dark:bg-[#12172A] border-b border-slate-200 dark:border-zinc-800 px-4 py-2.5 sticky top-0 z-40 shadow-sm">
               <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
                 
                 {/* Title and Candidate Profile */}
@@ -19878,7 +20985,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             <div className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
               
               {/* Left Column: Active Question Canvas */}
-              <div className="lg:col-span-8 flex flex-col justify-between rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] shadow-sm p-6 sm:p-8 min-h-[580px]">
+              <div className="lg:col-span-8 flex flex-col justify-between rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12172A] shadow-sm p-6 sm:p-8 min-h-[580px]">
                 {q ? (
                   <div className="space-y-6">
                     {/* Question Header */}
@@ -20178,7 +21285,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               </div>
 
               {/* Right Column: Question Palette */}
-              <div className={`lg:col-span-4 flex flex-col rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] shadow-sm p-6 space-y-6 ${
+              <div className={`lg:col-span-4 flex flex-col rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12172A] shadow-sm p-6 space-y-6 ${
                 mobilePaletteOpen ? 'fixed inset-x-4 top-20 bottom-6 z-50 overflow-y-auto block' : 'hidden lg:flex'
               }`}>
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
@@ -20413,7 +21520,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         const isMains = currentPaper && (currentPaper.examType === 'JEE Mains' || currentPaper.examCategory === 'jee-mains');
         return (
           <CBTErrorBoundary onReturnHome={() => { setView('home'); window.location.hash = '#/'; }}>
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 py-12 px-4 sm:px-6 lg:px-8">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto space-y-8">
               
               <div>
@@ -20428,7 +21535,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 </button>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] p-8 sm:p-12 shadow-xl space-y-8">
+              <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12172A] p-8 sm:p-12 shadow-xl space-y-8">
                 
                 <div className="space-y-3 border-b border-slate-100 dark:border-zinc-800 pb-6">
                   <div className="flex items-center gap-2">
@@ -20629,7 +21736,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
         return (
           <CBTErrorBoundary onReturnHome={() => { setView('home'); window.location.hash = '#/'; }}>
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 py-10 px-4 sm:px-6 lg:px-8">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 py-10 px-4 sm:px-6 lg:px-8">
             <div className="max-w-5xl mx-auto space-y-8">
               
               {/* Back to Home / Header */}
@@ -20790,7 +21897,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 {Object.entries(ev.subjectStats).map(([subj, data]) => {
                   const subjAcc = data.attempted > 0 ? Math.round(((data.correct + data.partial) / data.attempted) * 100) : 0;
                   return (
-                    <div key={subj} className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] p-6 shadow-sm space-y-4">
+                    <div key={subj} className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12172A] p-6 shadow-sm space-y-4">
                       <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
                         <h3 className="text-base font-bold text-slate-900 dark:text-zinc-50">{subj}</h3>
                         <span className="text-xs font-mono font-extrabold text-indigo-600 dark:text-indigo-400">
@@ -20826,7 +21933,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               </div>
 
               {/* 4. UPGRADED ANSWER & SOLUTION REVIEW SECTION */}
-              <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12131a] p-6 sm:p-8 shadow-sm space-y-6">
+              <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#12172A] p-6 sm:p-8 shadow-sm space-y-6">
                 
                 {/* Review Header with Dual Filters */}
                 <div className="space-y-4 pb-4 border-b border-slate-100 dark:border-zinc-800">
@@ -20950,7 +22057,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         <div
                           key={qObj.id}
                           id={'question-card-' + qObj.id}
-                          className="rounded-2xl border border-slate-200 dark:border-zinc-800 p-6 space-y-5 hover:border-indigo-300 dark:hover:border-indigo-800/60 transition-colors bg-white dark:bg-[#12131a]"
+                          className="rounded-2xl border border-slate-200 dark:border-zinc-800 p-6 space-y-5 hover:border-indigo-300 dark:hover:border-indigo-800/60 transition-colors bg-white dark:bg-[#12172A]"
                         >
                           {/* Top Meta Bar */}
                           <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
@@ -21206,13 +22313,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       // -------------------------------------------------------------
       if (view === 'progress') {
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21257,13 +22364,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return null;
         }
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21295,13 +22402,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       // -------------------------------------------------------------
       if (view === 'admin_forbidden') {
         return (
-          <div className="min-h-screen bg-white dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans">
+          <div className="min-h-screen bg-white dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21338,13 +22445,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       // -------------------------------------------------------------
       if (view === 'lectures') {
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-red-500 selection:text-white transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans selection:bg-red-500 selection:text-white transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21376,13 +22483,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       // -------------------------------------------------------------
       if (view === 'lecture-player') {
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-red-500 selection:text-white transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans selection:bg-red-500 selection:text-white transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21417,13 +22524,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             if (view === 'subject-resources' || view === 'physics-resources' || view === 'chemistry-resources' || view === 'mathematics-resources') {
         const currentSub = view === 'chemistry-resources' ? 'chemistry' : (view === 'mathematics-resources' ? 'mathematics' : (view === 'physics-resources' ? 'physics' : activeVaultSubject));
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21454,13 +22561,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       if (view === 'subject-chapter' || view === 'physics-chapter') {
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21488,13 +22595,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       if (view === 'resources') {
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21521,13 +22628,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
             if (view === 'notebook') {
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21558,13 +22665,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       // -------------------------------------------------------------
       if (view === 'privacy-policy') {
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21589,13 +22696,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       if (view === 'terms') {
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21620,13 +22727,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       if (view === 'disclaimer') {
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21651,13 +22758,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       if (view === 'copyright') {
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21682,13 +22789,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       if (view === 'account') {
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21718,13 +22825,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       if (view === 'leaderboard') {
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21798,13 +22905,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       if (view === 'schedule') {
         return (
-          <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
+          <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans transition-colors duration-200">
             <MainNavbar
               currentUser={currentUser}
               activeCategory={activeCategory}
               setActiveCategory={setActiveCategory}
               isDark={isDark}
-              setIsDark={setIsDark}
+              setIsDark={handleToggleTheme}
               openAuth={openAuth}
               handleLogOut={handleLogOut}
               setView={setView}
@@ -21851,7 +22958,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const faqs = window.faqsData || [];
 
       return (
-        <div className="min-h-screen bg-white dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+        <div className="min-h-screen bg-white dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
           
           {/* Top Sticky Header */}
           <MainNavbar
@@ -21859,7 +22966,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             activeCategory={activeCategory}
             setActiveCategory={setActiveCategory}
             isDark={isDark}
-            setIsDark={setIsDark}
+            setIsDark={handleToggleTheme}
             openAuth={openAuth}
             handleLogOut={handleLogOut}
             setView={setView}
@@ -21990,7 +23097,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   <Tilt3DCard
                     maxTilt={5}
                     perspective={1400}
-                    className="relative rounded-3xl border border-indigo-200/80 dark:border-indigo-900/60 bg-gradient-to-br from-white via-slate-50 to-indigo-50/40 dark:from-[#111218] dark:via-[#0e0f14] dark:to-indigo-950/20 p-6 sm:p-8 shadow-2xl shadow-indigo-500/10 text-left overflow-hidden"
+                    className="relative rounded-3xl border border-indigo-200/80 dark:border-indigo-900/60 bg-gradient-to-br from-white via-slate-50 to-indigo-50/40 dark:from-[#0E1322] dark:via-[#0e0f14] dark:to-indigo-950/20 p-6 sm:p-8 shadow-2xl shadow-indigo-500/10 text-left overflow-hidden"
                     style={{
                       transform: 'rotateX(3deg) rotateY(-4deg)'
                     }}

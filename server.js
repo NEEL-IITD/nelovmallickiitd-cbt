@@ -27,10 +27,14 @@ const server = http.createServer((req, res) => {
     reqPath = '/index.html';
   }
 
-  let filePath = path.join(__dirname, reqPath);
-  if (!fs.existsSync(filePath) && fs.existsSync(path.join(__dirname, 'public', reqPath))) {
-    filePath = path.join(__dirname, 'public', reqPath);
-  }
+  const publicPath = path.join(__dirname, 'public', reqPath);
+  const rootPath = path.join(__dirname, reqPath);
+  let filePath = rootPath;
+  try {
+    if (fs.existsSync(publicPath) && fs.statSync(publicPath).isFile()) {
+      filePath = publicPath;
+    }
+  } catch (e) {}
 
   // Security check: ensure path is within directory
   if (!filePath.startsWith(__dirname)) {

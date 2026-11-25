@@ -436,7 +436,7 @@ export const AdminDashboard: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 pb-20">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 pb-20">
       {/* Top Admin Header */}
       <div className="border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#101116] sticky top-16 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">

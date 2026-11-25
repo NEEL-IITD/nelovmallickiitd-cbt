@@ -142,7 +142,7 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Navigation Breadcrumb / Header */}

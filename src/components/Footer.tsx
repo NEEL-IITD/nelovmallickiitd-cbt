@@ -14,7 +14,7 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onOpenAuth }) => {
   return (
-    <footer className="border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0a0a0c] text-slate-600 dark:text-zinc-400 text-xs">
+    <footer className="border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#080B14] text-slate-600 dark:text-zinc-400 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         
         {/* Main 4-Column Grid (TestonGo Style) */}

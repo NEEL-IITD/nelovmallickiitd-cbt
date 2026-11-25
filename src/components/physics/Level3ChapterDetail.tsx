@@ -56,7 +56,7 @@ export const Level3ChapterDetail: React.FC<Level3ChapterDetailProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/60 dark:bg-[#0a0a0c] py-8 sm:py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50/60 dark:bg-[#080B14] py-8 sm:py-12 relative overflow-hidden">
       
       {/* Background Ambience */}
       <div
@@ -106,7 +106,7 @@ export const Level3ChapterDetail: React.FC<Level3ChapterDetailProps> = ({
         </div>
 
         {/* Chapter Header Banner */}
-        <div className="rounded-3xl bg-white dark:bg-[#12131a] border border-slate-200/90 dark:border-zinc-800/90 p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-sm">
+        <div className="rounded-3xl bg-white dark:bg-[#12172A] border border-slate-200/90 dark:border-zinc-800/90 p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-sm">
           <div className="flex items-center gap-5">
             <div
               className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center shrink-0 border border-white/20 shadow-md text-white"
@@ -160,7 +160,7 @@ export const Level3ChapterDetail: React.FC<Level3ChapterDetailProps> = ({
             onClick={() => setShowTheoryModal(true)}
           >
             <div
-              className="relative rounded-3xl bg-white dark:bg-[#12131a] border border-slate-200/90 dark:border-zinc-800/90
+              className="relative rounded-3xl bg-white dark:bg-[#12172A] border border-slate-200/90 dark:border-zinc-800/90
                 border-b-4 border-b-slate-300 dark:border-b-zinc-700
                 hover:border-b-indigo-500 dark:hover:border-b-indigo-500
                 shadow-[0_12px_30px_-5px_rgba(0,0,0,0.06)]

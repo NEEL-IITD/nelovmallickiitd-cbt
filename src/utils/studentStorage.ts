@@ -85,7 +85,12 @@ export const studentStorage = {
   saveSession(userId: string, testId: string, sessionData: any): void {
     if (!userId || !testId) return;
     try {
-      localStorage.setItem(`nelov_${userId}_session_${testId}`, JSON.stringify(sessionData));
+      const stamped = {
+        ...(sessionData || {}),
+        testId,
+        updatedAt: (sessionData && sessionData.updatedAt) || new Date().toISOString()
+      };
+      localStorage.setItem(`nelov_${userId}_session_${testId}`, JSON.stringify(stamped));
     } catch (e) {}
   },
 
@@ -94,6 +99,31 @@ export const studentStorage = {
     try {
       const raw = localStorage.getItem(`nelov_${userId}_session_${testId}`);
       return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  getLatestInProgressSession(userId: string): any | null {
+    if (!userId) return null;
+    try {
+      const prefix = `nelov_${userId}_session_`;
+      let best: any = null;
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k || !k.startsWith(prefix)) continue;
+        const testId = k.slice(prefix.length);
+        const raw = localStorage.getItem(k);
+        if (!raw) continue;
+        const parsed = JSON.parse(raw);
+        if (!parsed) continue;
+        const ts = parsed.updatedAt ? new Date(parsed.updatedAt).getTime() : 0;
+        const ansCount = parsed.responses ? Object.keys(parsed.responses).length : 0;
+        if (!best || ts > best.ts || (ts === best.ts && ansCount > best.ansCount)) {
+          best = { testId, ts, ansCount, ...parsed };
+        }
+      }
+      return best;
     } catch (e) {
       return null;
     }

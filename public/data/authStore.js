@@ -610,7 +610,12 @@
     saveSession(userId, testId, sessionData) {
       if (!userId || !testId) return;
       try {
-        localStorage.setItem(`nelov_${userId}_session_${testId}`, JSON.stringify(sessionData));
+        const stamped = {
+          ...(sessionData || {}),
+          testId,
+          updatedAt: (sessionData && sessionData.updatedAt) || new Date().toISOString()
+        };
+        localStorage.setItem(`nelov_${userId}_session_${testId}`, JSON.stringify(stamped));
       } catch (e) {}
     },
 
@@ -619,6 +624,31 @@
       try {
         const raw = localStorage.getItem(`nelov_${userId}_session_${testId}`);
         return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    },
+
+    getLatestInProgressSession(userId) {
+      if (!userId) return null;
+      try {
+        const prefix = `nelov_${userId}_session_`;
+        let best = null;
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (!k || !k.startsWith(prefix)) continue;
+          const testId = k.slice(prefix.length);
+          const raw = localStorage.getItem(k);
+          if (!raw) continue;
+          const parsed = JSON.parse(raw);
+          if (!parsed) continue;
+          const ts = parsed.updatedAt ? new Date(parsed.updatedAt).getTime() : 0;
+          const ansCount = parsed.responses ? Object.keys(parsed.responses).length : 0;
+          if (!best || ts > best.ts || (ts === best.ts && ansCount > best.ansCount)) {
+            best = { testId, ts, ansCount, ...parsed };
+          }
+        }
+        return best;
       } catch (e) {
         return null;
       }
@@ -2397,6 +2427,8 @@
       try {
         const uId = userId || (window.authService?.getCurrentUser()?.id);
         if (!uId || uId === 'guest') return;
+        const { data: sessData } = await supabaseClient.auth.getSession();
+        if (!sessData?.session?.user) return;
 
         const payload = {
           user_id: uId,
@@ -2424,6 +2456,8 @@
       try {
         const uId = userId || (window.authService?.getCurrentUser()?.id);
         if (!uId || uId === 'guest') return this.getAllProgress(userId);
+        const { data: sessData } = await supabaseClient.auth.getSession();
+        if (!sessData?.session?.user) return this.getAllProgress(userId);
 
         const { data, error } = await supabaseClient
           .from('chapter_progress')
@@ -2456,6 +2490,419 @@
   };
 
   window.chapterProgressService = window.chapterProgressStore;
+
+  // ============================================================================
+  // DAILY GOAL, STREAK & 24-HOUR STUDY PLANNER STORE
+  // Keyed by YYYY-MM-DD local date, persisted in localStorage + optional cloud
+  // ============================================================================
+  const DAILY_PLANNER_EVENT = 'nelov:daily-planner-updated';
+  const DAILY_PLANNER_DEFAULT_ACTIVITIES = [
+    { id: 'sleep', label: 'Sleep', color: '#6366F1', isStudy: false },
+    { id: 'school', label: 'School', color: '#10B981', isStudy: false },
+    { id: 'coaching', label: 'Coaching', color: '#F59E0B', isStudy: false },
+    { id: 'self-study', label: 'Self study', color: '#3B82F6', isStudy: true },
+    { id: 'revision', label: 'Revision', color: '#14B8A6', isStudy: true },
+    { id: 'test', label: 'Test', color: '#F43F5E', isStudy: true },
+    { id: 'break', label: 'Break', color: '#EC4899', isStudy: false },
+    { id: 'misc', label: 'Misc', color: '#64748B', isStudy: false }
+  ];
+  const DAILY_PLANNER_STAGES = ['No stage', 'Theory', 'Practice', 'Revision', 'PYQs', 'Completed'];
+
+  function pad2(n) {
+    return n < 10 ? '0' + n : String(n);
+  }
+
+  function parseDateKeyLocal(dateKey) {
+    const parts = String(dateKey || '').split('-').map(Number);
+    if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+      return new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0, 0);
+    }
+    return new Date();
+  }
+
+  function toLocalDateKey(d) {
+    const dt = d instanceof Date ? d : new Date(d);
+    if (isNaN(dt.getTime())) {
+      const now = new Date();
+      return `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+    }
+    return `${dt.getFullYear()}-${pad2(dt.getMonth() + 1)}-${pad2(dt.getDate())}`;
+  }
+
+  function buildAllSlotKeys() {
+    const slots = [];
+    for (let h = 0; h < 24; h++) {
+      slots.push(`${pad2(h)}:00`);
+      slots.push(`${pad2(h)}:30`);
+    }
+    return slots;
+  }
+
+  window.dailyPlannerStore = {
+    EVENT_NAME: DAILY_PLANNER_EVENT,
+    DEFAULT_ACTIVITIES: DAILY_PLANNER_DEFAULT_ACTIVITIES,
+    STAGES: DAILY_PLANNER_STAGES,
+    ALL_SLOT_KEYS: buildAllSlotKeys(),
+
+    getLocalDateKey(d) {
+      return toLocalDateKey(d || new Date());
+    },
+
+    shiftDateKey(dateKey, deltaDays) {
+      const dt = parseDateKeyLocal(dateKey);
+      dt.setDate(dt.getDate() + deltaDays);
+      return toLocalDateKey(dt);
+    },
+
+    getWeekDates(anchorDateKey) {
+      const dt = parseDateKeyLocal(anchorDateKey);
+      const dayOfWeek = dt.getDay(); // 0 = Sun ... 6 = Sat
+      const sunday = new Date(dt);
+      sunday.setDate(dt.getDate() - dayOfWeek);
+      const days = [];
+      const weekdayLabels = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+      for (let i = 0; i < 7; i++) {
+        const cur = new Date(sunday);
+        cur.setDate(sunday.getDate() + i);
+        const key = toLocalDateKey(cur);
+        days.push({
+          dateKey: key,
+          weekday: weekdayLabels[i],
+          dayNum: cur.getDate()
+        });
+      }
+      return days;
+    },
+
+    formatDisplayDate(dateKey) {
+      const dt = parseDateKeyLocal(dateKey);
+      const title = dt.toLocaleDateString('en-IN', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      });
+      const todayKey = toLocalDateKey(new Date());
+      const yestKey = this.shiftDateKey(todayKey, -1);
+      const tomKey = this.shiftDateKey(todayKey, 1);
+      let relative = String(dt.getFullYear());
+      if (dateKey === todayKey) relative = 'Today';
+      else if (dateKey === yestKey) relative = 'Yesterday';
+      else if (dateKey === tomKey) relative = 'Tomorrow';
+      return { title, relative };
+    },
+
+    _resolveUserId(userId) {
+      return userId || (window.authService?.getCurrentUser()?.id) || 'guest';
+    },
+
+    getStore(userId) {
+      const uId = this._resolveUserId(userId);
+      const base = {
+        dailyTarget: 30,
+        customActivities: [],
+        days: {}
+      };
+      try {
+        const userRaw = localStorage.getItem(`nelov_${uId}_daily_planner_v1`);
+        const guestRaw = localStorage.getItem('nelov_daily_planner_v1');
+        if (guestRaw && uId === 'guest') {
+          return { ...base, ...JSON.parse(guestRaw) };
+        }
+        if (userRaw) {
+          return { ...base, ...JSON.parse(userRaw) };
+        }
+        if (guestRaw) {
+          return { ...base, ...JSON.parse(guestRaw) };
+        }
+      } catch (e) {}
+      return base;
+    },
+
+    saveStore(store, userId) {
+      const uId = this._resolveUserId(userId);
+      try {
+        localStorage.setItem(`nelov_${uId}_daily_planner_v1`, JSON.stringify(store));
+        if (uId === 'guest') {
+          localStorage.setItem('nelov_daily_planner_v1', JSON.stringify(store));
+        }
+      } catch (e) {}
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent(DAILY_PLANNER_EVENT, { detail: store }));
+      }
+      this.syncCloudIfAuthenticated(store, uId);
+      return store;
+    },
+
+    async syncCloudIfAuthenticated(store, userId) {
+      if (!isConfigured || !supabaseClient || !userId || userId === 'guest') return;
+      try {
+        const { data: sessData } = await supabaseClient.auth.getSession();
+        if (!sessData?.session?.user) return;
+        await supabaseClient.auth.updateUser({
+          data: { nelov_daily_planner_v1: store }
+        });
+      } catch (e) {}
+    },
+
+    getAllActivities(userId) {
+      const st = this.getStore(userId);
+      return [...DAILY_PLANNER_DEFAULT_ACTIVITIES, ...(st.customActivities || [])];
+    },
+
+    addCustomActivity(label, color, isStudy, userId) {
+      const clean = String(label || '').trim();
+      if (!clean) return null;
+      const st = this.getStore(userId);
+      const id = 'act_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 5);
+      const act = { id, label: clean, color: color || '#8B5CF6', isStudy: Boolean(isStudy) };
+      st.customActivities = [...(st.customActivities || []), act];
+      this.saveStore(st, userId);
+      return act;
+    },
+
+    getDayPlan(dateKey, userId) {
+      const st = this.getStore(userId);
+      const d = (st.days && st.days[dateKey]) || {};
+      return {
+        topics: Array.isArray(d.topics) ? d.topics : [],
+        slots: d.slots && typeof d.slots === 'object' ? d.slots : {},
+        manualSolvedCount: Number(d.manualSolvedCount || 0)
+      };
+    },
+
+    _mutateDay(dateKey, mutator, userId) {
+      const st = this.getStore(userId);
+      if (!st.days) st.days = {};
+      const current = this.getDayPlan(dateKey, userId);
+      const updated = mutator({
+        topics: [...current.topics],
+        slots: { ...current.slots },
+        manualSolvedCount: current.manualSolvedCount
+      });
+      st.days[dateKey] = {
+        ...updated,
+        updatedAt: new Date().toISOString()
+      };
+      this.saveStore(st, userId);
+      return st.days[dateKey];
+    },
+
+    setDailyTarget(target, userId) {
+      const num = Math.max(1, Math.min(500, Math.round(Number(target) || 30)));
+      const st = this.getStore(userId);
+      st.dailyTarget = num;
+      this.saveStore(st, userId);
+      return num;
+    },
+
+    adjustManualSolved(dateKey, delta, userId) {
+      return this._mutateDay(dateKey, (day) => ({
+        ...day,
+        manualSolvedCount: Math.max(0, (day.manualSolvedCount || 0) + Number(delta || 0))
+      }), userId);
+    },
+
+    addTopic(dateKey, text, stage = 'No stage', userId) {
+      const clean = String(text || '').trim();
+      if (!clean) return null;
+      const item = {
+        id: 'top_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 5),
+        text: clean,
+        stage: stage || 'No stage',
+        done: stage === 'Completed',
+        createdAt: new Date().toISOString()
+      };
+      this._mutateDay(dateKey, (day) => ({
+        ...day,
+        topics: [...day.topics, item]
+      }), userId);
+      return item;
+    },
+
+    toggleTopic(dateKey, topicId, userId) {
+      return this._mutateDay(dateKey, (day) => ({
+        ...day,
+        topics: day.topics.map((t) =>
+          t.id === topicId
+            ? { ...t, done: !t.done, stage: !t.done && t.stage === 'No stage' ? 'Completed' : (t.done && t.stage === 'Completed' ? 'No stage' : t.stage) }
+            : t
+        )
+      }), userId);
+    },
+
+    updateTopicStage(dateKey, topicId, stage, userId) {
+      return this._mutateDay(dateKey, (day) => ({
+        ...day,
+        topics: day.topics.map((t) =>
+          t.id === topicId ? { ...t, stage, done: stage === 'Completed' ? true : t.done } : t
+        )
+      }), userId);
+    },
+
+    deleteTopic(dateKey, topicId, userId) {
+      return this._mutateDay(dateKey, (day) => ({
+        ...day,
+        topics: day.topics.filter((t) => t.id !== topicId)
+      }), userId);
+    },
+
+    paintSlots(dateKey, slotKeys, activityIdOrNull, userId) {
+      return this._mutateDay(dateKey, (day) => {
+        const nextSlots = { ...day.slots };
+        (slotKeys || []).forEach((sk) => {
+          if (!activityIdOrNull || activityIdOrNull === 'erase') {
+            delete nextSlots[sk];
+          } else {
+            nextSlots[sk] = activityIdOrNull;
+          }
+        });
+        return { ...day, slots: nextSlots };
+      }, userId);
+    },
+
+    copyDayPlan(fromDateKey, toDateKey, userId) {
+      if (!fromDateKey || !toDateKey || fromDateKey === toDateKey) return null;
+      const src = this.getDayPlan(fromDateKey, userId);
+      return this._mutateDay(toDateKey, (day) => ({
+        ...day,
+        slots: { ...src.slots },
+        topics: [
+          ...day.topics,
+          ...src.topics.map((t) => ({
+            ...t,
+            id: 'top_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 5),
+            done: false
+          }))
+        ]
+      }), userId);
+    },
+
+    clearDayPlan(dateKey, userId) {
+      return this._mutateDay(dateKey, () => ({
+        topics: [],
+        slots: {},
+        manualSolvedCount: 0
+      }), userId);
+    },
+
+    getBacklog(currentDateKey, userId) {
+      const st = this.getStore(userId);
+      const items = [];
+      const keys = Object.keys(st.days || {}).sort((a, b) => (a < b ? 1 : -1));
+      keys.forEach((dKey) => {
+        if (dKey >= currentDateKey) return;
+        const dPlan = st.days[dKey];
+        (dPlan?.topics || []).forEach((t) => {
+          if (!t.done) {
+            items.push({ ...t, dateKey: dKey });
+          }
+        });
+      });
+      return items;
+    },
+
+    moveBacklogToDate(fromDateKey, topicId, targetDateKey, userId) {
+      if (!fromDateKey || !topicId || !targetDateKey) return;
+      const st = this.getStore(userId);
+      const srcTopics = st.days?.[fromDateKey]?.topics || [];
+      const found = srcTopics.find((t) => t.id === topicId);
+      if (!found) return;
+      this.deleteTopic(fromDateKey, topicId, userId);
+      this.addTopic(targetDateKey, found.text, found.stage, userId);
+    },
+
+    getSavedDateKeys(userId) {
+      const st = this.getStore(userId);
+      return Object.keys(st.days || {})
+        .filter((k) => {
+          const d = st.days[k];
+          return (d?.topics?.length > 0) || (d?.slots && Object.keys(d.slots).length > 0);
+        })
+        .sort((a, b) => (a < b ? 1 : -1));
+    },
+
+    getQuestionsSolvedOnDate(dateKey, userId) {
+      const uId = this._resolveUserId(userId);
+      const plan = this.getDayPlan(dateKey, uId);
+      let solvedFromAttempts = 0;
+      if (uId !== 'guest' && window.studentStorage?.getAttempts) {
+        const attempts = window.studentStorage.getAttempts(uId) || [];
+        attempts.forEach((a) => {
+          const dt = a.completedAt || a.date;
+          if (!dt) return;
+          if (toLocalDateKey(new Date(dt)) === dateKey) {
+            const cnt = Number(a.attemptedCount ?? (a.responses ? Object.keys(a.responses).length : 0));
+            solvedFromAttempts += isNaN(cnt) ? 0 : cnt;
+          }
+        });
+      }
+      return solvedFromAttempts + (plan.manualSolvedCount || 0);
+    },
+
+    computeBreakdown(slots, userId) {
+      const activities = this.getAllActivities(userId);
+      const actMap = {};
+      activities.forEach((a) => { actMap[a.id] = a; });
+
+      const countsById = {};
+      let totalHalfHours = 0;
+      let studyHalfHours = 0;
+
+      Object.values(slots || {}).forEach((actId) => {
+        if (!actId || !actMap[actId]) return;
+        totalHalfHours += 1;
+        countsById[actId] = (countsById[actId] || 0) + 1;
+        if (actMap[actId].isStudy) {
+          studyHalfHours += 1;
+        }
+      });
+
+      const studyHours = studyHalfHours * 0.5;
+      const plannedHours = Math.min(24, totalHalfHours * 0.5);
+      const freeHours = Math.max(0, 24 - plannedHours);
+
+      const segments = Object.keys(countsById).map((id) => ({
+        id,
+        label: actMap[id].label,
+        color: actMap[id].color,
+        hours: countsById[id] * 0.5,
+        pct: Math.round((countsById[id] * 0.5 / 24) * 1000) / 10
+      }));
+
+      return { studyHours, plannedHours, freeHours, segments };
+    },
+
+    getStreak(todayKey, userId) {
+      const st = this.getStore(userId);
+      const target = st.dailyTarget || 30;
+      const isDayActive = (dKey) => {
+        const solved = this.getQuestionsSolvedOnDate(dKey, userId);
+        const dayPlan = this.getDayPlan(dKey, userId);
+        const completedTopic = (dayPlan.topics || []).some((t) => t.done);
+        const plannedStudy = this.computeBreakdown(dayPlan.slots, userId).studyHours > 0;
+        return solved >= target || completedTopic || plannedStudy;
+      };
+
+      let streak = 0;
+      let cursor = todayKey;
+      if (isDayActive(cursor)) {
+        streak++;
+        cursor = this.shiftDateKey(cursor, -1);
+        while (isDayActive(cursor) && streak < 365) {
+          streak++;
+          cursor = this.shiftDateKey(cursor, -1);
+        }
+      } else {
+        // Allow active streak up to yesterday to keep showing until today is done
+        cursor = this.shiftDateKey(cursor, -1);
+        while (isDayActive(cursor) && streak < 365) {
+          streak++;
+          cursor = this.shiftDateKey(cursor, -1);
+        }
+      }
+      return streak;
+    }
+  };
 
   // Alias adminService to studentStorage for full backward and cross-module compatibility
   window.adminService = window.studentStorage;

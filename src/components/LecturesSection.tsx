@@ -164,7 +164,7 @@ export const LecturesSection: React.FC<LecturesSectionProps> = ({
         </div>
 
         {/* Bottom Banner */}
-        <div className="rounded-3xl border border-red-200/80 dark:border-red-900/50 bg-gradient-to-br from-red-50/50 via-white to-slate-50 dark:from-red-950/20 dark:via-[#121318] dark:to-[#0a0a0c] p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+        <div className="rounded-3xl border border-red-200/80 dark:border-red-900/50 bg-gradient-to-br from-red-50/50 via-white to-slate-50 dark:from-red-950/20 dark:via-[#121318] dark:to-[#080B14] p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
           <div className="flex items-center gap-4 text-center sm:text-left">
             <div className="w-14 h-14 rounded-2xl bg-red-600 text-white flex items-center justify-center text-2xl flex-shrink-0 shadow-lg shadow-red-600/30">
               ▶

@@ -50,6 +50,9 @@ import { ScheduleView } from './ScheduleView';
 import { StudyResourcesVaultShowcase } from './vault/StudyResourcesVaultShowcase';
 import { SubjectChaptersGrid } from './vault/SubjectChaptersGrid';
 import { VaultContentManager } from './vault/VaultContentManager';
+import { DailyGoalTodayCard } from './DailyGoalTodayCard';
+import { DailyStudyPlannerView } from './DailyStudyPlannerView';
+import { dailyPlannerService, DAILY_PLANNER_EVENT } from '../services/dailyPlannerService';
 
 export type DashboardTabId =
   | 'home'
@@ -202,6 +205,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [profileOpen, setProfileOpen] = useState(false);
   const [now, setNow] = useState(Date.now());
   const [progressTick, setProgressTick] = useState(0);
+  const [trackersMode, setTrackersMode] = useState<'planner' | 'syllabus'>('planner');
+  const [plannerTick, setPlannerTick] = useState(0);
 
   // Interactive tab controls
   const [resourceSubTab, setResourceSubTab] = useState<'hub' | 'physics' | 'chemistry' | 'mathematics' | 'formulas'>('hub');
@@ -291,8 +296,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   useEffect(() => {
     const refresh = () => setProgressTick((p) => p + 1);
+    const refreshPlanner = () => setPlannerTick((p) => p + 1);
     window.addEventListener(PROGRESS_UPDATED_EVENT, refresh);
-    return () => window.removeEventListener(PROGRESS_UPDATED_EVENT, refresh);
+    window.addEventListener(DAILY_PLANNER_EVENT, refreshPlanner);
+    return () => {
+      window.removeEventListener(PROGRESS_UPDATED_EVENT, refresh);
+      window.removeEventListener(DAILY_PLANNER_EVENT, refreshPlanner);
+    };
   }, []);
 
   useEffect(() => {
@@ -507,17 +517,34 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     }
   };
 
-  // Styles aligned with Obsidian Dark (#0B0F19 / #111827) + Crisp Light toggle
-  const shellBg = isDark ? 'bg-[#0B0F19] text-slate-100' : 'bg-slate-50 text-slate-900';
-  const sidebarBg = isDark ? 'bg-[#0E1320]/95 border-white/[0.08]' : 'bg-white border-slate-200';
-  const topBarBg = isDark ? 'bg-[#0E1320]/85 border-white/[0.08]' : 'bg-white/90 border-slate-200';
+  const handleResumeLastTest = () => {
+    if (!user) {
+      openAuthModal('login', '#/dashboard', 'Sign in to resume or attempt live JEE mock tests.');
+      return;
+    }
+    const latestSess = studentStorage.getLatestInProgressSession(user.id);
+    if (latestSess?.testId && onSelectTest) {
+      onSelectTest(latestSess.testId);
+      return;
+    }
+    if (onSelectTest) {
+      onSelectTest('jee-mains-ptm-02');
+    } else {
+      onNavigate('#/dashboard/tests');
+    }
+  };
+
+  // Styles aligned with Deep Obsidian (#080B14 / #0E1322) + Indigo-Charcoal (#12172A -> #171D35)
+  const shellBg = isDark ? 'bg-[#080B14] text-[#F8FAFC]' : 'bg-slate-50 text-slate-900';
+  const sidebarBg = isDark ? 'bg-[#0E1322]/95 border-white/[0.08]' : 'bg-white border-slate-200';
+  const topBarBg = isDark ? 'bg-[#0E1322]/85 border-white/[0.08]' : 'bg-white/90 border-slate-200';
   const cardCls = isDark
-    ? 'bg-[#111827]/90 border border-white/[0.08] shadow-xl shadow-black/25'
+    ? 'bg-gradient-to-br from-[#12172A] to-[#171D35] border border-white/[0.08] shadow-xl shadow-black/30'
     : 'bg-white border border-slate-200/90 shadow-sm shadow-slate-900/5';
-  const subCardCls = isDark ? 'bg-[#0B0F19]/75 border border-white/[0.07]' : 'bg-slate-50/90 border border-slate-200/80';
-  const mutedText = isDark ? 'text-slate-400' : 'text-slate-500';
+  const subCardCls = isDark ? 'bg-[#0E1322]/90 border border-white/[0.08]' : 'bg-slate-50/90 border border-slate-200/80';
+  const mutedText = isDark ? 'text-[#94A3B8]' : 'text-slate-500';
   const activePill = isDark
-    ? 'bg-gradient-to-r from-indigo-500/20 via-indigo-500/10 to-transparent text-indigo-300 border border-indigo-500/40 shadow-[0_0_24px_-6px_rgba(99,102,241,0.55)] font-bold'
+    ? 'bg-gradient-to-r from-[#6366F1]/25 via-[#7C3AED]/15 to-transparent text-indigo-200 border border-[#6366F1]/45 shadow-[0_0_24px_-6px_rgba(99,102,241,0.55)] font-bold'
     : 'bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-sm font-bold';
   const inactivePill = isDark
     ? 'text-slate-300/90 border border-transparent hover:bg-white/[0.05] hover:text-white font-medium'
@@ -751,7 +778,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </button>
       </nav>
 
-      <div className={`p-3 border-t space-y-2 shrink-0 ${isDark ? 'border-white/[0.08] bg-[#0B0F19]/40' : 'border-slate-200 bg-slate-50/70'}`}>
+      <div className={`p-3 border-t space-y-2 shrink-0 ${isDark ? 'border-white/[0.08] bg-[#080B14]/40' : 'border-slate-200 bg-slate-50/70'}`}>
         {isStrictAdmin && (
           <button
             type="button"
@@ -825,7 +852,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               type="button"
               onClick={() => setSearchModalOpen(true)}
               className={`flex items-center justify-between gap-2 min-w-0 flex-1 max-w-md px-3 sm:px-3.5 py-2 rounded-xl border text-left ${
-                isDark ? 'bg-[#111827] border-white/10 text-slate-400 hover:border-indigo-500/50' : 'bg-slate-100 border-slate-200 text-slate-500 hover:border-indigo-300'
+                isDark ? 'bg-[#12172A] border-white/10 text-slate-400 hover:border-indigo-500/50' : 'bg-slate-100 border-slate-200 text-slate-500 hover:border-indigo-300'
               }`}
             >
               <span className="flex items-center gap-2 min-w-0">
@@ -858,7 +885,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <button
               type="button"
               onClick={toggleTheme}
-              className={`p-2 rounded-xl border ${isDark ? 'bg-[#111827] border-white/10 text-amber-300 hover:bg-white/10' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'}`}
+              className={`p-2 rounded-xl border ${isDark ? 'bg-[#12172A] border-white/10 text-amber-300 hover:bg-white/10' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'}`}
               title="Toggle Light / Dark Mode"
             >
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -869,7 +896,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setProfileOpen((p) => !p)}
-                  className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl border ${isDark ? 'bg-[#111827] border-white/10' : 'bg-slate-100 border-slate-200'}`}
+                  className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl border ${isDark ? 'bg-[#12172A] border-white/10' : 'bg-slate-100 border-slate-200'}`}
                 >
                   <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-xs font-black flex items-center justify-center">
                     {(user.name || 'S').charAt(0).toUpperCase()}
@@ -888,7 +915,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               )}
 
               {profileOpen && user && (
-                <div className={`absolute right-0 mt-2 w-56 rounded-2xl border p-2 shadow-2xl z-50 text-xs ${isDark ? 'bg-[#111827] border-white/10' : 'bg-white border-slate-200'}`}>
+                <div className={`absolute right-0 mt-2 w-56 rounded-2xl border p-2 shadow-2xl z-50 text-xs ${isDark ? 'bg-[#12172A] border-white/10' : 'bg-white border-slate-200'}`}>
                   <div className={`px-3 py-2 border-b mb-1 ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
                     <div className="font-black truncate">{user.name}</div>
                     <div className={`text-[11px] truncate ${mutedText}`}>{user.email}</div>
@@ -914,7 +941,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <button
               type="button"
               onClick={() => onNavigate('#/')}
-              className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 ${isDark ? 'border-white/10 bg-[#111827]' : 'border-slate-200 bg-white'}`}
+              className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 ${isDark ? 'border-white/10 bg-[#12172A]' : 'border-slate-200 bg-white'}`}
             >
               Main Site <ExternalLink className="w-3.5 h-3.5" />
             </button>
@@ -922,7 +949,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           {activeTab === 'home' && (
             <div className="space-y-6">
-              <div className={`rounded-3xl p-6 sm:p-8 border ${isDark ? 'bg-gradient-to-br from-indigo-950/80 via-[#111827] to-[#0B0F19] border-indigo-500/25' : 'bg-gradient-to-br from-indigo-600 to-violet-700 text-white border-indigo-500'}`}>
+              <DailyGoalTodayCard
+                userId={user?.id}
+                isDark={isDark}
+                plannerTick={plannerTick}
+                onOpenPlanner={() => {
+                  setTrackersMode('planner');
+                  onNavigate('#/dashboard/trackers');
+                }}
+                onResumeTest={handleResumeLastTest}
+              />
+
+              <div className={`rounded-3xl p-6 sm:p-8 border ${isDark ? 'bg-gradient-to-br from-indigo-950/80 via-[#12172A] to-[#080B14] border-indigo-500/25' : 'bg-gradient-to-br from-indigo-600 to-violet-700 text-white border-indigo-500'}`}>
                 <h2 className="text-2xl sm:text-3xl font-black text-white">Welcome back, {user ? user.name : 'Future IITian'}!</h2>
                 <p className="text-xs sm:text-sm text-indigo-100/85 mt-1 max-w-2xl">
                   100% Free JEE 2027 preparation hub curated by Nelov Mallick (IIT Delhi).
@@ -1088,6 +1126,40 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           {activeTab === 'trackers' && (
             <div className="space-y-4">
+              <div className="no-print flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setTrackersMode('planner')}
+                  className={`px-4 py-2 rounded-xl text-xs font-black ${
+                    trackersMode === 'planner'
+                      ? 'bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white'
+                      : `${subCardCls}`
+                  }`}
+                >
+                  Daily Study Planner (24h Timetable)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTrackersMode('syllabus')}
+                  className={`px-4 py-2 rounded-xl text-xs font-black ${
+                    trackersMode === 'syllabus'
+                      ? 'bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white'
+                      : `${subCardCls}`
+                  }`}
+                >
+                  83-Chapter Syllabus Checklist ({chaptersSnapshot.masteredTotal}/83)
+                </button>
+              </div>
+
+              {trackersMode === 'planner' ? (
+                <DailyStudyPlannerView
+                  userId={user?.id}
+                  isDark={isDark}
+                  plannerTick={plannerTick}
+                  onBackHome={() => onNavigate('#/dashboard')}
+                />
+              ) : (
+                <div className="space-y-4">
               <div className={`rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 ${cardCls}`}>
                 <div className="flex flex-wrap gap-2">
                   {(['all', 'physics', 'chemistry', 'mathematics'] as const).map((s) => (
@@ -1106,7 +1178,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   value={trackerQuery}
                   onChange={(e) => setTrackerQuery(e.target.value)}
                   placeholder="Filter 83 chapters..."
-                  className={`px-3 py-1.5 rounded-xl border text-xs ${isDark ? 'bg-[#0B0F19] border-white/10 text-white' : 'bg-white border-slate-200'}`}
+                  className={`px-3 py-1.5 rounded-xl border text-xs ${isDark ? 'bg-[#080B14] border-white/10 text-white' : 'bg-white border-slate-200'}`}
                 />
               </div>
               <div className="space-y-2.5">
@@ -1133,10 +1205,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           </button>
                         );
                       })}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const tKey = dailyPlannerService.getLocalDateKey(new Date());
+                          dailyPlannerService.addTopic(tKey, `${ch.subjectName}: ${ch.name}`, 'Practice', user?.id);
+                          setTrackersMode('planner');
+                        }}
+                        className="px-2.5 py-1.5 rounded-xl bg-[#6366F1]/15 text-indigo-300 text-xs font-bold"
+                      >
+                        + Plan Today
+                      </button>
                     </div>
                   </div>
                 ))}
               </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -1164,13 +1249,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                   <form onSubmit={handleAddNote} className={`rounded-2xl p-5 space-y-3 h-fit ${cardCls}`}>
-                    <input value={noteTitle} onChange={(e) => setNoteTitle(e.target.value)} placeholder="Title" required className={`w-full px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#0B0F19] border-white/10' : 'bg-white border-slate-200'}`} />
-                    <select value={noteSubject} onChange={(e) => setNoteSubject(e.target.value)} className={`w-full px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#0B0F19] border-white/10' : 'bg-white border-slate-200'}`}>
+                    <input value={noteTitle} onChange={(e) => setNoteTitle(e.target.value)} placeholder="Title" required className={`w-full px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#080B14] border-white/10' : 'bg-white border-slate-200'}`} />
+                    <select value={noteSubject} onChange={(e) => setNoteSubject(e.target.value)} className={`w-full px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#080B14] border-white/10' : 'bg-white border-slate-200'}`}>
                       <option value="Physics">Physics</option>
                       <option value="Chemistry">Chemistry</option>
                       <option value="Mathematics">Mathematics</option>
                     </select>
-                    <textarea rows={4} value={noteBody} onChange={(e) => setNoteBody(e.target.value)} placeholder="Note..." required className={`w-full px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#0B0F19] border-white/10' : 'bg-white border-slate-200'}`} />
+                    <textarea rows={4} value={noteBody} onChange={(e) => setNoteBody(e.target.value)} placeholder="Note..." required className={`w-full px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#080B14] border-white/10' : 'bg-white border-slate-200'}`} />
                     <button type="submit" className="w-full py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-black">Save Note</button>
                   </form>
                   <div className="lg:col-span-2 space-y-3">
@@ -1264,14 +1349,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 className={`rounded-2xl p-5 space-y-3 h-fit ${cardCls}`}
               >
                 <h3 className="text-sm font-black">Post Doubt or Tip</h3>
-                <select value={communityPostSubject} onChange={(e) => setCommunityPostSubject(e.target.value)} className={`w-full px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#0B0F19] border-white/10' : 'bg-white border-slate-200'}`}>
+                <select value={communityPostSubject} onChange={(e) => setCommunityPostSubject(e.target.value)} className={`w-full px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#080B14] border-white/10' : 'bg-white border-slate-200'}`}>
                   <option value="Physics">Physics</option>
                   <option value="Chemistry">Chemistry</option>
                   <option value="Mathematics">Mathematics</option>
                   <option value="Strategy">Strategy</option>
                 </select>
-                <input value={communityTitle} onChange={(e) => setCommunityTitle(e.target.value)} placeholder="Title" required className={`w-full px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#0B0F19] border-white/10' : 'bg-white border-slate-200'}`} />
-                <textarea rows={4} value={communityBody} onChange={(e) => setCommunityBody(e.target.value)} placeholder="Question or strategy note..." required className={`w-full px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#0B0F19] border-white/10' : 'bg-white border-slate-200'}`} />
+                <input value={communityTitle} onChange={(e) => setCommunityTitle(e.target.value)} placeholder="Title" required className={`w-full px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#080B14] border-white/10' : 'bg-white border-slate-200'}`} />
+                <textarea rows={4} value={communityBody} onChange={(e) => setCommunityBody(e.target.value)} placeholder="Question or strategy note..." required className={`w-full px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#080B14] border-white/10' : 'bg-white border-slate-200'}`} />
                 <button type="submit" className="w-full py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-black">Post</button>
               </form>
             </div>
@@ -1282,18 +1367,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <h3 className="text-lg font-black">Feedback &amp; Issue Reporter</h3>
               {feedbackDone && <div className="p-3 rounded-xl bg-emerald-500/20 text-emerald-400 text-xs font-bold">Feedback submitted!</div>}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <select value={feedbackCat} onChange={(e) => setFeedbackCat(e.target.value)} className={`px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#0B0F19] border-white/10' : 'bg-white border-slate-200'}`}>
+                <select value={feedbackCat} onChange={(e) => setFeedbackCat(e.target.value)} className={`px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#080B14] border-white/10' : 'bg-white border-slate-200'}`}>
                   <option value="Feature Suggestion">Feature Suggestion</option>
                   <option value="Question / Answer Key Issue">Question / Answer Key Issue</option>
                 </select>
-                <input value={feedbackRef} onChange={(e) => setFeedbackRef(e.target.value)} placeholder="Paper / Topic" className={`px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#0B0F19] border-white/10' : 'bg-white border-slate-200'}`} />
+                <input value={feedbackRef} onChange={(e) => setFeedbackRef(e.target.value)} placeholder="Paper / Topic" className={`px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#080B14] border-white/10' : 'bg-white border-slate-200'}`} />
               </div>
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((s) => (
                   <button key={s} type="button" onClick={() => setFeedbackRating(s)} className={`px-3 py-1 rounded-lg border text-xs font-bold ${feedbackRating >= s ? 'border-amber-500/40 text-amber-400' : 'border-white/10'}`}>★ {s}</button>
                 ))}
               </div>
-              <textarea rows={4} required value={feedbackMsg} onChange={(e) => setFeedbackMsg(e.target.value)} placeholder="Describe suggestion or issue..." className={`w-full px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#0B0F19] border-white/10' : 'bg-white border-slate-200'}`} />
+              <textarea rows={4} required value={feedbackMsg} onChange={(e) => setFeedbackMsg(e.target.value)} placeholder="Describe suggestion or issue..." className={`w-full px-3 py-2 rounded-xl border text-xs ${isDark ? 'bg-[#080B14] border-white/10' : 'bg-white border-slate-200'}`} />
               <button type="submit" className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-black">Submit Feedback</button>
             </form>
           )}
@@ -1306,7 +1391,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
       {searchModalOpen && (
         <div className="fixed inset-0 z-[120] flex items-start justify-center pt-20 px-4 bg-black/70 backdrop-blur-sm" onClick={() => setSearchModalOpen(false)}>
-          <div onClick={(e) => e.stopPropagation()} className={`w-full max-w-2xl rounded-2xl border shadow-2xl overflow-hidden ${isDark ? 'bg-[#111827] border-white/10' : 'bg-white border-slate-200'}`}>
+          <div onClick={(e) => e.stopPropagation()} className={`w-full max-w-2xl rounded-2xl border shadow-2xl overflow-hidden ${isDark ? 'bg-[#12172A] border-white/10' : 'bg-white border-slate-200'}`}>
             <div className={`flex items-center gap-3 px-4 py-3 border-b ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
               <Search className="w-5 h-5 text-indigo-400" />
               <input

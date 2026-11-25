@@ -57,7 +57,7 @@ export const LecturePlayer: React.FC<LecturePlayerProps> = ({
 
   if (!chapter) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 flex items-center justify-center p-6">
         <div className="text-center space-y-4 max-w-md">
           <p className="text-4xl">⚠️</p>
           <h2 className="text-xl font-bold">Chapter not found</h2>
@@ -138,7 +138,7 @@ export const LecturePlayer: React.FC<LecturePlayerProps> = ({
   }, [chapter, progressMap]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-zinc-50 font-sans selection:bg-red-500 selection:text-white py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-zinc-50 font-sans selection:bg-red-500 selection:text-white py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Navigation Breadcrumb */}

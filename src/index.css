@@ -2,11 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-canvas: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-elevated: #f1f5f9;
+  --border-hairline: rgba(15, 23, 42, 0.08);
+  --brand-indigo: #6366f1;
+  --brand-violet: #7c3aed;
+}
+
+html.dark {
+  --bg-canvas: #080b14;
+  --bg-secondary: #0e1322;
+  --bg-card: #12172a;
+  --bg-card-elevated: #171d35;
+  --border-hairline: rgba(255, 255, 255, 0.08);
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
+
+  html.dark body {
+    background-color: #080b14;
+    background-image: radial-gradient(ellipse 80% 50% at 50% -15%, rgba(99, 102, 241, 0.12), transparent);
+    color: #f8fafc;
+  }
+}
+
+.premium-indigo-surface {
+  background: linear-gradient(135deg, #12172a 0%, #171d35 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.brand-gradient-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
 }
 
 /* Custom scrollbar */
@@ -21,5 +54,14 @@
   border-radius: 4px;
 }
 .dark ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: #27304d;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .planner-print-only {
+    display: block !important;
+  }
 }

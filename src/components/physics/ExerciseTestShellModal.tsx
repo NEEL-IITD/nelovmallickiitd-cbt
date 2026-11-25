@@ -485,7 +485,7 @@ export const ExerciseTestShellModal: React.FC<ExerciseTestShellModalProps> = ({
                 return (
                   <div
                     key={q.id || rIdx}
-                    className="bg-white dark:bg-[#12131a] rounded-2xl border border-slate-200 dark:border-zinc-800 p-5 sm:p-7 shadow-sm space-y-4"
+                    className="bg-white dark:bg-[#12172A] rounded-2xl border border-slate-200 dark:border-zinc-800 p-5 sm:p-7 shadow-sm space-y-4"
                   >
                     {/* Header */}
                     <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
@@ -667,7 +667,7 @@ export const ExerciseTestShellModal: React.FC<ExerciseTestShellModalProps> = ({
               )}
 
               {/* Question Card Box */}
-              <div className="bg-white dark:bg-[#12131a] rounded-2xl border border-slate-200 dark:border-zinc-800 p-6 sm:p-7 shadow-sm space-y-6">
+              <div className="bg-white dark:bg-[#12172A] rounded-2xl border border-slate-200 dark:border-zinc-800 p-6 sm:p-7 shadow-sm space-y-6">
                 
                 {/* Question Info Bar */}
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-4">
@@ -996,7 +996,7 @@ export const ExerciseTestShellModal: React.FC<ExerciseTestShellModalProps> = ({
       {/* Submit Summary Modal */}
       {showSubmitModal && (
         <div className="fixed inset-0 z-60 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#12131a] rounded-3xl border border-slate-200 dark:border-zinc-800 max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-5">
+          <div className="bg-white dark:bg-[#12172A] rounded-3xl border border-slate-200 dark:border-zinc-800 max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-5">
             <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto text-2xl font-black shadow-sm">
               <ShieldCheck className="w-8 h-8" />
             </div>
