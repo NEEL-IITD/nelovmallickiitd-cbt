@@ -17,7 +17,7 @@ import {
   TestConfigItem
 } from '../types';
 import { authService } from '../services/authService';
-import { checkClientRateLimit, errorReportSchema } from '../utils/validationSchemas';
+import { checkClientRateLimit, errorReportSchema, canonicalizeLeaderboardTestId } from '../utils/validationSchemas';
 
 export interface TestAttemptRecord {
   id: string;
@@ -897,7 +897,7 @@ export const studentStorage = {
             startsAt: d.starts_at || null,
             endsAt: d.ends_at || null,
             windowLabel: d.window_label || null,
-            lockLeaderboardUntilEnd: d.lock_leaderboard_until_end ?? true,
+            lockLeaderboardUntilEnd: d.lock_leaderboard_until_end ?? false,
             allowPracticeAfterEnd: d.allow_practice_after_end ?? true,
             updatedAt: d.updated_at
           }));
@@ -949,49 +949,85 @@ export const studentStorage = {
   },
 
   async getTestLeaderboard(testId: string): Promise<LeaderboardResult> {
+    const canonicalId = canonicalizeLeaderboardTestId(testId);
     if (isSupabaseConfigured && supabase) {
       try {
-        const { data, error } = await supabase.rpc('get_test_leaderboard', { p_test_id: testId });
+        const { data, error } = await supabase.rpc('get_test_leaderboard', { p_test_id: canonicalId });
         if (!error && data) {
           const mapEntry = (e: any): LeaderboardEntry => ({
             rank: e.rank,
-            displayName: e.display_name || 'JEE Aspirant',
-            marks: Number(e.marks ?? 0),
-            maxMarks: Number(e.max_marks ?? 300),
+            displayName: e.display_name || e.student_name || 'JEE Aspirant',
+            marks: Number(e.marks ?? e.score ?? e.obtained_marks ?? 0),
+            maxMarks: Number(e.max_marks ?? e.total_marks ?? 300),
             percentage: Number(e.percentage ?? 0),
             percentile: Number(e.percentile ?? 0),
             accuracy: Number(e.accuracy ?? 0),
             timeTakenSeconds: Number(e.time_taken_seconds ?? 0),
             submittedAt: e.submitted_at,
-            attemptedInLiveWindow: e.attempted_in_live_window,
-            isCurrentUser: e.is_current_user
+            attemptedInLiveWindow: Boolean(e.attempted_in_live_window),
+            isCurrentUser: Boolean(e.is_current_user)
           });
 
-          const top5 = Array.isArray(data.top_5) && data.top_5.length > 0
-            ? data.top_5.map(mapEntry)
-            : (data.entries || []).slice(0, 5).map(mapEntry);
+          const rawTop5 = Array.isArray(data.top_5) ? data.top_5 : [];
+          const rawAll = Array.isArray(data.all_entries) ? data.all_entries : [];
+          const rawEntries = Array.isArray(data.entries) && data.entries.length > 0
+            ? data.entries
+            : (rawTop5.length > 0 ? rawTop5 : rawAll);
+
+          const top5 = (rawTop5.length > 0 ? rawTop5 : rawEntries.slice(0, 5)).map(mapEntry);
+          const allEntries = rawAll.map(mapEntry);
+          const entries = rawEntries.map(mapEntry);
 
           return {
-            locked: data.locked || false,
-            unlocksAt: data.unlocks_at || null,
-            totalParticipants: data.total_participants || 0,
-            averageMarks: data.average_marks || 0,
-            highestMarks: data.highest_marks || 0,
+            locked: false,
+            unlocksAt: null,
+            totalParticipants: Number(data.total_participants || 0),
+            averageMarks: Number(data.average_marks ?? data.avg_marks ?? 0),
+            highestMarks: Number(data.highest_marks ?? 0),
             topper: data.topper ? mapEntry(data.topper) : (top5[0] || null),
-            top5: top5,
+            top5,
+            allEntries,
             myStanding: data.my_standing ? mapEntry(data.my_standing) : null,
-            entries: (data.entries || []).map(mapEntry),
-            myAttemptSubmitted: data.my_attempt_submitted
+            entries,
+            myAttemptSubmitted: Boolean(data.my_attempt_submitted),
+            error: null
           };
-        } else if (error) {
-          console.error('[Supabase] get_test_leaderboard rpc error:', error);
         }
-      } catch (e) {
-        console.warn('[Supabase] get_test_leaderboard rpc fallback:', e);
+        console.error('[Supabase] get_test_leaderboard rpc error:', error);
+        return {
+          locked: false,
+          unlocksAt: null,
+          totalParticipants: 0,
+          averageMarks: 0,
+          highestMarks: 0,
+          topper: null,
+          top5: [],
+          allEntries: [],
+          myStanding: null,
+          entries: [],
+          myAttemptSubmitted: false,
+          error: error?.message || 'Unable to load leaderboard from server.'
+        };
+      } catch (e: any) {
+        console.warn('[Supabase] get_test_leaderboard rpc error:', e);
+        return {
+          locked: false,
+          unlocksAt: null,
+          totalParticipants: 0,
+          averageMarks: 0,
+          highestMarks: 0,
+          topper: null,
+          top5: [],
+          allEntries: [],
+          myStanding: null,
+          entries: [],
+          myAttemptSubmitted: false,
+          error: e?.message || 'Network error while loading leaderboard.'
+        };
       }
     }
 
-    return await this.calculateLocalTestLeaderboard(testId);
+    return await this.calculateLocalTestLeaderboard(canonicalId);
   },
 
   async calculateLocalTestLeaderboard(testId: string): Promise<LeaderboardResult> {
@@ -1011,17 +1047,11 @@ export const studentStorage = {
     const isAdminUser = (a: any) => {
       const email = (a.userEmail || a.email || a.profiles?.email || a.candidateEmail || '').toLowerCase().trim();
       const role = (a.role || a.profiles?.role || '').toLowerCase().trim();
-      return (
-        email === 'mallicknelov@gmail.com' ||
-        email === 'nelovmallick@gmail.com' ||
-        email === 'nelovmallick@iitd.ac.in' ||
-        role === 'admin'
-      );
+      return email === 'mallicknelov@gmail.com' || role === 'admin';
     };
 
     const isCurrentAdmin =
       (currentUser?.email || '').toLowerCase().trim() === 'mallicknelov@gmail.com' ||
-      (currentUser?.email || '').toLowerCase().trim() === 'nelovmallick@gmail.com' ||
       currentUser?.role === 'admin';
 
     // Filter by testId, exclude Admin attempts, and pick BEST attempt per user (highest marks)

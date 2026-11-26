@@ -41,6 +41,7 @@ import { Disclaimer } from './components/legal/Disclaimer';
 import { CopyrightPolicy } from './components/legal/CopyrightPolicy';
 import { AccountPrivacy } from './components/legal/AccountPrivacy';
 import { StorageNotice } from './components/legal/StorageNotice';
+import { canonicalizeLeaderboardTestId } from './utils/validationSchemas';
 
 export const AppContent: React.FC = () => {
   const { user, isCloudConnected, openAuthModal } = useAuth();
@@ -256,9 +257,18 @@ export const AppContent: React.FC = () => {
         <Disclaimer />
       ) : currentHash === '#/copyright' || currentHash === '#copyright' ? (
         <CopyrightPolicy />
-      ) : currentHash.startsWith('#/leaderboard') || currentHash.startsWith('#leaderboard') ? (
+      ) : (
+        currentHash.startsWith('#/leaderboard') ||
+        currentHash.startsWith('#leaderboard') ||
+        ((!currentHash || currentHash === '#' || currentHash === '#/') &&
+          (window.location.pathname.toLowerCase() === '/leaderboard' || window.location.pathname.toLowerCase().startsWith('/leaderboard/')))
+      ) ? (
         <LeaderboardHub
-          initialTestId={currentHash.split('/')[2] || 'jee-advanced-pta-04'}
+          initialTestId={canonicalizeLeaderboardTestId(
+            (currentHash.startsWith('#/leaderboard') || currentHash.startsWith('#leaderboard')
+              ? currentHash.split('/')[2]
+              : window.location.pathname.split('/')[2]) || 'jee-advanced-pta-04'
+          )}
           onNavigateHome={() => handleNavigate('#/')}
         />
       ) : currentHash === '#/schedule' || currentHash === '#schedule' ? (

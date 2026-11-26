@@ -305,6 +305,17 @@
       return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     }
 
+    // Helper: Canonicalize testId slugs (e.g., ptm-01 -> jee-mains-ptm-01, pta-04 -> jee-advanced-pta-04)
+    function canonicalizeLeaderboardTestId(rawId) {
+      const clean = String(rawId || '').trim().toLowerCase();
+      if (!clean) return 'jee-advanced-pta-04';
+      const ptmMatch = clean.match(/ptm[-_ ]?(\d{1,2})/);
+      if (ptmMatch) return `jee-mains-ptm-${ptmMatch[1].padStart(2, '0')}`;
+      const ptaMatch = clean.match(/pta[-_ ]?(\d{1,2})/);
+      if (ptaMatch) return `jee-advanced-pta-${ptaMatch[1].padStart(2, '0')}`;
+      return clean;
+    }
+
     // Helper: Rich KaTeX & Markdown formatted container (XSS-Sanitized)
     function RichMathContent({ text, className = '' }) {
       const containerRef = useRef(null);
@@ -6762,32 +6773,41 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
     function LiveLeaderboardResultsCard({ currentPaper, candidateName, evaluationData, currentUser, setView }) {
       const [leaderboardData, setLeaderboardData] = useState(null);
       const [loading, setLoading] = useState(true);
+      const [errorMsg, setErrorMsg] = useState(null);
       const [attemptCount, setAttemptCount] = useState(1);
 
-      useEffect(() => {
+      const loadResultsLeaderboard = useCallback(() => {
         if (!currentPaper) return;
-        const testId = currentPaper.id || currentPaper.testId;
+        const rawTestId = currentPaper.id || currentPaper.testId;
+        const testId = canonicalizeLeaderboardTestId(rawTestId);
 
         // Check user's attempt count for this test
         if (currentUser && window.studentStorage?.getAttempts) {
           const userAtts = window.studentStorage.getAttempts(currentUser.id) || [];
-          const testAtts = userAtts.filter(a => a.testId === testId);
+          const testAtts = userAtts.filter(a => a.testId === testId || a.testId === rawTestId);
           setAttemptCount(Math.max(1, testAtts.length));
         }
 
-        // Fetch leaderboard data
         if (window.studentStorage?.getTestLeaderboard) {
+          setLoading(true);
+          setErrorMsg(null);
           window.studentStorage.getTestLeaderboard(testId).then(res => {
             setLeaderboardData(res);
+            if (res?.error) setErrorMsg(res.error);
             setLoading(false);
           }).catch(err => {
             console.warn('Error loading results leaderboard:', err);
+            setErrorMsg(err?.message || 'Unable to fetch live leaderboard.');
             setLoading(false);
           });
         } else {
           setLoading(false);
         }
       }, [currentPaper, currentUser]);
+
+      useEffect(() => {
+        loadResultsLeaderboard();
+      }, [loadResultsLeaderboard]);
 
       if (!currentPaper || !evaluationData) return null;
 
@@ -6822,7 +6842,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               type="button"
               onClick={() => {
                 if (typeof setView === 'function') setView('leaderboard');
-                window.location.hash = `#/leaderboard/${currentPaper.id || currentPaper.testId}`;
+                window.location.hash = `#/leaderboard/${canonicalizeLeaderboardTestId(currentPaper.id || currentPaper.testId)}`;
               }}
               className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5 self-start sm:self-auto hover:scale-105"
             >
@@ -6880,12 +6900,29 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             </div>
           </div>
 
+          {/* Error Banner with Retry */}
+          {errorMsg && !loading && (
+            <div className="rounded-2xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/30 p-4 flex items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2 text-rose-700 dark:text-rose-300 font-semibold">
+                <span>⚠️</span>
+                <span>{errorMsg}</span>
+              </div>
+              <button
+                type="button"
+                onClick={loadResultsLeaderboard}
+                className="shrink-0 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold"
+              >
+                ↻ Retry
+              </button>
+            </div>
+          )}
+
           {/* Top 5 Performers Mini-Bar */}
-          {leaderboardData?.entries && leaderboardData.entries.length > 0 && (
+          {((leaderboardData?.top5?.length ? leaderboardData.top5 : leaderboardData?.entries) || []).length > 0 && (
             <div className="space-y-2 pt-2">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Top 5 Candidates on this Paper:</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
-                {leaderboardData.entries.slice(0, 5).map((entry, idx) => (
+                {((leaderboardData?.top5?.length ? leaderboardData.top5 : leaderboardData?.entries) || []).slice(0, 5).map((entry, idx) => (
                   <div key={idx} className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800 flex flex-col justify-between text-xs space-y-1">
                     <div className="flex items-center justify-between gap-1">
                       <span className="font-bold text-[10px]">{idx === 0 ? '👑 #1' : (idx === 1 ? '🥈 #2' : (idx === 2 ? '🥉 #3' : `🎖️ #${idx + 1}`))}</span>
@@ -11261,7 +11298,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           startsAt,
           endsAt,
           windowLabel: cur.windowLabel || 'Sunday All-India Live Mock',
-          lockLeaderboard: cur.lockLeaderboardUntilEnd ?? true,
+          lockLeaderboard: cur.lockLeaderboardUntilEnd ?? false,
           allowPractice: cur.allowPracticeAfterEnd ?? true
         });
       };
@@ -11338,12 +11375,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       };
 
       const handleExportLeaderboardCSV = () => {
-        if (!adminLeaderboardData || !adminLeaderboardData.entries || adminLeaderboardData.entries.length === 0) {
+        const exportRows = (adminLeaderboardData?.allEntries?.length ? adminLeaderboardData.allEntries : adminLeaderboardData?.entries) || [];
+        if (exportRows.length === 0) {
           alert('No leaderboard entries to export for this test.');
           return;
         }
         const headers = ['Rank', 'Student Name', 'Marks Scored', 'Max Marks', 'Percentile', 'Accuracy (%)', 'Time Taken (Seconds)', 'Attempted in Live Window', 'Submitted At'];
-        const rows = adminLeaderboardData.entries.map(e => [
+        const rows = exportRows.map(e => [
           e.rank,
           `"${(e.displayName || 'Student').replace(/"/g, '""')}"`,
           e.marks,
@@ -12169,9 +12207,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   </div>
 
                   {/* Top 5 Performers Showcase in Admin */}
-                  {adminLeaderboardData?.entries && adminLeaderboardData.entries.length > 0 && (
+                  {((adminLeaderboardData?.allEntries?.length ? adminLeaderboardData.allEntries : adminLeaderboardData?.entries) || []).length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-1">
-                      {adminLeaderboardData.entries.slice(0, 5).map((entry, idx) => (
+                      {((adminLeaderboardData?.allEntries?.length ? adminLeaderboardData.allEntries : adminLeaderboardData?.entries) || []).slice(0, 5).map((entry, idx) => (
                         <div
                           key={entry.rank}
                           className={`p-3.5 rounded-2xl border ${
@@ -12224,12 +12262,12 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           <tr>
                             <td colSpan={7} className="p-8 text-center text-slate-400">Loading rankings...</td>
                           </tr>
-                        ) : (adminLeaderboardData?.entries || []).length === 0 ? (
+                        ) : ((adminLeaderboardData?.allEntries?.length ? adminLeaderboardData.allEntries : adminLeaderboardData?.entries) || []).length === 0 ? (
                           <tr>
                             <td colSpan={7} className="p-8 text-center text-slate-400 italic">No attempt entries recorded for this paper yet.</td>
                           </tr>
                         ) : (
-                          (adminLeaderboardData?.entries || []).map((row) => (
+                          ((adminLeaderboardData?.allEntries?.length ? adminLeaderboardData.allEntries : adminLeaderboardData?.entries) || []).map((row) => (
                             <tr key={row.rank + row.displayName} className="hover:bg-slate-50 dark:hover:bg-zinc-900/40">
                               <td className="p-3 font-mono font-bold">
                                 {row.rank === 1 ? (
@@ -14301,11 +14339,14 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
     // COMPONENT: LeaderboardView (Supabase Live All-India Leaderboard - Ranked by Highest Marks)
     // ==============================================================================
     function LeaderboardView({ currentUser, setView, openAuth, initialTestId = 'jee-advanced-pta-04', handleSelectTest, testConfigs = {}, detailedConfigs = {} }) {
-      const isJeeMainsId = (id) => (id || '').startsWith('jee-mains-') || (id || '').toLowerCase().includes('ptm');
-      const [activeTab, setActiveTab] = useState(() => isJeeMainsId(initialTestId) ? 'jee-mains' : 'jee-advanced');
-      const [selectedTestId, setSelectedTestId] = useState(initialTestId);
+      const normalizedInitial = canonicalizeLeaderboardTestId(initialTestId);
+      const isJeeMainsId = (id) => canonicalizeLeaderboardTestId(id).startsWith('jee-mains-');
+      const isAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : ((currentUser?.email || '').toLowerCase() === 'mallicknelov@gmail.com'));
+      const [activeTab, setActiveTab] = useState(() => isJeeMainsId(normalizedInitial) ? 'jee-mains' : 'jee-advanced');
+      const [selectedTestId, setSelectedTestId] = useState(normalizedInitial);
       const [searchQuery, setSearchQuery] = useState('');
       const [loading, setLoading] = useState(true);
+      const [errorMsg, setErrorMsg] = useState(null);
       const [leaderboardData, setLeaderboardData] = useState(null);
       const [toppersSummaries, setToppersSummaries] = useState([]);
       const [overallLeaderboard, setOverallLeaderboard] = useState([]);
@@ -14314,10 +14355,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       useEffect(() => {
         if (initialTestId) {
-          setSelectedTestId(initialTestId);
-          if (isJeeMainsId(initialTestId)) {
+          const norm = canonicalizeLeaderboardTestId(initialTestId);
+          setSelectedTestId(norm);
+          if (isJeeMainsId(norm)) {
             setActiveTab('jee-mains');
-          } else if (initialTestId.startsWith('jee-advanced-') || initialTestId.toLowerCase().includes('pta')) {
+          } else if (norm.startsWith('jee-advanced-')) {
             setActiveTab('jee-advanced');
           }
         }
@@ -14339,13 +14381,18 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       const loadTestLeaderboard = async (testId) => {
         setLoading(true);
+        setErrorMsg(null);
         try {
           if (window.studentStorage?.getTestLeaderboard) {
             const res = await window.studentStorage.getTestLeaderboard(testId);
             setLeaderboardData(res);
+            if (res?.error) {
+              setErrorMsg(res.error);
+            }
           }
         } catch (e) {
           console.warn('Error loading leaderboard:', e);
+          setErrorMsg(e?.message || 'Unable to load All-India rankings right now.');
         } finally {
           setLoading(false);
         }
@@ -14353,6 +14400,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
       const loadOverallLeaderboard = async () => {
         setLoading(true);
+        setErrorMsg(null);
         try {
           if (window.studentStorage?.getOverallLeaderboard) {
             const res = await window.studentStorage.getOverallLeaderboard();
@@ -14360,6 +14408,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           }
         } catch (e) {
           console.warn('Error loading overall leaderboard:', e);
+          setErrorMsg(e?.message || 'Unable to load overall rankings right now.');
         } finally {
           setLoading(false);
         }
@@ -14383,7 +14432,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           testId: tid,
           code: 'PTM ' + num,
           title: 'JEE Mains – PTM ' + num,
-          isLive: testConfigs[tid] === 'live'
+          isLive: ['01', '02', '03'].includes(num) || testConfigs[tid] === 'live'
         };
       });
 
@@ -14391,7 +14440,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const currentTestObj = currentTestList.find((t) => t.testId === selectedTestId);
       const selectedTestCode = currentTestObj?.code || selectedTestId.split('-').pop()?.toUpperCase() || 'this paper';
 
-      const filteredEntries = (leaderboardData?.entries || []).filter(entry =>
+      const visibleRows = isAdmin && leaderboardData?.allEntries && leaderboardData.allEntries.length > 0
+        ? leaderboardData.allEntries
+        : (leaderboardData?.top5 && leaderboardData.top5.length > 0
+          ? leaderboardData.top5
+          : (leaderboardData?.entries || []).slice(0, 5));
+
+      const filteredEntries = visibleRows.filter(entry =>
         (entry.displayName || '').toLowerCase().includes(searchQuery.toLowerCase())
       );
 
@@ -14594,11 +14649,33 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   </div>
                 )}
 
+                {/* Error Banner with Retry */}
+                {errorMsg && !loading && (
+                  <div className="rounded-2xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/30 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                      <span className="text-xl shrink-0">⚠️</span>
+                      <div>
+                        <h4 className="text-sm font-extrabold text-rose-800 dark:text-rose-200">
+                          Unable to load live All-India rankings
+                        </h4>
+                        <p className="text-xs text-rose-700 dark:text-rose-300 mt-0.5">{errorMsg}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => loadTestLeaderboard(selectedTestId)}
+                      className="shrink-0 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold shadow-sm transition-colors"
+                    >
+                      ↻ Retry
+                    </button>
+                  </div>
+                )}
+
                 {/* Unlocked Content */}
                 {!leaderboardData?.locked && (
                   <>
                     {/* 1. TOP 5 PERFORMERS SHOWCASE */}
-                    {leaderboardData?.entries && leaderboardData.entries.length > 0 && (
+                    {visibleRows.length > 0 && (
                       <div className="space-y-4">
                         <div className="text-center space-y-1">
                           <span className="px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wider uppercase bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300">
@@ -14612,29 +14689,29 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end pt-4 max-w-4xl mx-auto">
                           
                           {/* #2 Runner-Up Podium Card (Silver) */}
-                          {leaderboardData.entries[1] ? (
+                          {visibleRows[1] ? (
                             <Tilt3DCard maxTilt={8} perspective={1000} className="rounded-3xl border-2 border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#121318] p-6 shadow-lg text-center space-y-4 md:order-1 order-2">
                               <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 text-xl font-black flex items-center justify-center mx-auto shadow-sm">
                                 🥈 #2
                               </div>
                               <div>
                                 <h4 className="text-base font-extrabold text-slate-900 dark:text-zinc-100 line-clamp-1">
-                                  {leaderboardData.entries[1].displayName}
+                                  {visibleRows[1].displayName}
                                 </h4>
                                 <p className="text-[11px] font-bold text-slate-500">Runner-Up</p>
                               </div>
                               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 space-y-1">
                                 <div className="text-2xl font-black font-mono text-slate-800 dark:text-zinc-200">
-                                  {leaderboardData.entries[1].marks} <span className="text-xs text-slate-400">/ {leaderboardData.entries[1].maxMarks}</span>
+                                  {visibleRows[1].marks} <span className="text-xs text-slate-400">/ {visibleRows[1].maxMarks}</span>
                                 </div>
                                 <div className="flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                                  <span>{leaderboardData.entries[1].percentile}%ile</span>
+                                  <span>{visibleRows[1].percentile}%ile</span>
                                   <span>·</span>
-                                  <span>{leaderboardData.entries[1].accuracy}% Acc</span>
+                                  <span>{visibleRows[1].accuracy}% Acc</span>
                                 </div>
                               </div>
                               <p className="text-[10px] text-slate-400">
-                                Time Taken: {formatSeconds(leaderboardData.entries[1].timeTakenSeconds)}
+                                Time Taken: {formatSeconds(visibleRows[1].timeTakenSeconds)}
                               </p>
                             </Tilt3DCard>
                           ) : (
@@ -14642,7 +14719,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           )}
 
                           {/* #1 Topper Podium Card (Gold Crown, Elevated) */}
-                          {leaderboardData.entries[0] && (
+                          {visibleRows[0] && (
                             <Tilt3DCard maxTilt={10} perspective={1000} className="rounded-3xl border-2 border-amber-500 bg-gradient-to-b from-amber-500/10 via-white dark:via-[#121318] to-white dark:to-[#121318] p-7 shadow-2xl text-center space-y-4 md:order-2 order-1 md:-translate-y-4 ring-4 ring-amber-500/10">
                               <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-amber-400 to-amber-600 text-white text-3xl font-black flex items-center justify-center mx-auto shadow-lg shadow-amber-500/30 animate-bounce">
                                 👑
@@ -14652,50 +14729,50 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                               </span>
                               <div>
                                 <h4 className="text-lg font-black text-slate-900 dark:text-zinc-50 line-clamp-1">
-                                  {leaderboardData.entries[0].displayName}
+                                  {visibleRows[0].displayName}
                                 </h4>
                                 <p className="text-xs font-bold text-amber-600 dark:text-amber-400">All-India #1 Scorer</p>
                               </div>
                               <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/80 space-y-1">
                                 <div className="text-3xl font-black font-mono text-amber-600 dark:text-amber-400">
-                                  {leaderboardData.entries[0].marks} <span className="text-sm text-slate-500 font-semibold">/ {leaderboardData.entries[0].maxMarks}</span>
+                                  {visibleRows[0].marks} <span className="text-sm text-slate-500 font-semibold">/ {visibleRows[0].maxMarks}</span>
                                 </div>
                                 <div className="flex items-center justify-center gap-2 text-xs font-extrabold text-emerald-600 dark:text-emerald-400">
-                                  <span>{leaderboardData.entries[0].percentile}%ile</span>
+                                  <span>{visibleRows[0].percentile}%ile</span>
                                   <span>·</span>
-                                  <span>{leaderboardData.entries[0].accuracy}% Acc</span>
+                                  <span>{visibleRows[0].accuracy}% Acc</span>
                                 </div>
                               </div>
                               <p className="text-[10px] text-slate-500 dark:text-zinc-400">
-                                Pacing: {formatSeconds(leaderboardData.entries[0].timeTakenSeconds)}
+                                Pacing: {formatSeconds(visibleRows[0].timeTakenSeconds)}
                               </p>
                             </Tilt3DCard>
                           )}
 
                           {/* #3 Bronze Podium Card */}
-                          {leaderboardData.entries[2] ? (
+                          {visibleRows[2] ? (
                             <Tilt3DCard maxTilt={8} perspective={1000} className="rounded-3xl border-2 border-amber-700/50 dark:border-amber-700/40 bg-white dark:bg-[#121318] p-6 shadow-lg text-center space-y-4 md:order-3 order-3">
                               <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-xl font-black flex items-center justify-center mx-auto shadow-sm">
                                 🥉 #3
                               </div>
                               <div>
                                 <h4 className="text-base font-extrabold text-slate-900 dark:text-zinc-100 line-clamp-1">
-                                  {leaderboardData.entries[2].displayName}
+                                  {visibleRows[2].displayName}
                                 </h4>
                                 <p className="text-[11px] font-bold text-slate-500">2nd Runner-Up</p>
                               </div>
                               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 space-y-1">
                                 <div className="text-2xl font-black font-mono text-slate-800 dark:text-zinc-200">
-                                  {leaderboardData.entries[2].marks} <span className="text-xs text-slate-400">/ {leaderboardData.entries[2].maxMarks}</span>
+                                  {visibleRows[2].marks} <span className="text-xs text-slate-400">/ {visibleRows[2].maxMarks}</span>
                                 </div>
                                 <div className="flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                                  <span>{leaderboardData.entries[2].percentile}%ile</span>
+                                  <span>{visibleRows[2].percentile}%ile</span>
                                   <span>·</span>
-                                  <span>{leaderboardData.entries[2].accuracy}% Acc</span>
+                                  <span>{visibleRows[2].accuracy}% Acc</span>
                                 </div>
                               </div>
                               <p className="text-[10px] text-slate-400">
-                                Time Taken: {formatSeconds(leaderboardData.entries[2].timeTakenSeconds)}
+                                Time Taken: {formatSeconds(visibleRows[2].timeTakenSeconds)}
                               </p>
                             </Tilt3DCard>
                           ) : (
@@ -14705,9 +14782,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         </div>
 
                         {/* #4 & #5 Honor Cards (Top 5 Leaderboard Showcase) */}
-                        {(leaderboardData.entries[3] || leaderboardData.entries[4]) && (
+                        {(visibleRows[3] || visibleRows[4]) && (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto pt-2">
-                            {leaderboardData.entries[3] && (
+                            {visibleRows[3] && (
                               <div className="rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-[#121318] p-4 shadow-sm flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                   <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-black text-sm flex items-center justify-center border border-indigo-200 dark:border-indigo-800">
@@ -14715,22 +14792,22 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                   </div>
                                   <div>
                                     <h4 className="text-sm font-extrabold text-slate-900 dark:text-zinc-100 line-clamp-1">
-                                      {leaderboardData.entries[3].displayName}
+                                      {visibleRows[3].displayName}
                                     </h4>
                                     <p className="text-[10px] font-bold text-slate-400">Top 5 Performer</p>
                                   </div>
                                 </div>
                                 <div className="text-right">
                                   <div className="text-lg font-black font-mono text-slate-800 dark:text-zinc-200">
-                                    {leaderboardData.entries[3].marks} <span className="text-xs text-slate-400 font-normal">/ {leaderboardData.entries[3].maxMarks}</span>
+                                    {visibleRows[3].marks} <span className="text-xs text-slate-400 font-normal">/ {visibleRows[3].maxMarks}</span>
                                   </div>
                                   <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono">
-                                    {leaderboardData.entries[3].percentile}%ile · {leaderboardData.entries[3].accuracy}% Acc
+                                    {visibleRows[3].percentile}%ile · {visibleRows[3].accuracy}% Acc
                                   </div>
                                 </div>
                               </div>
                             )}
-                            {leaderboardData.entries[4] && (
+                            {visibleRows[4] && (
                               <div className="rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-[#121318] p-4 shadow-sm flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                   <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-black text-sm flex items-center justify-center border border-indigo-200 dark:border-indigo-800">
@@ -14738,17 +14815,17 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                   </div>
                                   <div>
                                     <h4 className="text-sm font-extrabold text-slate-900 dark:text-zinc-100 line-clamp-1">
-                                      {leaderboardData.entries[4].displayName}
+                                      {visibleRows[4].displayName}
                                     </h4>
                                     <p className="text-[10px] font-bold text-slate-400">Top 5 Performer</p>
                                   </div>
                                 </div>
                                 <div className="text-right">
                                   <div className="text-lg font-black font-mono text-slate-800 dark:text-zinc-200">
-                                    {leaderboardData.entries[4].marks} <span className="text-xs text-slate-400 font-normal">/ {leaderboardData.entries[4].maxMarks}</span>
+                                    {visibleRows[4].marks} <span className="text-xs text-slate-400 font-normal">/ {visibleRows[4].maxMarks}</span>
                                   </div>
                                   <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono">
-                                    {leaderboardData.entries[4].percentile}%ile · {leaderboardData.entries[4].accuracy}% Acc
+                                    {visibleRows[4].percentile}%ile · {visibleRows[4].accuracy}% Acc
                                   </div>
                                 </div>
                               </div>
@@ -14889,6 +14966,24 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                   <p>Loading All-India rankings...</p>
                                 </td>
                               </tr>
+                            ) : errorMsg && filteredEntries.length === 0 ? (
+                              <tr>
+                                <td colSpan={6} className="p-12 text-center">
+                                  <div className="max-w-md mx-auto space-y-3">
+                                    <span className="text-3xl block">⚠️</span>
+                                    <h4 className="text-sm font-extrabold text-rose-700 dark:text-rose-300">
+                                      {errorMsg}
+                                    </h4>
+                                    <button
+                                      type="button"
+                                      onClick={() => loadTestLeaderboard(selectedTestId)}
+                                      className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-sm transition-colors"
+                                    >
+                                      ↻ Retry Loading Rankings
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
                             ) : filteredEntries.length === 0 ? (
                               <tr>
                                 <td colSpan={6} className="p-12 text-center">
@@ -14903,12 +14998,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                     <button
                                       type="button"
                                       onClick={() => {
+                                        const paperSlug = selectedTestId.replace(/^jee-(?:mains|advanced)-/, '');
                                         if (!currentUser && openAuth) {
-                                          openAuth('login', `#/test/${activeTab}/${selectedTestId.split('-').pop()}`);
+                                          openAuth('login', `#/test/${activeTab}/${paperSlug}`);
                                         } else if (handleSelectTest) {
                                           handleSelectTest(selectedTestId);
                                         } else {
-                                          window.location.hash = `#/test/${activeTab}/${selectedTestId.split('-').pop()}`;
+                                          window.location.hash = `#/test/${activeTab}/${paperSlug}`;
                                         }
                                       }}
                                       className="mt-2 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/25 transition-all hover:scale-105"
@@ -15035,6 +15131,22 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                             <td colSpan={6} className="p-12 text-center text-slate-400">
                               <div className="inline-block animate-spin text-2xl pb-2">⟳</div>
                               <p>Loading Overall Champions...</p>
+                            </td>
+                          </tr>
+                        ) : errorMsg && filteredOverall.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} className="p-12 text-center">
+                              <div className="max-w-md mx-auto space-y-3">
+                                <span className="text-3xl block">⚠️</span>
+                                <p className="text-sm font-extrabold text-rose-700 dark:text-rose-300">{errorMsg}</p>
+                                <button
+                                  type="button"
+                                  onClick={loadOverallLeaderboard}
+                                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-sm transition-colors"
+                                >
+                                  ↻ Retry Overall Rankings
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ) : filteredOverall.length === 0 ? (
@@ -20750,10 +20862,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         const isHashEmpty = !hash || hash === '#' || hash === '#/' || hash === '';
 
         // Priority 0: Leaderboard Routes (100% Public Access - No Login Required)
-        if (hash === '#/leaderboard' || hash === '#leaderboard' || hash.startsWith('#/leaderboard/') || hash.startsWith('#leaderboard/')) {
-          const parts = hash.split('/');
-          if (parts.length > 2 && parts[2]) {
-            setActiveLeaderboardTestId(parts[2]);
+        const isLeaderboardHash = hash === '#/leaderboard' || hash === '#leaderboard' || hash.startsWith('#/leaderboard/') || hash.startsWith('#leaderboard/');
+        const isLeaderboardPath = isHashEmpty && (path === '/leaderboard' || path.startsWith('/leaderboard/'));
+        if (isLeaderboardHash || isLeaderboardPath) {
+          const rawSource = isLeaderboardHash ? hash : path;
+          const parts = rawSource.replace(/^#?\/?leaderboard\/?/, '').split('/').filter(Boolean);
+          if (parts[0]) {
+            setActiveLeaderboardTestId(canonicalizeLeaderboardTestId(parts[0]));
           }
           setView('leaderboard');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -20983,9 +21098,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         }
 
         if (hash === '#/leaderboard' || hash === '#leaderboard' || hash.startsWith('#/leaderboard/') || hash.startsWith('#leaderboard/')) {
-          const parts = hash.split('/');
-          if (parts.length > 2 && parts[2]) {
-            setActiveLeaderboardTestId(parts[2]);
+          const parts = hash.replace(/^#\/?leaderboard\/?/, '').split('/').filter(Boolean);
+          if (parts[0]) {
+            setActiveLeaderboardTestId(canonicalizeLeaderboardTestId(parts[0]));
           }
           setView('leaderboard');
           window.scrollTo({ top: 0, behavior: 'smooth' });

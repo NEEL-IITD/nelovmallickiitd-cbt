@@ -2029,49 +2029,93 @@
     },
 
     async getTestLeaderboard(testId) {
+      const canonicalId = (() => {
+        const s = String(testId || '').trim().toLowerCase();
+        const mPtm = s.match(/ptm[-_\s]?0*(\d+)/i);
+        if (mPtm) return `jee-mains-ptm-${String(parseInt(mPtm[1], 10)).padStart(2, '0')}`;
+        const mPta = s.match(/pta[-_\s]?0*(\d+)/i);
+        if (mPta) return `jee-advanced-pta-${String(parseInt(mPta[1], 10)).padStart(2, '0')}`;
+        return s || 'jee-advanced-pta-04';
+      })();
+
       if (window.authService.isCloudConnected() && supabaseClient) {
         try {
-          const { data, error } = await supabaseClient.rpc('get_test_leaderboard', { p_test_id: testId });
+          const { data, error } = await supabaseClient.rpc('get_test_leaderboard', { p_test_id: canonicalId });
           if (!error && data) {
             const mapEntry = e => ({
               rank: e.rank,
-              displayName: e.display_name || e.displayName || 'JEE Aspirant',
-              marks: Number(e.marks ?? 0),
-              maxMarks: Number(e.max_marks ?? e.maxMarks ?? 300),
+              displayName: e.display_name || e.student_name || e.displayName || 'JEE Aspirant',
+              marks: Number(e.marks ?? e.score ?? e.obtained_marks ?? 0),
+              maxMarks: Number(e.max_marks ?? e.total_marks ?? e.maxMarks ?? 300),
               percentage: Number(e.percentage ?? 0),
               percentile: Number(e.percentile ?? 0),
               accuracy: Number(e.accuracy ?? 0),
               timeTakenSeconds: Number(e.time_taken_seconds ?? e.timeTakenSeconds ?? 0),
               submittedAt: e.submitted_at || e.submittedAt,
-              attemptedInLiveWindow: e.attempted_in_live_window,
-              isCurrentUser: e.is_current_user
+              attemptedInLiveWindow: Boolean(e.attempted_in_live_window),
+              isCurrentUser: Boolean(e.is_current_user)
             });
 
-            const top5 = Array.isArray(data.top_5) && data.top_5.length > 0
-              ? data.top_5.map(mapEntry)
-              : (data.entries || []).slice(0, 5).map(mapEntry);
+            const rawTop5 = Array.isArray(data.top_5) ? data.top_5 : [];
+            const rawAll = Array.isArray(data.all_entries) ? data.all_entries : [];
+            const rawEntries = Array.isArray(data.entries) && data.entries.length > 0
+              ? data.entries
+              : (rawTop5.length > 0 ? rawTop5 : rawAll);
+
+            const top5 = (rawTop5.length > 0 ? rawTop5 : rawEntries.slice(0, 5)).map(mapEntry);
+            const allEntries = rawAll.map(mapEntry);
+            const entries = rawEntries.map(mapEntry);
 
             return {
-              locked: data.locked || false,
-              unlocksAt: data.unlocks_at || null,
-              totalParticipants: data.total_participants || 0,
-              averageMarks: data.average_marks || 0,
-              highestMarks: data.highest_marks || 0,
+              locked: false,
+              unlocksAt: null,
+              totalParticipants: Number(data.total_participants || 0),
+              averageMarks: Number(data.average_marks ?? data.avg_marks ?? 0),
+              highestMarks: Number(data.highest_marks ?? 0),
               topper: data.topper ? mapEntry(data.topper) : (top5[0] || null),
-              top5: top5,
+              top5,
+              allEntries,
               myStanding: data.my_standing ? mapEntry(data.my_standing) : null,
-              entries: (data.entries || []).map(mapEntry),
-              myAttemptSubmitted: data.my_attempt_submitted || false
+              entries,
+              myAttemptSubmitted: Boolean(data.my_attempt_submitted),
+              error: null
             };
-          } else if (error) {
-            console.error('[Supabase] get_test_leaderboard rpc error:', error);
           }
+          console.error('[Supabase] get_test_leaderboard rpc error:', error);
+          return {
+            locked: false,
+            unlocksAt: null,
+            totalParticipants: 0,
+            averageMarks: 0,
+            highestMarks: 0,
+            topper: null,
+            top5: [],
+            allEntries: [],
+            myStanding: null,
+            entries: [],
+            myAttemptSubmitted: false,
+            error: error?.message || 'Unable to load leaderboard from server.'
+          };
         } catch (e) {
-          console.warn('[Supabase] get_test_leaderboard fallback:', e);
+          console.warn('[Supabase] get_test_leaderboard rpc error:', e);
+          return {
+            locked: false,
+            unlocksAt: null,
+            totalParticipants: 0,
+            averageMarks: 0,
+            highestMarks: 0,
+            topper: null,
+            top5: [],
+            allEntries: [],
+            myStanding: null,
+            entries: [],
+            myAttemptSubmitted: false,
+            error: e?.message || 'Network error while loading leaderboard.'
+          };
         }
       }
 
-      return await this.calculateLocalTestLeaderboard(testId);
+      return await this.calculateLocalTestLeaderboard(canonicalId);
     },
 
     async calculateLocalTestLeaderboard(testId) {
@@ -2089,12 +2133,11 @@
       const isAdminUser = a => {
         const email = (a.userEmail || a.email || a.profiles?.email || a.candidateEmail || '').toLowerCase().trim();
         const role = (a.role || a.profiles?.role || '').toLowerCase().trim();
-        return email === 'mallicknelov@gmail.com' || email === 'nelovmallick@gmail.com' || email === 'nelovmallick@iitd.ac.in' || role === 'admin';
+        return email === 'mallicknelov@gmail.com' || role === 'admin';
       };
 
       const isCurrentAdmin =
         (currentUser?.email || '').toLowerCase().trim() === 'mallicknelov@gmail.com' ||
-        (currentUser?.email || '').toLowerCase().trim() === 'nelovmallick@gmail.com' ||
         currentUser?.role === 'admin';
 
       const norm = id => (id || '').toString().toLowerCase().replace(/[^a-z0-9]/g, '');

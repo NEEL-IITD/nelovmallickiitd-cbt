@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { studentStorage } from '../utils/studentStorage';
 import { Tilt3DCard } from './ui/Tilt3DCard';
 import { useCountdown } from '../hooks/useCountdown';
+import { canonicalizeLeaderboardTestId } from '../utils/validationSchemas';
 
 interface LeaderboardHubProps {
   initialTestId?: string;
@@ -16,24 +17,26 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
   onSelectTest,
   onNavigateHome
 }) => {
-  const { isAuthenticated, openAuthModal } = useAuth();
+  const { isAuthenticated, isAdmin, openAuthModal } = useAuth();
+  const normalizedInitial = canonicalizeLeaderboardTestId(initialTestId);
 
-  const isJeeMainsId = (id: string) => (id || '').startsWith('jee-mains-') || (id || '').toLowerCase().includes('ptm');
+  const isJeeMainsId = (id: string) => (id || '').toLowerCase().includes('jee-mains-') || (id || '').toLowerCase().includes('ptm');
 
   // Tab State
   const [activeTab, setActiveTab] = useState<'jee-advanced' | 'jee-mains' | 'overall'>(() => {
-    return isJeeMainsId(initialTestId) ? 'jee-mains' : 'jee-advanced';
+    return isJeeMainsId(normalizedInitial) ? 'jee-mains' : 'jee-advanced';
   });
-  const [selectedTestId, setSelectedTestId] = useState<string>(initialTestId);
+  const [selectedTestId, setSelectedTestId] = useState<string>(normalizedInitial);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Sync when initialTestId changes (e.g. from hash navigation or prop change)
   useEffect(() => {
     if (initialTestId) {
-      setSelectedTestId(initialTestId);
-      if (isJeeMainsId(initialTestId)) {
+      const nextId = canonicalizeLeaderboardTestId(initialTestId);
+      setSelectedTestId(nextId);
+      if (isJeeMainsId(nextId)) {
         setActiveTab('jee-mains');
-      } else if (initialTestId.startsWith('jee-advanced-') || initialTestId.toLowerCase().includes('pta')) {
+      } else if (nextId.startsWith('jee-advanced-') || nextId.toLowerCase().includes('pta')) {
         setActiveTab('jee-advanced');
       }
     }
@@ -41,6 +44,7 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
 
   // Data States
   const [loading, setLoading] = useState<boolean>(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardResult | null>(null);
   const [toppersSummaries, setToppersSummaries] = useState<TopperSummaryItem[]>([]);
   const [overallLeaderboard, setOverallLeaderboard] = useState<OverallLeaderboardEntry[]>([]);
@@ -77,11 +81,16 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
 
   const loadTestLeaderboard = async (testId: string) => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const result = await studentStorage.getTestLeaderboard(testId);
       setLeaderboardData(result);
-    } catch (e) {
+      if (result?.error) {
+        setErrorMsg(result.error);
+      }
+    } catch (e: any) {
       console.error('Failed to load test leaderboard:', e);
+      setErrorMsg(e?.message || 'Unable to load All-India rankings right now.');
     } finally {
       setLoading(false);
     }
@@ -89,11 +98,13 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
 
   const loadOverallLeaderboard = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const result = await studentStorage.getOverallLeaderboard();
       setOverallLeaderboard(result);
-    } catch (e) {
+    } catch (e: any) {
       console.error('Failed to load overall leaderboard:', e);
+      setErrorMsg(e?.message || 'Unable to load overall rankings right now.');
     } finally {
       setLoading(false);
     }
@@ -116,7 +127,7 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
       testId: `jee-mains-ptm-${num}`,
       code: `PTM ${num}`,
       title: `JEE Mains – PTM ${num}`,
-      isLive: allTestConfigs[`jee-mains-ptm-${num}`] === 'live'
+      isLive: ['01', '02', '03'].includes(num) || allTestConfigs[`jee-mains-ptm-${num}`] === 'live'
     };
   });
 
@@ -124,8 +135,15 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
   const currentTestObj = currentTestList.find((t) => t.testId === selectedTestId);
   const selectedTestCode = currentTestObj?.code || selectedTestId.split('-').pop()?.toUpperCase() || 'this paper';
 
+  // Always render top_5 cleanly for students & visitors; admins inspect allEntries when available
+  const visibleRows = isAdmin && leaderboardData?.allEntries && leaderboardData.allEntries.length > 0
+    ? leaderboardData.allEntries
+    : (leaderboardData?.top5 && leaderboardData.top5.length > 0
+      ? leaderboardData.top5
+      : (leaderboardData?.entries || []).slice(0, 5));
+
   // Filter entries by search query
-  const filteredEntries = (leaderboardData?.entries || []).filter((entry) =>
+  const filteredEntries = visibleRows.filter((entry) =>
     entry.displayName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -226,7 +244,7 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
             }`}
           >
             <span>⚡</span>
-            <span>JEE Mains (PTM 01–10)</span>
+            <span>JEE Mains (PTM 01–20)</span>
           </button>
 
           <button
@@ -335,15 +353,37 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
               </div>
             )}
 
+            {/* Error Banner with Retry */}
+            {errorMsg && !loading && (
+              <div className="rounded-2xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/30 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <span className="text-xl shrink-0">⚠️</span>
+                  <div>
+                    <h4 className="text-sm font-extrabold text-rose-800 dark:text-rose-200">
+                      Unable to load live All-India rankings
+                    </h4>
+                    <p className="text-xs text-rose-700 dark:text-rose-300 mt-0.5">{errorMsg}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => loadTestLeaderboard(selectedTestId)}
+                  className="shrink-0 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold shadow-sm transition-colors"
+                >
+                  ↻ Retry
+                </button>
+              </div>
+            )}
+
             {/* Unlocked Leaderboard Content */}
             {!leaderboardData?.locked && (
               <>
-                {/* 1. TOP 3 CROWNED PODIUM SHOWCASE */}
-                {leaderboardData?.entries && leaderboardData.entries.length > 0 && (
+                {/* 1. TOP 5 CROWNED PODIUM SHOWCASE */}
+                {visibleRows.length > 0 && (
                   <div className="space-y-4">
                     <div className="text-center space-y-1">
                       <span className="px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wider uppercase bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300">
-                        Top 3 Performers
+                        Top 5 Performers
                       </span>
                       <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-zinc-50">
                         Crowned Toppers Podium
@@ -353,29 +393,29 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end pt-4 max-w-4xl mx-auto">
                       
                       {/* #2 Runner-Up Podium Card (Silver) */}
-                      {leaderboardData.entries[1] ? (
+                      {visibleRows[1] ? (
                         <Tilt3DCard maxTilt={8} perspective={1000} className="rounded-3xl border-2 border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#121318] p-6 shadow-lg text-center space-y-4 md:order-1 order-2">
                           <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 text-xl font-black flex items-center justify-center mx-auto shadow-sm">
                             🥈 #2
                           </div>
                           <div>
                             <h4 className="text-base font-extrabold text-slate-900 dark:text-zinc-100 line-clamp-1">
-                              {leaderboardData.entries[1].displayName}
+                              {visibleRows[1].displayName}
                             </h4>
                             <p className="text-[11px] font-bold text-slate-500">Runner-Up</p>
                           </div>
                           <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 space-y-1">
                             <div className="text-2xl font-black font-mono text-slate-800 dark:text-zinc-200">
-                              {leaderboardData.entries[1].marks} <span className="text-xs text-slate-400">/ {leaderboardData.entries[1].maxMarks}</span>
+                              {visibleRows[1].marks} <span className="text-xs text-slate-400">/ {visibleRows[1].maxMarks}</span>
                             </div>
                             <div className="flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                              <span>{leaderboardData.entries[1].percentile}%ile</span>
+                              <span>{visibleRows[1].percentile}%ile</span>
                               <span>·</span>
-                              <span>{leaderboardData.entries[1].accuracy}% Acc</span>
+                              <span>{visibleRows[1].accuracy}% Acc</span>
                             </div>
                           </div>
                           <p className="text-[10px] text-slate-400">
-                            Time Taken: {formatSeconds(leaderboardData.entries[1].timeTakenSeconds)}
+                            Time Taken: {formatSeconds(visibleRows[1].timeTakenSeconds)}
                           </p>
                         </Tilt3DCard>
                       ) : (
@@ -383,7 +423,7 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                       )}
 
                       {/* #1 Topper Podium Card (Gold Crown, Elevated) */}
-                      {leaderboardData.entries[0] && (
+                      {visibleRows[0] && (
                         <Tilt3DCard maxTilt={10} perspective={1000} className="rounded-3xl border-2 border-amber-500 bg-gradient-to-b from-amber-500/10 via-white dark:via-[#121318] to-white dark:to-[#121318] p-7 shadow-2xl text-center space-y-4 md:order-2 order-1 md:-translate-y-4 ring-4 ring-amber-500/10">
                           <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-amber-400 to-amber-600 text-white text-3xl font-black flex items-center justify-center mx-auto shadow-lg shadow-amber-500/30 animate-bounce">
                             👑
@@ -393,50 +433,50 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                           </span>
                           <div>
                             <h4 className="text-lg font-black text-slate-900 dark:text-zinc-50 line-clamp-1">
-                              {leaderboardData.entries[0].displayName}
+                              {visibleRows[0].displayName}
                             </h4>
                             <p className="text-xs font-bold text-amber-600 dark:text-amber-400">All-India #1 Scorer</p>
                           </div>
                           <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/80 space-y-1">
                             <div className="text-3xl font-black font-mono text-amber-600 dark:text-amber-400">
-                              {leaderboardData.entries[0].marks} <span className="text-sm text-slate-500 font-semibold">/ {leaderboardData.entries[0].maxMarks}</span>
+                              {visibleRows[0].marks} <span className="text-sm text-slate-500 font-semibold">/ {visibleRows[0].maxMarks}</span>
                             </div>
                             <div className="flex items-center justify-center gap-2 text-xs font-extrabold text-emerald-600 dark:text-emerald-400">
-                              <span>{leaderboardData.entries[0].percentile}%ile</span>
+                              <span>{visibleRows[0].percentile}%ile</span>
                               <span>·</span>
-                              <span>{leaderboardData.entries[0].accuracy}% Acc</span>
+                              <span>{visibleRows[0].accuracy}% Acc</span>
                             </div>
                           </div>
                           <p className="text-[10px] text-slate-500 dark:text-zinc-400">
-                            Pacing: {formatSeconds(leaderboardData.entries[0].timeTakenSeconds)}
+                            Pacing: {formatSeconds(visibleRows[0].timeTakenSeconds)}
                           </p>
                         </Tilt3DCard>
                       )}
 
                       {/* #3 Bronze Podium Card */}
-                      {leaderboardData.entries[2] ? (
+                      {visibleRows[2] ? (
                         <Tilt3DCard maxTilt={8} perspective={1000} className="rounded-3xl border-2 border-amber-700/50 dark:border-amber-700/40 bg-white dark:bg-[#121318] p-6 shadow-lg text-center space-y-4 md:order-3 order-3">
                           <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-xl font-black flex items-center justify-center mx-auto shadow-sm">
                             🥉 #3
                           </div>
                           <div>
                             <h4 className="text-base font-extrabold text-slate-900 dark:text-zinc-100 line-clamp-1">
-                              {leaderboardData.entries[2].displayName}
+                              {visibleRows[2].displayName}
                             </h4>
                             <p className="text-[11px] font-bold text-slate-500">2nd Runner-Up</p>
                           </div>
                           <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800/80 space-y-1">
                             <div className="text-2xl font-black font-mono text-slate-800 dark:text-zinc-200">
-                              {leaderboardData.entries[2].marks} <span className="text-xs text-slate-400">/ {leaderboardData.entries[2].maxMarks}</span>
+                              {visibleRows[2].marks} <span className="text-xs text-slate-400">/ {visibleRows[2].maxMarks}</span>
                             </div>
                             <div className="flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                              <span>{leaderboardData.entries[2].percentile}%ile</span>
+                              <span>{visibleRows[2].percentile}%ile</span>
                               <span>·</span>
-                              <span>{leaderboardData.entries[2].accuracy}% Acc</span>
+                              <span>{visibleRows[2].accuracy}% Acc</span>
                             </div>
                           </div>
                           <p className="text-[10px] text-slate-400">
-                            Time Taken: {formatSeconds(leaderboardData.entries[2].timeTakenSeconds)}
+                            Time Taken: {formatSeconds(visibleRows[2].timeTakenSeconds)}
                           </p>
                         </Tilt3DCard>
                       ) : (
@@ -446,9 +486,9 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                     </div>
 
                     {/* #4 & #5 Honor Cards (Top 5 Leaderboard Showcase) */}
-                    {(leaderboardData.entries[3] || leaderboardData.entries[4]) && (
+                    {(visibleRows[3] || visibleRows[4]) && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto pt-2">
-                        {leaderboardData.entries[3] && (
+                        {visibleRows[3] && (
                           <div className="rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-[#121318] p-4 shadow-sm flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-black text-sm flex items-center justify-center border border-indigo-200 dark:border-indigo-800">
@@ -456,22 +496,22 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                               </div>
                               <div>
                                 <h4 className="text-sm font-extrabold text-slate-900 dark:text-zinc-100 line-clamp-1">
-                                  {leaderboardData.entries[3].displayName}
+                                  {visibleRows[3].displayName}
                                 </h4>
                                 <p className="text-[10px] font-bold text-slate-400">Top 5 Performer</p>
                               </div>
                             </div>
                             <div className="text-right">
                               <div className="text-lg font-black font-mono text-slate-800 dark:text-zinc-200">
-                                {leaderboardData.entries[3].marks} <span className="text-xs text-slate-400 font-normal">/ {leaderboardData.entries[3].maxMarks}</span>
+                                {visibleRows[3].marks} <span className="text-xs text-slate-400 font-normal">/ {visibleRows[3].maxMarks}</span>
                               </div>
                               <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono">
-                                {leaderboardData.entries[3].percentile}%ile · {leaderboardData.entries[3].accuracy}% Acc
+                                {visibleRows[3].percentile}%ile · {visibleRows[3].accuracy}% Acc
                               </div>
                             </div>
                           </div>
                         )}
-                        {leaderboardData.entries[4] && (
+                        {visibleRows[4] && (
                           <div className="rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-white dark:bg-[#121318] p-4 shadow-sm flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-black text-sm flex items-center justify-center border border-indigo-200 dark:border-indigo-800">
@@ -479,17 +519,17 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                               </div>
                               <div>
                                 <h4 className="text-sm font-extrabold text-slate-900 dark:text-zinc-100 line-clamp-1">
-                                  {leaderboardData.entries[4].displayName}
+                                  {visibleRows[4].displayName}
                                 </h4>
                                 <p className="text-[10px] font-bold text-slate-400">Top 5 Performer</p>
                               </div>
                             </div>
                             <div className="text-right">
                               <div className="text-lg font-black font-mono text-slate-800 dark:text-zinc-200">
-                                {leaderboardData.entries[4].marks} <span className="text-xs text-slate-400 font-normal">/ {leaderboardData.entries[4].maxMarks}</span>
+                                {visibleRows[4].marks} <span className="text-xs text-slate-400 font-normal">/ {visibleRows[4].maxMarks}</span>
                               </div>
                               <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono">
-                                {leaderboardData.entries[4].percentile}%ile · {leaderboardData.entries[4].accuracy}% Acc
+                                {visibleRows[4].percentile}%ile · {visibleRows[4].accuracy}% Acc
                               </div>
                             </div>
                           </div>
@@ -571,12 +611,13 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                       <button
                         type="button"
                         onClick={() => {
+                          const paperSlug = selectedTestId.replace(/^jee-(?:mains|advanced)-/, '');
                           if (!isAuthenticated) {
-                            openAuthModal('login', `#/test/${activeTab}/${selectedTestId.split('-').pop()}`);
+                            openAuthModal('login', `#/test/${activeTab}/${paperSlug}`);
                           } else if (onSelectTest) {
                             onSelectTest(selectedTestId);
                           } else {
-                            window.location.hash = `#/test/${activeTab}/${selectedTestId.split('-').pop()}`;
+                            window.location.hash = `#/test/${activeTab}/${paperSlug}`;
                           }
                         }}
                         className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all hover:scale-105"
@@ -628,6 +669,24 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                               <p>Loading All-India rankings...</p>
                             </td>
                           </tr>
+                        ) : errorMsg && filteredEntries.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} className="p-12 text-center">
+                              <div className="max-w-md mx-auto space-y-3">
+                                <span className="text-3xl block">⚠️</span>
+                                <h4 className="text-sm font-extrabold text-rose-700 dark:text-rose-300">
+                                  {errorMsg}
+                                </h4>
+                                <button
+                                  type="button"
+                                  onClick={() => loadTestLeaderboard(selectedTestId)}
+                                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-sm transition-colors"
+                                >
+                                  ↻ Retry Loading Rankings
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
                         ) : filteredEntries.length === 0 ? (
                           <tr>
                             <td colSpan={6} className="p-12 text-center">
@@ -642,12 +701,13 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => {
+                                    const paperSlug = selectedTestId.replace(/^jee-(?:mains|advanced)-/, '');
                                     if (!isAuthenticated) {
-                                      openAuthModal('login', `#/test/${activeTab}/${selectedTestId.split('-').pop()}`);
+                                      openAuthModal('login', `#/test/${activeTab}/${paperSlug}`);
                                     } else if (onSelectTest) {
                                       onSelectTest(selectedTestId);
                                     } else {
-                                      window.location.hash = `#/test/${activeTab}/${selectedTestId.split('-').pop()}`;
+                                      window.location.hash = `#/test/${activeTab}/${paperSlug}`;
                                     }
                                   }}
                                   className="mt-2 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-md shadow-indigo-600/25 transition-all hover:scale-105"
@@ -775,6 +835,22 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
                         <td colSpan={6} className="p-12 text-center text-slate-400">
                           <div className="inline-block animate-spin text-2xl pb-2">↻</div>
                           <p>Aggregating portal champions...</p>
+                        </td>
+                      </tr>
+                    ) : errorMsg && filteredOverall.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="p-12 text-center">
+                          <div className="max-w-md mx-auto space-y-3">
+                            <span className="text-3xl block">⚠️</span>
+                            <p className="text-sm font-extrabold text-rose-700 dark:text-rose-300">{errorMsg}</p>
+                            <button
+                              type="button"
+                              onClick={loadOverallLeaderboard}
+                              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-sm transition-colors"
+                            >
+                              ↻ Retry Overall Rankings
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ) : filteredOverall.length === 0 ? (

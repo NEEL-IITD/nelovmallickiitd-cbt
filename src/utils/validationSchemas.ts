@@ -139,6 +139,20 @@ export function sanitizeHashRedirect(rawHash: string | undefined | null): string
   }
   return raw;
 }
+
+export function canonicalizeLeaderboardTestId(rawId: string | undefined | null): string {
+  const s = String(rawId || '').trim().toLowerCase();
+  if (!s) return 'jee-advanced-pta-04';
+  const mPtm = s.match(/^(?:jee-mains-)?ptm[-_\s]?0*(\d+)$/i) || s.match(/ptm[-_\s]?0*(\d+)/i);
+  if (mPtm) {
+    return `jee-mains-ptm-${String(parseInt(mPtm[1], 10)).padStart(2, '0')}`;
+  }
+  const mPta = s.match(/^(?:jee-advanced-)?pta[-_\s]?0*(\d+)$/i) || s.match(/pta[-_\s]?0*(\d+)/i);
+  if (mPta) {
+    return `jee-advanced-pta-${String(parseInt(mPta[1], 10)).padStart(2, '0')}`;
+  }
+  return s;
+}
 export const vaultQuestionSchema = z.object({
   id: z.union([z.string().min(1).max(64), z.number()]),
   type: z.enum(['single_correct', 'multi_correct', 'numerical', 'subjective', 'conceptual_flashcard']),

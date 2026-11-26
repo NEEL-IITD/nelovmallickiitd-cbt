@@ -61,6 +61,7 @@ export interface LeaderboardResult {
   highestMarks: number;
   topper: LeaderboardEntry | null;
   top5?: LeaderboardEntry[];
+  allEntries?: LeaderboardEntry[];
   myStanding: LeaderboardEntry | null;
   entries: LeaderboardEntry[];
   myAttemptSubmitted?: boolean;

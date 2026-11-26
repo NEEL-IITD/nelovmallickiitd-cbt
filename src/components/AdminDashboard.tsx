@@ -195,7 +195,7 @@ export const AdminDashboard: React.FC = () => {
       starts_at: null,
       ends_at: null,
       window_label: null,
-      lock_leaderboard_until_end: true,
+      lock_leaderboard_until_end: false,
       allow_practice_after_end: true
     });
     if (ok) {
@@ -214,13 +214,16 @@ export const AdminDashboard: React.FC = () => {
   };
 
   const handleExportLeaderboardCSV = () => {
-    if (!adminLeaderboardData?.entries || adminLeaderboardData.entries.length === 0) {
+    const exportRows = (adminLeaderboardData?.allEntries && adminLeaderboardData.allEntries.length > 0
+      ? adminLeaderboardData.allEntries
+      : adminLeaderboardData?.entries) || [];
+    if (exportRows.length === 0) {
       alert('No leaderboard entries available to export for this test.');
       return;
     }
 
     const headers = ['Rank', 'Student Name', 'Marks Scored', 'Max Marks', 'Percentage', 'Percentile', 'Accuracy', 'Time Taken (Seconds)', 'Attempted in Live Window', 'Submitted At'];
-    const rows = adminLeaderboardData.entries.map((e) => [
+    const rows = exportRows.map((e) => [
       e.rank,
       `"${e.displayName.replace(/"/g, '""')}"`,
       e.marks,
@@ -1184,7 +1187,7 @@ export const AdminDashboard: React.FC = () => {
                                 startsAt: d?.startsAt ? new Date(d.startsAt).toISOString().substring(0, 16) : '',
                                 endsAt: d?.endsAt ? new Date(d.endsAt).toISOString().substring(0, 16) : '',
                                 windowLabel: d?.windowLabel || 'Sunday All-India Live Mock',
-                                lockLeaderboard: d?.lockLeaderboardUntilEnd ?? true,
+                                lockLeaderboard: d?.lockLeaderboardUntilEnd ?? false,
                                 allowPractice: d?.allowPracticeAfterEnd ?? true
                               });
                             }}
@@ -1275,7 +1278,7 @@ export const AdminDashboard: React.FC = () => {
                                 startsAt: d?.startsAt ? new Date(d.startsAt).toISOString().substring(0, 16) : '',
                                 endsAt: d?.endsAt ? new Date(d.endsAt).toISOString().substring(0, 16) : '',
                                 windowLabel: d?.windowLabel || 'Sunday All-India Live Mock',
-                                lockLeaderboard: d?.lockLeaderboardUntilEnd ?? true,
+                                lockLeaderboard: d?.lockLeaderboardUntilEnd ?? false,
                                 allowPractice: d?.allowPracticeAfterEnd ?? true
                               });
                             }}
@@ -1358,9 +1361,9 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
               {/* Top 5 Performers Showcase in Admin */}
-              {adminLeaderboardData?.entries && adminLeaderboardData.entries.length > 0 && (
+              {((adminLeaderboardData?.allEntries?.length ? adminLeaderboardData.allEntries : adminLeaderboardData?.entries) || []).length > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-1">
-                  {adminLeaderboardData.entries.slice(0, 5).map((entry, idx) => (
+                  {((adminLeaderboardData?.allEntries?.length ? adminLeaderboardData.allEntries : adminLeaderboardData?.entries) || []).slice(0, 5).map((entry, idx) => (
                     <div
                       key={entry.rank}
                       className={`p-3.5 rounded-2xl border ${
@@ -1413,12 +1416,12 @@ export const AdminDashboard: React.FC = () => {
                       <tr>
                         <td colSpan={7} className="p-8 text-center text-slate-400">Loading rankings...</td>
                       </tr>
-                    ) : (adminLeaderboardData?.entries || []).length === 0 ? (
+                    ) : ((adminLeaderboardData?.allEntries?.length ? adminLeaderboardData.allEntries : adminLeaderboardData?.entries) || []).length === 0 ? (
                       <tr>
                         <td colSpan={7} className="p-8 text-center text-slate-400 italic">No attempt entries recorded for this paper yet.</td>
                       </tr>
                     ) : (
-                      (adminLeaderboardData?.entries || []).map((row) => (
+                      ((adminLeaderboardData?.allEntries?.length ? adminLeaderboardData.allEntries : adminLeaderboardData?.entries) || []).map((row) => (
                         <tr key={row.rank + row.displayName} className="hover:bg-slate-50 dark:hover:bg-zinc-900/40">
                           <td className="p-3 font-mono font-bold">
                             {row.rank === 1 ? (
