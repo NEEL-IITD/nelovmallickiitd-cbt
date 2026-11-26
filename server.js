@@ -37,13 +37,14 @@ const BLOCKED_PATH_PATTERNS = [
   /^\/node_modules(?:\/|$)/i,
   /^\/src(?:\/|$)/i,
   /^\/scratch(?:\/|$)/i,
+  /^\/backups(?:\/|$)/i,
   /^\/server\.js$/i,
   /^\/package(?:-lock)?\.json$/i,
   /^\/tsconfig\.json$/i,
   /^\/vite\.config\.ts$/i,
   /^\/SUPABASE_SETUP\.md$/i,
   /^\/README\.md$/i,
-  /\.(?:sql|py|mjs|cjs|ts|tsx|map)$/i,
+  /\.(?:sql|py|mjs|cjs|ts|tsx|map|gz)$/i,
 ];
 
 const MIME_TYPES = {

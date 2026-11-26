@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "serve": "node server.js",
+    "backup": "node scripts/backup-supabase.mjs",
     "sync": "node scripts/deploy-all.mjs",
     "sync:watch": "node scripts/auto-sync.mjs",
     "sync:lectures": "node scripts/sync-youtube-lectures.mjs"

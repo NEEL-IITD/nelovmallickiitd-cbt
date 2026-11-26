@@ -46,6 +46,9 @@ Thumbs.db
 browser_evidence/
 scratch/
 
+# Local database backups (contains student PII - NEVER commit)
+backups/
+
 .vercel
 .env*
 
