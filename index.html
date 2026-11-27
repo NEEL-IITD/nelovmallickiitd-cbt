@@ -2460,6 +2460,8 @@ function PhysicsCbtTestShellModal({
   const [scoreSummary, setScoreSummary] = useState(null);
   const [showVirtualKeypad, setShowVirtualKeypad] = useState(false);
   const [revealedSolutions, setRevealedSolutions] = useState({});
+  const hasSubmittedRef = useRef(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Timer
   useEffect(() => {
@@ -2560,6 +2562,9 @@ function PhysicsCbtTestShellModal({
 
   // Scoring Engine
   const handleSubmitTest = () => {
+    if (hasSubmittedRef.current || testSubmitted) return;
+    hasSubmittedRef.current = true;
+    setIsSubmitting(true);
     setShowSubmitModal(false);
     const timeTaken = defaultDuration - timeLeft;
     let totalScore = 0;
@@ -2694,6 +2699,7 @@ function PhysicsCbtTestShellModal({
 
     setScoreSummary(summaryData);
     setTestSubmitted(true);
+    setIsSubmitting(false);
 
     // Save attempt to vaultStorage and studentStorage
     if (window.vaultStorage?.saveExerciseAttempt) {
@@ -2717,6 +2723,8 @@ function PhysicsCbtTestShellModal({
   };
 
   const handleRetake = () => {
+    hasSubmittedRef.current = false;
+    setIsSubmitting(false);
     setResponses({});
     setMarkedForReview([]);
     setVisitedQuestions([1]);
@@ -3499,10 +3507,11 @@ function PhysicsCbtTestShellModal({
               </button>
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={handleSubmitTest}
-                className="flex-1 py-2.5 rounded-xl text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition-colors"
+                className="flex-1 py-2.5 rounded-xl text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 shadow-md transition-colors"
               >
-                Confirm & Submit
+                {isSubmitting ? 'Submitting...' : 'Confirm & Submit'}
               </button>
             </div>
           </div>
@@ -11054,6 +11063,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       // Core Data States
       const [students, setStudents] = useState([]);
       const [allAttempts, setAllAttempts] = useState([]);
+      const [submissionStats, setSubmissionStats] = useState(null);
+      const [lastSyncedAt, setLastSyncedAt] = useState(null);
       const [allBookmarks, setAllBookmarks] = useState([]);
       const [allLectures, setAllLectures] = useState([]);
       const [reports, setReports] = useState([]);
@@ -11121,7 +11132,21 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           if (window.studentStorage?.getAllAttempts) {
             atts = await window.studentStorage.getAllAttempts();
             setAllAttempts(atts || []);
+            if (window.studentStorage?._lastAttemptsError) {
+              setSupabaseError(window.studentStorage._lastAttemptsError.message || 'Supabase test_attempts query error');
+            }
           }
+
+          if (window.studentStorage?.getAdminSubmissionStats) {
+            try {
+              const stats = await window.studentStorage.getAdminSubmissionStats(atts || []);
+              setSubmissionStats(stats);
+              if (stats?.error) {
+                setSupabaseError(prev => prev || stats.error);
+              }
+            } catch (statsErr) {}
+          }
+          setLastSyncedAt(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
 
           let bks = [];
           if (window.studentStorage?.getAllBookmarks) {
@@ -11445,15 +11470,86 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         setTimeout(() => setSavedNoteId(null), 2000);
       };
 
-      // KPI Calculations
+      // KPI Calculations (Completed student submissions + unique students + mock/chapter breakdown)
       const totalStudentsCount = students.length;
       const gmailCount = students.filter(s => s.auth_method === 'google' || s.auth_method === 'gmail' || (s.email && s.email.includes('@gmail.com'))).length;
       const phoneCount = students.filter(s => s.auth_method === 'phone' || (s.contact_number && !s.email)).length;
       const emailWithPhoneCount = students.filter(s => s.auth_method === 'email_with_phone').length;
 
-      const totalAttemptsCount = allAttempts.length;
-      const ptmAttemptsCount = allAttempts.filter(a => (a.testCode && a.testCode.startsWith('PTM')) || (a.testId && a.testId.includes('ptm'))).length;
-      const ptaAttemptsCount = allAttempts.filter(a => (a.testCode && a.testCode.startsWith('PTA')) || (a.testId && a.testId.includes('pta'))).length;
+      const studentCompletedAttempts = allAttempts.filter(a => !a.isAdminAttempt && a.status !== 'in_progress');
+      const totalAttemptsCount = submissionStats ? submissionStats.completedTotal : studentCompletedAttempts.length;
+      const uniqueStudentsSubmitting = submissionStats
+        ? submissionStats.uniqueStudentsTotal
+        : new Set(studentCompletedAttempts.map(a => a.userId || a.user_id || a.id)).size;
+      const mockSubmissionsCount = submissionStats
+        ? submissionStats.mockCompletedCount
+        : studentCompletedAttempts.filter(a => (a.testType || 'mock') === 'mock').length;
+      const chapterSubmissionsCount = submissionStats
+        ? submissionStats.chapterCompletedCount
+        : studentCompletedAttempts.filter(a => a.testType === 'chapter_exercise').length;
+      const inProgressDraftsCount = submissionStats ? submissionStats.inProgressCount : 0;
+      const adminPreviewAttemptsCount = submissionStats ? submissionStats.adminPreviewCount : allAttempts.filter(a => a.isAdminAttempt).length;
+
+      const ptmAttemptsCount = studentCompletedAttempts.filter(a => (a.testCode && a.testCode.startsWith('PTM')) || (a.testId && a.testId.includes('ptm'))).length;
+      const ptaAttemptsCount = studentCompletedAttempts.filter(a => (a.testCode && a.testCode.startsWith('PTA')) || (a.testId && a.testId.includes('pta'))).length;
+
+      const perTestBreakdownMap = useMemo(() => {
+        const map = {};
+        if (submissionStats && Array.isArray(submissionStats.byTest) && submissionStats.byTest.length > 0) {
+          submissionStats.byTest.forEach(b => {
+            map[b.testId] = {
+              code: b.code,
+              testType: b.testType,
+              completedCount: b.completedCount,
+              uniqueStudents: b.uniqueStudents
+            };
+          });
+          return map;
+        }
+        const uniqueSets = {};
+        studentCompletedAttempts.forEach(a => {
+          const canon = window.studentStorage?._canonicalizeTestKey
+            ? window.studentStorage._canonicalizeTestKey(a.testId, a.testCode || a.code)
+            : { testId: String(a.testId || a.testCode || 'unknown').toLowerCase(), code: a.testCode || a.code || 'Test', testType: a.testType || 'mock' };
+          const tType = a.testType || canon.testType;
+          if (!map[canon.testId]) {
+            map[canon.testId] = { code: canon.code, testType: tType, completedCount: 0, uniqueStudents: 0 };
+            uniqueSets[canon.testId] = new Set();
+          }
+          map[canon.testId].completedCount += 1;
+          const uid = a.userId || a.user_id || a.id;
+          if (uid) uniqueSets[canon.testId].add(uid);
+          map[canon.testId].uniqueStudents = uniqueSets[canon.testId].size;
+        });
+        return map;
+      }, [submissionStats, allAttempts]);
+
+      const seriesBreakdownRows = useMemo(() => {
+        const baseTests = [
+          { testId: 'jee-mains-ptm-01', code: 'PTM 01', testType: 'mock' },
+          { testId: 'jee-mains-ptm-02', code: 'PTM 02', testType: 'mock' },
+          { testId: 'jee-mains-ptm-03', code: 'PTM 03', testType: 'mock' },
+          { testId: 'jee-mains-ptm-04', code: 'PTM 04', testType: 'mock' },
+          { testId: 'jee-advanced-pta-04', code: 'PTA 04', testType: 'mock' },
+          { testId: 'jee-advanced-pta-05', code: 'PTA 05', testType: 'mock' },
+          { testId: 'jee-advanced-pta-06', code: 'PTA 06', testType: 'mock' },
+          { testId: 'jee-advanced-pta-01', code: 'PTA 01', testType: 'mock' },
+          { testId: 'jee-advanced-pta-02', code: 'PTA 02', testType: 'mock' },
+          { testId: 'jee-advanced-pta-03', code: 'PTA 03', testType: 'mock' }
+        ];
+        const seen = new Set(baseTests.map(b => b.testId));
+        const extras = Object.entries(perTestBreakdownMap)
+          .filter(([tid, val]) => !seen.has(tid) && (val.completedCount > 0 || val.testType === 'chapter_exercise'))
+          .map(([tid, val]) => ({ testId: tid, code: val.code, testType: val.testType }));
+        return [...baseTests, ...extras].map(item => {
+          const hit = perTestBreakdownMap[item.testId];
+          return {
+            ...item,
+            completedCount: hit ? hit.completedCount : 0,
+            uniqueStudents: hit ? hit.uniqueStudents : 0
+          };
+        });
+      }, [perTestBreakdownMap]);
 
       const totalLecturesCount = allLectures.filter(l => l.completed).length;
       const totalBookmarksCount = allBookmarks.length;
@@ -11528,8 +11624,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         return 0;
       });
 
-      // Filtered Attempts
-      const filteredAttempts = allAttempts.filter(att => {
+      // Filtered Attempts (strictly completed student submissions)
+      const filteredAttempts = studentCompletedAttempts.filter(att => {
         if (attemptSearch) {
           const q = attemptSearch.toLowerCase();
           const matchUser = (att.userName || att.name || '').toLowerCase().includes(q);
@@ -11538,8 +11634,12 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         }
         if (attemptExamFilter !== 'All') {
           const isMains = (att.testCode && att.testCode.startsWith('PTM')) || (att.testId && att.testId.includes('mains'));
-          if (attemptExamFilter === 'JEE Mains' && !isMains) return false;
-          if (attemptExamFilter === 'JEE Advanced' && isMains) return false;
+          if (attemptExamFilter === 'Chapter Exercise') {
+            if (att.testType !== 'chapter_exercise') return false;
+          } else {
+            if (attemptExamFilter === 'JEE Mains' && !isMains) return false;
+            if (attemptExamFilter === 'JEE Advanced' && isMains) return false;
+          }
         }
         if (attemptCodeFilter !== 'All') {
           if (att.testCode !== attemptCodeFilter && att.testId !== attemptCodeFilter) return false;
@@ -11645,8 +11745,18 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   {students.length} Student Profiles
                 </span>
                 <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                  {allAttempts.length} Total Attempts
+                  {totalAttemptsCount} Completed Submissions · {uniqueStudentsSubmitting} Unique
                 </span>
+                {inProgressDraftsCount > 0 && (
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                    {inProgressDraftsCount} In-Progress Excluded
+                  </span>
+                )}
+                {lastSyncedAt && (
+                  <span className="text-[11px] font-mono text-slate-400">
+                    Synced {lastSyncedAt}
+                  </span>
+                )}
                 {supabaseError && (
                   <span className="text-xs text-rose-600 dark:text-rose-400 font-medium">
                     ⚠️ {supabaseError}
@@ -11666,7 +11776,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 disabled={loading}
                 className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-2 whitespace-nowrap"
               >
-                <span>🔄</span> Force Refresh From Supabase
+                <span className={loading ? 'animate-spin' : ''}>🔄</span>
+                <span>{loading ? 'Refreshing...' : 'Refresh Live Counts'}</span>
               </button>
             </div>
 
@@ -11683,13 +11794,20 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       Gmail: {gmailCount} · Phone: {phoneCount}
                     </p>
                   </div>
-                  <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-5 shadow-sm space-y-2">
+                  <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-5 shadow-sm space-y-1.5">
                     <span className="text-2xl">📝</span>
                     <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Test Submissions</p>
                     <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-zinc-50">{totalAttemptsCount}</h3>
-                    <p className="text-[10px] text-indigo-600 font-semibold truncate">
-                      PTM: {ptmAttemptsCount} · PTA: {ptaAttemptsCount}
+                    <p className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold truncate">
+                      {uniqueStudentsSubmitting} Unique · Mocks: {mockSubmissionsCount} · Ch: {chapterSubmissionsCount}
                     </p>
+                    {(inProgressDraftsCount > 0 || adminPreviewAttemptsCount > 0) && (
+                      <p className="text-[9px] text-amber-600 dark:text-amber-400 truncate">
+                        {inProgressDraftsCount > 0 ? `${inProgressDraftsCount} draft` : ''}
+                        {inProgressDraftsCount > 0 && adminPreviewAttemptsCount > 0 ? ' · ' : ''}
+                        {adminPreviewAttemptsCount > 0 ? `${adminPreviewAttemptsCount} admin` : ''} excluded
+                      </p>
+                    )}
                   </div>
                   <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-5 shadow-sm space-y-2">
                     <span className="text-2xl">▶</span>
@@ -11706,8 +11824,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-5 shadow-sm space-y-2">
                     <span className="text-2xl">🟢</span>
                     <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Live Active Tests</p>
-                    <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-zinc-50">{liveTestsCount} <span className="text-xs font-normal text-slate-400">/ 20</span></h3>
-                    <p className="text-[10px] text-emerald-600 font-semibold">PTA 04, 05, 06 Ready</p>
+                    <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-zinc-50">{liveTestsCount} <span className="text-xs font-normal text-slate-400">/ 30</span></h3>
+                    <p className="text-[10px] text-emerald-600 font-semibold">PTM 01–03 &amp; PTA 04–06 Ready</p>
                   </div>
                   <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-5 shadow-sm space-y-2">
                     <span className="text-2xl">🚩</span>
@@ -11720,31 +11838,38 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 {/* Submissions Bar Chart & Recent Feed */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2 rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 shadow-sm space-y-4">
-                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-zinc-800 pb-3">
                       <h3 className="text-base font-extrabold text-slate-900 dark:text-zinc-50 flex items-center gap-2">
-                        <span>📈</span> Test Submissions Across Series (PTA 01–10 & PTM 01–10)
+                        <span>📈</span> Completed Submissions Breakdown (PTM 01–04, PTA &amp; Chapter Exercises)
                       </h3>
                       <span className="text-xs font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-950 px-2.5 py-1 rounded-full">
-                        {totalAttemptsCount} Total Attempts
+                        {totalAttemptsCount} Completed ({uniqueStudentsSubmitting} Students)
                       </span>
                     </div>
 
                     <div className="w-full overflow-x-auto py-2">
-                      <div className="min-w-[580px] h-48 flex items-end gap-3 pt-6 border-b border-slate-200 dark:border-zinc-800">
-                        {['PTA 04', 'PTA 05', 'PTA 06', 'PTA 01', 'PTA 02', 'PTA 03', 'PTM 01', 'PTM 02', 'PTM 03', 'PTM 04'].map((code) => {
-                          const count = allAttempts.filter(a => (a.testCode === code) || (a.testId && a.testId.includes(code.toLowerCase().replace(' ', '')))).length;
-                          const heightPct = Math.max(10, (count / (Math.max(1, totalAttemptsCount) || 1)) * 100);
-                          const isReady = (code === 'PTA 04' || code === 'PTA 05' || code === 'PTA 06');
+                      <div className="min-w-[640px] h-52 flex items-end gap-3 pt-6 border-b border-slate-200 dark:border-zinc-800">
+                        {seriesBreakdownRows.map((row) => {
+                          const maxRowCount = Math.max(...seriesBreakdownRows.map(r => r.completedCount), 1);
+                          const count = row.completedCount;
+                          const heightPct = Math.max(count > 0 ? 14 : 6, (count / maxRowCount) * 100);
+                          const isChapter = row.testType === 'chapter_exercise';
+                          const isReady = isChapter || ['PTM 01', 'PTM 02', 'PTM 03', 'PTA 04', 'PTA 05', 'PTA 06'].includes(row.code);
                           return (
-                            <div key={code} className="flex-1 flex flex-col items-center gap-2">
+                            <div key={row.testId} className="flex-1 min-w-[54px] flex flex-col items-center gap-1.5" title={`${row.code}: ${count} completed submissions · ${row.uniqueStudents} unique students`}>
                               <span className="text-[11px] font-mono font-bold text-indigo-600 dark:text-indigo-400">{count}</span>
                               <div
                                 style={{ height: `${heightPct}%` }}
                                 className={`w-full max-w-[34px] rounded-t-xl transition-all shadow-sm ${
-                                  isReady ? 'bg-gradient-to-t from-indigo-600 to-violet-500' : 'bg-slate-300 dark:bg-zinc-700'
+                                  isChapter
+                                    ? 'bg-gradient-to-t from-emerald-600 to-teal-400'
+                                    : isReady
+                                    ? 'bg-gradient-to-t from-indigo-600 to-violet-500'
+                                    : 'bg-slate-300 dark:bg-zinc-700'
                                 }`}
                               />
-                              <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-400">{code}</span>
+                              <span className="text-[10px] font-bold text-slate-600 dark:text-zinc-300 text-center leading-tight line-clamp-2">{row.code}</span>
+                              <span className="text-[9px] text-slate-400 font-mono">{row.uniqueStudents} uniq</span>
                             </div>
                           );
                         })}
@@ -11758,10 +11883,10 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       <span>⚡</span> Live Activity Feed
                     </h3>
                     <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
-                      {allAttempts.length === 0 && students.length === 0 ? (
+                      {studentCompletedAttempts.length === 0 && students.length === 0 ? (
                         <div className="text-center py-8 text-xs text-slate-400">No activity logged yet.</div>
                       ) : (
-                        allAttempts.slice(0, 5).map((att, i) => (
+                        studentCompletedAttempts.slice(0, 5).map((att, i) => (
                           <div key={i} className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/60 dark:border-zinc-800/60 text-xs space-y-1">
                             <div className="flex justify-between items-center font-bold">
                               <span className="text-indigo-600 dark:text-indigo-400">{att.testCode || att.testId} Submitted</span>
@@ -12338,14 +12463,14 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       className="px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs font-bold text-slate-700 dark:text-zinc-300"
                     >
                       <option value="All">All Tests</option>
-                      {Array.from(new Set(allAttempts.map(a => a.testCode || a.code || a.testId))).filter(Boolean).map(c => (
+                      {Array.from(new Set(studentCompletedAttempts.map(a => a.testCode || a.code || a.testId))).filter(Boolean).map(c => (
                         <option key={c} value={c}>{c}</option>
                       ))}
                     </select>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    {['All', 'JEE Mains', 'JEE Advanced'].map((ex) => (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {['All', 'JEE Mains', 'JEE Advanced', 'Chapter Exercise'].map((ex) => (
                       <button
                         key={ex}
                         onClick={() => setAttemptExamFilter(ex)}

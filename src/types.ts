@@ -293,3 +293,27 @@ export interface VaultValidationResult {
   data: VaultExercise | null;
 }
 
+export interface AdminTestSubmissionBreakdown {
+  testId: string;
+  code: string;
+  testType: 'mock' | 'chapter_exercise';
+  completedCount: number;
+  uniqueStudents: number;
+  inProgressCount: number;
+  adminPreviewCount: number;
+  lastSubmittedAt: string | null;
+}
+
+export interface AdminSubmissionStats {
+  completedTotal: number;
+  uniqueStudentsTotal: number;
+  completedIncludingAdmin: number;
+  adminPreviewCount: number;
+  inProgressCount: number;
+  mockCompletedCount: number;
+  chapterCompletedCount: number;
+  byTest: AdminTestSubmissionBreakdown[];
+  fromRpc: boolean;
+  error?: string | null;
+}
+

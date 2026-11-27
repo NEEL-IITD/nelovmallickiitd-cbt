@@ -7,7 +7,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { studentStorage } from '../utils/studentStorage';
-import { ErrorReportItem, ErrorReportStatus, LeaderboardResult, TestConfigItem } from '../types';
+import { ErrorReportItem, ErrorReportStatus, LeaderboardResult, TestConfigItem, AdminSubmissionStats } from '../types';
+import { canonicalizeAttemptTest } from '../utils/validationSchemas';
 import { VaultContentManager } from './vault/VaultContentManager';
 import { ExerciseTestShellModal } from './physics/ExerciseTestShellModal';
 import { formatISTWindow } from '../hooks/useCountdown';
@@ -20,6 +21,8 @@ export const AdminDashboard: React.FC = () => {
   // Core Data States
   const [students, setStudents] = useState<any[]>([]);
   const [allAttempts, setAllAttempts] = useState<any[]>([]);
+  const [submissionStats, setSubmissionStats] = useState<AdminSubmissionStats | null>(null);
+  const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const [allBookmarks, setAllBookmarks] = useState<any[]>([]);
   const [allLectures, setAllLectures] = useState<any[]>([]);
   const [reports, setReports] = useState<ErrorReportItem[]>([]);
@@ -56,7 +59,7 @@ export const AdminDashboard: React.FC = () => {
 
   // Attempts Tab Filters
   const [attemptSearch, setAttemptSearch] = useState('');
-  const [attemptExamFilter, setAttemptExamFilter] = useState<'All' | 'JEE Mains' | 'JEE Advanced'>('All');
+  const [attemptExamFilter, setAttemptExamFilter] = useState<'All' | 'JEE Mains' | 'JEE Advanced' | 'Chapter Exercise'>('All');
   const [attemptCodeFilter, setAttemptCodeFilter] = useState<string>('All');
 
   // Error Reports Tab States
@@ -91,22 +94,34 @@ export const AdminDashboard: React.FC = () => {
         studentStorage.getTestConfigs()
       ]);
 
+      const attemptsErr = (studentStorage as any)._lastAttemptsError;
       if (profilesResult.error) {
         console.warn('Supabase profiles fetch notice:', profilesResult.error);
         setSupabaseError(profilesResult.error.message || 'Supabase profiles query returned an error or was restricted by RLS.');
+      } else if (attemptsErr) {
+        setSupabaseError(attemptsErr.message || 'Supabase test_attempts query was restricted or failed.');
       }
 
+      const resolvedAttempts = attemptsData || [];
       setStudents(profilesResult.data || []);
-      setAllAttempts(attemptsData || []);
+      setAllAttempts(resolvedAttempts);
       setAllBookmarks(bookmarksData || []);
       setAllLectures(lecturesData || []);
       setReports(reportsData || []);
       setTestConfigs(configsData || {});
 
-      const detailed = await studentStorage.getTestConfigsDetails();
+      const [detailed, stats] = await Promise.all([
+        studentStorage.getTestConfigsDetails(),
+        studentStorage.getAdminSubmissionStats(resolvedAttempts)
+      ]);
       const map: Record<string, TestConfigItem> = {};
       detailed.forEach(d => { map[d.testId] = d; });
       setDetailedConfigs(map);
+      setSubmissionStats(stats);
+      if (stats.error && !profilesResult.error && !attemptsErr) {
+        setSupabaseError(stats.error);
+      }
+      setLastSyncedAt(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
     } catch (e: any) {
       console.warn('Error loading admin portal data:', e);
       setSupabaseError(e?.message || 'Unexpected error loading data from cloud.');
@@ -384,11 +399,76 @@ export const AdminDashboard: React.FC = () => {
     (s) => s.auth_method === 'email_with_phone'
   ).length;
 
-  const totalAttemptsCount = allAttempts.length;
-  const totalLecturesCompleted = allLectures.filter((l) => l.completed).length;
-  const totalBookmarksCount = allBookmarks.length;
+  const studentCompletedAttempts = allAttempts.filter((a) => !a.isAdminAttempt && a.status !== 'in_progress');
+  const totalAttemptsCount = submissionStats ? submissionStats.completedTotal : studentCompletedAttempts.length;
+  const uniqueStudentsSubmitting = submissionStats
+    ? submissionStats.uniqueStudentsTotal
+    : new Set(studentCompletedAttempts.map((a) => a.userId || a.user_id || a.id)).size;
+  const mockCompletedCount = submissionStats
+    ? submissionStats.mockCompletedCount
+    : studentCompletedAttempts.filter((a) => (a.testType || 'mock') === 'mock').length;
+  const chapterCompletedCount = submissionStats
+    ? submissionStats.chapterCompletedCount
+    : studentCompletedAttempts.filter((a) => a.testType === 'chapter_exercise').length;
+  const inProgressCount = submissionStats ? submissionStats.inProgressCount : 0;
+  const adminPreviewCount = submissionStats ? submissionStats.adminPreviewCount : allAttempts.filter((a) => a.isAdminAttempt).length;
   const liveTestsCount = Object.values(testConfigs).filter((s) => s === 'live').length;
   const openReportsCount = reports.filter((r) => r.status === 'open').length;
+  const totalLecturesCompleted = allLectures.filter((l) => l.completed).length;
+  const totalBookmarksCount = allBookmarks.length;
+
+  const perTestBreakdownMap = React.useMemo(() => {
+    const map: Record<string, { code: string; testType: 'mock' | 'chapter_exercise'; completedCount: number; uniqueStudents: number }> = {};
+    if (submissionStats && Array.isArray(submissionStats.byTest) && submissionStats.byTest.length > 0) {
+      submissionStats.byTest.forEach((b) => {
+        map[b.testId] = {
+          code: b.code,
+          testType: b.testType,
+          completedCount: b.completedCount,
+          uniqueStudents: b.uniqueStudents
+        };
+      });
+      return map;
+    }
+    const uniqueSets: Record<string, Set<string>> = {};
+    studentCompletedAttempts.forEach((a) => {
+      const canon = canonicalizeAttemptTest(a.testId, a.testCode || a.code, a.examType);
+      const tType = a.testType || canon.testType;
+      if (!map[canon.testId]) {
+        map[canon.testId] = { code: canon.code, testType: tType, completedCount: 0, uniqueStudents: 0 };
+        uniqueSets[canon.testId] = new Set();
+      }
+      map[canon.testId].completedCount += 1;
+      const uid = a.userId || a.user_id || a.id;
+      if (uid) uniqueSets[canon.testId].add(uid);
+      map[canon.testId].uniqueStudents = uniqueSets[canon.testId].size;
+    });
+    return map;
+  }, [submissionStats, allAttempts]);
+
+  const seriesBreakdownRows = React.useMemo(() => {
+    const baseCodes = [
+      { testId: 'jee-mains-ptm-01', code: 'PTM 01', testType: 'mock' as const },
+      { testId: 'jee-mains-ptm-02', code: 'PTM 02', testType: 'mock' as const },
+      { testId: 'jee-mains-ptm-03', code: 'PTM 03', testType: 'mock' as const },
+      { testId: 'jee-mains-ptm-04', code: 'PTM 04', testType: 'mock' as const },
+      { testId: 'jee-advanced-pta-04', code: 'PTA 04', testType: 'mock' as const },
+      { testId: 'jee-advanced-pta-05', code: 'PTA 05', testType: 'mock' as const },
+      { testId: 'jee-advanced-pta-06', code: 'PTA 06', testType: 'mock' as const }
+    ];
+    const seen = new Set(baseCodes.map((b) => b.testId));
+    const extras = Object.entries(perTestBreakdownMap)
+      .filter(([tid, val]) => !seen.has(tid) && (val.completedCount > 0 || val.testType === 'chapter_exercise'))
+      .map(([tid, val]) => ({ testId: tid, code: val.code, testType: val.testType }));
+    return [...baseCodes, ...extras].map((item) => {
+      const hit = perTestBreakdownMap[item.testId];
+      return {
+        ...item,
+        completedCount: hit ? hit.completedCount : 0,
+        uniqueStudents: hit ? hit.uniqueStudents : 0
+      };
+    });
+  }, [perTestBreakdownMap]);
 
   // Filtered Students
   const filteredStudents = students.filter((s) => {
@@ -417,8 +497,8 @@ export const AdminDashboard: React.FC = () => {
     return true;
   });
 
-  // Filtered Attempts
-  const filteredAttempts = allAttempts.filter((a) => {
+  // Filtered Attempts (strictly completed student submissions)
+  const filteredAttempts = studentCompletedAttempts.filter((a) => {
     if (attemptSearch) {
       const term = attemptSearch.toLowerCase();
       const matchName = (a.studentName || '').toLowerCase().includes(term);
@@ -427,8 +507,14 @@ export const AdminDashboard: React.FC = () => {
       const matchCode = (a.testCode || '').toLowerCase().includes(term);
       if (!matchName && !matchEmail && !matchContact && !matchCode) return false;
     }
-    if (attemptExamFilter !== 'All' && a.examType !== attemptExamFilter) return false;
-    if (attemptCodeFilter !== 'All' && a.testCode !== attemptCodeFilter) return false;
+    if (attemptExamFilter !== 'All') {
+      if (attemptExamFilter === 'Chapter Exercise') {
+        if (a.testType !== 'chapter_exercise') return false;
+      } else if (a.examType !== attemptExamFilter) {
+        return false;
+      }
+    }
+    if (attemptCodeFilter !== 'All' && a.testCode !== attemptCodeFilter && a.testId !== attemptCodeFilter) return false;
     return true;
   });
 
@@ -567,12 +653,22 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Total Test Attempts */}
+              {/* Total Test Submissions (Completed Only) */}
               <div className="p-4 rounded-2xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-1">
                 <span className="text-xl">📝</span>
-                <p className="text-[11px] font-bold text-slate-500 dark:text-zinc-400">Test Attempts</p>
+                <p className="text-[11px] font-bold text-slate-500 dark:text-zinc-400">Test Submissions</p>
                 <p className="text-2xl font-black text-slate-900 dark:text-zinc-100">{totalAttemptsCount}</p>
-                <p className="text-[10px] text-slate-400 pt-1">PTM & PTA test submissions</p>
+                <div className="text-[10px] text-slate-400 space-y-0.5 pt-1">
+                  <span className="block text-indigo-600 dark:text-indigo-400 font-bold">{uniqueStudentsSubmitting} Unique Students</span>
+                  <span className="block">Mocks: {mockCompletedCount} · Ch. Ex: {chapterCompletedCount}</span>
+                  {(inProgressCount > 0 || adminPreviewCount > 0) && (
+                    <span className="block text-amber-600 dark:text-amber-400">
+                      {inProgressCount > 0 ? `${inProgressCount} in-progress` : ''}
+                      {inProgressCount > 0 && adminPreviewCount > 0 ? ' · ' : ''}
+                      {adminPreviewCount > 0 ? `${adminPreviewCount} admin preview` : ''} excluded
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Total Lectures Completed */}
@@ -595,8 +691,8 @@ export const AdminDashboard: React.FC = () => {
               <div className="p-4 rounded-2xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-1">
                 <span className="text-xl">🚀</span>
                 <p className="text-[11px] font-bold text-slate-500 dark:text-zinc-400">Live Mock Tests</p>
-                <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{liveTestsCount} / 20</p>
-                <p className="text-[10px] text-slate-400 pt-1">PTA 04, 05, 06 Active</p>
+                <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{liveTestsCount} / 30</p>
+                <p className="text-[10px] text-slate-400 pt-1">PTM 01–03 &amp; PTA 04–06</p>
               </div>
 
               {/* Open Reports */}
@@ -612,34 +708,53 @@ export const AdminDashboard: React.FC = () => {
 
             {/* Visual Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {/* Chart 1: Attempts per Test */}
+              {/* Chart 1: Completed Submissions per Test & Chapter Exercises */}
               <div className="p-5 rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <div>
-                    <h3 className="font-extrabold text-sm text-slate-900 dark:text-zinc-100">Attempts Distribution by Test</h3>
-                    <p className="text-[11px] text-slate-400">Student submissions across JEE Advanced & Mains</p>
+                    <h3 className="font-extrabold text-sm text-slate-900 dark:text-zinc-100">Completed Submissions by Test</h3>
+                    <p className="text-[11px] text-slate-400">
+                      PTM 01–04, PTA 04–06 &amp; Chapter Exercises{lastSyncedAt ? ` · Synced ${lastSyncedAt}` : ''}
+                    </p>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
-                    Live Analytics
-                  </span>
+                  <button
+                    type="button"
+                    onClick={loadAllAdminData}
+                    disabled={loading}
+                    className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 transition-colors"
+                  >
+                    {loading ? '↻ Syncing...' : '↻ Refresh Live'}
+                  </button>
                 </div>
 
-                <div className="space-y-2.5 pt-2">
-                  {['PTA 04', 'PTA 05', 'PTA 06', 'PTA 01', 'PTM 01'].map((code) => {
-                    const count = allAttempts.filter((a) => a.testCode === code || (a.test_code === code)).length;
-                    const max = Math.max(...['PTA 04', 'PTA 05', 'PTA 06', 'PTA 01', 'PTM 01'].map((c) => allAttempts.filter((a) => a.testCode === c).length), 1);
-                    const pct = Math.round((count / max) * 100);
+                <div className="space-y-2.5 pt-2 max-h-72 overflow-y-auto pr-1">
+                  {seriesBreakdownRows.map((row) => {
+                    const max = Math.max(...seriesBreakdownRows.map((r) => r.completedCount), 1);
+                    const pct = Math.round((row.completedCount / max) * 100);
 
                     return (
-                      <div key={code} className="space-y-1">
-                        <div className="flex justify-between text-xs font-bold text-slate-700 dark:text-zinc-300">
-                          <span>{code}</span>
-                          <span>{count} attempts</span>
+                      <div key={row.testId} className="space-y-1">
+                        <div className="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-zinc-300 gap-2">
+                          <span className="flex items-center gap-1.5 truncate">
+                            <span className="truncate">{row.code}</span>
+                            {row.testType === 'chapter_exercise' && (
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                                Ch. Ex
+                              </span>
+                            )}
+                          </span>
+                          <span className="shrink-0 font-mono text-[11px]">
+                            {row.completedCount} {row.completedCount === 1 ? 'submission' : 'submissions'} · {row.uniqueStudents} uniq
+                          </span>
                         </div>
                         <div className="h-2.5 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-gradient-to-r from-indigo-500 to-violet-600 rounded-full transition-all duration-500"
-                            style={{ width: `${Math.max(pct, count > 0 ? 8 : 2)}%` }}
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              row.testType === 'chapter_exercise'
+                                ? 'bg-gradient-to-r from-emerald-500 to-teal-500'
+                                : 'bg-gradient-to-r from-indigo-500 to-violet-600'
+                            }`}
+                            style={{ width: `${Math.max(pct, row.completedCount > 0 ? 8 : 2)}%` }}
                           />
                         </div>
                       </div>
@@ -728,7 +843,7 @@ export const AdminDashboard: React.FC = () => {
                   </button>
                 </div>
                 <div className="space-y-2.5">
-                  {allAttempts.slice(0, 5).map((a, idx) => (
+                  {studentCompletedAttempts.slice(0, 5).map((a, idx) => (
                     <div key={a.id || idx} className="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-50 dark:bg-zinc-900">
                       <div>
                         <p className="font-bold text-slate-800 dark:text-zinc-200">{a.studentName || 'Student'}</p>
@@ -739,7 +854,7 @@ export const AdminDashboard: React.FC = () => {
                       </span>
                     </div>
                   ))}
-                  {allAttempts.length === 0 && <p className="text-xs text-slate-400 text-center py-2">No attempts submitted yet.</p>}
+                  {studentCompletedAttempts.length === 0 && <p className="text-xs text-slate-400 text-center py-2">No attempts submitted yet.</p>}
                 </div>
               </div>
 
@@ -1014,6 +1129,7 @@ export const AdminDashboard: React.FC = () => {
                 <option value="All">All Exam Types</option>
                 <option value="JEE Advanced">JEE Advanced</option>
                 <option value="JEE Mains">JEE Mains</option>
+                <option value="Chapter Exercise">Chapter Exercises</option>
               </select>
 
               <select
@@ -1022,11 +1138,13 @@ export const AdminDashboard: React.FC = () => {
                 className="px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-xs font-bold text-slate-700 dark:text-zinc-300"
               >
                 <option value="All">All Test Codes</option>
+                <option value="PTM 01">PTM 01</option>
+                <option value="PTM 02">PTM 02</option>
+                <option value="PTM 03">PTM 03</option>
+                <option value="PTM 04">PTM 04</option>
                 <option value="PTA 04">PTA 04</option>
                 <option value="PTA 05">PTA 05</option>
                 <option value="PTA 06">PTA 06</option>
-                <option value="PTM 01">PTM 01</option>
-                <option value="PTM 02">PTM 02</option>
               </select>
             </div>
 

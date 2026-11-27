@@ -192,3 +192,50 @@ export function checkClientRateLimit(bucketKey: string, maxRequests: number, win
     return { allowed: true, retryAfterSec: 0 };
   }
 }
+
+export function canonicalizeAttemptTest(
+  rawTestId?: string,
+  rawCode?: string,
+  rawExamType?: string
+): {
+  testId: string;
+  code: string;
+  examType: 'JEE Mains' | 'JEE Advanced';
+  testType: 'mock' | 'chapter_exercise';
+} {
+  const combined = `${rawTestId || ''} ${rawCode || ''}`.toLowerCase().trim();
+  const isChapter =
+    combined.includes('chapter') ||
+    combined.includes('exercise') ||
+    /^(physics|chemistry|mathematics|maths)[-_ ]/i.test((rawTestId || '').trim());
+
+  const mPtm = combined.match(/ptm[-_ ]*0*([0-9]+)/i);
+  if (mPtm && !isChapter) {
+    const num = String(parseInt(mPtm[1], 10)).padStart(2, '0');
+    return {
+      testId: `jee-mains-ptm-${num}`,
+      code: `PTM ${num}`,
+      examType: 'JEE Mains',
+      testType: 'mock'
+    };
+  }
+
+  const mPta = combined.match(/pta[-_ ]*0*([0-9]+)/i);
+  if (mPta && !isChapter) {
+    const num = String(parseInt(mPta[1], 10)).padStart(2, '0');
+    return {
+      testId: `jee-advanced-pta-${num}`,
+      code: `PTA ${num}`,
+      examType: 'JEE Advanced',
+      testType: 'mock'
+    };
+  }
+
+  const fallbackId = String(rawTestId || rawCode || 'chapter-exercise').trim().toLowerCase();
+  return {
+    testId: fallbackId,
+    code: String(rawCode || fallbackId).trim(),
+    examType: rawExamType === 'JEE Mains' ? 'JEE Mains' : 'JEE Advanced',
+    testType: isChapter ? 'chapter_exercise' : 'mock'
+  };
+}

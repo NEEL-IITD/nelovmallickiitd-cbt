@@ -643,34 +643,52 @@
     // --------------------------------------------------------------------------
     async saveExerciseAttempt(attempt) {
       if (!attempt) return;
+      const attemptUuid = attempt.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(attempt.id)
+        ? attempt.id
+        : (typeof crypto !== 'undefined' && crypto.randomUUID
+          ? crypto.randomUUID()
+          : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+              const r = Math.random() * 16 | 0;
+              return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            }));
+      const submittedIso = attempt.submittedAt || new Date().toISOString();
+      const subj = (attempt.subject || 'physics').toLowerCase();
+      const chapCode = String(attempt.chapterCode || 'c1').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const exSlug = String(attempt.exerciseId || 'ex1').toLowerCase().replace(/[^a-z0-9-]/g, '');
+      const canonicalTestId = `chapter-${subj}-${chapCode}-${exSlug}`;
+      const canonicalCode = `${subj.slice(0, 3).toUpperCase()} ${String(attempt.chapterCode || 'CH').toUpperCase()} · ${attempt.exerciseTitle || exSlug}`;
+
       try {
         const raw = localStorage.getItem(STORAGE_KEY_ATTEMPTS);
         const list = raw ? JSON.parse(raw) : [];
-        list.unshift({ ...attempt, submittedAt: new Date().toISOString() });
-        localStorage.setItem(STORAGE_KEY_ATTEMPTS, JSON.stringify(list.slice(0, 100)));
+        if (!list.some(item => item && item.id === attemptUuid)) {
+          list.unshift({ ...attempt, id: attemptUuid, testId: canonicalTestId, testType: 'chapter_exercise', status: 'completed', submittedAt: submittedIso });
+          localStorage.setItem(STORAGE_KEY_ATTEMPTS, JSON.stringify(list.slice(0, 100)));
+        }
       } catch (e) {}
 
-      // Cloud sync
-      if (window.supabaseClient && window.authService?.isCloudConnected && window.authService.isCloudConnected()) {
+      // Persist completed Chapter Exercise submission to Supabase public.test_attempts (test_type = 'chapter_exercise')
+      const currentUser = window.authService?.getCurrentUser ? window.authService.getCurrentUser() : null;
+      if (currentUser?.id && window.studentStorage?.saveAttempt) {
         try {
-          await window.supabaseClient.from('physics_exercise_attempts').insert({
-            chapter_code: attempt.chapterCode || 'C8',
-            chapter_name: attempt.chapterName || '',
-            exercise_id: attempt.exerciseId || '',
-            exercise_title: attempt.exerciseTitle || '',
-            target_exam: attempt.targetExam || 'Both',
-            total_questions: attempt.totalQuestions || 0,
-            answered_count: attempt.answeredCount || 0,
-            obtained_marks: attempt.score || 0,
-            total_marks: attempt.totalMarks || 0,
-            percentage: attempt.percentage || 0,
-            accuracy: attempt.accuracy || 0,
-            time_spent_seconds: attempt.timeSpentSeconds || 0,
+          await window.studentStorage.saveAttempt(currentUser.id, {
+            id: attemptUuid,
+            testId: canonicalTestId,
+            testCode: canonicalCode,
+            testTitle: attempt.exerciseTitle || canonicalCode,
+            examType: attempt.targetExam === 'JEE Mains' ? 'JEE Mains' : 'JEE Advanced',
+            testType: 'chapter_exercise',
+            status: 'completed',
+            totalMarksScored: Number(attempt.score ?? 0),
+            totalMaxMarks: Number(attempt.totalMarks ?? 0),
+            percentage: Number(attempt.percentage ?? 0),
+            accuracy: Number(attempt.accuracy ?? 0),
+            timeTakenSeconds: Number(attempt.timeSpentSeconds ?? 0),
             responses: attempt.responses || {},
-            submitted_at: new Date().toISOString()
+            completedAt: submittedIso
           });
         } catch (err) {
-          console.warn('[vaultStorage] Failed to sync exercise attempt:', err);
+          console.warn('[vaultStorage] Failed to sync chapter exercise to test_attempts:', err);
         }
       }
     },

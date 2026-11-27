@@ -17,7 +17,8 @@ import {
   TestConfigItem
 } from '../types';
 import { authService } from '../services/authService';
-import { checkClientRateLimit, errorReportSchema, canonicalizeLeaderboardTestId } from '../utils/validationSchemas';
+import { checkClientRateLimit, errorReportSchema, canonicalizeLeaderboardTestId, canonicalizeAttemptTest } from '../utils/validationSchemas';
+import { AdminSubmissionStats, AdminTestSubmissionBreakdown } from '../types';
 
 export interface TestAttemptRecord {
   id: string;
@@ -25,6 +26,8 @@ export interface TestAttemptRecord {
   testCode: string;
   testTitle: string;
   examType: 'JEE Mains' | 'JEE Advanced';
+  testType?: 'mock' | 'chapter_exercise';
+  status?: 'completed' | 'in_progress';
   totalMarksScored: number;
   totalMaxMarks: number;
   percentage: number;
@@ -140,10 +143,13 @@ export const studentStorage = {
   // ----------------------------------------------------------------------------
   // COMPLETED TEST ATTEMPTS (Cloud + Local Cache)
   // ----------------------------------------------------------------------------
+  _inFlightSubmissions: new Set<string>(),
+  _lastAttemptsError: null as any,
+
   async saveAttempt(userId: string, attemptRecord: TestAttemptRecord): Promise<void> {
     if (!userId) return;
 
-    // 1. Generate / Validate UUID for attemptRecord.id (Postgres public.test_attempts.id is type UUID)
+    // 1. Generate / Validate deterministic UUID for attemptRecord.id (Postgres public.test_attempts.id is UUID)
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     let attemptUuid = attemptRecord.id;
     if (!attemptUuid || !uuidRegex.test(attemptUuid)) {
@@ -159,174 +165,197 @@ export const studentStorage = {
       attemptRecord.id = attemptUuid;
     }
 
-    // Canonical test ID normalization (e.g. ptm-01 -> jee-mains-ptm-01, pta-04 -> jee-advanced-pta-04)
-    const rawTestKey = String(attemptRecord.testId || attemptRecord.testCode || '').toLowerCase().trim();
-    let canonicalTestId = attemptRecord.testId || '';
-    let canonicalCode = attemptRecord.testCode || '';
-    const mPtm = rawTestKey.match(/ptm[-\s_]?0?(\d+)/);
-    if (mPtm) {
-      const num = String(parseInt(mPtm[1], 10)).padStart(2, '0');
-      canonicalTestId = `jee-mains-ptm-${num}`;
-      canonicalCode = `PTM ${num}`;
-    } else {
-      const mPta = rawTestKey.match(/pta[-\s_]?0?(\d+)/);
-      if (mPta) {
-        const num = String(parseInt(mPta[1], 10)).padStart(2, '0');
-        canonicalTestId = `jee-advanced-pta-${num}`;
-        canonicalCode = `PTA ${num}`;
-      }
-    }
-    if (!canonicalTestId) {
-      canonicalTestId = attemptRecord.testId || 'jee-mains-ptm-01';
-      canonicalCode = 'PTM 01';
-    }
+    const canon = canonicalizeAttemptTest(
+      attemptRecord.testId || attemptRecord.testCode,
+      attemptRecord.testCode,
+      attemptRecord.examType
+    );
+    const canonicalTestId = canon.testId;
+    const canonicalCode = canon.code;
+    const resolvedTestType = attemptRecord.testType || canon.testType;
 
-    // Resolve live authenticated Supabase user ID if available & ensure session freshness
-    let effectiveUserId = userId;
-    if (isSupabaseConfigured && supabase) {
-      try {
-        const { data: sessData } = await supabase.auth.getSession();
-        const sess = sessData?.session;
-        if (sess) {
-          const expMs = sess.expires_at ? sess.expires_at * 1000 : 0;
-          if (expMs > 0 && expMs < Date.now() + 120000) {
-            const { data: refData } = await supabase.auth.refreshSession();
-            if (refData?.session?.user?.id && uuidRegex.test(refData.session.user.id)) {
-              effectiveUserId = refData.session.user.id;
-            }
-          } else if (sess.user?.id && uuidRegex.test(sess.user.id)) {
-            effectiveUserId = sess.user.id;
-          }
-        }
-      } catch (e) {
-        console.warn('[Supabase] Session check notice:', e);
-      }
-    }
+    // Prevent concurrent double-submission for the same attempt UUID or simultaneous click+timeout
+    const flightKey = `${userId}:${canonicalTestId}:${attemptUuid}`;
+    if (this._inFlightSubmissions.has(flightKey)) return;
+    this._inFlightSubmissions.add(flightKey);
 
-    // 1. Always update local storage cache immediately for zero latency
     try {
-      const attempts = this.getAttempts(userId);
-      const existingIdx = attempts.findIndex((a) => a.id === attemptRecord.id);
-      if (existingIdx !== -1) {
-        attempts[existingIdx] = attemptRecord;
-      } else {
-        attempts.unshift(attemptRecord);
-      }
-      localStorage.setItem(`nelov_${userId}_attempts`, JSON.stringify(attempts));
-      if (effectiveUserId !== userId) {
-        localStorage.setItem(`nelov_${effectiveUserId}_attempts`, JSON.stringify(attempts));
-      }
-    } catch (e) {}
-
-    // 2. Cloud sync to Supabase `test_attempts` with profile pre-check and retry
-    if (isSupabaseConfigured && supabase && uuidRegex.test(effectiveUserId)) {
-      try {
-        // Pre-check / upsert student profile
+      // Resolve live authenticated Supabase user ID if available & ensure session freshness
+      let effectiveUserId = userId;
+      if (isSupabaseConfigured && supabase) {
         try {
-          const profileName = (attemptRecord as any).candidateName || (attemptRecord as any).studentName || 'JEE Aspirant';
-          const profileEmail = (attemptRecord as any).email || (attemptRecord as any).studentEmail || null;
-          await supabase.from('profiles').upsert({
-            id: effectiveUserId,
-            full_name: profileName,
-            email: profileEmail,
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'id', ignoreDuplicates: true });
-        } catch (pe) {}
-
-        const timeSec = attemptRecord.timeTakenSeconds || (attemptRecord.timeSpentTotal ? Math.round(attemptRecord.timeSpentTotal) : 0);
-        const payload = {
-          id: attemptUuid,
-          user_id: effectiveUserId,
-          test_id: canonicalTestId,
-          exam_type: attemptRecord.examType || (canonicalTestId.includes('mains') ? 'JEE Mains' : 'JEE Advanced'),
-          code: canonicalCode,
-          obtained_marks: Number(attemptRecord.totalMarksScored ?? (attemptRecord as any).obtainedMarks ?? 0),
-          total_marks: Number(attemptRecord.totalMaxMarks ?? attemptRecord.totalMarks ?? 300),
-          percentage: Number(attemptRecord.percentage ?? 0),
-          accuracy: Number(attemptRecord.accuracy ?? 0),
-          time_taken_seconds: timeSec,
-          estimated_rank_label: attemptRecord.predictedAirDisplay || 'AIR Qualified',
-          subject_breakdown: attemptRecord.subjectStats || (attemptRecord as any).subjectBreakdown || {},
-          responses: attemptRecord.responses || {},
-          time_per_question: attemptRecord.questionTimings || attemptRecord.question_timings || attemptRecord.timePerQuestion || {},
-          question_timings: attemptRecord.questionTimings || attemptRecord.question_timings || attemptRecord.timePerQuestion || {},
-          mistake_tags: {
-            ...(attemptRecord.mistakeTags || {}),
-            submission_trigger: (attemptRecord as any).submissionTrigger || 'manual'
-          },
-          submitted_at: attemptRecord.completedAt || new Date().toISOString()
-        };
-
-        let savedCloud = false;
-        for (let tryIdx = 0; tryIdx < 3; tryIdx++) {
-          try {
-            const { error } = await supabase.from('test_attempts').insert(payload);
-            if (error) {
-              console.warn(`[Supabase] saveAttempt try ${tryIdx + 1} warning:`, error.message);
-              // Fallback: If DB schema does not have question_timings column yet, retry insert without it
-              if ((payload as any).question_timings && ((error as any).status === 400 || (error as any).code === '42703' || error.message?.includes('question_timings'))) {
-                console.warn('[Supabase] question_timings column missing in DB, retrying without question_timings...');
-                delete (payload as any).question_timings;
+          const { data: sessData } = await supabase.auth.getSession();
+          const sess = sessData?.session;
+          if (sess) {
+            const expMs = sess.expires_at ? sess.expires_at * 1000 : 0;
+            if (expMs > 0 && expMs < Date.now() + 120000) {
+              const { data: refData } = await supabase.auth.refreshSession();
+              if (refData?.session?.user?.id && uuidRegex.test(refData.session.user.id)) {
+                effectiveUserId = refData.session.user.id;
               }
-              if ((error as any).status === 401 || error.message?.includes('JWT') || error.message?.includes('token') || error.message?.includes('expired') || error.message?.includes('auth')) {
-                try {
-                  const { data: refData } = await supabase.auth.refreshSession();
-                  if (refData?.session?.user?.id && uuidRegex.test(refData.session.user.id)) {
-                    effectiveUserId = refData.session.user.id;
-                    payload.user_id = effectiveUserId;
-                  }
-                } catch (re) {}
-              }
-            } else {
-              savedCloud = true;
-              break;
+            } else if (sess.user?.id && uuidRegex.test(sess.user.id)) {
+              effectiveUserId = sess.user.id;
             }
-          } catch (err) {
-            console.warn(`[Supabase] saveAttempt try ${tryIdx + 1} exception:`, err);
           }
-          if (!savedCloud && tryIdx < 2) {
-            await new Promise(r => setTimeout(r, 600));
-          }
+        } catch (e) {
+          console.warn('[Supabase] Session check notice:', e);
         }
-
-        if (!savedCloud) {
-          try {
-            const qKey = 'nelov_pending_sync_attempts';
-            const rawQ = localStorage.getItem(qKey);
-            const q = rawQ ? JSON.parse(rawQ) : [];
-            if (!q.some((item: any) => item.id === attemptUuid)) {
-              q.push({ ...attemptRecord, id: attemptUuid, userId: effectiveUserId, testId: canonicalTestId, testCode: canonicalCode });
-              localStorage.setItem(qKey, JSON.stringify(q));
-            }
-          } catch (qe) {}
-        }
-      } catch (cloudErr) {
-        console.error('[Supabase] Cloud sync error:', cloudErr);
       }
-    } else {
-      try {
-        const qKey = 'nelov_pending_sync_attempts';
-        const rawQ = localStorage.getItem(qKey);
-        const q = rawQ ? JSON.parse(rawQ) : [];
-        if (!q.some((item: any) => item.id === attemptUuid)) {
-          q.push({ ...attemptRecord, id: attemptUuid, userId: effectiveUserId, testId: canonicalTestId, testCode: canonicalCode });
-          localStorage.setItem(qKey, JSON.stringify(q));
-        }
-      } catch (qe) {}
-    }
 
-    // 3. Dispatch global event so all dashboards react instantly
-    if (typeof window !== 'undefined') {
+      const normalizedRecord: TestAttemptRecord = {
+        ...attemptRecord,
+        id: attemptUuid,
+        testId: canonicalTestId,
+        testCode: canonicalCode,
+        examType: attemptRecord.examType || canon.examType,
+        testType: resolvedTestType,
+        status: 'completed',
+        completedAt: attemptRecord.completedAt || new Date().toISOString()
+      };
+
+      // 1. Always update local storage cache immediately for zero latency
       try {
-        window.dispatchEvent(new CustomEvent('nelov_attempt_saved', {
-          detail: {
-            attemptRecord,
-            userId: effectiveUserId,
-            testId: canonicalTestId,
-            code: canonicalCode
+        const attempts = this.getAttempts(userId);
+        const existingIdx = attempts.findIndex((a) => a.id === attemptUuid);
+        if (existingIdx !== -1) {
+          attempts[existingIdx] = normalizedRecord;
+        } else {
+          attempts.unshift(normalizedRecord);
+        }
+        localStorage.setItem(`nelov_${userId}_attempts`, JSON.stringify(attempts));
+        if (effectiveUserId !== userId) {
+          localStorage.setItem(`nelov_${effectiveUserId}_attempts`, JSON.stringify(attempts));
+        }
+      } catch (e) {}
+
+      // 2. Cloud sync to Supabase `test_attempts` via idempotent upsert
+      if (isSupabaseConfigured && supabase && uuidRegex.test(effectiveUserId)) {
+        try {
+          try {
+            const profileName = (attemptRecord as any).candidateName || (attemptRecord as any).studentName || 'JEE Aspirant';
+            const profileEmail = (attemptRecord as any).email || (attemptRecord as any).studentEmail || null;
+            await supabase.from('profiles').upsert({
+              id: effectiveUserId,
+              full_name: profileName,
+              email: profileEmail,
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'id', ignoreDuplicates: true });
+          } catch (pe) {}
+
+          const timeSec = attemptRecord.timeTakenSeconds || (attemptRecord.timeSpentTotal ? Math.round(attemptRecord.timeSpentTotal) : 0);
+          const obtainedNum = Number(attemptRecord.totalMarksScored ?? (attemptRecord as any).obtainedMarks ?? 0);
+          const totalNum = Number(attemptRecord.totalMaxMarks ?? attemptRecord.totalMarks ?? 300);
+          const payload: Record<string, any> = {
+            id: attemptUuid,
+            user_id: effectiveUserId,
+            test_id: canonicalTestId,
+            exam_type: normalizedRecord.examType,
+            test_type: resolvedTestType,
+            status: 'completed',
+            code: canonicalCode,
+            obtained_marks: obtainedNum,
+            total_marks: totalNum,
+            score: obtainedNum,
+            max_score: totalNum,
+            percentage: Number(attemptRecord.percentage ?? 0),
+            accuracy: Number(attemptRecord.accuracy ?? 0),
+            time_taken_seconds: timeSec,
+            time_spent_seconds: timeSec,
+            estimated_rank_label: attemptRecord.predictedAirDisplay || 'AIR Qualified',
+            subject_breakdown: attemptRecord.subjectStats || (attemptRecord as any).subjectBreakdown || {},
+            responses: attemptRecord.responses || {},
+            time_per_question: attemptRecord.questionTimings || attemptRecord.question_timings || attemptRecord.timePerQuestion || {},
+            question_timings: attemptRecord.questionTimings || attemptRecord.question_timings || attemptRecord.timePerQuestion || {},
+            mistake_tags: {
+              ...(attemptRecord.mistakeTags || {}),
+              submission_trigger: (attemptRecord as any).submissionTrigger || 'manual'
+            },
+            submitted_at: normalizedRecord.completedAt,
+            updated_at: new Date().toISOString()
+          };
+
+          let savedCloud = false;
+          for (let tryIdx = 0; tryIdx < 3; tryIdx++) {
+            try {
+              const { error } = await supabase.from('test_attempts').upsert(payload, { onConflict: 'id' });
+              if (error) {
+                console.warn(`[Supabase] saveAttempt try ${tryIdx + 1} warning:`, error.message);
+                if ((error as any).status === 400 || (error as any).code === '42703' || /column|schema cache/i.test(error.message || '')) {
+                  ['question_timings', 'test_type', 'score', 'max_score', 'time_spent_seconds', 'updated_at'].forEach((col) => {
+                    if (col in payload && (error.message?.includes(col) || col !== 'status')) {
+                      delete payload[col];
+                    }
+                  });
+                }
+                if ((error as any).status === 401 || error.message?.includes('JWT') || error.message?.includes('token') || error.message?.includes('expired') || error.message?.includes('auth')) {
+                  try {
+                    const { data: refData } = await supabase.auth.refreshSession();
+                    if (refData?.session?.user?.id && uuidRegex.test(refData.session.user.id)) {
+                      effectiveUserId = refData.session.user.id;
+                      payload.user_id = effectiveUserId;
+                    }
+                  } catch (re) {}
+                }
+              } else {
+                savedCloud = true;
+                // Clean up leftover in_progress draft row for this user/test
+                try {
+                  await supabase
+                    .from('test_attempts')
+                    .delete()
+                    .match({ user_id: effectiveUserId, test_id: canonicalTestId, status: 'in_progress' });
+                } catch {}
+                break;
+              }
+            } catch (err) {
+              console.warn(`[Supabase] saveAttempt try ${tryIdx + 1} exception:`, err);
+            }
+            if (!savedCloud && tryIdx < 2) {
+              await new Promise(r => setTimeout(r, 600));
+            }
           }
-        }));
-      } catch (de) {}
+
+          if (!savedCloud) {
+            try {
+              const qKey = 'nelov_pending_sync_attempts';
+              const rawQ = localStorage.getItem(qKey);
+              const q = rawQ ? JSON.parse(rawQ) : [];
+              if (!q.some((item: any) => item.id === attemptUuid)) {
+                q.push({ ...normalizedRecord, userId: effectiveUserId });
+                localStorage.setItem(qKey, JSON.stringify(q));
+              }
+            } catch (qe) {}
+          }
+        } catch (cloudErr) {
+          console.error('[Supabase] Cloud sync error:', cloudErr);
+        }
+      } else {
+        try {
+          const qKey = 'nelov_pending_sync_attempts';
+          const rawQ = localStorage.getItem(qKey);
+          const q = rawQ ? JSON.parse(rawQ) : [];
+          if (!q.some((item: any) => item.id === attemptUuid)) {
+            q.push({ ...normalizedRecord, userId: effectiveUserId });
+            localStorage.setItem(qKey, JSON.stringify(q));
+          }
+        } catch (qe) {}
+      }
+
+      // 3. Dispatch global event so all dashboards react instantly
+      if (typeof window !== 'undefined') {
+        try {
+          window.dispatchEvent(new CustomEvent('nelov_attempt_saved', {
+            detail: {
+              attemptRecord: normalizedRecord,
+              userId: effectiveUserId,
+              testId: canonicalTestId,
+              code: canonicalCode
+            }
+          }));
+        } catch (de) {}
+      }
+    } finally {
+      this._inFlightSubmissions.delete(flightKey);
     }
   },
   async syncLocalAttemptsToSupabase(): Promise<{ synced: number; pending: number }> {
@@ -415,34 +444,16 @@ export const studentStorage = {
 
       if (existingIds.has(attId)) continue;
 
-      const rawTestKey = String(attempt.testId || attempt.testCode || '').toLowerCase().trim();
-      let canonicalTestId = attempt.testId || '';
-      let canonicalCode = attempt.testCode || attempt.code || '';
-      const mPtm = rawTestKey.match(/ptm[-\s_]?0?(\d+)/);
-      if (mPtm) {
-        const num = String(parseInt(mPtm[1], 10)).padStart(2, '0');
-        canonicalTestId = `jee-mains-ptm-${num}`;
-        canonicalCode = `PTM ${num}`;
-      } else {
-        const mPta = rawTestKey.match(/pta[-\s_]?0?(\d+)/);
-        if (mPta) {
-          const num = String(parseInt(mPta[1], 10)).padStart(2, '0');
-          canonicalTestId = `jee-advanced-pta-${num}`;
-          canonicalCode = `PTA ${num}`;
-        }
-      }
-      if (!canonicalTestId) {
-        canonicalTestId = 'jee-mains-ptm-01';
-        canonicalCode = 'PTM 01';
-      }
-
+      const canonAttempt = canonicalizeAttemptTest(attempt.testId || attempt.testCode, attempt.testCode || attempt.code, attempt.examType);
       const timeSec = attempt.timeTakenSeconds || (attempt.timeSpentTotal ? Math.round(attempt.timeSpentTotal) : 0);
-      const payload = {
+      const payload: Record<string, any> = {
         id: attId,
         user_id: authUser.id,
-        test_id: canonicalTestId,
-        exam_type: attempt.examType || (canonicalTestId.includes('mains') ? 'JEE Mains' : 'JEE Advanced'),
-        code: canonicalCode,
+        test_id: canonAttempt.testId,
+        exam_type: attempt.examType || canonAttempt.examType,
+        test_type: attempt.testType || canonAttempt.testType,
+        status: 'completed',
+        code: canonAttempt.code,
         obtained_marks: Number(attempt.totalMarksScored ?? attempt.obtainedMarks ?? 0),
         total_marks: Number(attempt.totalMaxMarks ?? attempt.totalMarks ?? 300),
         percentage: Number(attempt.percentage ?? 0),
@@ -462,10 +473,10 @@ export const studentStorage = {
       };
 
       try {
-        let { error } = await supabase.from('test_attempts').insert(payload);
+        let { error } = await supabase.from('test_attempts').upsert(payload, { onConflict: 'id' });
         if (error && (payload as any).question_timings && ((error as any).status === 400 || (error as any).code === '42703' || error.message?.includes('question_timings'))) {
           delete (payload as any).question_timings;
-          const res2 = await supabase.from('test_attempts').insert(payload);
+          const res2 = await supabase.from('test_attempts').upsert(payload, { onConflict: 'id' });
           error = res2.error;
         }
         if (!error) {
@@ -519,12 +530,15 @@ export const studentStorage = {
       if (error) throw error;
       if (!data) return this.getAttempts(userId);
 
-      const records: TestAttemptRecord[] = data.map((d: any) => ({
+      const completedRows = data.filter((d: any) => d.status !== 'in_progress' && Boolean(d.submitted_at));
+      const records: TestAttemptRecord[] = completedRows.map((d: any) => ({
         id: d.id,
         testId: d.test_id,
         testCode: d.code,
         testTitle: `${d.exam_type} – ${d.code} Mock Test`,
         examType: d.exam_type,
+        testType: d.test_type || (String(d.test_id || '').includes('chapter') ? 'chapter_exercise' : 'mock'),
+        status: 'completed',
         totalMarksScored: Number(d.obtained_marks),
         totalMaxMarks: Number(d.total_marks),
         percentage: Number(d.percentage),
@@ -1407,19 +1421,67 @@ export const studentStorage = {
   async getAllAttempts(): Promise<any[]> {
     const allAttempts: any[] = [];
     const seenIds = new Set<string>();
-    let cloudQuerySucceeded = false;
 
     if (isSupabaseConfigured && supabase) {
       try {
-        const { data: attemptsData, error: attError } = await supabase
-          .from('test_attempts')
-          .select('*')
-          .order('submitted_at', { ascending: false });
+        const attemptsData: any[] = [];
+        const PAGE_SIZE = 1000;
+        let offset = 0;
+        let attError: any = null;
+
+        while (true) {
+          const { data: pageRows, error: pageErr } = await supabase
+            .from('test_attempts')
+            .select('*')
+            .eq('status', 'completed')
+            .not('submitted_at', 'is', null)
+            .order('submitted_at', { ascending: false })
+            .range(offset, offset + PAGE_SIZE - 1);
+
+          if (pageErr) {
+            attError = pageErr;
+            break;
+          }
+          if (Array.isArray(pageRows) && pageRows.length > 0) {
+            attemptsData.push(...pageRows);
+          }
+          if (!Array.isArray(pageRows) || pageRows.length < PAGE_SIZE) {
+            break;
+          }
+          offset += PAGE_SIZE;
+        }
+
+        // Fallback when DB table does not have `status` column migrated yet
+        if (attError && (attError.code === '42703' || String(attError.message || '').includes('status'))) {
+          attError = null;
+          offset = 0;
+          attemptsData.length = 0;
+          while (true) {
+            const { data: pageRows, error: pageErr } = await supabase
+              .from('test_attempts')
+              .select('*')
+              .not('submitted_at', 'is', null)
+              .order('submitted_at', { ascending: false })
+              .range(offset, offset + PAGE_SIZE - 1);
+            if (pageErr) {
+              attError = pageErr;
+              break;
+            }
+            if (Array.isArray(pageRows) && pageRows.length > 0) {
+              attemptsData.push(...pageRows);
+            }
+            if (!Array.isArray(pageRows) || pageRows.length < PAGE_SIZE) {
+              break;
+            }
+            offset += PAGE_SIZE;
+          }
+        }
 
         if (attError) {
           console.error('[Supabase] getAllAttempts test_attempts error:', attError.message);
+          this._lastAttemptsError = attError;
         } else {
-          cloudQuerySucceeded = true;
+          this._lastAttemptsError = null;
         }
 
         const { data: profilesData } = await supabase.from('profiles').select('*');
@@ -1430,105 +1492,97 @@ export const studentStorage = {
           });
         }
 
-        if (Array.isArray(attemptsData)) {
-          attemptsData.forEach((d: any) => {
-            seenIds.add(d.id);
-            const p = profilesMap[d.user_id] || {};
-            const rawEmail = p.email || '';
-            const isSynthetic = rawEmail.endsWith('@phone.nelovportal.local');
-            const studentName = p.full_name || p.name || 'JEE Aspirant';
+        attemptsData.forEach((d: any) => {
+          if (d.status === 'in_progress' || !d.submitted_at) return;
+          if (seenIds.has(d.id)) return;
+          seenIds.add(d.id);
+          const p = profilesMap[d.user_id] || {};
+          const rawEmail = p.email || '';
+          const isSynthetic = rawEmail.endsWith('@phone.nelovportal.local');
+          const studentName = p.full_name || p.name || 'JEE Aspirant';
+          const isAdminAttempt = p.role === 'admin' || rawEmail.toLowerCase().trim() === 'mallicknelov@gmail.com';
+          const canon = canonicalizeAttemptTest(d.test_id, d.code, d.exam_type);
+          const resolvedType = d.test_type || canon.testType;
 
-            const rawId = String(d.test_id || '').toLowerCase();
-            let code = d.code || '';
-            if (rawId.includes('ptm')) {
-              const m = rawId.match(/ptm[-\s_]?0*([0-9]+)/i);
-              code = m ? `PTM ${m[1].padStart(2, '0')}` : (code || 'PTM 01');
-            } else if (rawId.includes('pta')) {
-              const m = rawId.match(/pta[-\s_]?0*([0-9]+)/i);
-              code = m ? `PTA ${m[1].padStart(2, '0')}` : (code || 'PTA 04');
-            } else if (!code) {
-              code = 'PTM 01';
-            }
-
-            allAttempts.push({
-              id: d.id,
-              userId: d.user_id,
-              user_id: d.user_id,
-              studentName: studentName,
-              candidateName: studentName,
-              userName: studentName,
-              studentEmail: isSynthetic ? '' : rawEmail,
-              email: isSynthetic ? '' : rawEmail,
-              studentContact: p.contact_number || '',
-              contactNumber: p.contact_number || '',
-              authMethod: p.auth_method || (p.contact_number ? 'phone' : 'gmail'),
-              testId: d.test_id,
-              examType: d.exam_type || (rawId.includes('mains') ? 'JEE Mains' : 'JEE Advanced'),
-              testCode: code,
-              code: code,
-              obtainedMarks: Number(d.obtained_marks ?? 0),
-              totalMarksScored: Number(d.obtained_marks ?? 0),
-              totalMarks: Number(d.total_marks ?? 300),
-              totalMaxMarks: Number(d.total_marks ?? 300),
-              percentage: Number(d.percentage ?? 0),
-              accuracy: Number(d.accuracy ?? 0),
-              timeTakenSeconds: Number(d.time_taken_seconds ?? 0),
-              time_taken_seconds: Number(d.time_taken_seconds ?? 0),
-              estimatedRankLabel: d.estimated_rank_label,
-              predictedAirDisplay: d.estimated_rank_label,
-              subjectStats: d.subject_breakdown || {},
-              subjectBreakdown: d.subject_breakdown || {},
-              responses: d.responses || {},
-              mistakeTags: d.mistake_tags || {},
-              submittedAt: d.submitted_at,
-              completedAt: d.submitted_at
-            });
+          allAttempts.push({
+            id: d.id,
+            userId: d.user_id,
+            user_id: d.user_id,
+            studentName: studentName,
+            candidateName: studentName,
+            userName: studentName,
+            studentEmail: isSynthetic ? '' : rawEmail,
+            email: isSynthetic ? '' : rawEmail,
+            studentContact: p.contact_number || '',
+            contactNumber: p.contact_number || '',
+            authMethod: p.auth_method || (p.contact_number ? 'phone' : 'gmail'),
+            testId: canon.testId,
+            rawTestId: d.test_id,
+            testType: resolvedType,
+            status: d.status || 'completed',
+            isAdminAttempt,
+            examType: d.exam_type || canon.examType,
+            testCode: canon.code,
+            code: canon.code,
+            obtainedMarks: Number(d.obtained_marks ?? 0),
+            totalMarksScored: Number(d.obtained_marks ?? 0),
+            totalMarks: Number(d.total_marks ?? 300),
+            totalMaxMarks: Number(d.total_marks ?? 300),
+            percentage: Number(d.percentage ?? 0),
+            accuracy: Number(d.accuracy ?? 0),
+            timeTakenSeconds: Number(d.time_taken_seconds ?? 0),
+            time_taken_seconds: Number(d.time_taken_seconds ?? 0),
+            estimatedRankLabel: d.estimated_rank_label,
+            predictedAirDisplay: d.estimated_rank_label,
+            subjectStats: d.subject_breakdown || {},
+            subjectBreakdown: d.subject_breakdown || {},
+            responses: d.responses || {},
+            mistakeTags: d.mistake_tags || {},
+            submittedAt: d.submitted_at,
+            completedAt: d.submitted_at
           });
-        }
-      } catch (e) {
+        });
+
+        return allAttempts.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+      } catch (e: any) {
         console.warn('Exception fetching all test attempts from Supabase:', e);
+        this._lastAttemptsError = e;
+        return [];
       }
     }
 
-    // Local fallback: scan localStorage keys for all user attempts not already in Supabase
+    // Offline local fallback (only executes when Supabase cloud is NOT configured)
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && (key.startsWith('nelov_') && key.endsWith('_attempts') || key === 'nelov_pending_sync_attempts')) {
+        if (key && ((key.startsWith('nelov_') && key.endsWith('_attempts')) || key === 'nelov_pending_sync_attempts' || key === 'nelov_vault_exercise_attempts')) {
           const uId = key.replace('nelov_', '').replace('_attempts', '');
           const raw = localStorage.getItem(key);
           if (raw) {
             const list = JSON.parse(raw);
             if (Array.isArray(list)) {
               list.forEach((item: any) => {
-                if (item && item.id && !seenIds.has(item.id)) {
-                  seenIds.add(item.id);
-                  const rawId = String(item.testId || item.testCode || '').toLowerCase();
-                  let code = item.testCode || item.code || '';
-                  if (rawId.includes('ptm')) {
-                    const m = rawId.match(/ptm[-\s_]?0*([0-9]+)/i);
-                    code = m ? `PTM ${m[1].padStart(2, '0')}` : (code || 'PTM 01');
-                  } else if (rawId.includes('pta')) {
-                    const m = rawId.match(/pta[-\s_]?0*([0-9]+)/i);
-                    code = m ? `PTA ${m[1].padStart(2, '0')}` : (code || 'PTA 04');
-                  } else if (!code) {
-                    code = 'PTM 01';
-                  }
-
-                  allAttempts.push({
-                    ...item,
-                    userId: item.userId || uId,
-                    user_id: item.userId || uId,
-                    testCode: code,
-                    code: code,
-                    obtainedMarks: Number(item.totalMarksScored ?? item.obtainedMarks ?? 0),
-                    totalMarksScored: Number(item.totalMarksScored ?? item.obtainedMarks ?? 0),
-                    totalMarks: Number(item.totalMaxMarks ?? item.totalMarks ?? 300),
-                    totalMaxMarks: Number(item.totalMaxMarks ?? item.totalMarks ?? 300),
-                    submittedAt: item.completedAt || item.submittedAt || new Date().toISOString(),
-                    completedAt: item.completedAt || item.submittedAt || new Date().toISOString()
-                  });
-                }
+                if (!item || item.status === 'in_progress') return;
+                const rowId = item.id || `${uId}:${item.testId || item.exerciseId}:${item.completedAt || item.submittedAt}`;
+                if (seenIds.has(rowId)) return;
+                seenIds.add(rowId);
+                const canon = canonicalizeAttemptTest(item.testId || item.exerciseId, item.testCode || item.code || item.exerciseTitle, item.examType);
+                allAttempts.push({
+                  ...item,
+                  id: rowId,
+                  userId: item.userId || uId,
+                  user_id: item.userId || uId,
+                  testId: canon.testId,
+                  testType: item.testType || (key === 'nelov_vault_exercise_attempts' ? 'chapter_exercise' : canon.testType),
+                  testCode: canon.code,
+                  code: canon.code,
+                  obtainedMarks: Number(item.totalMarksScored ?? item.obtainedMarks ?? item.score ?? 0),
+                  totalMarksScored: Number(item.totalMarksScored ?? item.obtainedMarks ?? item.score ?? 0),
+                  totalMarks: Number(item.totalMaxMarks ?? item.totalMarks ?? 300),
+                  totalMaxMarks: Number(item.totalMaxMarks ?? item.totalMarks ?? 300),
+                  submittedAt: item.completedAt || item.submittedAt || new Date().toISOString(),
+                  completedAt: item.completedAt || item.submittedAt || new Date().toISOString()
+                });
               });
             }
           }
@@ -1536,73 +1590,123 @@ export const studentStorage = {
       }
     } catch (e) {}
 
-    if (!cloudQuerySucceeded && allAttempts.length === 0) {
-      const demoAttempts = [
-        {
-          id: '00000000-0000-4000-a000-000000000001',
-          userId: '1b60422e-834f-4e1d-aefd-52febe7b633d',
-          user_id: '1b60422e-834f-4e1d-aefd-52febe7b633d',
-          studentName: 'Harshada Karche',
-          candidateName: 'Harshada Karche',
-          userName: 'Harshada Karche',
-          studentEmail: 'karcheharshada565@gmail.com',
-          email: 'karcheharshada565@gmail.com',
-          studentContact: '+91 98765 43210',
-          contactNumber: '+91 98765 43210',
-          testId: 'jee-mains-ptm-01',
-          testCode: 'PTM 01',
-          code: 'PTM 01',
-          examType: 'JEE Mains',
-          obtainedMarks: 268,
-          totalMarksScored: 268,
-          totalMarks: 300,
-          totalMaxMarks: 300,
-          percentage: 89.33,
-          accuracy: 94.2,
-          timeTakenSeconds: 9720,
-          time_taken_seconds: 9720,
-          estimatedRankLabel: 'AIR 140 - 280',
-          predictedAirDisplay: 'AIR 140 - 280',
-          attemptNumber: 1,
-          attemptCount: 1,
-          submittedAt: '2026-11-22T10:30:00.000Z',
-          completedAt: '2026-11-22T10:30:00.000Z'
-        },
-        {
-          id: '00000000-0000-4000-a000-000000000002',
-          userId: '784d81d8-f381-44a4-8b78-32ae2c6eb9ba',
-          user_id: '784d81d8-f381-44a4-8b78-32ae2c6eb9ba',
-          studentName: 'Santoshi Janjire',
-          candidateName: 'Santoshi Janjire',
-          userName: 'Santoshi Janjire',
-          studentEmail: 'santoshijanjire16@gmail.com',
-          email: 'santoshijanjire16@gmail.com',
-          studentContact: '+91 98123 45678',
-          contactNumber: '+91 98123 45678',
-          testId: 'jee-mains-ptm-01',
-          testCode: 'PTM 01',
-          code: 'PTM 01',
-          examType: 'JEE Mains',
-          obtainedMarks: 254,
-          totalMarksScored: 254,
-          totalMarks: 300,
-          totalMaxMarks: 300,
-          percentage: 84.67,
-          accuracy: 91.5,
-          timeTakenSeconds: 10100,
-          time_taken_seconds: 10100,
-          estimatedRankLabel: 'AIR 320 - 550',
-          predictedAirDisplay: 'AIR 320 - 550',
-          attemptNumber: 1,
-          attemptCount: 1,
-          submittedAt: '2026-11-22T11:15:00.000Z',
-          completedAt: '2026-11-22T11:15:00.000Z'
+    return allAttempts.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+  },
+
+  async getAdminSubmissionStats(preloadedAttempts?: any[]): Promise<AdminSubmissionStats> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.rpc('get_admin_submission_stats');
+        if (!error && data && typeof data === 'object') {
+          const rawByTest: any[] = Array.isArray((data as any).by_test) ? (data as any).by_test : [];
+          return {
+            completedTotal: Number((data as any).completed_total ?? 0),
+            uniqueStudentsTotal: Number((data as any).unique_students_total ?? 0),
+            completedIncludingAdmin: Number((data as any).completed_including_admin ?? 0),
+            adminPreviewCount: Number((data as any).admin_preview_count ?? 0),
+            inProgressCount: Number((data as any).in_progress_count ?? 0),
+            mockCompletedCount: Number((data as any).mock_completed_count ?? 0),
+            chapterCompletedCount: Number((data as any).chapter_completed_count ?? 0),
+            byTest: rawByTest.map((b: any) => ({
+              testId: b.test_id,
+              code: b.code,
+              testType: b.test_type === 'chapter_exercise' ? 'chapter_exercise' : 'mock',
+              completedCount: Number(b.completed_count ?? 0),
+              uniqueStudents: Number(b.unique_students ?? 0),
+              inProgressCount: Number(b.in_progress_count ?? 0),
+              adminPreviewCount: Number(b.admin_preview_count ?? 0),
+              lastSubmittedAt: b.last_submitted_at || null
+            })),
+            fromRpc: true,
+            error: null
+          };
         }
-      ];
-      allAttempts.push(...demoAttempts);
+        if (error) {
+          console.warn('[Supabase] get_admin_submission_stats rpc notice:', error.message);
+        }
+      } catch (e) {
+        console.warn('[Supabase] get_admin_submission_stats exception:', e);
+      }
     }
 
-    return allAttempts.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+    // Fallback aggregation from Supabase exact head count + loaded attempts
+    let exactCompletedCount: number | null = null;
+    let exactInProgressCount = 0;
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const res = await supabase
+          .from('test_attempts')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', 'completed')
+          .not('submitted_at', 'is', null);
+        if (!res.error && typeof res.count === 'number') {
+          exactCompletedCount = res.count;
+        }
+        const ipRes = await supabase
+          .from('test_attempts')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', 'in_progress');
+        if (!ipRes.error && typeof ipRes.count === 'number') {
+          exactInProgressCount = ipRes.count;
+        }
+      } catch {}
+    }
+
+    const rows = Array.isArray(preloadedAttempts) ? preloadedAttempts : await this.getAllAttempts();
+    const studentRows = rows.filter((a) => !a.isAdminAttempt && a.status !== 'in_progress' && a.submittedAt);
+    const adminRows = rows.filter((a) => a.isAdminAttempt && a.status !== 'in_progress' && a.submittedAt);
+    const byTestMap: Record<string, { breakdown: AdminTestSubmissionBreakdown; uniqueUsers: Set<string> }> = {};
+    const allUniqueStudents = new Set<string>();
+
+    studentRows.forEach((a) => {
+      const canon = canonicalizeAttemptTest(a.testId, a.testCode || a.code, a.examType);
+      const tType = a.testType || canon.testType;
+      const uid = a.userId || a.user_id || a.studentEmail || a.id;
+      if (uid) allUniqueStudents.add(uid);
+      if (!byTestMap[canon.testId]) {
+        byTestMap[canon.testId] = {
+          breakdown: {
+            testId: canon.testId,
+            code: canon.code,
+            testType: tType,
+            completedCount: 0,
+            uniqueStudents: 0,
+            inProgressCount: 0,
+            adminPreviewCount: 0,
+            lastSubmittedAt: null
+          },
+          uniqueUsers: new Set<string>()
+        };
+      }
+      const bucket = byTestMap[canon.testId];
+      bucket.breakdown.completedCount += 1;
+      if (uid) bucket.uniqueUsers.add(uid);
+      if (a.submittedAt && (!bucket.breakdown.lastSubmittedAt || new Date(a.submittedAt) > new Date(bucket.breakdown.lastSubmittedAt))) {
+        bucket.breakdown.lastSubmittedAt = a.submittedAt;
+      }
+    });
+
+    const byTest = Object.values(byTestMap).map(({ breakdown, uniqueUsers }) => ({
+      ...breakdown,
+      uniqueStudents: uniqueUsers.size
+    }));
+
+    const completedTotal = exactCompletedCount !== null ? Math.max(0, exactCompletedCount - adminRows.length) : studentRows.length;
+    const mockCompletedCount = studentRows.filter((r) => (r.testType || 'mock') === 'mock').length;
+    const chapterCompletedCount = studentRows.filter((r) => r.testType === 'chapter_exercise').length;
+
+    return {
+      completedTotal,
+      uniqueStudentsTotal: allUniqueStudents.size,
+      completedIncludingAdmin: exactCompletedCount !== null ? exactCompletedCount : (studentRows.length + adminRows.length),
+      adminPreviewCount: adminRows.length,
+      inProgressCount: exactInProgressCount,
+      mockCompletedCount,
+      chapterCompletedCount,
+      byTest,
+      fromRpc: false,
+      error: this._lastAttemptsError?.message || null
+    };
   },
 
   async getAllBookmarks(): Promise<any[]> {

@@ -10,6 +10,8 @@ import {
   Zap, RotateCcw, Check, Sparkles, Hash
 } from 'lucide-react';
 import { vaultService } from '../../services/vaultService';
+import { studentStorage } from '../../utils/studentStorage';
+import { useAuth } from '../../context/AuthContext';
 import { VaultQuestion } from '../../types';
 
 interface ExerciseTestShellModalProps {
@@ -56,6 +58,10 @@ export const ExerciseTestShellModal: React.FC<ExerciseTestShellModalProps> = ({
   studentName = 'Guest Aspirant',
   onOpenAdminUpload
 }) => {
+  const { user } = useAuth();
+  const hasSubmittedRef = useRef<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   if (!isOpen || !chapter || !exercise) return null;
 
   // 1. Query uploaded exercise JSON from vaultService
@@ -178,7 +184,10 @@ export const ExerciseTestShellModal: React.FC<ExerciseTestShellModalProps> = ({
   };
 
   // Scoring
-  const handleSubmitTest = () => {
+  const handleSubmitTest = async () => {
+    if (hasSubmittedRef.current || testSubmitted) return;
+    hasSubmittedRef.current = true;
+    setIsSubmitting(true);
     setShowSubmitModal(false);
     const timeTaken = defaultDuration - timeLeft;
     let totalScore = 0;
@@ -302,9 +311,53 @@ export const ExerciseTestShellModal: React.FC<ExerciseTestShellModalProps> = ({
 
     setScoreSummary(summaryData);
     setTestSubmitted(true);
+    setIsSubmitting(false);
+
+    // Sync completed Chapter Exercise submission into test_attempts (test_type = 'chapter_exercise')
+    const chapCode = String(chapter?.code || chapter?.id || 'ch').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const exSlug = String(exercise?.id || 'ex1').toLowerCase().replace(/[^a-z0-9-]/g, '');
+    const canonicalExerciseId = `chapter-${subject}-${chapCode}-${exSlug}`;
+    const canonicalExerciseCode = `${subject.slice(0, 3).toUpperCase()} ${String(chapter?.code || 'CH').toUpperCase()} · ${exercise?.title || exSlug}`;
+    const submittedIso = new Date().toISOString();
+    const attemptUuid = (typeof crypto !== 'undefined' && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+          const r = Math.random() * 16 | 0;
+          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+
+    if (user?.id) {
+      try {
+        await studentStorage.saveAttempt(user.id, {
+          id: attemptUuid,
+          testId: canonicalExerciseId,
+          testCode: canonicalExerciseCode,
+          testTitle: testData.title || exercise.title || canonicalExerciseCode,
+          examType: exercise?.targetExam === 'JEE Mains' ? 'JEE Mains' : 'JEE Advanced',
+          testType: 'chapter_exercise',
+          status: 'completed',
+          totalMarksScored: totalScore,
+          totalMaxMarks: totalMaxMarks,
+          percentage,
+          accuracy,
+          attemptedCount: Object.keys(responses).length,
+          correctCount,
+          partialCount,
+          incorrectCount,
+          unattemptedCount,
+          timeTakenSeconds: timeTaken,
+          responses,
+          completedAt: submittedIso
+        });
+      } catch (err) {
+        console.warn('Error persisting chapter exercise submission:', err);
+      }
+    }
   };
 
   const handleRetake = () => {
+    hasSubmittedRef.current = false;
+    setIsSubmitting(false);
     setResponses({});
     setMarkedForReview([]);
     setVisitedQuestions([1]);
@@ -1041,10 +1094,11 @@ export const ExerciseTestShellModal: React.FC<ExerciseTestShellModalProps> = ({
               </button>
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={handleSubmitTest}
-                className="flex-1 py-2.5 rounded-xl text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition-colors"
+                className="flex-1 py-2.5 rounded-xl text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 shadow-md transition-colors"
               >
-                Confirm & Submit
+                {isSubmitting ? 'Submitting...' : 'Confirm & Submit'}
               </button>
             </div>
           </div>
