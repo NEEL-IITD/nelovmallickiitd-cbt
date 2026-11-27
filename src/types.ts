@@ -305,11 +305,14 @@ export interface AdminTestSubmissionBreakdown {
 }
 
 export interface AdminSubmissionStats {
-  completedTotal: number;
+  uniqueSubmissionsTotal: number;
   uniqueStudentsTotal: number;
+  completedTotal: number;
   completedIncludingAdmin: number;
   adminPreviewCount: number;
   inProgressCount: number;
+  mockUniqueSubmissions: number;
+  chapterUniqueSubmissions: number;
   mockCompletedCount: number;
   chapterCompletedCount: number;
   byTest: AdminTestSubmissionBreakdown[];

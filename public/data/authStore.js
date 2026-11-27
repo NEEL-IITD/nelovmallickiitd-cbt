@@ -1538,11 +1538,14 @@
           if (!error && data && typeof data === 'object') {
             const rawByTest = Array.isArray(data.by_test) ? data.by_test : [];
             return {
-              completedTotal: Number(data.completed_total ?? 0),
+              uniqueSubmissionsTotal: Number(data.unique_submissions_total ?? data.unique_students_total ?? 0),
               uniqueStudentsTotal: Number(data.unique_students_total ?? 0),
+              completedTotal: Number(data.completed_total ?? 0),
               completedIncludingAdmin: Number(data.completed_including_admin ?? 0),
               adminPreviewCount: Number(data.admin_preview_count ?? 0),
               inProgressCount: Number(data.in_progress_count ?? 0),
+              mockUniqueSubmissions: Number(data.mock_unique_submissions ?? 0),
+              chapterUniqueSubmissions: Number(data.chapter_unique_submissions ?? 0),
               mockCompletedCount: Number(data.mock_completed_count ?? 0),
               chapterCompletedCount: Number(data.chapter_completed_count ?? 0),
               byTest: rawByTest.map(b => ({
@@ -1567,7 +1570,7 @@
         }
       }
 
-      // Fallback aggregation from exact count + loaded attempts if SQL RPC is not yet deployed
+      // Fallback aggregation from exact count + deduplicated (user_id, test_id) pairs
       let exactCompletedCount = null;
       let exactInProgressCount = 0;
       if (window.authService && window.authService.isCloudConnected() && supabaseClient) {
@@ -1591,12 +1594,24 @@
       const adminRows = rows.filter(a => a.isAdminAttempt && a.status !== 'in_progress' && a.submittedAt);
       const byTestMap = {};
       const allUniqueStudents = new Set();
+      const uniqueSubmissionPairs = new Set();
+      const mockUniquePairs = new Set();
+      const chapterUniquePairs = new Set();
 
       studentRows.forEach(a => {
         const canon = this._canonicalizeTestKey(a.testId, a.testCode || a.code);
         const tType = a.testType || canon.testType;
-        const uid = a.userId || a.user_id || a.studentEmail || a.id;
-        if (uid) allUniqueStudents.add(uid);
+        const uid = String(a.userId || a.user_id || a.studentEmail || a.id);
+        if (uid) {
+          allUniqueStudents.add(uid);
+          const pairKey = `${uid}::${canon.testId}`;
+          uniqueSubmissionPairs.add(pairKey);
+          if (tType === 'chapter_exercise') {
+            chapterUniquePairs.add(pairKey);
+          } else {
+            mockUniquePairs.add(pairKey);
+          }
+        }
         if (!byTestMap[canon.testId]) {
           byTestMap[canon.testId] = {
             testId: canon.testId,
@@ -1633,11 +1648,14 @@
       const chapterCompletedCount = studentRows.filter(r => r.testType === 'chapter_exercise').length;
 
       return {
-        completedTotal,
+        uniqueSubmissionsTotal: uniqueSubmissionPairs.size,
         uniqueStudentsTotal: allUniqueStudents.size,
+        completedTotal,
         completedIncludingAdmin: exactCompletedCount !== null ? exactCompletedCount : (studentRows.length + adminRows.length),
         adminPreviewCount: adminRows.length,
         inProgressCount: exactInProgressCount,
+        mockUniqueSubmissions: mockUniquePairs.size,
+        chapterUniqueSubmissions: chapterUniquePairs.size,
         mockCompletedCount,
         chapterCompletedCount,
         byTest,

@@ -1600,11 +1600,14 @@ export const studentStorage = {
         if (!error && data && typeof data === 'object') {
           const rawByTest: any[] = Array.isArray((data as any).by_test) ? (data as any).by_test : [];
           return {
-            completedTotal: Number((data as any).completed_total ?? 0),
+            uniqueSubmissionsTotal: Number((data as any).unique_submissions_total ?? (data as any).unique_students_total ?? 0),
             uniqueStudentsTotal: Number((data as any).unique_students_total ?? 0),
+            completedTotal: Number((data as any).completed_total ?? 0),
             completedIncludingAdmin: Number((data as any).completed_including_admin ?? 0),
             adminPreviewCount: Number((data as any).admin_preview_count ?? 0),
             inProgressCount: Number((data as any).in_progress_count ?? 0),
+            mockUniqueSubmissions: Number((data as any).mock_unique_submissions ?? 0),
+            chapterUniqueSubmissions: Number((data as any).chapter_unique_submissions ?? 0),
             mockCompletedCount: Number((data as any).mock_completed_count ?? 0),
             chapterCompletedCount: Number((data as any).chapter_completed_count ?? 0),
             byTest: rawByTest.map((b: any) => ({
@@ -1629,7 +1632,7 @@ export const studentStorage = {
       }
     }
 
-    // Fallback aggregation from Supabase exact head count + loaded attempts
+    // Fallback aggregation from Supabase exact head count + deduplicated (user_id, test_id) pairs
     let exactCompletedCount: number | null = null;
     let exactInProgressCount = 0;
     if (isSupabaseConfigured && supabase) {
@@ -1657,12 +1660,24 @@ export const studentStorage = {
     const adminRows = rows.filter((a) => a.isAdminAttempt && a.status !== 'in_progress' && a.submittedAt);
     const byTestMap: Record<string, { breakdown: AdminTestSubmissionBreakdown; uniqueUsers: Set<string> }> = {};
     const allUniqueStudents = new Set<string>();
+    const uniqueSubmissionPairs = new Set<string>();
+    const mockUniquePairs = new Set<string>();
+    const chapterUniquePairs = new Set<string>();
 
     studentRows.forEach((a) => {
       const canon = canonicalizeAttemptTest(a.testId, a.testCode || a.code, a.examType);
       const tType = a.testType || canon.testType;
-      const uid = a.userId || a.user_id || a.studentEmail || a.id;
-      if (uid) allUniqueStudents.add(uid);
+      const uid = String(a.userId || a.user_id || a.studentEmail || a.id);
+      if (uid) {
+        allUniqueStudents.add(uid);
+        const pairKey = `${uid}::${canon.testId}`;
+        uniqueSubmissionPairs.add(pairKey);
+        if (tType === 'chapter_exercise') {
+          chapterUniquePairs.add(pairKey);
+        } else {
+          mockUniquePairs.add(pairKey);
+        }
+      }
       if (!byTestMap[canon.testId]) {
         byTestMap[canon.testId] = {
           breakdown: {
@@ -1696,11 +1711,14 @@ export const studentStorage = {
     const chapterCompletedCount = studentRows.filter((r) => r.testType === 'chapter_exercise').length;
 
     return {
-      completedTotal,
+      uniqueSubmissionsTotal: uniqueSubmissionPairs.size,
       uniqueStudentsTotal: allUniqueStudents.size,
+      completedTotal,
       completedIncludingAdmin: exactCompletedCount !== null ? exactCompletedCount : (studentRows.length + adminRows.length),
       adminPreviewCount: adminRows.length,
       inProgressCount: exactInProgressCount,
+      mockUniqueSubmissions: mockUniquePairs.size,
+      chapterUniqueSubmissions: chapterUniquePairs.size,
       mockCompletedCount,
       chapterCompletedCount,
       byTest,

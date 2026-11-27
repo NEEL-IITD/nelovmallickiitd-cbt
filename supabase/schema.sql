@@ -4015,14 +4015,7 @@ SECURITY DEFINER
 SET search_path = ''
 AS $$
 DECLARE
-  v_completed_total INTEGER := 0;
-  v_unique_students_total INTEGER := 0;
-  v_completed_including_admin INTEGER := 0;
-  v_admin_preview_count INTEGER := 0;
-  v_in_progress_count INTEGER := 0;
-  v_mock_completed_count INTEGER := 0;
-  v_chapter_completed_count INTEGER := 0;
-  v_by_test JSONB := '[]'::jsonb;
+  v_result JSONB := NULL;
 BEGIN
   IF NOT COALESCE(public.is_admin(), FALSE) THEN
     RAISE EXCEPTION 'Forbidden: Admin privileges required' USING ERRCODE = '42501';
@@ -4064,103 +4057,71 @@ BEGIN
     FROM public.test_attempts a
     LEFT JOIN public.profiles p ON p.id = a.user_id
     LEFT JOIN auth.users u ON u.id = a.user_id
-  )
-  SELECT
-    COUNT(*) FILTER (WHERE is_completed AND NOT is_admin_row)::INTEGER,
-    COUNT(DISTINCT user_id) FILTER (WHERE is_completed AND NOT is_admin_row)::INTEGER,
-    COUNT(*) FILTER (WHERE is_completed)::INTEGER,
-    COUNT(*) FILTER (WHERE is_completed AND is_admin_row)::INTEGER,
-    COUNT(*) FILTER (WHERE is_in_progress)::INTEGER,
-    COUNT(*) FILTER (WHERE is_completed AND NOT is_admin_row AND norm_test_type = 'mock')::INTEGER,
-    COUNT(*) FILTER (WHERE is_completed AND NOT is_admin_row AND norm_test_type = 'chapter_exercise')::INTEGER
-  INTO
-    v_completed_total,
-    v_unique_students_total,
-    v_completed_including_admin,
-    v_admin_preview_count,
-    v_in_progress_count,
-    v_mock_completed_count,
-    v_chapter_completed_count
-  FROM classified;
-
-  WITH classified AS (
+  ),
+  overall_counts AS (
     SELECT
-      a.user_id,
-      CASE
-        WHEN LOWER(TRIM(COALESCE(a.test_id, ''))) ~ '^(jee-mains-)?ptm[-_ ]*0*[0-9]+$' THEN
-          'jee-mains-ptm-' || LPAD((SUBSTRING(LOWER(TRIM(a.test_id)) FROM '([0-9]+)$'))::INTEGER::TEXT, 2, '0')
-        WHEN LOWER(TRIM(COALESCE(a.test_id, ''))) ~ '^(jee-advanced-)?pta[-_ ]*0*[0-9]+$' THEN
-          'jee-advanced-pta-' || LPAD((SUBSTRING(LOWER(TRIM(a.test_id)) FROM '([0-9]+)$'))::INTEGER::TEXT, 2, '0')
-        ELSE LOWER(TRIM(COALESCE(a.test_id, 'unknown')))
-      END AS canon_test_id,
-      CASE
-        WHEN LOWER(TRIM(COALESCE(a.test_id, ''))) ~ '^(jee-mains-)?ptm[-_ ]*0*[0-9]+$' THEN
-          'PTM ' || LPAD((SUBSTRING(LOWER(TRIM(a.test_id)) FROM '([0-9]+)$'))::INTEGER::TEXT, 2, '0')
-        WHEN LOWER(TRIM(COALESCE(a.test_id, ''))) ~ '^(jee-advanced-)?pta[-_ ]*0*[0-9]+$' THEN
-          'PTA ' || LPAD((SUBSTRING(LOWER(TRIM(a.test_id)) FROM '([0-9]+)$'))::INTEGER::TEXT, 2, '0')
-        ELSE COALESCE(NULLIF(TRIM(a.code), ''), a.test_id, 'Exercise')
-      END AS canon_code,
-      CASE
-        WHEN COALESCE(a.test_type, '') = 'chapter_exercise'
-          OR LOWER(COALESCE(a.test_id, '')) LIKE 'chapter%'
-          OR LOWER(COALESCE(a.test_id, '')) LIKE '%exercise%'
-          OR LOWER(COALESCE(a.test_id, '')) ~ '^(physics|chemistry|mathematics|maths)[-_]'
-        THEN 'chapter_exercise'
-        ELSE 'mock'
-      END AS norm_test_type,
-      (COALESCE(a.status, 'completed') = 'completed' AND a.submitted_at IS NOT NULL) AS is_completed,
-      (COALESCE(a.status, 'completed') = 'in_progress') AS is_in_progress,
-      (
-        COALESCE(p.role, '') = 'admin'
-        OR LOWER(COALESCE(p.email, u.email, '')) = 'mallicknelov@gmail.com'
-      ) AS is_admin_row,
-      a.submitted_at
-    FROM public.test_attempts a
-    LEFT JOIN public.profiles p ON p.id = a.user_id
-    LEFT JOIN auth.users u ON u.id = a.user_id
+      COUNT(DISTINCT (COALESCE(user_id::TEXT, '') || '::' || canon_test_id)) FILTER (WHERE is_completed AND NOT is_admin_row)::INTEGER AS unique_submissions_total,
+      COUNT(DISTINCT user_id) FILTER (WHERE is_completed AND NOT is_admin_row)::INTEGER AS unique_students_total,
+      COUNT(*) FILTER (WHERE is_completed AND NOT is_admin_row)::INTEGER AS completed_total,
+      COUNT(*) FILTER (WHERE is_completed)::INTEGER AS completed_including_admin,
+      COUNT(*) FILTER (WHERE is_completed AND is_admin_row)::INTEGER AS admin_preview_count,
+      COUNT(*) FILTER (WHERE is_in_progress)::INTEGER AS in_progress_count,
+      COUNT(DISTINCT (COALESCE(user_id::TEXT, '') || '::' || canon_test_id)) FILTER (WHERE is_completed AND NOT is_admin_row AND norm_test_type = 'mock')::INTEGER AS mock_unique_submissions,
+      COUNT(DISTINCT (COALESCE(user_id::TEXT, '') || '::' || canon_test_id)) FILTER (WHERE is_completed AND NOT is_admin_row AND norm_test_type = 'chapter_exercise')::INTEGER AS chapter_unique_submissions,
+      COUNT(*) FILTER (WHERE is_completed AND NOT is_admin_row AND norm_test_type = 'mock')::INTEGER AS mock_completed_count,
+      COUNT(*) FILTER (WHERE is_completed AND NOT is_admin_row AND norm_test_type = 'chapter_exercise')::INTEGER AS chapter_completed_count
+    FROM classified
   ),
   grouped AS (
     SELECT
       canon_test_id AS test_id,
       MAX(canon_code) AS code,
       MAX(norm_test_type) AS test_type,
-      COUNT(*) FILTER (WHERE is_completed AND NOT is_admin_row)::INTEGER AS completed_count,
       COUNT(DISTINCT user_id) FILTER (WHERE is_completed AND NOT is_admin_row)::INTEGER AS unique_students,
+      COUNT(*) FILTER (WHERE is_completed AND NOT is_admin_row)::INTEGER AS completed_count,
       COUNT(*) FILTER (WHERE is_in_progress)::INTEGER AS in_progress_count,
       COUNT(*) FILTER (WHERE is_completed AND is_admin_row)::INTEGER AS admin_preview_count,
       MAX(submitted_at) FILTER (WHERE is_completed AND NOT is_admin_row) AS last_submitted_at
     FROM classified
     GROUP BY canon_test_id
+  ),
+  grouped_json AS (
+    SELECT COALESCE(
+      jsonb_agg(
+        jsonb_build_object(
+          'test_id', g.test_id,
+          'code', g.code,
+          'test_type', g.test_type,
+          'unique_students', g.unique_students,
+          'completed_count', g.completed_count,
+          'in_progress_count', g.in_progress_count,
+          'admin_preview_count', g.admin_preview_count,
+          'last_submitted_at', g.last_submitted_at
+        )
+        ORDER BY g.unique_students DESC, g.test_id ASC
+      ),
+      '[]'::jsonb
+    ) AS by_test
+    FROM grouped g
   )
-  SELECT COALESCE(
-    jsonb_agg(
-      jsonb_build_object(
-        'test_id', g.test_id,
-        'code', g.code,
-        'test_type', g.test_type,
-        'completed_count', g.completed_count,
-        'unique_students', g.unique_students,
-        'in_progress_count', g.in_progress_count,
-        'admin_preview_count', g.admin_preview_count,
-        'last_submitted_at', g.last_submitted_at
-      )
-      ORDER BY g.completed_count DESC, g.test_id ASC
-    ),
-    '[]'::jsonb
+  SELECT jsonb_build_object(
+    'unique_submissions_total', COALESCE(o.unique_submissions_total, 0),
+    'unique_students_total', COALESCE(o.unique_students_total, 0),
+    'completed_total', COALESCE(o.completed_total, 0),
+    'completed_including_admin', COALESCE(o.completed_including_admin, 0),
+    'admin_preview_count', COALESCE(o.admin_preview_count, 0),
+    'in_progress_count', COALESCE(o.in_progress_count, 0),
+    'mock_unique_submissions', COALESCE(o.mock_unique_submissions, 0),
+    'chapter_unique_submissions', COALESCE(o.chapter_unique_submissions, 0),
+    'mock_completed_count', COALESCE(o.mock_completed_count, 0),
+    'chapter_completed_count', COALESCE(o.chapter_completed_count, 0),
+    'by_test', COALESCE(gj.by_test, '[]'::jsonb)
   )
-  INTO v_by_test
-  FROM grouped g;
+  INTO v_result
+  FROM overall_counts o
+  CROSS JOIN grouped_json gj;
 
-  RETURN jsonb_build_object(
-    'completed_total', COALESCE(v_completed_total, 0),
-    'unique_students_total', COALESCE(v_unique_students_total, 0),
-    'completed_including_admin', COALESCE(v_completed_including_admin, 0),
-    'admin_preview_count', COALESCE(v_admin_preview_count, 0),
-    'in_progress_count', COALESCE(v_in_progress_count, 0),
-    'mock_completed_count', COALESCE(v_mock_completed_count, 0),
-    'chapter_completed_count', COALESCE(v_chapter_completed_count, 0),
-    'by_test', v_by_test
-  );
+  RETURN COALESCE(v_result, '{}'::jsonb);
 END;
 $$;
 

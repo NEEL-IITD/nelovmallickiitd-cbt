@@ -11477,16 +11477,31 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const emailWithPhoneCount = students.filter(s => s.auth_method === 'email_with_phone').length;
 
       const studentCompletedAttempts = allAttempts.filter(a => !a.isAdminAttempt && a.status !== 'in_progress');
+      const uniqueSubmissionPairsFallback = new Set();
+      const mockUniquePairsFallback = new Set();
+      const chapterUniquePairsFallback = new Set();
+      studentCompletedAttempts.forEach(a => {
+        const canon = window.studentStorage?._canonicalizeTestKey
+          ? window.studentStorage._canonicalizeTestKey(a.testId, a.testCode || a.code)
+          : { testId: String(a.testId || a.testCode || 'unknown').toLowerCase(), testType: a.testType || 'mock' };
+        const uid = String(a.userId || a.user_id || a.studentEmail || a.id);
+        if (uid) {
+          const pairKey = `${uid}::${canon.testId}`;
+          uniqueSubmissionPairsFallback.add(pairKey);
+          if ((a.testType || canon.testType) === 'chapter_exercise') {
+            chapterUniquePairsFallback.add(pairKey);
+          } else {
+            mockUniquePairsFallback.add(pairKey);
+          }
+        }
+      });
       const totalAttemptsCount = submissionStats ? submissionStats.completedTotal : studentCompletedAttempts.length;
+      const uniqueSubmissionsCount = submissionStats ? submissionStats.uniqueSubmissionsTotal : uniqueSubmissionPairsFallback.size;
       const uniqueStudentsSubmitting = submissionStats
         ? submissionStats.uniqueStudentsTotal
         : new Set(studentCompletedAttempts.map(a => a.userId || a.user_id || a.id)).size;
-      const mockSubmissionsCount = submissionStats
-        ? submissionStats.mockCompletedCount
-        : studentCompletedAttempts.filter(a => (a.testType || 'mock') === 'mock').length;
-      const chapterSubmissionsCount = submissionStats
-        ? submissionStats.chapterCompletedCount
-        : studentCompletedAttempts.filter(a => a.testType === 'chapter_exercise').length;
+      const mockUniqueCount = submissionStats ? submissionStats.mockUniqueSubmissions : mockUniquePairsFallback.size;
+      const chapterUniqueCount = submissionStats ? submissionStats.chapterUniqueSubmissions : chapterUniquePairsFallback.size;
       const inProgressDraftsCount = submissionStats ? submissionStats.inProgressCount : 0;
       const adminPreviewAttemptsCount = submissionStats ? submissionStats.adminPreviewCount : allAttempts.filter(a => a.isAdminAttempt).length;
 
@@ -11539,7 +11554,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         ];
         const seen = new Set(baseTests.map(b => b.testId));
         const extras = Object.entries(perTestBreakdownMap)
-          .filter(([tid, val]) => !seen.has(tid) && (val.completedCount > 0 || val.testType === 'chapter_exercise'))
+          .filter(([tid, val]) => !seen.has(tid) && (val.uniqueStudents > 0 || val.testType === 'chapter_exercise'))
           .map(([tid, val]) => ({ testId: tid, code: val.code, testType: val.testType }));
         return [...baseTests, ...extras].map(item => {
           const hit = perTestBreakdownMap[item.testId];
@@ -11745,7 +11760,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   {students.length} Student Profiles
                 </span>
                 <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                  {totalAttemptsCount} Completed Submissions · {uniqueStudentsSubmitting} Unique
+                  {uniqueSubmissionsCount} Unique Submissions · {uniqueStudentsSubmitting} Students
                 </span>
                 {inProgressDraftsCount > 0 && (
                   <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
@@ -11796,13 +11811,15 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   </div>
                   <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-5 shadow-sm space-y-1.5">
                     <span className="text-2xl">📝</span>
-                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Test Submissions</p>
-                    <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-zinc-50">{totalAttemptsCount}</h3>
+                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Unique Submissions</p>
+                    <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-zinc-50">{uniqueSubmissionsCount}</h3>
                     <p className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold truncate">
-                      {uniqueStudentsSubmitting} Unique · Mocks: {mockSubmissionsCount} · Ch: {chapterSubmissionsCount}
+                      {uniqueStudentsSubmitting} Students · Mocks: {mockUniqueCount} · Ch: {chapterUniqueCount}
                     </p>
-                    {(inProgressDraftsCount > 0 || adminPreviewAttemptsCount > 0) && (
+                    {(totalAttemptsCount > uniqueSubmissionsCount || inProgressDraftsCount > 0 || adminPreviewAttemptsCount > 0) && (
                       <p className="text-[9px] text-amber-600 dark:text-amber-400 truncate">
+                        {totalAttemptsCount > uniqueSubmissionsCount ? `${totalAttemptsCount - uniqueSubmissionsCount} retakes` : ''}
+                        {totalAttemptsCount > uniqueSubmissionsCount && (inProgressDraftsCount > 0 || adminPreviewAttemptsCount > 0) ? ' · ' : ''}
                         {inProgressDraftsCount > 0 ? `${inProgressDraftsCount} draft` : ''}
                         {inProgressDraftsCount > 0 && adminPreviewAttemptsCount > 0 ? ' · ' : ''}
                         {adminPreviewAttemptsCount > 0 ? `${adminPreviewAttemptsCount} admin` : ''} excluded
@@ -11840,23 +11857,23 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   <div className="lg:col-span-2 rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 shadow-sm space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-zinc-800 pb-3">
                       <h3 className="text-base font-extrabold text-slate-900 dark:text-zinc-50 flex items-center gap-2">
-                        <span>📈</span> Completed Submissions Breakdown (PTM 01–04, PTA &amp; Chapter Exercises)
+                        <span>📈</span> Unique Submissions Breakdown (PTM 01–04, PTA &amp; Chapter Exercises)
                       </h3>
                       <span className="text-xs font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-950 px-2.5 py-1 rounded-full">
-                        {totalAttemptsCount} Completed ({uniqueStudentsSubmitting} Students)
+                        {uniqueSubmissionsCount} Unique ({uniqueStudentsSubmitting} Students)
                       </span>
                     </div>
 
                     <div className="w-full overflow-x-auto py-2">
                       <div className="min-w-[640px] h-52 flex items-end gap-3 pt-6 border-b border-slate-200 dark:border-zinc-800">
                         {seriesBreakdownRows.map((row) => {
-                          const maxRowCount = Math.max(...seriesBreakdownRows.map(r => r.completedCount), 1);
-                          const count = row.completedCount;
+                          const maxRowCount = Math.max(...seriesBreakdownRows.map(r => r.uniqueStudents), 1);
+                          const count = row.uniqueStudents;
                           const heightPct = Math.max(count > 0 ? 14 : 6, (count / maxRowCount) * 100);
                           const isChapter = row.testType === 'chapter_exercise';
                           const isReady = isChapter || ['PTM 01', 'PTM 02', 'PTM 03', 'PTA 04', 'PTA 05', 'PTA 06'].includes(row.code);
                           return (
-                            <div key={row.testId} className="flex-1 min-w-[54px] flex flex-col items-center gap-1.5" title={`${row.code}: ${count} completed submissions · ${row.uniqueStudents} unique students`}>
+                            <div key={row.testId} className="flex-1 min-w-[54px] flex flex-col items-center gap-1.5" title={`${row.code}: ${count} unique students completed (${row.completedCount} total attempts)`}>
                               <span className="text-[11px] font-mono font-bold text-indigo-600 dark:text-indigo-400">{count}</span>
                               <div
                                 style={{ height: `${heightPct}%` }}
@@ -11869,7 +11886,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                 }`}
                               />
                               <span className="text-[10px] font-bold text-slate-600 dark:text-zinc-300 text-center leading-tight line-clamp-2">{row.code}</span>
-                              <span className="text-[9px] text-slate-400 font-mono">{row.uniqueStudents} uniq</span>
+                              <span className="text-[9px] text-slate-400 font-mono">{row.completedCount > count ? `${row.completedCount} att` : 'unique'}</span>
                             </div>
                           );
                         })}

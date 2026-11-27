@@ -400,16 +400,29 @@ export const AdminDashboard: React.FC = () => {
   ).length;
 
   const studentCompletedAttempts = allAttempts.filter((a) => !a.isAdminAttempt && a.status !== 'in_progress');
+  const uniqueSubmissionPairsFallback = new Set<string>();
+  const mockUniquePairsFallback = new Set<string>();
+  const chapterUniquePairsFallback = new Set<string>();
+  studentCompletedAttempts.forEach((a) => {
+    const canon = canonicalizeAttemptTest(a.testId, a.testCode || a.code, a.examType);
+    const uid = String(a.userId || a.user_id || a.studentEmail || a.id);
+    if (uid) {
+      const pairKey = `${uid}::${canon.testId}`;
+      uniqueSubmissionPairsFallback.add(pairKey);
+      if ((a.testType || canon.testType) === 'chapter_exercise') {
+        chapterUniquePairsFallback.add(pairKey);
+      } else {
+        mockUniquePairsFallback.add(pairKey);
+      }
+    }
+  });
   const totalAttemptsCount = submissionStats ? submissionStats.completedTotal : studentCompletedAttempts.length;
+  const uniqueSubmissionsCount = submissionStats ? submissionStats.uniqueSubmissionsTotal : uniqueSubmissionPairsFallback.size;
   const uniqueStudentsSubmitting = submissionStats
     ? submissionStats.uniqueStudentsTotal
     : new Set(studentCompletedAttempts.map((a) => a.userId || a.user_id || a.id)).size;
-  const mockCompletedCount = submissionStats
-    ? submissionStats.mockCompletedCount
-    : studentCompletedAttempts.filter((a) => (a.testType || 'mock') === 'mock').length;
-  const chapterCompletedCount = submissionStats
-    ? submissionStats.chapterCompletedCount
-    : studentCompletedAttempts.filter((a) => a.testType === 'chapter_exercise').length;
+  const mockUniqueCount = submissionStats ? submissionStats.mockUniqueSubmissions : mockUniquePairsFallback.size;
+  const chapterUniqueCount = submissionStats ? submissionStats.chapterUniqueSubmissions : chapterUniquePairsFallback.size;
   const inProgressCount = submissionStats ? submissionStats.inProgressCount : 0;
   const adminPreviewCount = submissionStats ? submissionStats.adminPreviewCount : allAttempts.filter((a) => a.isAdminAttempt).length;
   const liveTestsCount = Object.values(testConfigs).filter((s) => s === 'live').length;
@@ -458,7 +471,7 @@ export const AdminDashboard: React.FC = () => {
     ];
     const seen = new Set(baseCodes.map((b) => b.testId));
     const extras = Object.entries(perTestBreakdownMap)
-      .filter(([tid, val]) => !seen.has(tid) && (val.completedCount > 0 || val.testType === 'chapter_exercise'))
+      .filter(([tid, val]) => !seen.has(tid) && (val.uniqueStudents > 0 || val.testType === 'chapter_exercise'))
       .map(([tid, val]) => ({ testId: tid, code: val.code, testType: val.testType }));
     return [...baseCodes, ...extras].map((item) => {
       const hit = perTestBreakdownMap[item.testId];
@@ -653,19 +666,20 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Total Test Submissions (Completed Only) */}
+              {/* Unique Test Submissions Stat Card (COUNT(DISTINCT (user_id, test_id))) */}
               <div className="p-4 rounded-2xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-1">
                 <span className="text-xl">📝</span>
-                <p className="text-[11px] font-bold text-slate-500 dark:text-zinc-400">Test Submissions</p>
-                <p className="text-2xl font-black text-slate-900 dark:text-zinc-100">{totalAttemptsCount}</p>
+                <p className="text-[11px] font-bold text-slate-500 dark:text-zinc-400">Unique Submissions</p>
+                <p className="text-2xl font-black text-slate-900 dark:text-zinc-100">{uniqueSubmissionsCount}</p>
                 <div className="text-[10px] text-slate-400 space-y-0.5 pt-1">
-                  <span className="block text-indigo-600 dark:text-indigo-400 font-bold">{uniqueStudentsSubmitting} Unique Students</span>
-                  <span className="block">Mocks: {mockCompletedCount} · Ch. Ex: {chapterCompletedCount}</span>
-                  {(inProgressCount > 0 || adminPreviewCount > 0) && (
+                  <span className="block text-indigo-600 dark:text-indigo-400 font-bold">{uniqueStudentsSubmitting} Students · Mocks: {mockUniqueCount} · Ch: {chapterUniqueCount}</span>
+                  {(totalAttemptsCount > uniqueSubmissionsCount || inProgressCount > 0 || adminPreviewCount > 0) && (
                     <span className="block text-amber-600 dark:text-amber-400">
-                      {inProgressCount > 0 ? `${inProgressCount} in-progress` : ''}
+                      {totalAttemptsCount > uniqueSubmissionsCount ? `${totalAttemptsCount - uniqueSubmissionsCount} retakes` : ''}
+                      {totalAttemptsCount > uniqueSubmissionsCount && (inProgressCount > 0 || adminPreviewCount > 0) ? ' · ' : ''}
+                      {inProgressCount > 0 ? `${inProgressCount} drafts` : ''}
                       {inProgressCount > 0 && adminPreviewCount > 0 ? ' · ' : ''}
-                      {adminPreviewCount > 0 ? `${adminPreviewCount} admin preview` : ''} excluded
+                      {adminPreviewCount > 0 ? `${adminPreviewCount} admin` : ''} excluded
                     </span>
                   )}
                 </div>
@@ -708,13 +722,13 @@ export const AdminDashboard: React.FC = () => {
 
             {/* Visual Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {/* Chart 1: Completed Submissions per Test & Chapter Exercises */}
+              {/* Chart 1: Unique Submissions per Test (COUNT(DISTINCT user_id)) & Chapter Exercises */}
               <div className="p-5 rounded-3xl bg-white dark:bg-[#121318] border border-slate-200/80 dark:border-zinc-800/80 shadow-sm space-y-4">
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <h3 className="font-extrabold text-sm text-slate-900 dark:text-zinc-100">Completed Submissions by Test</h3>
+                    <h3 className="font-extrabold text-sm text-slate-900 dark:text-zinc-100">Unique Submissions by Test</h3>
                     <p className="text-[11px] text-slate-400">
-                      PTM 01–04, PTA 04–06 &amp; Chapter Exercises{lastSyncedAt ? ` · Synced ${lastSyncedAt}` : ''}
+                      Distinct students (PTM 01–04, PTA 04–06 &amp; Chapter Exercises){lastSyncedAt ? ` · Synced ${lastSyncedAt}` : ''}
                     </p>
                   </div>
                   <button
@@ -729,8 +743,8 @@ export const AdminDashboard: React.FC = () => {
 
                 <div className="space-y-2.5 pt-2 max-h-72 overflow-y-auto pr-1">
                   {seriesBreakdownRows.map((row) => {
-                    const max = Math.max(...seriesBreakdownRows.map((r) => r.completedCount), 1);
-                    const pct = Math.round((row.completedCount / max) * 100);
+                    const max = Math.max(...seriesBreakdownRows.map((r) => r.uniqueStudents), 1);
+                    const pct = Math.round((row.uniqueStudents / max) * 100);
 
                     return (
                       <div key={row.testId} className="space-y-1">
@@ -744,7 +758,8 @@ export const AdminDashboard: React.FC = () => {
                             )}
                           </span>
                           <span className="shrink-0 font-mono text-[11px]">
-                            {row.completedCount} {row.completedCount === 1 ? 'submission' : 'submissions'} · {row.uniqueStudents} uniq
+                            {row.uniqueStudents} {row.uniqueStudents === 1 ? 'unique student' : 'unique students'}
+                            {row.completedCount > row.uniqueStudents ? ` (${row.completedCount} attempts)` : ''}
                           </span>
                         </div>
                         <div className="h-2.5 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
@@ -754,7 +769,7 @@ export const AdminDashboard: React.FC = () => {
                                 ? 'bg-gradient-to-r from-emerald-500 to-teal-500'
                                 : 'bg-gradient-to-r from-indigo-500 to-violet-600'
                             }`}
-                            style={{ width: `${Math.max(pct, row.completedCount > 0 ? 8 : 2)}%` }}
+                            style={{ width: `${Math.max(pct, row.uniqueStudents > 0 ? 8 : 2)}%` }}
                           />
                         </div>
                       </div>
