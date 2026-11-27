@@ -102,7 +102,21 @@
       startIso: "2026-12-02T09:00:00+05:30",
       endIso: "2026-12-02T21:00:00+05:30",
       route: "/test/jee-mains/ptm-04",
-      hashRoute: "#/test/jee-mains/ptm-04"
+      hashRoute: "#/test/jee-mains/ptm-04",
+      syllabus: {
+        physics: [
+          "Electrostatics & Capacitors (Charge redistribution and energy loss on touching identical conducting spheres; work done in separating plates of an isolated capacitor; series and parallel combinations of dielectrics; variable triangular dielectric wedge integration; interleaved multi-plate and floating-conductor systems; asymmetrically charged parallel-plate capacitors in RC circuits)",
+          "Current Electricity & DC Circuits (Electrical power scaling with voltage, temperature coefficient of resistance referenced to 0°C, wire stretching at constant density, non-uniform cylindrical current density integration J(x), electron drift mobility, mixed grouping of cells for maximum current, Kirchhoff's junction & loop conservation laws, balanced and anti-symmetric Wheatstone bridges, resistor ladders & short-wire symmetric networks, meter bridge null-point shifts, potentiometer internal resistance, finite-resistance voltmeter loading, and initial t=0+ vs. steady-state RC capacitor charges)"
+        ],
+        chemistry: [
+          "**Alcohols, Phenols & Ethers:** Cleavage of mixed aryl-alkyl and benzylic ethers with hot HI; acid-catalyzed dehydration rates (3° benzylic vs. 2° vs. 1° & carbocation rearrangements/spiro ring expansion & Bredt's rule resistance at bicyclic bridgeheads); chemoselective allylic oxidation with MnO<sub>2</sub> vs. PCC and chromic acid oxidation to p-benzoquinone; Lucas reagent reactivity (cyclopropylmethyl, cyclopropenyl, and tropylium cations); epoxide ring opening and Lindlar reduction; relative acidity of substituted phenols, picric acid with NaHCO<sub>3</sub>, distinction tests (neutral FeCl<sub>3</sub>, Liebermann's nitroso, Na, Br<sub>2</sub>/CS<sub>2</sub>, Zn dust, PCl<sub>5</sub>, HBr inertness); Reimer–Tiemann, Gattermann formylation, oxymercuration–demercuration cyclization, and intramolecular Friedel–Crafts alkylation.",
+          "**Haloalkanes & Stereochemistry:** Stereochemical course of SOCl<sub>2</sub> (S<sub>N</sub>i retention vs. S<sub>N</sub>2 inversion with pyridine), Finkelstein S<sub>N</sub>2 inversion (NaI/acetone), anti-periplanar E2 elimination selectivity, iodoform test (I<sub>2</sub>+NaOH), and optical/diastereomeric isomer counting."
+        ],
+        mathematics: [
+          "Permutations & Combinations (Fundamental counting principle for alternative questions, digit pairs without borrowing, digit-product multisets; restricted arrangements of INEFFECTIVE and dictionary rank of MONDAY; non-consecutive identical digits and odd digits at even places; circular seating avoiding adjacent same-nationality pairs; block-constrained multiset arrangements; committee selection, non-decreasing onto functions, grid rectangles excluding squares, diagonals of polygons, parallel-line segment intersections, and lattice-point integer-area triangle counting)",
+          "Matrices & Number Theory Counting (Counting 3×3 matrices with zero trace and 2×2 matrices with prime entry sums; divisibility by 9, Legendre's formula on 33!, inclusion–exclusion on positive divisors of 10^10, 15^7, 18^11, GCD-constrained 4-digit numbers, and digit-sum parity counts)"
+        ]
+      }
     },
     {
       id: "jee-mains-ptm-05",

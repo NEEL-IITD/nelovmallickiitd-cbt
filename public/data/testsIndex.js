@@ -67,8 +67,8 @@
     "examType": "JEE Mains",
     "code": "PTM 04",
     "title": "JEE Mains 2027 Test Series — PTM 04",
-    "subtitle": "Full Syllabus Comprehensive Mock Examination",
-    "status": "coming_soon",
+    "subtitle": "Current Electricity, Capacitors, Alcohols, Phenols, Ethers & Permutations",
+    "status": "live",
     "durationMinutes": 180,
     "totalMarks": 300,
     "totalQuestions": 75,
@@ -77,8 +77,8 @@
       "Chemistry (25 Qs)",
       "Mathematics (25 Qs)"
     ],
-    "description": "Standard NTA JEE Mains CBT pattern: 20 Single Correct MCQs (+4, -1) and 5 Numerical Value questions (+4, -1) per subject.",
-    "isLive": false,
+    "description": "Standard NTA JEE Mains CBT pattern: 20 Single Correct MCQs (+4, -1) and 5 Numerical Value questions (+4, -1) per subject. Current Electricity, Capacitors & RC Networks, Alcohols/Phenols/Ethers & Stereochemistry, Permutations, Combinations & Counting.",
+    "isLive": true,
     "isFree": true
   },
   {
@@ -590,6 +590,9 @@
     }
     if (cleanId.includes('ptm03') || cleanId.includes('ptm3')) {
       return window.ptm03Data;
+    }
+    if (cleanId.includes('ptm04') || cleanId.includes('ptm4')) {
+      return window.ptm04Data;
     }
     if (cleanId.includes('pta04') || cleanId.includes('pta4')) {
       return window.pta04Data;

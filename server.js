@@ -18,12 +18,41 @@ const ALLOWED_CORS_ORIGINS = new Set([
   'https://nelovmallickiitd-web.vercel.app',
 ]);
 
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://lyzmismtmtsvlqpzdruy.supabase.co';
+const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_NqVe4faHT7ccXhQoj8r6ng_KT4hmaSy';
+const ADMIN_EMAIL = 'mallicknelov@gmail.com';
+
+async function isAuthorizedAdminRequest(req) {
+  try {
+    const authHeader = req.headers?.authorization || '';
+    if (!authHeader.startsWith('Bearer ')) return false;
+    const token = authHeader.slice(7).trim();
+    if (!token) return false;
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!resp.ok) return false;
+    const user = await resp.json();
+    return String(user?.email || '').trim().toLowerCase() === ADMIN_EMAIL;
+  } catch {
+    return false;
+  }
+}
+
 // Scheduled go-live locks for unreleased future tests (UTC/IST timestamps)
 const SCHEDULED_TEST_LOCKS = [
   {
     pattern: /(?:^|\/)(?:ptm-?0?3\.(?:js|json))$/i,
     unlockAtMs: Date.parse('2026-11-29T09:00:00+05:30'),
     label: 'PTM 03 unlocks Sun, Nov 29, 2026 at 9:00 AM IST',
+  },
+  {
+    pattern: /(?:^|\/)(?:ptm-?0?4\.(?:js|json))$/i,
+    unlockAtMs: Date.parse('2026-12-02T09:00:00+05:30'),
+    label: 'PTM 04 unlocks Wed, Dec 2, 2026 at 9:00 AM IST',
   },
 ];
 
@@ -79,7 +108,7 @@ function buildSecurityHeaders(req, extraHeaders = {}) {
   return headers;
 }
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.writeHead(405, buildSecurityHeaders(req, { 'Content-Type': 'application/json; charset=utf-8' }));
     return res.end(JSON.stringify({ error: 'Method Not Allowed' }));
@@ -110,11 +139,14 @@ const server = http.createServer((req, res) => {
     return res.end('403 Forbidden');
   }
 
-  // Gate future scheduled test papers & answer keys before go-live
+  // Gate future scheduled test papers & answer keys before go-live (allow verified Admin preview only)
   const matchedLock = SCHEDULED_TEST_LOCKS.find((item) => item.pattern.test(normalizedUrlPath));
   if (matchedLock && Date.now() < matchedLock.unlockAtMs) {
-    res.writeHead(403, buildSecurityHeaders(req, { 'Content-Type': 'application/json; charset=utf-8' }));
-    return res.end(JSON.stringify({ error: matchedLock.label, locked: true }));
+    const allowedAdmin = await isAuthorizedAdminRequest(req);
+    if (!allowedAdmin) {
+      res.writeHead(403, buildSecurityHeaders(req, { 'Content-Type': 'application/json; charset=utf-8' }));
+      return res.end(JSON.stringify({ error: matchedLock.label, locked: true }));
+    }
   }
 
   const relPath = normalizedUrlPath.replace(/^\/+/, '');

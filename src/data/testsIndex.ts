@@ -5,6 +5,7 @@ import { pta06Data } from './jee-advanced/pta06';
 import { jeeMainsPtm01Data } from './jee-mains/ptm01';
 import { jeeMainsPtm02Data } from './jee-mains/ptm02';
 import { jeeMainsPtm03Data } from './jee-mains/ptm03';
+import { jeeMainsPtm04Data } from './jee-mains/ptm04';
 
 export const jeeMainsTests: TestMetadata[] = [
   {
@@ -73,8 +74,8 @@ export const jeeMainsTests: TestMetadata[] = [
     "examType": "JEE Mains",
     "code": "PTM 04",
     "title": "JEE Mains 2027 Test Series — PTM 04",
-    "subtitle": "Full Syllabus Comprehensive Mock Examination",
-    "status": "coming_soon",
+    "subtitle": "Electrostatics, Capacitors & Current Electricity, Alcohols, Phenols, Ethers & Stereochemistry, Permutations, Combinations & Counting",
+    "status": "live",
     "durationMinutes": 180,
     "totalMarks": 300,
     "totalQuestions": 75,
@@ -83,8 +84,8 @@ export const jeeMainsTests: TestMetadata[] = [
       "Chemistry (25 Qs)",
       "Mathematics (25 Qs)"
     ],
-    "description": "Standard NTA JEE Mains CBT pattern: 20 Single Correct MCQs (+4, -1) and 5 Numerical Value questions (+4, -1) per subject.",
-    "isLive": false,
+    "description": "Standard NTA JEE Mains CBT pattern: 20 Single Correct MCQs (+4, -1) and 5 Numerical Value questions (+4, -1) per subject. Current Electricity, Capacitors & RC Networks, Alcohols/Phenols/Ethers & Stereochemistry, Permutations, Combinations & Matrix Counting.",
+    "isLive": true,
     "isFree": true
   },
   {
@@ -589,6 +590,9 @@ export function getLiveTestPaper(id: string): TestPaper | undefined {
   }
   if (id === 'jee-mains-ptm-03' || id === 'ptm-03' || id === 'ptm03') {
     return jeeMainsPtm03Data;
+  }
+  if (id === 'jee-mains-ptm-04' || id === 'ptm-04' || id === 'ptm04') {
+    return jeeMainsPtm04Data;
   }
   if (id === 'jee-advanced-pta-04' || id === 'pta-04' || id === 'pta04') {
     return pta04Data;

@@ -74,8 +74,8 @@
 
   <!-- Loaded Test Registries and Test Papers -->
   <script src="/data/siteData.js"></script>
-  <script src="/data/testsIndex.js"></script>
-  <script src="/data/scheduleData.js"></script>
+  <script src="/data/testsIndex.js?v=ptm04-20261202"></script>
+  <script src="/data/scheduleData.js?v=ptm04-20261202"></script>
   <script src="/data/pta04.js"></script>
   <script src="/data/pta05.js"></script>
   <script src="/data/jee-advanced/pta04.js"></script>
@@ -83,7 +83,7 @@
   <script src="/data/jee-advanced/pta06.js"></script>
   <script src="/data/jee-mains/ptm01.js"></script>
   <script src="/data/jee-mains/ptm02.js"></script>
-  <!-- Note: Future scheduled test scripts (e.g. ptm03.js) are lazy-loaded only after scheduled go-live or verified Admin preview -->
+  <!-- Note: Future scheduled test scripts (e.g. ptm03.js, ptm04.js) are lazy-loaded only after scheduled go-live or verified Admin preview -->
   <script src="/data/rankPredictor.js"></script>
   <script src="/data/authStore.js"></script>
   <script src="/data/resourcesIndex.js"></script>
@@ -355,6 +355,172 @@
       );
     }
 
+    // Shared Diagram Renderer with Dark Mode White Container, Click/Tap-to-Zoom & Error Recovery
+    function DiagramImage({ src, alt = 'Question Diagram', maxHeightClass = 'max-h-[420px]', compact = false }) {
+      const [hasError, setHasError] = useState(false);
+      const [retryTick, setRetryTick] = useState(0);
+
+      useEffect(() => {
+        setHasError(false);
+        setRetryTick(0);
+      }, [src]);
+
+      if (!src) return null;
+      const safeOk = window.nelovSecurity?.isSafeImageUrl ? window.nelovSecurity.isSafeImageUrl(src) : true;
+      if (!safeOk) return null;
+      const finalSrc = retryTick > 0 ? `${src}${src.includes('?') ? '&' : '?'}retry=${retryTick}` : src;
+
+      if (hasError) {
+        return (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setHasError(false);
+              setRetryTick((t) => t + 1);
+            }}
+            className="mt-2 inline-flex flex-col items-center gap-2 p-3 rounded-xl bg-white border border-rose-200 text-slate-700 shadow-sm max-w-full"
+          >
+            <span className="text-[11px] font-semibold text-rose-600">Diagram failed to load</span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setHasError(false);
+                setRetryTick((t) => t + 1);
+              }}
+              className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold shadow-xs transition-colors"
+            >
+              Tap to reload image
+            </button>
+          </div>
+        );
+      }
+
+      const openZoom = (e) => {
+        e.stopPropagation();
+        window.dispatchEvent(new CustomEvent('nelov:zoom-diagram', { detail: { src: finalSrc, alt } }));
+      };
+
+      return (
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={openZoom}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              openZoom(e);
+            }
+          }}
+          title="Tap or click to zoom diagram"
+          className={`${compact ? 'mt-2 p-2.5' : 'p-3'} bg-white rounded-xl border border-slate-200 shadow-sm inline-flex flex-col items-center max-w-full cursor-zoom-in hover:border-indigo-400 transition-colors select-none`}
+        >
+          <img
+            key={retryTick}
+            src={finalSrc}
+            alt={alt}
+            loading="eager"
+            decoding="async"
+            onError={() => setHasError(true)}
+            className={`${maxHeightClass} w-auto object-contain rounded-lg mx-auto`}
+          />
+          <span className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-semibold">
+            <span>🔍</span>
+            <span>{compact ? 'Zoom' : 'Tap to zoom'}</span>
+          </span>
+        </div>
+      );
+    }
+
+    function DiagramZoomLightbox() {
+      const [modalData, setModalData] = useState(null);
+      const [zoomPct, setZoomPct] = useState(100);
+
+      useEffect(() => {
+        const onOpen = (e) => {
+          if (e?.detail?.src) {
+            setModalData({ src: e.detail.src, alt: e.detail.alt || 'Diagram Preview' });
+            setZoomPct(100);
+          }
+        };
+        window.addEventListener('nelov:zoom-diagram', onOpen);
+        return () => window.removeEventListener('nelov:zoom-diagram', onOpen);
+      }, []);
+
+      useEffect(() => {
+        if (!modalData) return;
+        const onKey = (e) => {
+          if (e.key === 'Escape') setModalData(null);
+          else if (e.key === '+' || e.key === '=') setZoomPct((z) => Math.min(300, z + 25));
+          else if (e.key === '-') setZoomPct((z) => Math.max(75, z - 25));
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      }, [modalData]);
+
+      if (!modalData) return null;
+
+      return (
+        <div
+          className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-sm flex flex-col p-3 sm:p-6 animate-in fade-in"
+          onClick={() => setModalData(null)}
+        >
+          <div
+            className="max-w-5xl w-full mx-auto flex flex-wrap items-center justify-between gap-2 pb-3 text-white"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="text-xs sm:text-sm font-bold text-slate-200 truncate">
+              {modalData.alt}
+            </span>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setZoomPct((z) => Math.max(75, z - 25))}
+                className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-xs font-bold"
+              >
+                −
+              </button>
+              <button
+                type="button"
+                onClick={() => setZoomPct(100)}
+                className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-xs font-mono font-bold"
+              >
+                {zoomPct}%
+              </button>
+              <button
+                type="button"
+                onClick={() => setZoomPct((z) => Math.min(300, z + 25))}
+                className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-xs font-bold"
+              >
+                +
+              </button>
+              <button
+                type="button"
+                onClick={() => setModalData(null)}
+                className="ml-2 px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold"
+              >
+                Close ✕
+              </button>
+            </div>
+          </div>
+
+          <div
+            className="flex-1 max-w-5xl w-full mx-auto overflow-auto flex items-center justify-center p-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-white p-3 sm:p-5 rounded-2xl border border-slate-200 shadow-2xl inline-block max-w-full">
+              <img
+                src={modalData.src}
+                alt={modalData.alt}
+                style={{ width: zoomPct === 100 ? 'auto' : `${zoomPct}%`, maxWidth: zoomPct === 100 ? '100%' : 'none' }}
+                className="max-h-[75vh] object-contain mx-auto select-none"
+              />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     // Helper: Format duration into readable Xm Ys
     function formatDuration(seconds) {
       if (!seconds || seconds <= 0) return '0s';
@@ -464,7 +630,7 @@
               <span>{windowLabel || 'All-India Scheduled Mock'}</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-amber-700 dark:text-amber-300">
-              <span>â ³ Starts in: {startCountdown.formatted}</span>
+              <span>⏳ Starts in: {startCountdown.formatted}</span>
             </div>
             <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-medium">
               {formatISTWindow(startsAt, endsAt)}
@@ -478,7 +644,7 @@
           <div className="flex flex-col items-start gap-1">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-rose-600 text-white shadow-lg shadow-rose-600/30 animate-pulse">
               <span className="w-2 h-2 rounded-full bg-white" />
-              <span>ðŸ”´ LIVE ALL-INDIA WINDOW</span>
+              <span>🔴 LIVE ALL-INDIA WINDOW</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs font-mono font-black text-rose-600 dark:text-rose-400">
               <span>Closes in: {endCountdown.formatted}</span>
@@ -506,7 +672,7 @@
         return (
           <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-500 text-white shadow-sm flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-            Live Now Â· Free
+            Live Now · Free
           </span>
         );
       }
@@ -6842,7 +7008,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-zinc-400">
-                  Benchmarked against {leaderboardData?.totalParticipants || 0} active JEE aspirants Â· NTA Percentile Normalized
+                  Benchmarked against {leaderboardData?.totalParticipants || 0} active JEE aspirants · NTA Percentile Normalized
                 </p>
               </div>
             </div>
@@ -7756,6 +7922,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
     function getFullTestPaperById(testId) {
       if (!testId) return window.pta04Data || null;
       const clean = String(testId).toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (clean.includes('ptm04') || clean.includes('ptm4')) return window.ptm04Data || null;
       if (clean.includes('ptm03') || clean.includes('ptm3')) return window.ptm03Data || null;
       if (clean.includes('ptm02') || clean.includes('ptm2')) return window.ptm02Data || null;
       if (clean.includes('ptm01') || clean.includes('ptm1')) return window.ptm01Data || null;
@@ -9498,7 +9665,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
           {/* Main Single-Row Navigation Bar */}
           <nav className="w-full backdrop-blur-md bg-white/95 dark:bg-[#080B14]/95 border-b border-slate-200/80 dark:border-zinc-800/80 transition-colors duration-200">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
               
               {/* 1. Brand Logo */}
               <a
@@ -9507,16 +9674,16 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   e.preventDefault();
                   navigateTo('home', '#/');
                 }}
-                className="flex items-center gap-2.5 group shrink-0 select-none"
+                className="flex items-center gap-2 sm:gap-2.5 group shrink-0 select-none min-w-0"
               >
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white font-extrabold text-sm shadow-md shadow-indigo-500/25 group-hover:scale-105 transition-transform">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white font-extrabold text-xs sm:text-sm shadow-md shadow-indigo-500/25 group-hover:scale-105 transition-transform shrink-0">
                   NM
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-extrabold text-base tracking-tight text-zinc-950 dark:text-zinc-50 flex items-center gap-1 leading-none">
+                <div className="flex flex-col min-w-0">
+                  <span className="font-extrabold text-sm sm:text-base tracking-tight text-zinc-950 dark:text-zinc-50 flex items-center gap-1 leading-none whitespace-nowrap">
                     Nelov <span className="text-indigo-600 dark:text-indigo-400">Mallick</span>
                   </span>
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-zinc-400 mt-1 leading-none">
+                  <span className="hidden sm:block text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-zinc-400 mt-1 leading-none">
                     JEE Mains &amp; Advanced · Free CBT
                   </span>
                 </div>
@@ -10054,18 +10221,18 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     )}
                   </div>
                 ) : (
-                  <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                  <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                     <button
                       type="button"
                       onClick={() => openAuth('login')}
-                      className="px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-zinc-800/60 transition-colors whitespace-nowrap"
+                      className="px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold text-slate-700 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-zinc-800/60 transition-colors whitespace-nowrap"
                     >
                       Log In
                     </button>
                     <button
                       type="button"
                       onClick={() => openAuth('signup')}
-                      className="px-3.5 sm:px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold shadow-sm shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap"
+                      className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] sm:text-xs font-extrabold shadow-sm shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap"
                     >
                       Sign Up Free
                     </button>
@@ -11871,7 +12038,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           const count = row.uniqueStudents;
                           const heightPct = Math.max(count > 0 ? 14 : 6, (count / maxRowCount) * 100);
                           const isChapter = row.testType === 'chapter_exercise';
-                          const isReady = isChapter || ['PTM 01', 'PTM 02', 'PTM 03', 'PTA 04', 'PTA 05', 'PTA 06'].includes(row.code);
+                          const isReady = isChapter || ['PTM 01', 'PTM 02', 'PTM 03', 'PTM 04', 'PTA 04', 'PTA 05', 'PTA 06'].includes(row.code);
                           return (
                             <div key={row.testId} className="flex-1 min-w-[54px] flex flex-col items-center gap-1.5" title={`${row.code}: ${count} unique students completed (${row.completedCount} total attempts)`}>
                               <span className="text-[11px] font-mono font-bold text-indigo-600 dark:text-indigo-400">{count}</span>
@@ -14574,7 +14741,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           testId: tid,
           code: 'PTM ' + num,
           title: 'JEE Mains – PTM ' + num,
-          isLive: ['01', '02', '03'].includes(num) || testConfigs[tid] === 'live'
+          isLive: ['01', '02', '03', '04'].includes(num) || testConfigs[tid] === 'live'
         };
       });
 
@@ -15474,7 +15641,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           Physics Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-sky-800/80 dark:text-sky-400">
-                          {previewItem.code === 'PTM 03' ? 'Thermal Properties of Matter & Heat Transfer Focus' : (previewItem.code === 'PTM 02' ? 'Thermal Physics & Heat Transfer Focus' : (previewItem.code === 'PTM 01' ? 'Thermodynamics & Kinetic Theory Focus' : 'Standard JEE Mains Pattern'))}
+                          {previewItem.code === 'PTM 04' ? 'Electrostatics, Capacitors & Current Electricity Focus' : (previewItem.code === 'PTM 03' ? 'Thermal Properties of Matter & Heat Transfer Focus' : (previewItem.code === 'PTM 02' ? 'Thermal Physics & Heat Transfer Focus' : (previewItem.code === 'PTM 01' ? 'Thermodynamics & Kinetic Theory Focus' : 'Standard JEE Mains Pattern')))}
                         </p>
                       </div>
                     </div>
@@ -15506,7 +15673,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           Chemistry Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-emerald-800/80 dark:text-emerald-400">
-                          {previewItem.code === 'PTM 03' ? 'Haloalkanes & Haloarenes, Grignard Reagents & Polymers Focus' : (previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern'))}
+                          {previewItem.code === 'PTM 04' ? 'Alcohols, Phenols, Ethers & Stereochemistry Focus' : (previewItem.code === 'PTM 03' ? 'Haloalkanes & Haloarenes, Grignard Reagents & Polymers Focus' : (previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern')))}
                         </p>
                       </div>
                     </div>
@@ -15538,7 +15705,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           Mathematics Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-purple-800/80 dark:text-purple-400">
-                          {previewItem.code === 'PTM 03' ? 'Matrices, Determinants & System of Linear Equations Focus' : (previewItem.code === 'PTM 02' ? 'Quadratic Equations, Inequalities & Sequences Focus' : (previewItem.code === 'PTM 01' ? 'Trigonometry & Functional Relations' : 'Standard JEE Mains Pattern'))}
+                          {previewItem.code === 'PTM 04' ? 'Permutations, Combinations, Matrices & Number Counting Focus' : (previewItem.code === 'PTM 03' ? 'Matrices, Determinants & System of Linear Equations Focus' : (previewItem.code === 'PTM 02' ? 'Quadratic Equations, Inequalities & Sequences Focus' : (previewItem.code === 'PTM 01' ? 'Trigonometry & Functional Relations' : 'Standard JEE Mains Pattern')))}
                         </p>
                       </div>
                     </div>
@@ -15672,11 +15839,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 )}
               </div>
 
-              <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-2.5 w-full sm:w-auto shrink-0">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 transition-colors"
+                  className="flex-1 sm:flex-none whitespace-nowrap px-4 py-2.5 rounded-xl text-xs font-bold bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 transition-colors"
                 >
                   Close Preview
                 </button>
@@ -15799,24 +15966,24 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         return schedule.filter(item => item.phase === selectedPhase);
       }, [selectedPhase, schedule]);
 
-      // Check if current wall clock time is inside the scheduled window
+      // Check if current wall clock time is inside the scheduled window (strict UTC epoch ms)
       const isInsideWindow = (startIso, endIso) => {
         if (!startIso || !endIso) return false;
-        const start = new Date(startIso).getTime();
-        const end = new Date(endIso).getTime();
+        const start = Date.parse(startIso);
+        const end = Date.parse(endIso);
         return now >= start && now <= end;
       };
 
-      // Check if test has started
+      // Check if test has started (strict UTC epoch ms so zero timezone offset occurs)
       const hasStarted = (startIso) => {
         if (!startIso) return true;
-        return now >= new Date(startIso).getTime();
+        return now >= Date.parse(startIso);
       };
 
       // Live countdown formatter
       const formatCountdown = (startIso) => {
         if (!startIso) return null;
-        const diff = new Date(startIso).getTime() - now;
+        const diff = Date.parse(startIso) - now;
         if (diff <= 0) return null;
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -15878,7 +16045,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       };
 
       const isTestReady = (id) => {
-        return id === 'jee-mains-ptm-01' || id === 'jee-mains-ptm-02' || id === 'jee-mains-ptm-03' || id.includes('pta-04') || id.includes('pta-05') || id.includes('pta-06') || testConfigs[id] === 'live';
+        return id === 'jee-mains-ptm-01' || id === 'jee-mains-ptm-02' || id === 'jee-mains-ptm-03' || id === 'jee-mains-ptm-04' || id.includes('pta-04') || id.includes('pta-05') || id.includes('pta-06') || testConfigs[id] === 'live';
       };
 
       const handleAction = (item) => {
@@ -18227,17 +18394,17 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       };
 
       const isTestReady = (id) => {
-        return id === 'jee-mains-ptm-01' || id === 'jee-mains-ptm-02' || id === 'jee-mains-ptm-03' || id.includes('pta-04') || id.includes('pta-05') || id.includes('pta-06') || testConfigs[id] === 'live';
+        return id === 'jee-mains-ptm-01' || id === 'jee-mains-ptm-02' || id === 'jee-mains-ptm-03' || id === 'jee-mains-ptm-04' || id.includes('pta-04') || id.includes('pta-05') || id.includes('pta-06') || testConfigs[id] === 'live';
       };
 
       const hasStarted = (startIso) => {
         if (!startIso) return true;
-        return now >= new Date(startIso).getTime();
+        return now >= Date.parse(startIso);
       };
 
       const formatCountdown = (startIso) => {
         if (!startIso) return null;
-        const diff = new Date(startIso).getTime() - now;
+        const diff = Date.parse(startIso) - now;
         if (diff <= 0) return null;
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -20705,6 +20872,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [activeVaultChapterSlug, setActiveVaultChapterSlug] = useState('c1');
       const [testConfigs, setTestConfigs] = useState({
         'jee-mains-ptm-01': 'live',
+        'jee-mains-ptm-02': 'live',
+        'jee-mains-ptm-03': 'live',
+        'jee-mains-ptm-04': 'live',
         'jee-advanced-pta-04': 'live',
         'jee-advanced-pta-05': 'live',
         'jee-advanced-pta-06': 'live'
@@ -20712,6 +20882,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [activeLeaderboardTestId, setActiveLeaderboardTestId] = useState('jee-advanced-pta-04');
       const [detailedConfigs, setDetailedConfigs] = useState({});
       const [toppersSummaries, setToppersSummaries] = useState([]);
+      const [homePreviewItem, setHomePreviewItem] = useState(null);
+      const [homePreviewTab, setHomePreviewTab] = useState('syllabus');
+      const [showInstructionsSyllabus, setShowInstructionsSyllabus] = useState(false);
 
       // Synchronize active authentication state from authStore & Supabase in real time
       useEffect(() => {
@@ -20747,7 +20920,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       useEffect(() => {
         if (window.studentStorage?.getTestConfigs) {
           window.studentStorage.getTestConfigs().then(cfg => {
-            if (cfg) setTestConfigs({ ...cfg, 'jee-mains-ptm-01': 'live', 'jee-advanced-pta-04': 'live', 'jee-advanced-pta-05': 'live', 'jee-advanced-pta-06': 'live' });
+            if (cfg) setTestConfigs({ ...cfg, 'jee-mains-ptm-01': 'live', 'jee-mains-ptm-02': 'live', 'jee-mains-ptm-03': 'live', 'jee-mains-ptm-04': 'live', 'jee-advanced-pta-04': 'live', 'jee-advanced-pta-05': 'live', 'jee-advanced-pta-06': 'live' });
           });
         }
         if (window.studentStorage?.getTestConfigsDetails) {
@@ -20763,7 +20936,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         const handleConfigChange = () => {
           if (window.studentStorage?.getTestConfigs) {
             window.studentStorage.getTestConfigs().then(cfg => {
-              if (cfg) setTestConfigs({ ...cfg, 'jee-mains-ptm-01': 'live', 'jee-advanced-pta-04': 'live', 'jee-advanced-pta-05': 'live', 'jee-advanced-pta-06': 'live' });
+              if (cfg) setTestConfigs({ ...cfg, 'jee-mains-ptm-01': 'live', 'jee-mains-ptm-02': 'live', 'jee-mains-ptm-03': 'live', 'jee-mains-ptm-04': 'live', 'jee-advanced-pta-04': 'live', 'jee-advanced-pta-05': 'live', 'jee-advanced-pta-06': 'live' });
             });
           }
         };
@@ -20946,6 +21119,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const currentPaper = useMemo(() => {
         if (!activeTestId) return window.pta04Data || null;
         const clean = activeTestId.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (clean.includes('ptm04') || clean.includes('ptm4')) {
+          return window.ptm04Data || null;
+        }
         if (clean.includes('ptm03') || clean.includes('ptm3')) {
           return window.ptm03Data || null;
         }
@@ -21090,7 +21266,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return;
         }
 
-        const ptmMatch = !hash.includes('leaderboard') ? hash.match(/ptm-?(\d+)/) : null;
+        const routeSrc = (isHashEmpty ? path : hash) || '';
+        const ptmMatch = !routeSrc.includes('leaderboard') ? routeSrc.match(/ptm-?(\d+)/) : null;
         if (ptmMatch) {
           const ptmNum = String(parseInt(ptmMatch[1], 10)).padStart(2, '0');
           const ptmId = `jee-mains-ptm-${ptmNum}`;
@@ -21460,7 +21637,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
         // Standardize canonical ID
         let canonicalId = testId;
-        if (testId.includes('ptm-03') || testId.includes('ptm03')) canonicalId = 'jee-mains-ptm-03';
+        if (testId.includes('ptm-04') || testId.includes('ptm04')) canonicalId = 'jee-mains-ptm-04';
+        else if (testId.includes('ptm-03') || testId.includes('ptm03')) canonicalId = 'jee-mains-ptm-03';
         else if (testId.includes('ptm-02') || testId.includes('ptm02')) canonicalId = 'jee-mains-ptm-02';
         else if (testId.includes('ptm-01') || testId.includes('ptm01')) canonicalId = 'jee-mains-ptm-01';
         else if (testId.includes('pta-04') || testId.includes('pta04')) canonicalId = 'jee-advanced-pta-04';
@@ -21474,7 +21652,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         const isStrictAdmin = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : (user && user.role === 'admin'));
 
         if (schedItem?.startIso && !isStrictAdmin) {
-          const startMs = new Date(schedItem.startIso).getTime();
+          const startMs = Date.parse(schedItem.startIso);
           if (!isNaN(startMs) && Date.now() < startMs) {
             setNoticeModal({
               title: `${schedItem.code} — Scheduled Window Locked`,
@@ -21485,7 +21663,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           }
         }
 
-        const isVerifiedLive = canonicalId === 'jee-mains-ptm-03' || canonicalId === 'jee-mains-ptm-02' || canonicalId === 'jee-mains-ptm-01' || canonicalId.includes('pta-04') || canonicalId.includes('pta-05') || canonicalId.includes('pta-06');
+        const isVerifiedLive = canonicalId === 'jee-mains-ptm-04' || canonicalId === 'jee-mains-ptm-03' || canonicalId === 'jee-mains-ptm-02' || canonicalId === 'jee-mains-ptm-01' || canonicalId.includes('pta-04') || canonicalId.includes('pta-05') || canonicalId.includes('pta-06');
         const configuredStatus = isVerifiedLive ? 'live' : (testConfigs[canonicalId] || (meta ? meta.status : 'coming_soon'));
 
         if (!isVerifiedLive && configuredStatus === 'coming_soon') {
@@ -21497,28 +21675,54 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return;
         }
 
-        // Lazy-load PTM 03 script only after scheduled window starts (or admin preview)
-        if (canonicalId === 'jee-mains-ptm-03' && !window.ptm03Data) {
-          try {
-            await new Promise((resolve, reject) => {
-              const sc = document.createElement('script');
-              sc.src = '/data/jee-mains/ptm03.js';
-              sc.onload = resolve;
-              sc.onerror = reject;
-              document.head.appendChild(sc);
-            });
-            setPaperLoadTick((t) => t + 1);
-          } catch (loadErr) {
-            setNoticeModal({
-              title: 'PTM 03 — Paper Locked / Unavailable',
-              message: 'This scheduled paper could not be loaded before its official start time.',
-              activeCategory: 'jee-mains'
-            });
-            return;
+        // Lazy-load scheduled PTM 03 / PTM 04 payload after scheduled go-live (or via Admin JWT before go-live)
+        if ((canonicalId === 'jee-mains-ptm-03' || canonicalId === 'jee-mains-ptm-04')) {
+          const num = canonicalId.slice(-2);
+          const dataKey = `ptm${num}Data`;
+          if (!window[dataKey]) {
+            const beforeStart = schedItem?.startIso ? (Date.now() < Date.parse(schedItem.startIso)) : false;
+            try {
+              if (beforeStart && isStrictAdmin) {
+                let token = '';
+                try {
+                  const sb = window.authStore?.getSupabaseClient ? window.authStore.getSupabaseClient() : null;
+                  if (sb?.auth?.getSession) {
+                    const { data: sessData } = await sb.auth.getSession();
+                    token = sessData?.session?.access_token || '';
+                  }
+                  if (!token) {
+                    const rawTok = localStorage.getItem('nelov_supabase_auth_token');
+                    if (rawTok) token = JSON.parse(rawTok)?.access_token || '';
+                  }
+                } catch (e) {}
+                const resp = await fetch(`/data/tests/jee-main-2027/ptm-${num}.json`, {
+                  headers: token ? { Authorization: `Bearer ${token}` } : {}
+                });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                window[dataKey] = await resp.json();
+              } else {
+                await new Promise((resolve, reject) => {
+                  const sc = document.createElement('script');
+                  sc.src = `/data/jee-mains/ptm${num}.js`;
+                  sc.onload = resolve;
+                  sc.onerror = reject;
+                  document.head.appendChild(sc);
+                });
+              }
+              setPaperLoadTick((t) => t + 1);
+            } catch (loadErr) {
+              setNoticeModal({
+                title: `PTM ${num} — Paper Locked / Unavailable`,
+                message: 'This scheduled paper could not be loaded before its official start time.',
+                activeCategory: 'jee-mains'
+              });
+              return;
+            }
           }
         }
 
         setActiveTestId(canonicalId);
+        setShowInstructionsSyllabus(false);
         const targetHash = canonicalId.startsWith('jee-mains-')
           ? `#/test/jee-mains/${canonicalId.replace('jee-mains-', '')}`
           : `#/test/jee-advanced/${canonicalId.replace('jee-advanced-', '')}`;
@@ -22132,13 +22336,12 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     {q.images && q.images.length > 0 && (
                       <div className="py-2 flex flex-wrap gap-4 items-center justify-center">
                         {q.images.map((imgSrc, idx) => (
-                          <div key={idx} className="p-3 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm max-w-full">
-                            <img
-                              src={imgSrc}
-                              alt={`Question Diagram ${idx + 1}`}
-                              className="max-h-64 object-contain rounded-lg mx-auto"
-                            />
-                          </div>
+                          <DiagramImage
+                            key={idx}
+                            src={imgSrc}
+                            alt={`Question ${q.id} Diagram ${idx + 1}`}
+                            maxHeightClass="max-h-[420px]"
+                          />
                         ))}
                       </div>
                     )}
@@ -22158,7 +22361,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                   <div className="flex-1">
                                     <MathSpan text={item.text} />
                                     {item.image && (
-                                      <img src={item.image} alt="" className="mt-1 max-h-24 rounded border p-1 bg-white" />
+                                      <DiagramImage src={item.image} alt={`List-I ${item.label}`} maxHeightClass="max-h-[420px]" compact />
                                     )}
                                   </div>
                                 </div>
@@ -22177,7 +22380,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                   <div className="flex-1">
                                     <MathSpan text={item.text} />
                                     {item.image && (
-                                      <img src={item.image} alt="" className="mt-1 max-h-24 rounded border p-1 bg-white" />
+                                      <DiagramImage src={item.image} alt={`List-II ${item.label}`} maxHeightClass="max-h-[420px]" compact />
                                     )}
                                   </div>
                                 </div>
@@ -22218,7 +22421,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                 <div className="flex-1 text-xs sm:text-sm text-slate-800 dark:text-zinc-200 pt-0.5">
                                   <MathSpan text={opt.text} />
                                   {opt.image && (
-                                    <img src={opt.image} alt="" className="mt-2 max-h-28 rounded-lg border p-1 bg-white" />
+                                    <div>
+                                      <DiagramImage src={opt.image} alt={`Option ${opt.id} Diagram`} maxHeightClass="max-h-40 sm:max-h-[420px]" compact />
+                                    </div>
                                   )}
                                 </div>
                               </button>
@@ -22262,7 +22467,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                 <div className="flex-1 text-xs sm:text-sm text-slate-800 dark:text-zinc-200 pt-0.5">
                                   <MathSpan text={opt.text} />
                                   {opt.image && (
-                                    <img src={opt.image} alt="" className="mt-2 max-h-28 rounded-lg border p-1 bg-white" />
+                                    <div>
+                                      <DiagramImage src={opt.image} alt={`Option ${opt.id} Diagram`} maxHeightClass="max-h-40 sm:max-h-[420px]" compact />
+                                    </div>
                                   )}
                                 </div>
                               </button>
@@ -22666,6 +22873,58 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     <p className="text-xl font-extrabold text-slate-900 dark:text-zinc-100">{currentQuestions.length}</p>
                   </div>
                 </div>
+
+                {(() => {
+                  const schedEntry = (window.JEE_MAINS_2027_SCHEDULE || []).find((s) => s.id === (currentPaper?.id || activeTestId));
+                  const activeSyllabus = currentPaper?.syllabus || schedEntry?.syllabus || null;
+                  const hasSubjects = Boolean(activeSyllabus && ['physics', 'chemistry', 'mathematics'].some((k) => Array.isArray(activeSyllabus[k]) && activeSyllabus[k].length > 0));
+                  if (!hasSubjects) return null;
+                  const subjMeta = [
+                    { key: 'physics', label: 'Physics (Q1–Q25)', badge: 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border-sky-500/30', card: 'border-sky-200 dark:border-sky-900/60 bg-sky-50/40 dark:bg-sky-950/20', dot: 'text-sky-500' },
+                    { key: 'chemistry', label: 'Chemistry (Q26–Q50)', badge: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30', card: 'border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/40 dark:bg-emerald-950/20', dot: 'text-emerald-500' },
+                    { key: 'mathematics', label: 'Mathematics (Q51–Q75)', badge: 'bg-violet-500/15 text-violet-700 dark:text-violet-300 border-violet-500/30', card: 'border-violet-200 dark:border-violet-900/60 bg-violet-50/40 dark:bg-violet-950/20', dot: 'text-violet-500' }
+                  ];
+                  return (
+                    <div className="space-y-3">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <h3 className="text-sm font-extrabold text-slate-900 dark:text-zinc-100 uppercase tracking-wider">
+                          Test Syllabus Overview (PCM):
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => setShowInstructionsSyllabus((prev) => !prev)}
+                          className="px-4 py-2 rounded-xl font-bold text-xs bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 transition-all flex items-center gap-1.5"
+                        >
+                          <span>📘</span>
+                          <span>{showInstructionsSyllabus ? 'Hide Syllabus' : 'View Syllabus'}</span>
+                        </button>
+                      </div>
+                      {showInstructionsSyllabus && (
+                        <div className="grid grid-cols-1 gap-4 pt-1">
+                          {subjMeta.map((sub) => {
+                            const list = activeSyllabus[sub.key] || [];
+                            if (!list.length) return null;
+                            return (
+                              <div key={sub.key} className={`rounded-2xl border p-4 space-y-2.5 ${sub.card}`}>
+                                <span className={`inline-flex px-2.5 py-0.5 rounded-lg border text-[11px] font-extrabold ${sub.badge}`}>
+                                  {sub.label}
+                                </span>
+                                <ul className="space-y-1.5 text-xs text-slate-700 dark:text-zinc-300">
+                                  {list.map((topic, tIdx) => (
+                                    <li key={tIdx} className="flex items-start gap-2">
+                                      <span className={`${sub.dot} font-bold`}>•</span>
+                                      <RichMathContent text={topic} className="flex-1 leading-relaxed" />
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {currentPaper && currentPaper.sectionsSummary && (
                   <div className="space-y-4">
@@ -23218,7 +23477,12 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           {qObj.images && qObj.images.length > 0 && (
                             <div className="flex flex-wrap gap-3 py-2">
                               {qObj.images.map((img, iIdx) => (
-                                <img key={iIdx} src={img} alt="" className="max-h-48 rounded-xl border p-1 bg-white shadow-sm" />
+                                <DiagramImage
+                                  key={iIdx}
+                                  src={img}
+                                  alt={`Question ${qObj.id} Diagram ${iIdx + 1}`}
+                                  maxHeightClass="max-h-[420px]"
+                                />
                               ))}
                             </div>
                           )}
@@ -23230,8 +23494,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                 <p className="font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider text-[11px]">List - I</p>
                                 {qObj.matchingList.listI.map((itemI, idxI) => (
                                   <div key={idxI} className="p-2 rounded-lg bg-white dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 flex gap-2">
-                                    <span className="font-bold text-slate-900 dark:text-zinc-100 min-w-[28px]">{itemI.key}</span>
-                                    <RichMathContent text={itemI.text} className="flex-1" />
+                                    <span className="font-bold text-slate-900 dark:text-zinc-100 min-w-[28px]">{itemI.key || itemI.label}</span>
+                                    <div className="flex-1">
+                                      <RichMathContent text={itemI.text} />
+                                      {itemI.image && (
+                                        <DiagramImage src={itemI.image} alt={`List-I ${itemI.key || itemI.label}`} maxHeightClass="max-h-36 sm:max-h-[420px]" compact />
+                                      )}
+                                    </div>
                                   </div>
                                 ))}
                               </div>
@@ -23239,8 +23508,13 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                 <p className="font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider text-[11px]">List - II</p>
                                 {qObj.matchingList.listII.map((itemII, idxII) => (
                                   <div key={idxII} className="p-2 rounded-lg bg-white dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 flex gap-2">
-                                    <span className="font-bold text-slate-900 dark:text-zinc-100 min-w-[28px]">{itemII.key}</span>
-                                    <RichMathContent text={itemII.text} className="flex-1" />
+                                    <span className="font-bold text-slate-900 dark:text-zinc-100 min-w-[28px]">{itemII.key || itemII.label}</span>
+                                    <div className="flex-1">
+                                      <RichMathContent text={itemII.text} />
+                                      {itemII.image && (
+                                        <DiagramImage src={itemII.image} alt={`List-II ${itemII.key || itemII.label}`} maxHeightClass="max-h-36 sm:max-h-[420px]" compact />
+                                      )}
+                                    </div>
                                   </div>
                                 ))}
                               </div>
@@ -23290,7 +23564,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                                       <div className="flex-1">
                                         <RichMathContent text={opt.text} />
                                         {opt.image && (
-                                          <img src={opt.image} alt="" className="mt-2 max-h-24 rounded-lg border p-1 bg-white" />
+                                          <div>
+                                            <DiagramImage src={opt.image} alt={`Option ${opt.id} Diagram`} maxHeightClass="max-h-36 sm:max-h-[420px]" compact />
+                                          </div>
                                         )}
                                       </div>
                                       {optBadge}
@@ -24424,7 +24700,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     </span>
                     <span className="text-slate-300 dark:text-zinc-700">·</span>
                     <span className="text-xs text-slate-500 dark:text-zinc-400">
-                      Showing PTA 01 to PTA 10 in numbered order
+                      {activeCategory === 'jee-advanced' ? 'Showing PTA 01 to PTA 10 in numbered order' : 'Showing PTM 01 to PTM 20 in numbered order'}
                     </span>
                   </div>
 
@@ -24471,6 +24747,18 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
                   {activeCategoryList.map((t) => {
                     const isLive = (testConfigs[t.id] || t.status) === 'live';
+                    const schedItem = (window.JEE_MAINS_2027_SCHEDULE || []).find((s) => s.id === t.id);
+                    const cfg = detailedConfigs[t.id];
+                    const hasDbWindow = Boolean(cfg?.isScheduledWindow && cfg?.startsAt);
+                    const isScheduledWin = hasDbWindow || Boolean(schedItem?.startIso);
+                    const effStartsAt = (hasDbWindow ? cfg?.startsAt : null) || schedItem?.startIso || null;
+                    const effEndsAt = (hasDbWindow ? cfg?.endsAt : null) || schedItem?.endIso || null;
+                    const effWindowLabel = (hasDbWindow ? cfg?.windowLabel : null) || (schedItem?.dateStr && schedItem?.windowStr ? `${schedItem.dateStr} · ${schedItem.windowStr}` : null);
+                    const effAllowPractice = cfg?.allowPracticeAfterEnd ?? true;
+                    const effStartMs = effStartsAt ? Date.parse(effStartsAt) : 0;
+                    const isScheduledUpcoming = Boolean(isScheduledWin && effStartMs > 0 && Date.now() < effStartMs);
+                    const isAdminUser = Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : currentUser?.role === 'admin');
+                    const hasSyllabus = Boolean(schedItem?.syllabus && Object.values(schedItem.syllabus).some((arr) => Array.isArray(arr) && arr.length > 0));
                     const CardComponent = isLive ? Tilt3DCard : 'div';
                     const cardProps = isLive ? { maxTilt: 6, perspective: 1000 } : {};
 
@@ -24486,18 +24774,18 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                       >
                         <div className="space-y-4">
                           {/* Top Badges */}
-                          <div className="flex items-center justify-between">
-                            <span className="font-mono text-xs font-extrabold px-3 py-1 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-mono text-xs font-extrabold px-3 py-1 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700 shrink-0">
                               {t.code}
                             </span>
 
                             <MockWindowBadge
-                              isScheduled={detailedConfigs[t.id]?.isScheduledWindow}
-                              startsAt={detailedConfigs[t.id]?.startsAt}
-                              endsAt={detailedConfigs[t.id]?.endsAt}
-                              windowLabel={detailedConfigs[t.id]?.windowLabel}
+                              isScheduled={isScheduledWin}
+                              startsAt={effStartsAt}
+                              endsAt={effEndsAt}
+                              windowLabel={effWindowLabel}
                               isLive={isLive}
-                              allowPractice={detailedConfigs[t.id]?.allowPracticeAfterEnd ?? true}
+                              allowPractice={effAllowPractice}
                             />
                           </div>
 
@@ -24550,14 +24838,34 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                         {/* Card CTA */}
                         <div className="pt-6 space-y-2">
                           {isLive ? (
-                            <button
-                              type="button"
-                              onClick={() => handleSelectTest(t.id)}
-                              className="w-full py-3.5 rounded-xl font-bold text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-1.5"
-                            >
-                              <span>Attempt Test Free</span>
-                              <span>→</span>
-                            </button>
+                            !isScheduledUpcoming ? (
+                              <button
+                                type="button"
+                                onClick={() => handleSelectTest(t.id)}
+                                className="w-full py-3.5 rounded-xl font-bold text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-1.5"
+                              >
+                                <span>Attempt Test Free</span>
+                                <span>→</span>
+                              </button>
+                            ) : isAdminUser ? (
+                              <button
+                                type="button"
+                                onClick={() => handleSelectTest(t.id)}
+                                className="w-full py-3.5 rounded-xl font-bold text-xs sm:text-sm bg-amber-600 hover:bg-amber-700 text-white shadow-md shadow-amber-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-1.5"
+                                title="Admin Preview: Authorized only for mallicknelov@gmail.com"
+                              >
+                                <span>Admin Preview {t.code}</span>
+                                <span>→</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                disabled
+                                className="w-full py-3 rounded-xl font-bold text-xs border border-amber-300/80 dark:border-amber-700/60 bg-amber-50/70 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 cursor-not-allowed flex items-center justify-center gap-1.5"
+                              >
+                                <span>🔒 Scheduled · Opens {schedItem?.dateStr || 'at Start Time'}</span>
+                              </button>
+                            )
                           ) : (
                             <button
                               type="button"
@@ -24568,18 +24876,35 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                             </button>
                           )}
 
-                          {isLive && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setActiveLeaderboardTestId(t.id);
-                                setView('leaderboard');
-                                window.location.hash = `#/leaderboard/${t.id}`;
-                              }}
-                              className="w-full py-2 rounded-xl font-bold text-xs border border-amber-300 dark:border-amber-700/60 bg-amber-50/60 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-950/40 transition-colors flex items-center justify-center gap-1.5"
-                            >
-                              <span>🏆 View Leaderboard &amp; Toppers</span>
-                            </button>
+                          {(hasSyllabus || isLive) && (
+                            <div className="flex items-center gap-2">
+                              {hasSyllabus && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setHomePreviewItem(schedItem);
+                                    setHomePreviewTab('syllabus');
+                                  }}
+                                  className="flex-1 py-2 px-2.5 rounded-xl font-bold text-xs border border-indigo-200 dark:border-indigo-800 bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors flex items-center justify-center gap-1"
+                                >
+                                  <span>📘 View Syllabus</span>
+                                </button>
+                              )}
+
+                              {isLive && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setActiveLeaderboardTestId(t.id);
+                                    setView('leaderboard');
+                                    window.location.hash = `#/leaderboard/${t.id}`;
+                                  }}
+                                  className="flex-1 py-2 px-2.5 rounded-xl font-bold text-xs border border-amber-300 dark:border-amber-700/60 bg-amber-50/60 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-950/40 transition-colors flex items-center justify-center gap-1"
+                                >
+                                  <span>🏆 Leaderboard</span>
+                                </button>
+                              )}
+                            </div>
                           )}
                         </div>
                       </CardComponent>
@@ -24820,6 +25145,28 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             onAuthSuccess={handleAuthSuccess}
           />
 
+          {/* HOME SYLLABUS & TEST PREVIEW MODAL */}
+          <TestPreviewDetailsModal
+            previewItem={homePreviewItem}
+            previewTab={homePreviewTab}
+            setPreviewTab={setHomePreviewTab}
+            onClose={() => setHomePreviewItem(null)}
+            isTestReady={(id) => ['jee-mains-ptm-01', 'jee-mains-ptm-02', 'jee-mains-ptm-03', 'jee-mains-ptm-04'].includes(id) || testConfigs[id] === 'live'}
+            isAdmin={Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : currentUser?.role === 'admin')}
+            started={homePreviewItem?.startIso ? Date.now() >= Date.parse(homePreviewItem.startIso) : true}
+            countdown={(() => {
+              if (!homePreviewItem?.startIso) return null;
+              const diff = Date.parse(homePreviewItem.startIso) - Date.now();
+              if (diff <= 0) return null;
+              const d = Math.floor(diff / 86400000);
+              const h = Math.floor((diff % 86400000) / 3600000);
+              const m = Math.floor((diff % 3600000) / 60000);
+              const s = Math.floor((diff % 60000) / 1000);
+              return d > 0 ? `${d}d ${h}h ${m}m ${s}s` : `${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+            })()}
+            handleSelectTest={handleSelectTest}
+          />
+
           {/* PLACEHOLDER / COMING SOON MODAL */}
           {noticeModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
@@ -24881,6 +25228,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
     root.render(
       <CBTErrorBoundary>
         <NelovMallickApp />
+        <DiagramZoomLightbox />
       </CBTErrorBoundary>
     );
   </script>
