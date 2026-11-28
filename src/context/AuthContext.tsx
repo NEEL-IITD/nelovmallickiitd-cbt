@@ -151,9 +151,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             localStorage.setItem('nelov_active_session', JSON.stringify(currentUser));
             cloudSyncService.hydrateAndMigrateOnLogin(currentUser).catch(() => {});
 
-            // Check if there was an OAuth redirect destination
+            // Check if there was an OAuth redirect destination (skip during password recovery)
+            const curPath = window.location.pathname.toLowerCase();
+            const curHash = (window.location.hash || '').toLowerCase();
+            const curSearch = (window.location.search || '').toLowerCase();
+            const isRecoveryFlow = curPath === '/reset-password' || curHash.includes('reset-password') || curHash.includes('recovery=1') || curHash.includes('type=recovery') || curSearch.includes('type=recovery');
             const savedRedirect = sessionStorage.getItem('nelov_auth_redirect');
-            if (savedRedirect) {
+            if (savedRedirect && !isRecoveryFlow) {
               sessionStorage.removeItem('nelov_auth_redirect');
               if (window.location.hash !== savedRedirect) {
                 window.location.hash = savedRedirect;
@@ -283,12 +287,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           cloudSyncService.hydrateAndMigrateOnLogin(loggedInUser).catch(() => {});
 
           if (isPasswordRecovery) {
-            window.location.hash = '#/login?recovery=1';
+            const p = window.location.pathname.toLowerCase();
+            const h = (window.location.hash || '').toLowerCase();
+            if (p !== '/reset-password' && !h.includes('reset-password') && !h.includes('recovery=1')) {
+              window.location.hash = '#/reset-password';
+            }
             return;
           }
 
           const savedRedirect = sessionStorage.getItem('nelov_auth_redirect');
-          if (savedRedirect) {
+          const curPath = window.location.pathname.toLowerCase();
+          const curHash = (window.location.hash || '').toLowerCase();
+          const curSearch = (window.location.search || '').toLowerCase();
+          const isRecoveryFlow = curPath === '/reset-password' || curHash.includes('reset-password') || curHash.includes('recovery=1') || curHash.includes('type=recovery') || curSearch.includes('type=recovery');
+          if (savedRedirect && !isRecoveryFlow) {
             sessionStorage.removeItem('nelov_auth_redirect');
             window.location.hash = savedRedirect;
           }
@@ -317,7 +329,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (params: SignUpParams): Promise<User> => {
     const newUser = await authService.signUp(params);
-    setUser(newUser);
+    if (!newUser.needsEmailConfirmation) {
+      setUser(newUser);
+    }
     return newUser;
   };
 

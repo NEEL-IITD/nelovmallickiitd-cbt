@@ -62,8 +62,11 @@ export const AppContent: React.FC = () => {
 
   const isDashboardRoute = currentHash.toLowerCase() === '#/dashboard' || currentHash.toLowerCase().startsWith('#/dashboard/');
   const lowHash = currentHash.toLowerCase();
-  const isLoginRoute = lowHash === '#/login' || lowHash.startsWith('#/login?') || window.location.pathname.toLowerCase() === '/login';
-  const isSignupRoute = lowHash === '#/signup' || lowHash.startsWith('#/signup?') || window.location.pathname.toLowerCase() === '/signup';
+  const lowPath = window.location.pathname.toLowerCase();
+  const lowSearch = window.location.search.toLowerCase();
+  const isResetPasswordRoute = lowHash === '#/reset-password' || lowHash.startsWith('#/reset-password?') || lowHash.includes('recovery=1') || lowHash.includes('type=recovery') || lowPath === '/reset-password' || lowSearch.includes('type=recovery');
+  const isLoginRoute = lowHash === '#/login' || lowHash.startsWith('#/login?') || lowPath === '/login';
+  const isSignupRoute = lowHash === '#/signup' || lowHash.startsWith('#/signup?') || lowPath === '/signup';
 
   // Sync dark class on document element
   useEffect(() => {
@@ -112,12 +115,17 @@ export const AppContent: React.FC = () => {
     setCurrentHash(hash);
   };
 
-  if (isLoginRoute || isSignupRoute) {
-    const mode = lowHash.includes('recovery=1') ? 'recovery' : (isSignupRoute ? 'signup' : 'login');
+  if (isLoginRoute || isSignupRoute || isResetPasswordRoute) {
+    const mode = isResetPasswordRoute ? 'recovery' : (isSignupRoute ? 'signup' : 'login');
     return (
       <AuthPage
         initialMode={mode}
-        onSuccess={() => handleNavigate('#/dashboard')}
+        onSuccess={() => {
+          if (window.location.pathname.toLowerCase() === '/reset-password' || window.location.pathname.toLowerCase() === '/login' || window.location.pathname.toLowerCase() === '/signup') {
+            window.history.replaceState(null, '', '/#/dashboard');
+          }
+          handleNavigate('#/dashboard');
+        }}
         onContinueGuest={() => handleNavigate('#/dashboard')}
       />
     );

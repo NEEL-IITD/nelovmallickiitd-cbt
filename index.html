@@ -8249,6 +8249,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [error, setError] = useState('');
       const [successMsg, setSuccessMsg] = useState('');
       const [loading, setLoading] = useState(false);
+      const [resendLoading, setResendLoading] = useState(false);
+      const [showResendConfirmation, setShowResendConfirmation] = useState(false);
       const [acceptedTerms, setAcceptedTerms] = useState(false);
       const [parentalConsent, setParentalConsent] = useState(false);
 
@@ -8256,6 +8258,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         if (initialMode) setAuthMode(initialMode);
         setError('');
         setSuccessMsg('');
+        setShowResendConfirmation(false);
       }, [initialMode, isOpen]);
 
       if (!isOpen) return null;
@@ -8269,18 +8272,34 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         return /^[6-9]\d{9}$/.test(digits);
       };
 
+      const handleResendConfirmation = async () => {
+        setError('');
+        setResendLoading(true);
+        try {
+          const res = await window.authService.resendVerificationEmail(email);
+          setSuccessMsg(res?.message || 'Verification link resent! Please check your inbox and spam folder.');
+          setShowResendConfirmation(false);
+        } catch (err) {
+          setError(err.message || 'Could not resend verification email.');
+        } finally {
+          setResendLoading(false);
+        }
+      };
+
       const handleLoginSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setSuccessMsg('');
+        setShowResendConfirmation(false);
         setLoading(true);
         try {
           let user;
           const trimmedEmail = (email || '').trim().toLowerCase();
           if (authTab === 'email') {
-            if (!trimmedEmail) throw new Error('Please enter your email address.');
+            if (!trimmedEmail || !trimmedEmail.includes('@')) throw new Error('Please enter a valid email address.');
             user = await window.authService.logIn({ email: trimmedEmail, password });
           } else {
+            if (contactNumber.includes('@')) throw new Error('Looks like you entered an email address — switch to the Gmail / Email tab above.');
             if (!contactNumber.trim()) throw new Error('Please enter your 10-digit contact number.');
             if (!isValidPhone(contactNumber)) throw new Error('Please enter a valid 10-digit mobile number.');
             user = await window.authService.logIn({ contactNumber: contactNumber.trim(), password });
@@ -8288,7 +8307,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           setSuccessMsg('Signed in! Syncing your study workspace...');
           onAuthSuccess(user, redirectUrl);
         } catch (err) {
-          setError(err.message || 'Login failed. Please check your credentials.');
+          const msg = err.message || 'Login failed. Please check your credentials.';
+          setError(msg);
+          if (err.code === 'EMAIL_NOT_CONFIRMED' || msg.toLowerCase().includes('not confirmed')) {
+            setShowResendConfirmation(true);
+          }
         } finally {
           setLoading(false);
         }
@@ -8298,6 +8321,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         e.preventDefault();
         setError('');
         setSuccessMsg('');
+        setShowResendConfirmation(false);
         if (!acceptedTerms) {
           setError('You must read and accept the Terms of Service and Privacy Policy to create a free account.');
           return;
@@ -8349,7 +8373,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             });
           }
           if (user?.needsEmailConfirmation) {
-            setSuccessMsg('Account created! Please check your email inbox to confirm your address before signing in.');
+            setSuccessMsg('Account created! Please check your email inbox (and spam folder) to confirm your address before signing in.');
+            setShowResendConfirmation(true);
             setAuthMode('login');
           } else {
             setSuccessMsg('Free account created! Cloud sync activated.');
@@ -8366,10 +8391,11 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         e.preventDefault();
         setError('');
         setSuccessMsg('');
+        setShowResendConfirmation(false);
         setLoading(true);
         try {
           const res = await window.authService.resetPassword(email);
-          setSuccessMsg(res?.message || 'Password reset email sent! Check your inbox.');
+          setSuccessMsg(res?.message || 'Password reset email sent! Check your inbox (and spam folder).');
         } catch (err) {
           setError(err.message || 'Failed to send reset instructions.');
         } finally {
@@ -8398,8 +8424,12 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           setSuccessMsg('Password updated! You are signed in.');
           setPassword('');
           setConfirmPassword('');
+          if (window.location.pathname.toLowerCase() === '/reset-password') {
+            window.history.replaceState(null, '', '/#/dashboard');
+          }
           const cur = window.authService?.getCurrentUser();
-          if (cur) onAuthSuccess(cur, redirectUrl);
+          if (cur) onAuthSuccess(cur, redirectUrl || '#/dashboard');
+          else onClose();
         } catch (err) {
           setError(err.message || 'Failed to update password.');
         } finally {
@@ -8483,15 +8513,39 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             )}
 
             {error && (
-              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-rose-600 dark:text-rose-400 flex items-start gap-2">
-                <span>⚠️</span>
-                <span>{error}</span>
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-rose-600 dark:text-rose-400 space-y-2">
+                <div className="flex items-start gap-2">
+                  <span>⚠️</span>
+                  <span>{error}</span>
+                </div>
+                {showResendConfirmation && authTab === 'email' && email.includes('@') && (
+                  <button
+                    type="button"
+                    disabled={resendLoading}
+                    onClick={handleResendConfirmation}
+                    className="inline-flex items-center px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition-colors disabled:opacity-50"
+                  >
+                    {resendLoading ? 'Sending Verification Link...' : 'Resend Verification Email'}
+                  </button>
+                )}
               </div>
             )}
             {successMsg && (
-              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 text-xs text-emerald-600 dark:text-emerald-400 flex items-start gap-2">
-                <span>✓</span>
-                <span>{successMsg}</span>
+              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 text-xs text-emerald-600 dark:text-emerald-400 space-y-2">
+                <div className="flex items-start gap-2">
+                  <span>✓</span>
+                  <span>{successMsg}</span>
+                </div>
+                {showResendConfirmation && authTab === 'email' && email.includes('@') && (
+                  <button
+                    type="button"
+                    disabled={resendLoading}
+                    onClick={handleResendConfirmation}
+                    className="inline-flex items-center px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition-colors disabled:opacity-50"
+                  >
+                    {resendLoading ? 'Sending Verification Link...' : 'Resend Verification Email'}
+                  </button>
+                )}
               </div>
             )}
 
@@ -8681,16 +8735,25 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div className="space-y-1">
-                    <label className="font-bold text-slate-700 dark:text-zinc-300">Password</label>
+                    <div className="flex items-center justify-between">
+                      <label className="font-bold text-slate-700 dark:text-zinc-300">Password</label>
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                      >
+                        {showPassword ? 'Hide' : 'Show'}
+                      </button>
+                    </div>
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      minLength={6}
+                      minLength={8}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Min 6 chars"
+                      placeholder="Min 8 chars (letter + num)"
                       className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
@@ -8700,7 +8763,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      minLength={6}
+                      minLength={8}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Repeat password"
@@ -8751,14 +8814,6 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                 >
                   {loading ? 'Creating Free Account...' : 'Complete Free Registration →'}
                 </button>
-
-                <p className="text-[10px] text-center text-slate-500 dark:text-zinc-400 leading-normal pt-1 px-1">
-                  By logging in or creating an account, you agree to our{' '}
-                  <a href="#/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-bold underline">Terms of Service</a>{' '}
-                  and{' '}
-                  <a href="#/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-bold underline">Privacy Policy</a>{' '}
-                  (and confirm parent/guardian consent if under 18).
-                </p>
 
                 <p className="text-[10px] text-center text-slate-500 dark:text-zinc-400 leading-normal pt-1 px-1">
                   By logging in or creating an account, you agree to our{' '}
@@ -8904,16 +8959,25 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div className="space-y-1">
-                    <label className="font-bold text-slate-700 dark:text-zinc-300">Password / PIN</label>
+                    <div className="flex items-center justify-between">
+                      <label className="font-bold text-slate-700 dark:text-zinc-300">Password / PIN</label>
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                      >
+                        {showPassword ? 'Hide' : 'Show'}
+                      </button>
+                    </div>
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      minLength={6}
+                      minLength={8}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Min 6 chars"
+                      placeholder="Min 8 chars (letter + num)"
                       className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
@@ -8923,13 +8987,32 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      minLength={6}
+                      minLength={8}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Repeat PIN"
+                      placeholder="Repeat password"
                       className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
+                </div>
+
+                <div className="space-y-2 pt-1 text-xs">
+                  <label className="flex items-start gap-2.5 cursor-pointer text-slate-700 dark:text-zinc-300">
+                    <input
+                      type="checkbox"
+                      required
+                      checked={acceptedTerms}
+                      onChange={(e) => setAcceptedTerms(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <span className="text-[11px] leading-relaxed">
+                      I agree to the{' '}
+                      <a href="#/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-bold underline">Terms of Service</a>{' '}
+                      and{' '}
+                      <a href="#/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-bold underline">Privacy Policy</a>
+                      , and confirm parent/guardian consent if under 18. <span className="text-rose-500">*</span>
+                    </span>
+                  </label>
                 </div>
 
                 <button
@@ -9002,15 +9085,24 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               <form onSubmit={handleRecoverySubmit} className="space-y-3.5 text-xs">
                 <div className="space-y-1">
                   <label className="font-bold text-slate-700 dark:text-zinc-300">New Password</label>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    minLength={6}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Min 6 characters"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0E1322] text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      minLength={8}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Min 8 chars (letter + num)"
+                      className="w-full px-4 py-2.5 pr-12 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0E1322] text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[11px] font-semibold"
+                    >
+                      {showPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-1">
@@ -9018,7 +9110,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
-                    minLength={6}
+                    minLength={8}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Repeat new password"
@@ -9065,6 +9157,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const [showPassword, setShowPassword] = useState(false);
       const [acceptedTerms, setAcceptedTerms] = useState(true);
       const [loading, setLoading] = useState(false);
+      const [resendLoading, setResendLoading] = useState(false);
+      const [showResendConfirmation, setShowResendConfirmation] = useState(false);
       const [error, setError] = useState('');
       const [successMsg, setSuccessMsg] = useState('');
 
@@ -9072,23 +9166,46 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         setAuthMode(initialMode);
         setError('');
         setSuccessMsg('');
+        setShowResendConfirmation(false);
       }, [initialMode]);
 
       const isCloudReady = Boolean(window.authService?.isCloudConnected?.());
+
+      const handleResendConfirmation = async () => {
+        setError('');
+        setResendLoading(true);
+        try {
+          const res = await window.authService.resendVerificationEmail(email);
+          setSuccessMsg(res?.message || 'Verification link resent! Check your inbox and spam folder.');
+          setShowResendConfirmation(false);
+        } catch (err) {
+          setError(err.message || 'Could not resend verification email.');
+        } finally {
+          setResendLoading(false);
+        }
+      };
 
       const submitLogin = async (e) => {
         e.preventDefault();
         setError('');
         setSuccessMsg('');
+        setShowResendConfirmation(false);
         setLoading(true);
         try {
+          if (authTab === 'phone' && contactNumber.includes('@')) {
+            throw new Error('Looks like you entered an email address — switch to Email / Password above.');
+          }
           const user = authTab === 'email'
             ? await window.authService.logIn({ email: email.trim().toLowerCase(), password })
             : await window.authService.logIn({ contactNumber: contactNumber.trim(), password });
           setSuccessMsg('Signed in! Loading your cloud workspace...');
           onAuthSuccess(user, '#/dashboard');
         } catch (err) {
-          setError(err.message || 'Sign in failed.');
+          const msg = err.message || 'Sign in failed.';
+          setError(msg);
+          if (err.code === 'EMAIL_NOT_CONFIRMED' || msg.toLowerCase().includes('not confirmed')) {
+            setShowResendConfirmation(true);
+          }
         } finally {
           setLoading(false);
         }
@@ -9098,6 +9215,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         e.preventDefault();
         setError('');
         setSuccessMsg('');
+        setShowResendConfirmation(false);
         if (!acceptedTerms) {
           setError('Please accept Terms of Service & Privacy Policy.');
           return;
@@ -9126,7 +9244,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             parentalConsentConfirmed: true
           });
           if (user?.needsEmailConfirmation) {
-            setSuccessMsg('Check your email to confirm your account, then sign in!');
+            setSuccessMsg('Account created! Check your email inbox (and spam folder) to verify your address, then sign in.');
+            setShowResendConfirmation(true);
             setAuthMode('login');
           } else {
             setSuccessMsg('Account created! Syncing your guest study progress to cloud...');
@@ -9143,6 +9262,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         e.preventDefault();
         setError('');
         setSuccessMsg('');
+        setShowResendConfirmation(false);
         setLoading(true);
         try {
           const res = await window.authService.resetPassword(email);
@@ -9173,8 +9293,12 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         try {
           await window.authService.updatePassword(password);
           setSuccessMsg('Password updated! Redirecting to dashboard...');
+          if (window.location.pathname.toLowerCase() === '/reset-password' || window.location.pathname.toLowerCase() === '/login' || window.location.pathname.toLowerCase() === '/signup') {
+            window.history.replaceState(null, '', '/#/dashboard');
+          }
           const cur = window.authService?.getCurrentUser();
           if (cur) onAuthSuccess(cur, '#/dashboard');
+          else window.location.hash = '#/dashboard';
         } catch (err) {
           setError(err.message || 'Password update failed.');
         } finally {
@@ -9209,13 +9333,33 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             </div>
 
             {error && (
-              <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-xs text-rose-300">
-                {error}
+              <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-xs text-rose-300 space-y-2">
+                <div>{error}</div>
+                {showResendConfirmation && authTab === 'email' && email.includes('@') && (
+                  <button
+                    type="button"
+                    disabled={resendLoading}
+                    onClick={handleResendConfirmation}
+                    className="inline-flex items-center px-3 py-1.5 rounded-lg bg-rose-500/25 hover:bg-rose-500/35 text-white font-bold text-[11px] transition-colors disabled:opacity-50"
+                  >
+                    {resendLoading ? 'Sending Verification Link...' : 'Resend Verification Email'}
+                  </button>
+                )}
               </div>
             )}
             {successMsg && (
-              <div className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs text-emerald-300">
-                {successMsg}
+              <div className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs text-emerald-300 space-y-2">
+                <div>{successMsg}</div>
+                {showResendConfirmation && authTab === 'email' && email.includes('@') && (
+                  <button
+                    type="button"
+                    disabled={resendLoading}
+                    onClick={handleResendConfirmation}
+                    className="inline-flex items-center px-3 py-1.5 rounded-lg bg-emerald-500/25 hover:bg-emerald-500/35 text-white font-bold text-[11px] transition-colors disabled:opacity-50"
+                  >
+                    {resendLoading ? 'Sending...' : 'Resend Verification Email'}
+                  </button>
+                )}
               </div>
             )}
 
@@ -9360,14 +9504,23 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     <option value="Both">Both (Mains &amp; Advanced)</option>
                   </select>
                 </div>
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
-                    <label className="font-bold text-slate-300 block mb-1">Password</label>
-                    <input type={showPassword ? 'text' : 'password'} required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 6 chars" className="w-full px-3 py-2 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="font-bold text-slate-300">Password</label>
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-[11px] font-bold text-indigo-400 hover:underline"
+                      >
+                        {showPassword ? 'Hide' : 'Show'}
+                      </button>
+                    </div>
+                    <input type={showPassword ? 'text' : 'password'} required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 chars (letter + num)" className="w-full px-3 py-2 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
                   </div>
                   <div>
                     <label className="font-bold text-slate-300 block mb-1">Confirm</label>
-                    <input type={showPassword ? 'text' : 'password'} required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repeat password" className="w-full px-3 py-2 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
+                    <input type={showPassword ? 'text' : 'password'} required minLength={8} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repeat password" className="w-full px-3 py-2 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
                   </div>
                 </div>
                 <label className="flex items-start gap-2 text-[11px] text-[#94A3B8] cursor-pointer">
@@ -9405,11 +9558,16 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
               <form onSubmit={submitRecovery} className="space-y-3.5 text-xs">
                 <div>
                   <label className="font-bold text-slate-300 block mb-1">New Password</label>
-                  <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 6 characters" className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
+                  <div className="relative">
+                    <input type={showPassword ? 'text' : 'password'} required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 chars (letter + num)" className="w-full px-4 py-2.5 pr-14 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 hover:text-white">
+                      {showPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
                 </div>
                 <div>
                   <label className="font-bold text-slate-300 block mb-1">Confirm New Password</label>
-                  <input type="password" required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repeat password" className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
+                  <input type={showPassword ? 'text' : 'password'} required minLength={8} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repeat password" className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]" />
                 </div>
                 <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white font-black">
                   {loading ? 'Saving Password...' : 'Update Password →'}
@@ -20915,8 +21073,10 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
         const handleRecoveryEvent = () => {
           setView('recovery');
-          if (!String(window.location.hash || '').includes('recovery=1')) {
-            window.location.hash = '#/login?recovery=1';
+          const curPath = window.location.pathname.toLowerCase();
+          const curHash = String(window.location.hash || '').toLowerCase();
+          if (curPath !== '/reset-password' && !curHash.includes('reset-password') && !curHash.includes('recovery=1')) {
+            window.location.hash = '#/reset-password';
           }
         };
 
@@ -21459,11 +21619,20 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return;
         }
 
+        const searchLower = String(window.location.search || '').toLowerCase();
+        if (
+          path === '/reset-password' ||
+          hash === '#/reset-password' ||
+          hash.startsWith('#/reset-password?') ||
+          hash.includes('recovery=1') ||
+          hash.includes('type=recovery') ||
+          searchLower.includes('type=recovery')
+        ) {
+          setView('recovery');
+          return;
+        }
+
         if (hash === '#/login' || hash.startsWith('#/login?') || (isHashEmpty && path === '/login')) {
-          if (hash.includes('recovery=1')) {
-            setView('recovery');
-            return;
-          }
           if (activeUser) {
             setView('dashboard');
             window.location.hash = '#/dashboard';

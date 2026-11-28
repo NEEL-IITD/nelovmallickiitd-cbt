@@ -21,6 +21,9 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   const [confirmPassword, setConfirmPassword] = useState('');
   const [targetExam, setTargetExam] = useState<TargetExam>('JEE 2027');
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [showResendConfirmation, setShowResendConfirmation] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
@@ -28,12 +31,28 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     setMode(initialMode);
     setError('');
     setSuccessMsg('');
+    setShowResendConfirmation(false);
   }, [initialMode]);
+
+  const handleResendConfirmation = async () => {
+    setError('');
+    setResendLoading(true);
+    try {
+      const msg = await authService.resendVerificationEmail(email);
+      setSuccessMsg(msg);
+      setShowResendConfirmation(false);
+    } catch (err: any) {
+      setError(err?.message || 'Could not resend verification email.');
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccessMsg('');
+    setShowResendConfirmation(false);
     setLoading(true);
     try {
       if (mode === 'login') {
@@ -51,22 +70,27 @@ export const AuthPage: React.FC<AuthPageProps> = ({
           parentalConsentConfirmed: true,
         });
         if (created.needsEmailConfirmation) {
-          setSuccessMsg('Confirmation link sent! Please verify your email before signing in.');
+          setSuccessMsg('Account created! Please check your email inbox (and spam) to verify your address before signing in.');
+          setShowResendConfirmation(true);
           setMode('login');
         } else {
           onSuccess();
         }
       } else if (mode === 'forgot') {
         await authService.resetPassword(email);
-        setSuccessMsg(`Password reset instructions sent to ${email.trim().toLowerCase()}.`);
+        setSuccessMsg(`Password reset instructions sent to ${email.trim().toLowerCase()}. Check your inbox (and spam folder).`);
       } else if (mode === 'recovery') {
         if (password !== confirmPassword) throw new Error('Passwords do not match.');
         await authService.updatePassword(password);
-        setSuccessMsg('Password updated!');
+        setSuccessMsg('Password updated! You are signed in.');
         onSuccess();
       }
     } catch (err: any) {
-      setError(err?.message || 'Authentication failed.');
+      const msg = err?.message || 'Authentication failed.';
+      setError(msg);
+      if (err?.code === 'EMAIL_NOT_CONFIRMED' || msg.toLowerCase().includes('not confirmed')) {
+        setShowResendConfirmation(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -95,8 +119,36 @@ export const AuthPage: React.FC<AuthPageProps> = ({
           )}
         </div>
 
-        {error && <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-xs text-rose-300">{error}</div>}
-        {successMsg && <div className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs text-emerald-300">{successMsg}</div>}
+        {error && (
+          <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-xs text-rose-300 space-y-2">
+            <div>{error}</div>
+            {showResendConfirmation && email.includes('@') && (
+              <button
+                type="button"
+                disabled={resendLoading}
+                onClick={handleResendConfirmation}
+                className="inline-flex items-center px-3 py-1.5 rounded-lg bg-rose-500/25 hover:bg-rose-500/35 text-white font-bold text-[11px] transition-colors disabled:opacity-50"
+              >
+                {resendLoading ? 'Sending Verification Link...' : 'Resend Verification Email'}
+              </button>
+            )}
+          </div>
+        )}
+        {successMsg && (
+          <div className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs text-emerald-300 space-y-2">
+            <div>{successMsg}</div>
+            {showResendConfirmation && email.includes('@') && (
+              <button
+                type="button"
+                disabled={resendLoading}
+                onClick={handleResendConfirmation}
+                className="inline-flex items-center px-3 py-1.5 rounded-lg bg-emerald-500/25 hover:bg-emerald-500/35 text-white font-bold text-[11px] transition-colors disabled:opacity-50"
+              >
+                {resendLoading ? 'Sending...' : 'Resend Verification Email'}
+              </button>
+            )}
+          </div>
+        )}
 
         {(mode === 'login' || mode === 'signup') && (
           <button
@@ -138,16 +190,50 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               <div className="flex justify-between mb-1">
                 <label className="font-bold text-slate-300">{mode === 'recovery' ? 'New Password' : 'Password'}</label>
                 {mode === 'login' && (
-                  <button type="button" onClick={() => setMode('forgot')} className="text-indigo-400 font-bold hover:underline">Forgot Password?</button>
+                  <button type="button" onClick={() => { setMode('forgot'); setError(''); setShowResendConfirmation(false); }} className="text-indigo-400 font-bold hover:underline">Forgot Password?</button>
                 )}
               </div>
-              <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white" />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  minLength={mode === 'login' ? 1 : 8}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={mode === 'login' ? 'Enter password' : 'Min 8 chars (letter + num)'}
+                  className="w-full px-4 py-2.5 pr-14 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 hover:text-white"
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
             </div>
           )}
           {(mode === 'signup' || mode === 'recovery') && (
             <div>
               <label className="font-bold text-slate-300 block mb-1">Confirm Password</label>
-              <input type="password" required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-[#0E1322] border border-white/10 text-white" />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  minLength={8}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repeat password"
+                  className="w-full px-4 py-2.5 pr-14 rounded-xl bg-[#0E1322] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#6366F1]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-bold text-slate-400 hover:text-white"
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
             </div>
           )}
           <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white font-black">

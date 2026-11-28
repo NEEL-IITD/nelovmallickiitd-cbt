@@ -251,11 +251,14 @@
 
       // 1. Supabase Cloud Auth
       if (this.isCloudConnected()) {
+        const emailRedirectTo = typeof window !== 'undefined'
+          ? (window.location.origin + '/')
+          : undefined;
         const { data, error } = await supabaseClient.auth.signUp({
           email: authEmail,
           password,
           options: {
-            emailRedirectTo: typeof window !== 'undefined' ? (window.location.origin + window.location.pathname) : undefined,
+            emailRedirectTo,
             data: {
               full_name: trimmedName,
               contact_number: formattedContact,
@@ -270,10 +273,21 @@
         });
 
         if (error) {
-          if (error.message.toLowerCase().includes('already registered')) {
-            throw new Error(authMethod === 'phone' ? 'This contact number is already registered. Please log in.' : 'An account with this email already exists. Please log in.');
+          const msgLower = String(error.message || '').toLowerCase();
+          if (msgLower.includes('already registered') || msgLower.includes('already exists') || msgLower.includes('already in use')) {
+            throw new Error(
+              authMethod === 'phone'
+                ? 'This contact number is already registered. Please log in instead.'
+                : 'An account with this email already exists. Please log in (or use "Forgot Password?" / "Continue with Google" if you registered earlier).'
+            );
           }
-          throw new Error(error.message);
+          if (error.status === 429 || msgLower.includes('rate limit') || msgLower.includes('too many')) {
+            throw new Error('Too many signup attempts right now. Please wait a minute and try again.');
+          }
+          if (msgLower.includes('database error saving new user')) {
+            throw new Error('Could not create your profile on server right now. Please try again in a moment.');
+          }
+          throw new Error(error.message || 'Registration failed. Please try again.');
         }
         if (!data.user) throw new Error('Registration failed. Please try again.');
 
@@ -393,13 +407,38 @@
 
       // 1. Supabase Cloud Auth
       if (this.isCloudConnected()) {
+        if (!isPhoneLogin && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(authEmail)) {
+          throw new Error('Please enter a valid email address (or switch to the Name + Contact tab to sign in with your mobile number).');
+        }
         const { data, error } = await supabaseClient.auth.signInWithPassword({
           email: authEmail,
           password
         });
 
         if (error) {
-          throw new Error(isPhoneLogin ? 'Incorrect contact number or password/PIN.' : error.message);
+          const msgLower = String(error.message || '').toLowerCase();
+          const codeLower = String(error.code || '').toLowerCase();
+          if (isPhoneLogin) {
+            throw new Error('Incorrect contact number or password/PIN. Check your digits and password, or register a free account.');
+          }
+          if (codeLower === 'email_not_confirmed' || msgLower.includes('email not confirmed')) {
+            const unconfirmedErr = new Error(
+              'Your email address is not confirmed yet. Check your inbox (and spam folder) for the confirmation link, or click "Resend Verification Email" below.'
+            );
+            unconfirmedErr.code = 'EMAIL_NOT_CONFIRMED';
+            throw unconfirmedErr;
+          }
+          if (codeLower === 'invalid_credentials' || msgLower.includes('invalid login credentials') || msgLower.includes('invalid_credentials')) {
+            const credErr = new Error(
+              'Incorrect email or password. Tip: If you originally signed up with "Continue with Google", click "Continue with Google" above — or use "Forgot Password?" to create a portal password.'
+            );
+            credErr.code = 'INVALID_CREDENTIALS';
+            throw credErr;
+          }
+          if (error.status === 429 || msgLower.includes('rate limit') || msgLower.includes('too many')) {
+            throw new Error('Too many login attempts right now. Please wait a minute and try again.');
+          }
+          throw new Error(error.message || 'Unable to sign in. Please try again.');
         }
         if (!data.user) throw new Error('Invalid credentials.');
 
@@ -594,12 +633,18 @@
 
       if (this.isCloudConnected()) {
         const redirectTo = typeof window !== 'undefined'
-          ? (window.location.origin + window.location.pathname + '#/login?recovery=1')
+          ? (window.location.origin + '/reset-password')
           : undefined;
         const { error } = await supabaseClient.auth.resetPasswordForEmail(trimmedEmail, {
           redirectTo
         });
-        if (error) throw new Error(error.message);
+        if (error) {
+          const msgLower = String(error.message || '').toLowerCase();
+          if (error.status === 429 || msgLower.includes('rate limit') || msgLower.includes('too many')) {
+            throw new Error('Too many reset emails requested. Please wait a few minutes and check your inbox/spam folder.');
+          }
+          throw new Error(error.message);
+        }
         return {
           sentEmail: true,
           message: `Password reset instructions sent to ${trimmedEmail}. Check your inbox (and spam folder).`
@@ -607,6 +652,38 @@
       }
 
       throw new Error('Email password reset requires Supabase Cloud connection. Configure Supabase env vars or sign in locally.');
+    },
+
+    async resendVerificationEmail(email) {
+      const rlResend = checkRateLimit('resend_verification', 3, 5 * 60 * 1000);
+      if (!rlResend.allowed) {
+        throw new Error(`Please wait ${rlResend.retryAfterSec}s before requesting another verification email.`);
+      }
+      const trimmedEmail = (email || '').trim().toLowerCase();
+      if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+        throw new Error('Please enter a valid email address first.');
+      }
+      if (!this.isCloudConnected() || !supabaseClient) {
+        throw new Error('Email verification requires Supabase Cloud connection.');
+      }
+      const { error } = await supabaseClient.auth.resend({
+        type: 'signup',
+        email: trimmedEmail,
+        options: {
+          emailRedirectTo: typeof window !== 'undefined' ? (window.location.origin + '/') : undefined
+        }
+      });
+      if (error) {
+        const msgLower = String(error.message || '').toLowerCase();
+        if (error.status === 429 || msgLower.includes('rate limit') || msgLower.includes('too many')) {
+          throw new Error('Please wait a minute before requesting another verification email.');
+        }
+        throw new Error(error.message || 'Could not resend verification email.');
+      }
+      return {
+        sent: true,
+        message: `Verification link resent to ${trimmedEmail}. Please check your inbox and spam folder.`
+      };
     },
 
     async updatePassword(newPassword) {
@@ -2780,7 +2857,14 @@
       }
 
       const saved = sessionStorage.getItem(REDIRECT_KEY);
-      if (saved) {
+      const isRecoveryUrl = typeof window !== 'undefined' && (
+        window.location.pathname.toLowerCase() === '/reset-password' ||
+        String(window.location.hash || '').toLowerCase().includes('reset-password') ||
+        String(window.location.hash || '').toLowerCase().includes('recovery=1') ||
+        String(window.location.hash || '').toLowerCase().includes('type=recovery') ||
+        String(window.location.search || '').toLowerCase().includes('type=recovery')
+      );
+      if (saved && !isRecoveryUrl) {
         sessionStorage.removeItem(REDIRECT_KEY);
         window.location.hash = saved;
       }
@@ -2797,8 +2881,10 @@
         if (session) await processSession(session);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('nelov_password_recovery', { detail: { session } }));
-          if (!String(window.location.hash || '').includes('recovery=1')) {
-            window.location.hash = '#/login?recovery=1';
+          const curPath = window.location.pathname.toLowerCase();
+          const curHash = String(window.location.hash || '').toLowerCase();
+          if (curPath !== '/reset-password' && !curHash.includes('reset-password') && !curHash.includes('recovery=1')) {
+            window.location.hash = '#/reset-password';
           }
         }
         return;

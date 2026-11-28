@@ -271,7 +271,7 @@ export const authService = {
         email: authEmail,
         password,
         options: {
-          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : undefined,
+          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/` : undefined,
           data: {
             full_name: trimmedName,
             contact_number: formattedContact,
@@ -286,14 +286,21 @@ export const authService = {
       });
 
       if (error) {
-        if (error.message.toLowerCase().includes('already registered') || error.message.toLowerCase().includes('already in use')) {
+        const msgLower = String(error.message || '').toLowerCase();
+        if (msgLower.includes('already registered') || msgLower.includes('already exists') || msgLower.includes('already in use')) {
           if (authMethod === 'phone') {
             throw new Error('This contact number is already registered. Please log in instead.');
           } else {
-            throw new Error('An account with this email already exists. Please log in.');
+            throw new Error('An account with this email already exists. Please log in (or use "Forgot Password?" / "Continue with Google" if you registered earlier).');
           }
         }
-        throw new Error(error.message);
+        if (error.status === 429 || msgLower.includes('rate limit') || msgLower.includes('too many')) {
+          throw new Error('Too many signup attempts right now. Please wait a minute and try again.');
+        }
+        if (msgLower.includes('database error saving new user')) {
+          throw new Error('Could not create your profile on server right now. Please try again in a moment.');
+        }
+        throw new Error(error.message || 'Signup failed. Please try again.');
       }
 
       if (!data.user) {
@@ -417,14 +424,36 @@ export const authService = {
 
     // 1. Supabase Cloud Auth
     if (this.isCloudConnected() && supabase) {
+      if (!isPhoneLogin && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(authEmail)) {
+        throw new Error('Please enter a valid email address (or switch to Name + Contact tab to sign in with your phone number).');
+      }
       const { data, error } = await supabase.auth.signInWithPassword({
         email: authEmail,
         password
       });
 
       if (error) {
+        const msgLower = String(error.message || '').toLowerCase();
+        const codeLower = String((error as any).code || '').toLowerCase();
         if (isPhoneLogin) {
-          throw new Error('Incorrect contact number or password/PIN.');
+          throw new Error('Incorrect contact number or password/PIN. Check your digits and password, or register a free account.');
+        }
+        if (codeLower === 'email_not_confirmed' || msgLower.includes('email not confirmed')) {
+          const unconfirmedErr: any = new Error(
+            'Your email address is not confirmed yet. Check your inbox (and spam folder) for the confirmation link, or click "Resend Verification Email" below.'
+          );
+          unconfirmedErr.code = 'EMAIL_NOT_CONFIRMED';
+          throw unconfirmedErr;
+        }
+        if (codeLower === 'invalid_credentials' || msgLower.includes('invalid login credentials') || msgLower.includes('invalid_credentials')) {
+          const credErr: any = new Error(
+            'Incorrect email or password. Tip: If you originally signed up with "Continue with Google", click "Continue with Google" above — or use "Forgot Password?" to create a portal password.'
+          );
+          credErr.code = 'INVALID_CREDENTIALS';
+          throw credErr;
+        }
+        if (error.status === 429 || msgLower.includes('rate limit') || msgLower.includes('too many')) {
+          throw new Error('Too many login attempts right now. Please wait a minute and try again.');
         }
         throw new Error(error.message || 'Incorrect email or password.');
       }
@@ -670,15 +699,48 @@ export const authService = {
 
     if (this.isCloudConnected() && supabase) {
       const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
-        redirectTo: `${window.location.origin}${window.location.pathname}#/login?recovery=1`
+        redirectTo: `${window.location.origin}/reset-password`
       });
       if (error) {
+        const msgLower = String(error.message || '').toLowerCase();
+        if (error.status === 429 || msgLower.includes('rate limit') || msgLower.includes('too many')) {
+          throw new Error('Too many reset emails requested. Please wait a few minutes and check your inbox/spam folder.');
+        }
         throw new Error(error.message);
       }
       return;
     }
 
     throw new Error('Email password reset requires Supabase Cloud connection.');
+  },
+
+  async resendVerificationEmail(email: string): Promise<string> {
+    const rl = checkClientRateLimit('resend_verification', 3, 5 * 60 * 1000);
+    if (!rl.allowed) {
+      throw new Error(`Please wait ${rl.retryAfterSec}s before requesting another verification email.`);
+    }
+    const trimmedEmail = (email || '').trim().toLowerCase();
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      throw new Error('Please enter a valid email address first.');
+    }
+    if (!this.isCloudConnected() || !supabase) {
+      throw new Error('Email verification requires Supabase Cloud connection.');
+    }
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: trimmedEmail,
+      options: {
+        emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/` : undefined
+      }
+    });
+    if (error) {
+      const msgLower = String(error.message || '').toLowerCase();
+      if (error.status === 429 || msgLower.includes('rate limit') || msgLower.includes('too many')) {
+        throw new Error('Please wait a minute before requesting another verification email.');
+      }
+      throw new Error(error.message || 'Could not resend verification email.');
+    }
+    return `Verification link resent to ${trimmedEmail}. Please check your inbox and spam folder.`;
   },
 
   async updatePassword(newPassword: string): Promise<void> {

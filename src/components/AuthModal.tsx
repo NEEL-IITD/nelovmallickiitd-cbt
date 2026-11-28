@@ -32,6 +32,8 @@ export const AuthModal: React.FC = () => {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [showResendConfirmation, setShowResendConfirmation] = useState(false);
   const [termsAgreed, setTermsAgreed] = useState(false);
   const [parentalConsent, setParentalConsent] = useState(false);
 
@@ -40,6 +42,7 @@ export const AuthModal: React.FC = () => {
     if (initialMode) setMode(initialMode);
     setError('');
     setSuccessMsg('');
+    setShowResendConfirmation(false);
     setTermsAgreed(false);
     setParentalConsent(false);
   }, [initialMode, isOpen]);
@@ -67,9 +70,25 @@ export const AuthModal: React.FC = () => {
     }
   };
 
+  const handleResendConfirmation = async () => {
+    setError('');
+    setResendLoading(true);
+    try {
+      const msg = await authService.resendVerificationEmail(email);
+      setSuccessMsg(msg);
+      setShowResendConfirmation(false);
+    } catch (err: any) {
+      setError(err?.message || 'Could not resend verification email.');
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccessMsg('');
+    setShowResendConfirmation(false);
     setLoading(true);
 
     try {
@@ -94,7 +113,11 @@ export const AuthModal: React.FC = () => {
         window.location.hash = redirectUrl.startsWith('#') ? redirectUrl : `#${redirectUrl}`;
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to log in. Please check your credentials.');
+      const msg = err?.message || 'Failed to log in. Please check your credentials.';
+      setError(msg);
+      if (err?.code === 'EMAIL_NOT_CONFIRMED' || msg.toLowerCase().includes('not confirmed')) {
+        setShowResendConfirmation(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -103,6 +126,8 @@ export const AuthModal: React.FC = () => {
   const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccessMsg('');
+    setShowResendConfirmation(false);
 
     if (password !== confirmPassword) {
       setError('Passwords do not match. Please re-enter.');
@@ -142,7 +167,8 @@ export const AuthModal: React.FC = () => {
           parentalConsentConfirmed: parentalConsent
         });
         if (created.needsEmailConfirmation) {
-          setSuccessMsg('Account created! Please check your email inbox to confirm before signing in.');
+          setSuccessMsg('Account created! Please check your email inbox (and spam folder) to confirm before signing in.');
+          setShowResendConfirmation(true);
           setMode('login');
           return;
         }
@@ -280,15 +306,39 @@ export const AuthModal: React.FC = () => {
 
         {/* Error / Success Alerts */}
         {error && (
-          <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-rose-600 dark:text-rose-400 flex items-start gap-2">
-            <span>⚠️</span>
-            <span>{error}</span>
+          <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-rose-600 dark:text-rose-400 space-y-2">
+            <div className="flex items-start gap-2">
+              <span>⚠️</span>
+              <span>{error}</span>
+            </div>
+            {showResendConfirmation && authTab === 'email' && email.includes('@') && (
+              <button
+                type="button"
+                disabled={resendLoading}
+                onClick={handleResendConfirmation}
+                className="inline-flex items-center px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition-colors disabled:opacity-50"
+              >
+                {resendLoading ? 'Sending Verification Link...' : 'Resend Verification Email'}
+              </button>
+            )}
           </div>
         )}
         {successMsg && (
-          <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 text-xs text-emerald-600 dark:text-emerald-400 flex items-start gap-2">
-            <span>✓</span>
-            <span>{successMsg}</span>
+          <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 text-xs text-emerald-600 dark:text-emerald-400 space-y-2">
+            <div className="flex items-start gap-2">
+              <span>✓</span>
+              <span>{successMsg}</span>
+            </div>
+            {showResendConfirmation && authTab === 'email' && email.includes('@') && (
+              <button
+                type="button"
+                disabled={resendLoading}
+                onClick={handleResendConfirmation}
+                className="inline-flex items-center px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition-colors disabled:opacity-50"
+              >
+                {resendLoading ? 'Sending Verification Link...' : 'Resend Verification Email'}
+              </button>
+            )}
           </div>
         )}
 
@@ -498,12 +548,22 @@ export const AuthModal: React.FC = () => {
             {/* Passwords */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 dark:text-zinc-300">
-                  Password <span className="text-rose-500">*</span>
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-slate-700 dark:text-zinc-300">
+                    Password <span className="text-rose-500">*</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
+                  minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Min 8+ chars (letter + num)"
@@ -518,6 +578,7 @@ export const AuthModal: React.FC = () => {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
+                  minLength={8}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Repeat password"
@@ -749,12 +810,22 @@ export const AuthModal: React.FC = () => {
             {/* Passwords */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div className="space-y-1">
-                <label className="font-bold text-slate-700 dark:text-zinc-300">
-                  Password / PIN <span className="text-rose-500">*</span>
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-slate-700 dark:text-zinc-300">
+                    Password / PIN <span className="text-rose-500">*</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
+                  minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Min 8+ chars (letter + num)"
@@ -769,6 +840,7 @@ export const AuthModal: React.FC = () => {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
+                  minLength={8}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Repeat password"
@@ -897,22 +969,31 @@ export const AuthModal: React.FC = () => {
           <form onSubmit={handleRecoverySubmit} className="space-y-4 text-xs">
             <div className="space-y-1.5">
               <label className="font-bold text-slate-700 dark:text-zinc-300">New Password</label>
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Min 6 characters"
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  minLength={8}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Min 8 chars (letter + num)"
+                  className="w-full px-4 py-2.5 pr-12 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900 text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-semibold"
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
             </div>
             <div className="space-y-1.5">
               <label className="font-bold text-slate-700 dark:text-zinc-300">Confirm New Password</label>
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
-                minLength={6}
+                minLength={8}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Repeat new password"
