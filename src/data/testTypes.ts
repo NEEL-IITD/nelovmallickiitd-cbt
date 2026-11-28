@@ -43,6 +43,8 @@ export interface Question {
   hasKey?: boolean;
   solution?: string;
   explanation?: string;
+  solutionImages?: string[];
+  solutionImage?: string | null;
 }
 
 export interface SectionSummaryItem {

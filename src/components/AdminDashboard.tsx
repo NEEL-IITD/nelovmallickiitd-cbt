@@ -465,6 +465,7 @@ export const AdminDashboard: React.FC = () => {
       { testId: 'jee-mains-ptm-02', code: 'PTM 02', testType: 'mock' as const },
       { testId: 'jee-mains-ptm-03', code: 'PTM 03', testType: 'mock' as const },
       { testId: 'jee-mains-ptm-04', code: 'PTM 04', testType: 'mock' as const },
+      { testId: 'jee-mains-ptm-05', code: 'PTM 05', testType: 'mock' as const },
       { testId: 'jee-advanced-pta-04', code: 'PTA 04', testType: 'mock' as const },
       { testId: 'jee-advanced-pta-05', code: 'PTA 05', testType: 'mock' as const },
       { testId: 'jee-advanced-pta-06', code: 'PTA 06', testType: 'mock' as const }
@@ -706,7 +707,7 @@ export const AdminDashboard: React.FC = () => {
                 <span className="text-xl">🚀</span>
                 <p className="text-[11px] font-bold text-slate-500 dark:text-zinc-400">Live Mock Tests</p>
                 <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{liveTestsCount} / 30</p>
-                <p className="text-[10px] text-slate-400 pt-1">PTM 01–03 &amp; PTA 04–06</p>
+                <p className="text-[10px] text-slate-400 pt-1">PTM 01–05 &amp; PTA 04–06</p>
               </div>
 
               {/* Open Reports */}
@@ -728,7 +729,7 @@ export const AdminDashboard: React.FC = () => {
                   <div>
                     <h3 className="font-extrabold text-sm text-slate-900 dark:text-zinc-100">Unique Submissions by Test</h3>
                     <p className="text-[11px] text-slate-400">
-                      Distinct students (PTM 01–04, PTA 04–06 &amp; Chapter Exercises){lastSyncedAt ? ` · Synced ${lastSyncedAt}` : ''}
+                      Distinct students (PTM 01–05, PTA 04–06 &amp; Chapter Exercises){lastSyncedAt ? ` · Synced ${lastSyncedAt}` : ''}
                     </p>
                   </div>
                   <button
@@ -1157,6 +1158,7 @@ export const AdminDashboard: React.FC = () => {
                 <option value="PTM 02">PTM 02</option>
                 <option value="PTM 03">PTM 03</option>
                 <option value="PTM 04">PTM 04</option>
+                <option value="PTM 05">PTM 05</option>
                 <option value="PTA 04">PTA 04</option>
                 <option value="PTA 05">PTA 05</option>
                 <option value="PTA 06">PTA 06</option>

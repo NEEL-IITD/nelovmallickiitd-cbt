@@ -6,6 +6,7 @@ import { jeeMainsPtm01Data } from './jee-mains/ptm01';
 import { jeeMainsPtm02Data } from './jee-mains/ptm02';
 import { jeeMainsPtm03Data } from './jee-mains/ptm03';
 import { jeeMainsPtm04Data } from './jee-mains/ptm04';
+import { jeeMainsPtm05Data } from './jee-mains/ptm05';
 
 export const jeeMainsTests: TestMetadata[] = [
   {
@@ -94,8 +95,8 @@ export const jeeMainsTests: TestMetadata[] = [
     "examType": "JEE Mains",
     "code": "PTM 05",
     "title": "JEE Mains 2027 Test Series — PTM 05",
-    "subtitle": "Full Syllabus Comprehensive Mock Examination",
-    "status": "coming_soon",
+    "subtitle": "Moving Charges & Magnetism, Magnetism & Matter, Aldehydes, Ketones & Carboxylic Acids, Probability & Bayes' Theorem",
+    "status": "live",
     "durationMinutes": 180,
     "totalMarks": 300,
     "totalQuestions": 75,
@@ -104,8 +105,8 @@ export const jeeMainsTests: TestMetadata[] = [
       "Chemistry (25 Qs)",
       "Mathematics (25 Qs)"
     ],
-    "description": "Standard NTA JEE Mains CBT pattern: 20 Single Correct MCQs (+4, -1) and 5 Numerical Value questions (+4, -1) per subject.",
-    "isLive": false,
+    "description": "Standard NTA JEE Mains CBT pattern: 20 Single Correct MCQs (+4, -1) and 5 Numerical Value questions (+4, -1) per subject. Moving Charges & Magnetism, Magnetism & Matter, Aldehydes/Ketones/Carboxylic Acids, Probability & Bayes' Theorem.",
+    "isLive": true,
     "isFree": true
   },
   {
@@ -593,6 +594,9 @@ export function getLiveTestPaper(id: string): TestPaper | undefined {
   }
   if (id === 'jee-mains-ptm-04' || id === 'ptm-04' || id === 'ptm04') {
     return jeeMainsPtm04Data;
+  }
+  if (id === 'jee-mains-ptm-05' || id === 'ptm-05' || id === 'ptm05') {
+    return jeeMainsPtm05Data;
   }
   if (id === 'jee-advanced-pta-04' || id === 'pta-04' || id === 'pta04') {
     return pta04Data;

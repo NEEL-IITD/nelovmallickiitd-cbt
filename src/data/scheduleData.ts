@@ -143,7 +143,21 @@ export const JEE_MAINS_2027_SCHEDULE: ScheduleTestItem[] = [
     endIso: "2026-12-06T18:00:00+05:30",
     tag: "All-India",
     route: "/test/jee-mains/ptm-05",
-    hashRoute: "#/test/jee-mains/ptm-05"
+    hashRoute: "#/test/jee-mains/ptm-05",
+    syllabus: {
+      physics: [
+        "Moving Charges & Magnetism (Circular motion in equilateral triangular and semi-infinite magnetic regions; rotation axis torque on planar loops; magnetic Lorentz force direction, gyroradius ratio r<sub>1</sub>/r<sub>2</sub> in uniform E vs. B fields, undeviated motion v ∥ B, and a ⊥ B; Biot–Savart law for hexagram star-shaped loop, tightly wound spiral coil B = (μ<sub>0</sub>NI / 2(b−a)) ln(b/a), and 3x-4x-5x right-triangular loop; antiparallel wire force equilibrium, tension reduction (Mg − BIL)/2 in suspended bar, magnetic torque on rotating charged disc qωr<sup>2</sup>B sinθ / 4, and gyromagnetic ratio M/L = q/2m for rotating rod)",
+        "Magnetism & Matter (Curie/Curie–Weiss temperature dependence of paramagnetic & ferromagnetic susceptibility; orbital electron motion in diamagnetism; intensity of magnetization I = M/V & magnetic induction B = μ<sub>0</sub>(H + I); work done MB(1 − cosθ) & torque at 60°; deformation work of current loops; dipole-dipole end-on force F ∝ X<sup>−4</sup>; resultant axial field of perpendicular short bar magnets; torsional oscillation period scaling T = 2π√(I/MB<sub>H</sub>))"
+      ],
+      chemistry: [
+        "**Aldehydes & Ketones:** Chemoselective Wolff–Kishner reduction (NH<sub>2</sub>NH<sub>2</sub>/OH<sup>−</sup>) preserving acid-sensitive alcohols; positive iodoform test in ethanal (CH<sub>3</sub>CHO); intramolecular aldol condensations of o-phenylenediacetaldehyde and bicyclic diketones; crossed + self-aldol stereoisomer counting (acetaldehyde + acetophenone); Cannizzaro hydride-transfer RDS, crossed Cannizzaro selectivity with HCHO, and m-chlorobenzaldehyde disproportionation; oxime syn/anti isomerism; PhMgBr reactivity order; σ/π/lone-pair counting in acetone enol; stable hydrate equilibria (chloral, CF<sub>3</sub>CHO, triketone, ninhydrin, cyclopropanone); Gattermann–Koch, benzal chloride hydrolysis, Rosenmund, and DIBAL-H syntheses.",
+        "**Carboxylic Acids & Derivatives:** Vigorous KMnO<sub>4</sub>/KOH side-chain oxidation vs. tert-butylbenzene stability after Friedel–Crafts rearrangement; dinitrile hydrolysis to succinic acid; alkaline ester hydrolysis rate with p-NO<sub>2</sub>, p-Cl, p-OCH<sub>3</sub> groups; selective neutralization of salicylic acid by NaHCO<sub>3</sub>; Hell–Volhard–Zelinsky (α-H requirement); inductive K<sub>a</sub> ranking in haloacids; SOCl<sub>2</sub> acid chloride prep, propyne carboxylation, and cyclic nitrile hydrolysis."
+      ],
+      mathematics: [
+        "Classical & Counting Probability (At least 7 consecutive heads in 13 fair coin tosses; derangements of 6 glove pairs and 5-element bijections; birthdays of 6 people in exactly 3 calendar months; hypergeometric lottery comparison; onto vs. one-one finite-set mapping counts; units digit product probability in {1, 3, 7, 9}; quadratic positivity x<sup>2</sup> + αx + β > 0 over dice rolls; wavy-curve inequality (x−15)/((x−10)(x−20)) > 0; multiples of 3 avoiding 5 and 7 via inclusion–exclusion; order statistics x<sub>2</sub> = 7, x<sub>4</sub> = 11; weighted die P(n) ∝ n<sup>2</sup>; non-identical faces across 6 dice)",
+        "Conditional Probability, Independence & Bayes' Theorem (Two-stage noisy relay signal transmission; independent event identities P(A|B') & P(A|(A<sup>c</sup> ∪ B<sup>c</sup>)); testing 2 faulty out of 5 machines; late arrival transport Bayes inference; uniform mixture black/white ball hypergeometric draws; missing-spade Bayesian inference after n spade draws; alternating dice game winning on 3rd throw; 3-event inclusion–exclusion from pairwise XOR probabilities)"
+      ]
+    }
   },
   {
     id: "jee-mains-ptm-06",

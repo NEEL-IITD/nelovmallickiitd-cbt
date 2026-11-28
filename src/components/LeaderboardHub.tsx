@@ -127,7 +127,7 @@ export const LeaderboardHub: React.FC<LeaderboardHubProps> = ({
       testId: `jee-mains-ptm-${num}`,
       code: `PTM ${num}`,
       title: `JEE Mains – PTM ${num}`,
-      isLive: ['01', '02', '03', '04'].includes(num) || allTestConfigs[`jee-mains-ptm-${num}`] === 'live'
+      isLive: ['01', '02', '03', '04', '05'].includes(num) || allTestConfigs[`jee-mains-ptm-${num}`] === 'live'
     };
   });
 

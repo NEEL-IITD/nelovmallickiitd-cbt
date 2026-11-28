@@ -74,8 +74,8 @@
 
   <!-- Loaded Test Registries and Test Papers -->
   <script src="/data/siteData.js"></script>
-  <script src="/data/testsIndex.js?v=ptm04-20261202"></script>
-  <script src="/data/scheduleData.js?v=ptm04-20261202"></script>
+  <script src="/data/testsIndex.js?v=ptm05-20261206"></script>
+  <script src="/data/scheduleData.js?v=ptm05-20261206"></script>
   <script src="/data/pta04.js"></script>
   <script src="/data/pta05.js"></script>
   <script src="/data/jee-advanced/pta04.js"></script>
@@ -83,7 +83,7 @@
   <script src="/data/jee-advanced/pta06.js"></script>
   <script src="/data/jee-mains/ptm01.js"></script>
   <script src="/data/jee-mains/ptm02.js"></script>
-  <!-- Note: Future scheduled test scripts (e.g. ptm03.js, ptm04.js) are lazy-loaded only after scheduled go-live or verified Admin preview -->
+  <!-- Note: Future scheduled test scripts (e.g. ptm03.js, ptm04.js, ptm05.js) are lazy-loaded only after scheduled go-live or verified Admin preview -->
   <script src="/data/rankPredictor.js"></script>
   <script src="/data/authStore.js"></script>
   <script src="/data/resourcesIndex.js"></script>
@@ -606,7 +606,7 @@
       if (!endsAt) return startStr;
       const endTimeStr = formatIST(endsAt, 'time');
       const startParts = startStr.replace(' IST', '');
-      return `${startParts} â€“ ${endTimeStr}`;
+      return `${startParts} – ${endTimeStr}`;
     }
 
     // Component: MockWindowBadge (Ticking Countdown & Status)
@@ -7922,6 +7922,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
     function getFullTestPaperById(testId) {
       if (!testId) return window.pta04Data || null;
       const clean = String(testId).toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (clean.includes('ptm05') || clean.includes('ptm5')) return window.ptm05Data || null;
       if (clean.includes('ptm04') || clean.includes('ptm4')) return window.ptm04Data || null;
       if (clean.includes('ptm03') || clean.includes('ptm3')) return window.ptm03Data || null;
       if (clean.includes('ptm02') || clean.includes('ptm2')) return window.ptm02Data || null;
@@ -11006,6 +11007,14 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     </div>
                   )}
 
+                  {((item.solutionImages && item.solutionImages.length > 0) || item.solutionImage) && (
+                    <div className="flex flex-wrap gap-3 py-2">
+                      {(item.solutionImages && item.solutionImages.length > 0 ? item.solutionImages : [item.solutionImage]).filter(Boolean).map((sImg, sIdx) => (
+                        <DiagramImage key={sIdx} src={sImg} alt={`Solution Diagram ${sIdx + 1}`} maxHeightClass="max-h-40 sm:max-h-[420px]" compact />
+                      ))}
+                    </div>
+                  )}
+
                   {(item.explanation || item.solution) && (
                     <div className="p-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/60 dark:border-indigo-900/40 space-y-1.5 text-xs text-slate-800 dark:text-zinc-200">
                       <p className="font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400 text-[10px]">
@@ -11712,6 +11721,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           { testId: 'jee-mains-ptm-02', code: 'PTM 02', testType: 'mock' },
           { testId: 'jee-mains-ptm-03', code: 'PTM 03', testType: 'mock' },
           { testId: 'jee-mains-ptm-04', code: 'PTM 04', testType: 'mock' },
+          { testId: 'jee-mains-ptm-05', code: 'PTM 05', testType: 'mock' },
           { testId: 'jee-advanced-pta-04', code: 'PTA 04', testType: 'mock' },
           { testId: 'jee-advanced-pta-05', code: 'PTA 05', testType: 'mock' },
           { testId: 'jee-advanced-pta-06', code: 'PTA 06', testType: 'mock' },
@@ -12009,7 +12019,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                     <span className="text-2xl">🟢</span>
                     <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Live Active Tests</p>
                     <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-zinc-50">{liveTestsCount} <span className="text-xs font-normal text-slate-400">/ 30</span></h3>
-                    <p className="text-[10px] text-emerald-600 font-semibold">PTM 01–03 &amp; PTA 04–06 Ready</p>
+                    <p className="text-[10px] text-emerald-600 font-semibold">PTM 01–05 &amp; PTA 04–06 Ready</p>
                   </div>
                   <div className="rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-5 shadow-sm space-y-2">
                     <span className="text-2xl">🚩</span>
@@ -12024,7 +12034,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                   <div className="lg:col-span-2 rounded-3xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#121318] p-6 shadow-sm space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-zinc-800 pb-3">
                       <h3 className="text-base font-extrabold text-slate-900 dark:text-zinc-50 flex items-center gap-2">
-                        <span>📈</span> Unique Submissions Breakdown (PTM 01–04, PTA &amp; Chapter Exercises)
+                        <span>📈</span> Unique Submissions Breakdown (PTM 01–05, PTA &amp; Chapter Exercises)
                       </h3>
                       <span className="text-xs font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-950 px-2.5 py-1 rounded-full">
                         {uniqueSubmissionsCount} Unique ({uniqueStudentsSubmitting} Students)
@@ -12038,7 +12048,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           const count = row.uniqueStudents;
                           const heightPct = Math.max(count > 0 ? 14 : 6, (count / maxRowCount) * 100);
                           const isChapter = row.testType === 'chapter_exercise';
-                          const isReady = isChapter || ['PTM 01', 'PTM 02', 'PTM 03', 'PTM 04', 'PTA 04', 'PTA 05', 'PTA 06'].includes(row.code);
+                          const isReady = isChapter || ['PTM 01', 'PTM 02', 'PTM 03', 'PTM 04', 'PTM 05', 'PTA 04', 'PTA 05', 'PTA 06'].includes(row.code);
                           return (
                             <div key={row.testId} className="flex-1 min-w-[54px] flex flex-col items-center gap-1.5" title={`${row.code}: ${count} unique students completed (${row.completedCount} total attempts)`}>
                               <span className="text-[11px] font-mono font-bold text-indigo-600 dark:text-indigo-400">{count}</span>
@@ -14741,7 +14751,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           testId: tid,
           code: 'PTM ' + num,
           title: 'JEE Mains – PTM ' + num,
-          isLive: ['01', '02', '03', '04'].includes(num) || testConfigs[tid] === 'live'
+          isLive: ['01', '02', '03', '04', '05'].includes(num) || testConfigs[tid] === 'live'
         };
       });
 
@@ -15641,7 +15651,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           Physics Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-sky-800/80 dark:text-sky-400">
-                          {previewItem.code === 'PTM 04' ? 'Electrostatics, Capacitors & Current Electricity Focus' : (previewItem.code === 'PTM 03' ? 'Thermal Properties of Matter & Heat Transfer Focus' : (previewItem.code === 'PTM 02' ? 'Thermal Physics & Heat Transfer Focus' : (previewItem.code === 'PTM 01' ? 'Thermodynamics & Kinetic Theory Focus' : 'Standard JEE Mains Pattern')))}
+                          {previewItem.code === 'PTM 05' ? 'Moving Charges & Magnetism and Magnetism & Matter Focus' : (previewItem.code === 'PTM 04' ? 'Electrostatics, Capacitors & Current Electricity Focus' : (previewItem.code === 'PTM 03' ? 'Thermal Properties of Matter & Heat Transfer Focus' : (previewItem.code === 'PTM 02' ? 'Thermal Physics & Heat Transfer Focus' : (previewItem.code === 'PTM 01' ? 'Thermodynamics & Kinetic Theory Focus' : 'Standard JEE Mains Pattern'))))}
                         </p>
                       </div>
                     </div>
@@ -15673,7 +15683,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           Chemistry Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-emerald-800/80 dark:text-emerald-400">
-                          {previewItem.code === 'PTM 04' ? 'Alcohols, Phenols, Ethers & Stereochemistry Focus' : (previewItem.code === 'PTM 03' ? 'Haloalkanes & Haloarenes, Grignard Reagents & Polymers Focus' : (previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern')))}
+                          {previewItem.code === 'PTM 05' ? 'Aldehydes, Ketones, Carboxylic Acids & Derivatives Focus' : (previewItem.code === 'PTM 04' ? 'Alcohols, Phenols, Ethers & Stereochemistry Focus' : (previewItem.code === 'PTM 03' ? 'Haloalkanes & Haloarenes, Grignard Reagents & Polymers Focus' : (previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern'))))}
                         </p>
                       </div>
                     </div>
@@ -15705,7 +15715,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           Mathematics Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-purple-800/80 dark:text-purple-400">
-                          {previewItem.code === 'PTM 04' ? 'Permutations, Combinations, Matrices & Number Counting Focus' : (previewItem.code === 'PTM 03' ? 'Matrices, Determinants & System of Linear Equations Focus' : (previewItem.code === 'PTM 02' ? 'Quadratic Equations, Inequalities & Sequences Focus' : (previewItem.code === 'PTM 01' ? 'Trigonometry & Functional Relations' : 'Standard JEE Mains Pattern')))}
+                          {previewItem.code === 'PTM 05' ? "Probability, Conditional Probability & Bayes' Theorem Focus" : (previewItem.code === 'PTM 04' ? 'Permutations, Combinations, Matrices & Number Counting Focus' : (previewItem.code === 'PTM 03' ? 'Matrices, Determinants & System of Linear Equations Focus' : (previewItem.code === 'PTM 02' ? 'Quadratic Equations, Inequalities & Sequences Focus' : (previewItem.code === 'PTM 01' ? 'Trigonometry & Functional Relations' : 'Standard JEE Mains Pattern'))))}
                         </p>
                       </div>
                     </div>
@@ -16045,7 +16055,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       };
 
       const isTestReady = (id) => {
-        return id === 'jee-mains-ptm-01' || id === 'jee-mains-ptm-02' || id === 'jee-mains-ptm-03' || id === 'jee-mains-ptm-04' || id.includes('pta-04') || id.includes('pta-05') || id.includes('pta-06') || testConfigs[id] === 'live';
+        return id === 'jee-mains-ptm-01' || id === 'jee-mains-ptm-02' || id === 'jee-mains-ptm-03' || id === 'jee-mains-ptm-04' || id === 'jee-mains-ptm-05' || id.includes('pta-04') || id.includes('pta-05') || id.includes('pta-06') || testConfigs[id] === 'live';
       };
 
       const handleAction = (item) => {
@@ -18394,7 +18404,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       };
 
       const isTestReady = (id) => {
-        return id === 'jee-mains-ptm-01' || id === 'jee-mains-ptm-02' || id === 'jee-mains-ptm-03' || id === 'jee-mains-ptm-04' || id.includes('pta-04') || id.includes('pta-05') || id.includes('pta-06') || testConfigs[id] === 'live';
+        return id === 'jee-mains-ptm-01' || id === 'jee-mains-ptm-02' || id === 'jee-mains-ptm-03' || id === 'jee-mains-ptm-04' || id === 'jee-mains-ptm-05' || id.includes('pta-04') || id.includes('pta-05') || id.includes('pta-06') || testConfigs[id] === 'live';
       };
 
       const hasStarted = (startIso) => {
@@ -20875,6 +20885,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         'jee-mains-ptm-02': 'live',
         'jee-mains-ptm-03': 'live',
         'jee-mains-ptm-04': 'live',
+        'jee-mains-ptm-05': 'live',
         'jee-advanced-pta-04': 'live',
         'jee-advanced-pta-05': 'live',
         'jee-advanced-pta-06': 'live'
@@ -20920,7 +20931,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       useEffect(() => {
         if (window.studentStorage?.getTestConfigs) {
           window.studentStorage.getTestConfigs().then(cfg => {
-            if (cfg) setTestConfigs({ ...cfg, 'jee-mains-ptm-01': 'live', 'jee-mains-ptm-02': 'live', 'jee-mains-ptm-03': 'live', 'jee-mains-ptm-04': 'live', 'jee-advanced-pta-04': 'live', 'jee-advanced-pta-05': 'live', 'jee-advanced-pta-06': 'live' });
+            if (cfg) setTestConfigs({ ...cfg, 'jee-mains-ptm-01': 'live', 'jee-mains-ptm-02': 'live', 'jee-mains-ptm-03': 'live', 'jee-mains-ptm-04': 'live', 'jee-mains-ptm-05': 'live', 'jee-advanced-pta-04': 'live', 'jee-advanced-pta-05': 'live', 'jee-advanced-pta-06': 'live' });
           });
         }
         if (window.studentStorage?.getTestConfigsDetails) {
@@ -20936,7 +20947,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
         const handleConfigChange = () => {
           if (window.studentStorage?.getTestConfigs) {
             window.studentStorage.getTestConfigs().then(cfg => {
-              if (cfg) setTestConfigs({ ...cfg, 'jee-mains-ptm-01': 'live', 'jee-mains-ptm-02': 'live', 'jee-mains-ptm-03': 'live', 'jee-mains-ptm-04': 'live', 'jee-advanced-pta-04': 'live', 'jee-advanced-pta-05': 'live', 'jee-advanced-pta-06': 'live' });
+              if (cfg) setTestConfigs({ ...cfg, 'jee-mains-ptm-01': 'live', 'jee-mains-ptm-02': 'live', 'jee-mains-ptm-03': 'live', 'jee-mains-ptm-04': 'live', 'jee-mains-ptm-05': 'live', 'jee-advanced-pta-04': 'live', 'jee-advanced-pta-05': 'live', 'jee-advanced-pta-06': 'live' });
             });
           }
         };
@@ -21037,7 +21048,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           options: q.options,
           answer: q.answer,
           explanation: q.explanation,
-          solution: q.solution
+          solution: q.solution,
+          solutionImages: q.solutionImages,
+          solutionImage: q.solutionImage
         });
         setBookmarkTrigger(prev => prev + 1);
       };
@@ -21119,6 +21132,9 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
       const currentPaper = useMemo(() => {
         if (!activeTestId) return window.pta04Data || null;
         const clean = activeTestId.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (clean.includes('ptm05') || clean.includes('ptm5')) {
+          return window.ptm05Data || null;
+        }
         if (clean.includes('ptm04') || clean.includes('ptm4')) {
           return window.ptm04Data || null;
         }
@@ -21637,7 +21653,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
 
         // Standardize canonical ID
         let canonicalId = testId;
-        if (testId.includes('ptm-04') || testId.includes('ptm04')) canonicalId = 'jee-mains-ptm-04';
+        if (testId.includes('ptm-05') || testId.includes('ptm05')) canonicalId = 'jee-mains-ptm-05';
+        else if (testId.includes('ptm-04') || testId.includes('ptm04')) canonicalId = 'jee-mains-ptm-04';
         else if (testId.includes('ptm-03') || testId.includes('ptm03')) canonicalId = 'jee-mains-ptm-03';
         else if (testId.includes('ptm-02') || testId.includes('ptm02')) canonicalId = 'jee-mains-ptm-02';
         else if (testId.includes('ptm-01') || testId.includes('ptm01')) canonicalId = 'jee-mains-ptm-01';
@@ -21663,7 +21680,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           }
         }
 
-        const isVerifiedLive = canonicalId === 'jee-mains-ptm-04' || canonicalId === 'jee-mains-ptm-03' || canonicalId === 'jee-mains-ptm-02' || canonicalId === 'jee-mains-ptm-01' || canonicalId.includes('pta-04') || canonicalId.includes('pta-05') || canonicalId.includes('pta-06');
+        const isVerifiedLive = canonicalId === 'jee-mains-ptm-05' || canonicalId === 'jee-mains-ptm-04' || canonicalId === 'jee-mains-ptm-03' || canonicalId === 'jee-mains-ptm-02' || canonicalId === 'jee-mains-ptm-01' || canonicalId.includes('pta-04') || canonicalId.includes('pta-05') || canonicalId.includes('pta-06');
         const configuredStatus = isVerifiedLive ? 'live' : (testConfigs[canonicalId] || (meta ? meta.status : 'coming_soon'));
 
         if (!isVerifiedLive && configuredStatus === 'coming_soon') {
@@ -21675,8 +21692,8 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
           return;
         }
 
-        // Lazy-load scheduled PTM 03 / PTM 04 payload after scheduled go-live (or via Admin JWT before go-live)
-        if ((canonicalId === 'jee-mains-ptm-03' || canonicalId === 'jee-mains-ptm-04')) {
+        // Lazy-load scheduled PTM 03 / PTM 04 / PTM 05 payload after scheduled go-live (or via Admin JWT before go-live)
+        if ((canonicalId === 'jee-mains-ptm-03' || canonicalId === 'jee-mains-ptm-04' || canonicalId === 'jee-mains-ptm-05')) {
           const num = canonicalId.slice(-2);
           const dataKey = `ptm${num}Data`;
           if (!window[dataKey]) {
@@ -23604,16 +23621,30 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
                           </div>
 
                           {/* Detailed Step-by-Step Explanation Panel */}
-                          {(qObj.explanation || qObj.solution) && (
+                          {(qObj.explanation || qObj.solution || (qObj.solutionImages && qObj.solutionImages.length > 0) || qObj.solutionImage) && (
                             <div className="p-5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/70 dark:border-indigo-900/40 space-y-3 text-xs text-slate-800 dark:text-zinc-200">
                               <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400 font-extrabold uppercase tracking-wider text-[11px]">
                                 <span>📘</span>
                                 <span>Detailed Step-by-Step Explanation:</span>
                               </div>
-                              <RichMathContent
-                                text={qObj.explanation || qObj.solution}
-                                className="leading-relaxed space-y-2 text-slate-800 dark:text-zinc-200"
-                              />
+                              {(qObj.explanation || qObj.solution) && (
+                                <RichMathContent
+                                  text={qObj.explanation || qObj.solution}
+                                  className="leading-relaxed space-y-2 text-slate-800 dark:text-zinc-200"
+                                />
+                              )}
+                              {((qObj.solutionImages && qObj.solutionImages.length > 0) || qObj.solutionImage) && (
+                                <div className="flex flex-wrap gap-3 pt-2">
+                                  {(qObj.solutionImages && qObj.solutionImages.length > 0 ? qObj.solutionImages : [qObj.solutionImage]).filter(Boolean).map((solImg, sIdx) => (
+                                    <DiagramImage
+                                      key={sIdx}
+                                      src={solImg}
+                                      alt={`Question ${qObj.id} Solution Diagram ${sIdx + 1}`}
+                                      maxHeightClass="max-h-[420px]"
+                                    />
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
@@ -25151,7 +25182,7 @@ function VaultContentManagerView({ onLaunchTest, onClose }) {
             previewTab={homePreviewTab}
             setPreviewTab={setHomePreviewTab}
             onClose={() => setHomePreviewItem(null)}
-            isTestReady={(id) => ['jee-mains-ptm-01', 'jee-mains-ptm-02', 'jee-mains-ptm-03', 'jee-mains-ptm-04'].includes(id) || testConfigs[id] === 'live'}
+            isTestReady={(id) => ['jee-mains-ptm-01', 'jee-mains-ptm-02', 'jee-mains-ptm-03', 'jee-mains-ptm-04', 'jee-mains-ptm-05'].includes(id) || testConfigs[id] === 'live'}
             isAdmin={Boolean(window.authService?.isAdmin ? window.authService.isAdmin() : currentUser?.role === 'admin')}
             started={homePreviewItem?.startIso ? Date.now() >= Date.parse(homePreviewItem.startIso) : true}
             countdown={(() => {

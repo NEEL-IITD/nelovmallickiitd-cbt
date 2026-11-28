@@ -859,6 +859,10 @@ export const studentStorage = {
           });
           // Ensure tests with verified digitized papers are always 'live'
           map['jee-mains-ptm-01'] = 'live';
+          map['jee-mains-ptm-02'] = 'live';
+          map['jee-mains-ptm-03'] = 'live';
+          map['jee-mains-ptm-04'] = 'live';
+          map['jee-mains-ptm-05'] = 'live';
           map['jee-advanced-pta-04'] = 'live';
           map['jee-advanced-pta-05'] = 'live';
           map['jee-advanced-pta-06'] = 'live';

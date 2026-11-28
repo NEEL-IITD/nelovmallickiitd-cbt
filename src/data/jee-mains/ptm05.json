@@ -1,0 +1,2390 @@
+{
+  "id": "jee-mains-ptm-05",
+  "aliasId": "ptm-05",
+  "examCategory": "jee-mains",
+  "examType": "JEE Mains",
+  "code": "PTM 05",
+  "title": "JEE Mains 2027 Test Series — PTM 05",
+  "subtitle": "Moving Charges & Magnetism, Magnetism & Matter, Aldehydes, Ketones & Carboxylic Acids, Probability & Bayes' Theorem",
+  "status": "live",
+  "durationMinutes": 180,
+  "maxMarks": 300,
+  "totalQuestions": 75,
+  "scheduledStartTime": "2026-12-06T09:00:00+05:30",
+  "scheduledEndTime": "2026-12-06T18:00:00+05:30",
+  "syllabus": {
+    "physics": [
+      "Moving Charges & Magnetism (Lorentz force and circular trajectories in equilateral triangular, rectilinear, and inclined magnetic fields; radius of curvature ratio $\\frac{r_1}{r_2}$ in uniform $E$ vs. $B$ fields; undeviated charge velocity condition $\\vec{v} \\parallel \\vec{B}$ and $\\vec{a} \\perp \\vec{B}$; Biot–Savart law for a hexagram star-shaped current loop, tightly wound planar spiral coil $B = \\frac{\\mu_0 NI}{2(b-a)}\\ln(b/a)$, and $3x$-$4x$-$5x$ right-triangular current loop; magnetic force equilibrium between antiparallel long/short horizontal wires; supporting wire tension reduction $\\frac{Mg - BIL}{2}$; magnetic torque and dipole moment of a rotating charged insulating disc $\\tau = \\frac{q\\omega r^2 B\\sin\\theta}{4}$ and gyromagnetic relation $\\frac{M}{L} = \\frac{q}{2m}$ for a rotating rod)",
+      "Magnetism & Matter (Curie-law temperature dependence of paramagnetic and ferromagnetic susceptibilities; orbital diamagnetism; intensity of magnetization $I = M/V$ and magnetic induction $B = \\mu_0(H + I)$; work done $MB(1 - \\cos\\theta)$ and torque on a rotated magnetic needle; work done changing loop geometry from square to equilateral triangle; dipole-dipole end-on force law $F \\propto X^{-4}$; net axial field along angle bisector of crossed perpendicular bar magnets; torsional oscillation period $T = 2\\pi\\sqrt{I/(MB_H)}$ upon increasing moment of inertia)"
+    ],
+    "chemistry": [
+      "Aldehydes & Ketones (Chemoselective Wolff–Kishner reduction $\\text{NH}_2\\text{NH}_2/\\text{OH}^-$ vs. Clemmensen $\\text{Zn(Hg)}/\\text{HCl}$ in hydroxy-ketones; positive iodoform test in ethanal $\\text{CH}_3\\text{CHO}$; intramolecular aldol condensations of *o*-phenylenediacetaldehyde and bicyclic diketones; crossed + self-aldol stereoisomer counting between acetaldehyde and acetophenone; Cannizzaro rate-determining hydride transfer, crossed Cannizzaro selectivity with $\\text{HCHO}$, and *m*-chlorobenzaldehyde disproportionation; oxime *syn*/*anti* isomerism with $\\text{NH}_2\\text{OH}/\\text{H}^+$; PhMgBr carbonyl reactivity order; $\\sigma/\\pi$/lone-pair counting in acetone enol; stable hydrate equilibria of $\\text{CCl}_3\\text{CHO}$, $\\text{CF}_3\\text{CHO}$, triketones, ninhydrin, and cyclopropanone; benzaldehyde syntheses via Gattermann–Koch, benzal chloride hydrolysis, Rosenmund reduction, and DIBAL-H)",
+      "Carboxylic Acids, Esters & Acid Derivatives (Hot alkaline $\\text{KMnO}_4$ side-chain oxidation of benzylic methyl/acetyl groups vs. $\\text{KMnO}_4$ resistance of rearranged *tert*-butylbenzene lacking benzylic H; dinitrile hydrolysis to succinic acid; inductive and resonance effects in alkaline hydrolysis of *p*-substituted ethyl benzoates; selective deprotonation of $-\\text{COOH}$ over phenolic $-\\text{OH}$ in salicylic acid by $\\text{NaHCO}_3$; Hell–Volhard–Zelinsky ($\\alpha$-H requirement); inductive $K_a$ comparison in haloacids; $\\text{SOCl}_2$ acyl chloride preparation; Grignard carbonation and cyclohexene-to-carboxylic-acid sequences)"
+    ],
+    "mathematics": [
+      "Classical, Combinatorial & Counting Probability (At least 7 consecutive heads in 13 fair coin tosses; derangements of 6 glove pairs and 5-element injective derangements; birthdays of 6 people falling in exactly 3 calendar months; hypergeometric lottery success comparison; surjections vs. injections on finite sets; units digit product probability in $\\{1, 3, 7, 9\\}$; quadratic positivity $x^2 + \\alpha x + \\beta > 0$ over two dice; rational inequality $\\frac{x-15}{(x-10)(x-20)} > 0$; divisibility by $3$ of pairs and integers not divisible by $5$ or $7$; order-statistics $x_2=7, x_4=11$; weighted die $P(n) \\propto n^2$; non-identical faces across 6 dice)",
+      "Conditional Probability, Independence & Bayes' Theorem (Two-stage noisy relay signal transmission; independent event identities $P(A|B')$ and $P(A|(A^c \\cup B^c))$; stopping probability in testing 2 faulty out of 5 machines; late arrival transport inference via Bayes' theorem; uniform black-white ball mixture hypergeometric draws; missing spade Bayesian calculation given $n$ spade draws; alternate pair-of-dice game winning on 3rd throw; 3-event union probability from pairwise exclusive-or probabilities)"
+    ]
+  },
+  "sectionsSummary": [
+    {
+      "subject": "Physics",
+      "sections": [
+        {
+          "name": "Section A: Single Correct (20 Qs)",
+          "questionCount": 20,
+          "marking": "+4, -1"
+        },
+        {
+          "name": "Section B: Numerical Value (5 Qs)",
+          "questionCount": 5,
+          "marking": "+4, -1"
+        }
+      ]
+    },
+    {
+      "subject": "Chemistry",
+      "sections": [
+        {
+          "name": "Section A: Single Correct (20 Qs)",
+          "questionCount": 20,
+          "marking": "+4, -1"
+        },
+        {
+          "name": "Section B: Numerical Value (5 Qs)",
+          "questionCount": 5,
+          "marking": "+4, -1"
+        }
+      ]
+    },
+    {
+      "subject": "Mathematics",
+      "sections": [
+        {
+          "name": "Section A: Single Correct (20 Qs)",
+          "questionCount": 20,
+          "marking": "+4, -1"
+        },
+        {
+          "name": "Section B: Numerical Value (5 Qs)",
+          "questionCount": 5,
+          "marking": "+4, -1"
+        }
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": 1,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A uniform magnetic field exists in a region which forms an equilateral triangle of side $a$. The magnetic field is perpendicular into the plane of the triangle. A particle of mass $m$ and charge $q$ enters into this magnetic field perpendicularly with speed $v$ along the perpendicular bisector of one side and comes out along the perpendicular bisector of the other side. The magnetic field strength in the triangle is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{mv}{qa}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{2mv}{qa}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{mv}{2qa}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{mv}{4qa}$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Since the particle enters perpendicular to one side at its midpoint and exits perpendicular to an adjacent side at its midpoint, the normals to the two sides intersect at the common vertex of the equilateral triangle. Thus the circular trajectory has radius $r = \\frac{a}{2}$ centered at that vertex:\n$$qvB = \\frac{mv^2}{r} = \\frac{mv^2}{a/2} \\implies B = \\frac{2mv}{qa}$$",
+      "explanation": "Since the particle enters perpendicular to one side at its midpoint and exits perpendicular to an adjacent side at its midpoint, the normals to the two sides intersect at the common vertex of the equilateral triangle. Thus the circular trajectory has radius $r = \\frac{a}{2}$ centered at that vertex:\n$$qvB = \\frac{mv^2}{r} = \\frac{mv^2}{a/2} \\implies B = \\frac{2mv}{qa}$$",
+      "solutionImages": [
+        "/images/ptm05/sol_q01.png"
+      ]
+    },
+    {
+      "id": 2,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A square loop of side $2\\text{ cm}$ carrying current $I_0$ is placed in the $x$-$y$ plane in a magnetic field $\\vec{B} = (4\\hat{i} + 3\\hat{j})\\text{ T}$. Find the unit vector along the axis about which it will start rotating.",
+      "images": [
+        "/images/ptm05/q02.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{4\\hat{j} + 3\\hat{i}}{5}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{-4\\hat{j} - 3\\hat{i}}{5}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{-4\\hat{j} + 3\\hat{i}}{5}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{4\\hat{j} - 3\\hat{i}}{5}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "From the figure, the current in the square loop circulates clockwise, so its magnetic dipole moment vector points along $-\\hat{k}$:\n$$\\vec{\\mu} = -(4 \\times 10^{-4}\\,I_0)\\hat{k}$$\nWith $\\vec{B} = (4\\hat{i} + 3\\hat{j})\\text{ T}$, the torque direction gives the rotation axis:\n$$\\vec{\\tau} = \\vec{\\mu} \\times \\vec{B} \\propto (-\\hat{k}) \\times (4\\hat{i} + 3\\hat{j}) = -4\\hat{j} + 3\\hat{i}$$\nNormalizing gives the unit vector $\\hat{\\tau} = \\dfrac{-4\\hat{j} + 3\\hat{i}}{5}$.",
+      "explanation": "From the figure, the current in the square loop circulates clockwise, so its magnetic dipole moment vector points along $-\\hat{k}$:\n$$\\vec{\\mu} = -(4 \\times 10^{-4}\\,I_0)\\hat{k}$$\nWith $\\vec{B} = (4\\hat{i} + 3\\hat{j})\\text{ T}$, the torque direction gives the rotation axis:\n$$\\vec{\\tau} = \\vec{\\mu} \\times \\vec{B} \\propto (-\\hat{k}) \\times (4\\hat{i} + 3\\hat{j}) = -4\\hat{j} + 3\\hat{i}$$\nNormalizing gives the unit vector $\\hat{\\tau} = \\dfrac{-4\\hat{j} + 3\\hat{i}}{5}$."
+    },
+    {
+      "id": 3,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "**Statement – I:** Susceptibilities of paramagnetic and ferromagnetic substances increase with decrease in temperature.\n\n**Statement – II:** Diamagnetism is a result of orbital motions of electrons developing magnetic moments opposite to the applied magnetic field.\n\nChoose the correct answer from the options given below:",
+      "options": [
+        {
+          "id": "A",
+          "text": "Both Statement – I and Statement – II are true"
+        },
+        {
+          "id": "B",
+          "text": "Both Statement – I and Statement – II are false"
+        },
+        {
+          "id": "C",
+          "text": "Statement – I is true but Statement – II is false"
+        },
+        {
+          "id": "D",
+          "text": "Statement – I is false but Statement – II is true"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "**Statement I is true:** By Curie's law ($\\chi = \\frac{C}{T}$) and the Curie–Weiss law ($\\chi = \\frac{C}{T - T_c}$), magnetic susceptibility rises as temperature $T$ decreases because thermal agitation opposes dipole alignment.\n\n**Statement II is true:** An external magnetic field alters the orbital velocity of bound electrons (Larmor precession / Lenz's law at the atomic scale), inducing a small opposing magnetic moment opposite to $\\vec{B}$.",
+      "explanation": "**Statement I is true:** By Curie's law ($\\chi = \\frac{C}{T}$) and the Curie–Weiss law ($\\chi = \\frac{C}{T - T_c}$), magnetic susceptibility rises as temperature $T$ decreases because thermal agitation opposes dipole alignment.\n\n**Statement II is true:** An external magnetic field alters the orbital velocity of bound electrons (Larmor precession / Lenz's law at the atomic scale), inducing a small opposing magnetic moment opposite to $\\vec{B}$."
+    },
+    {
+      "id": 4,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A rod of ferromagnetic material with dimensions $10\\text{ cm} \\times 0.5\\text{ cm} \\times 2\\text{ cm}$ is placed in a magnetizing field of intensity $2 \\times 10^5\\text{ A/m}$. The magnetic moment produced due to it is $6\\text{ A}\\cdot\\text{m}^2$. The value of magnetic induction in the rod is $P \\times 10^{-2}\\text{ T}$. Then find $P$ (nearly):",
+      "options": [
+        {
+          "id": "A",
+          "text": "$100.5$"
+        },
+        {
+          "id": "B",
+          "text": "$200.5$"
+        },
+        {
+          "id": "C",
+          "text": "$50.24$"
+        },
+        {
+          "id": "D",
+          "text": "$300.5$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "The volume of the rod is:\n$$V = (10 \\times 0.5 \\times 2)\\text{ cm}^3 = 10\\text{ cm}^3 = 10^{-5}\\text{ m}^3$$\nThe intensity of magnetization is $I = \\frac{M}{V} = \\frac{6}{10^{-5}} = 6 \\times 10^5\\text{ A/m}$.\nTherefore, the magnetic induction inside the rod is:\n$$B = \\mu_0(H + I) = 4\\pi \\times 10^{-7}\\,(2 \\times 10^5 + 6 \\times 10^5) = 4\\pi \\times 10^{-7} \\times 8 \\times 10^5 = 32\\pi \\times 10^{-2}\\text{ T} \\approx 100.53 \\times 10^{-2}\\text{ T}$$\nHence $P \\approx 100.5$.",
+      "explanation": "The volume of the rod is:\n$$V = (10 \\times 0.5 \\times 2)\\text{ cm}^3 = 10\\text{ cm}^3 = 10^{-5}\\text{ m}^3$$\nThe intensity of magnetization is $I = \\frac{M}{V} = \\frac{6}{10^{-5}} = 6 \\times 10^5\\text{ A/m}$.\nTherefore, the magnetic induction inside the rod is:\n$$B = \\mu_0(H + I) = 4\\pi \\times 10^{-7}\\,(2 \\times 10^5 + 6 \\times 10^5) = 4\\pi \\times 10^{-7} \\times 8 \\times 10^5 = 32\\pi \\times 10^{-2}\\text{ T} \\approx 100.53 \\times 10^{-2}\\text{ T}$$\nHence $P \\approx 100.5$."
+    },
+    {
+      "id": 5,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A magnetic needle lying parallel to a magnetic field requires $W$ units of work to turn it through $60^\\circ$. The torque needed to maintain the needle in this position will be:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\sqrt{3}\\,W$"
+        },
+        {
+          "id": "B",
+          "text": "$W$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{\\sqrt{3}}{2}\\,W$"
+        },
+        {
+          "id": "D",
+          "text": "$2W$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Work done to rotate a magnetic dipole from $\\theta_1 = 0^\\circ$ to $\\theta_2 = 60^\\circ$ in a uniform magnetic field $B$ is:\n$$W = MB(\\cos 0^\\circ - \\cos 60^\\circ) = MB\\left(1 - \\frac{1}{2}\\right) = \\frac{MB}{2}$$\nAt $\\theta = 60^\\circ$, the restoring magnetic torque is:\n$$\\tau = MB\\sin 60^\\circ = MB\\left(\\frac{\\sqrt{3}}{2}\\right) = \\sqrt{3}\\left(\\frac{MB}{2}\\right) = \\sqrt{3}\\,W$$",
+      "explanation": "Work done to rotate a magnetic dipole from $\\theta_1 = 0^\\circ$ to $\\theta_2 = 60^\\circ$ in a uniform magnetic field $B$ is:\n$$W = MB(\\cos 0^\\circ - \\cos 60^\\circ) = MB\\left(1 - \\frac{1}{2}\\right) = \\frac{MB}{2}$$\nAt $\\theta = 60^\\circ$, the restoring magnetic torque is:\n$$\\tau = MB\\sin 60^\\circ = MB\\left(\\frac{\\sqrt{3}}{2}\\right) = \\sqrt{3}\\left(\\frac{MB}{2}\\right) = \\sqrt{3}\\,W$$"
+    },
+    {
+      "id": 6,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "An insulating disc of radius $r$ carrying positive charge $q$ (uniformly distributed) is rotating with angular speed $\\omega$ in a uniform magnetic field $B$ about a fixed axis, such that the angle made by the axis of the disc with the magnetic field is $\\theta$ (as shown in figure). Torque applied by the axis on the disc is:",
+      "images": [
+        "/images/ptm05/q06.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{q\\omega r^2 B\\sin\\theta}{2}$, clockwise"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{q\\omega r^2 B\\sin\\theta}{4}$, anticlockwise"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{q\\omega r^2 B\\sin\\theta}{2}$, anticlockwise"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{q\\omega r^2 B\\sin\\theta}{4}$, clockwise"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "Surface charge density $\\sigma = \\frac{q}{\\pi r^2}$. Consider an elemental ring of radius $x$ and thickness $dx$ ($0 \\le x \\le r$):\n$$di = \\frac{dq}{T} = \\frac{\\sigma(2\\pi x\\,dx)}{2\\pi/\\omega} = \\sigma\\omega x\\,dx$$\nIts elemental magnetic moment is $dM = (di)(\\pi x^2) = \\pi\\sigma\\omega x^3\\,dx$.\nIntegrating from $0$ to $r$ gives the total magnetic dipole moment:\n$$M = \\int_0^r \\pi\\sigma\\omega x^3\\,dx = \\frac{\\pi\\sigma\\omega r^4}{4} = \\frac{q\\omega r^2}{4}$$\nThus the magnetic torque magnitude is $\\tau = MB\\sin\\theta = \\dfrac{q\\omega r^2 B\\sin\\theta}{4}$. To hold the fixed axis stationary against $\\vec{\\tau}_{\\text{mag}} = \\vec{M}\\times\\vec{B}$, the axis exerts an equal opposite torque of magnitude $\\dfrac{q\\omega r^2 B\\sin\\theta}{4}$, clockwise.",
+      "explanation": "Surface charge density $\\sigma = \\frac{q}{\\pi r^2}$. Consider an elemental ring of radius $x$ and thickness $dx$ ($0 \\le x \\le r$):\n$$di = \\frac{dq}{T} = \\frac{\\sigma(2\\pi x\\,dx)}{2\\pi/\\omega} = \\sigma\\omega x\\,dx$$\nIts elemental magnetic moment is $dM = (di)(\\pi x^2) = \\pi\\sigma\\omega x^3\\,dx$.\nIntegrating from $0$ to $r$ gives the total magnetic dipole moment:\n$$M = \\int_0^r \\pi\\sigma\\omega x^3\\,dx = \\frac{\\pi\\sigma\\omega r^4}{4} = \\frac{q\\omega r^2}{4}$$\nThus the magnetic torque magnitude is $\\tau = MB\\sin\\theta = \\dfrac{q\\omega r^2 B\\sin\\theta}{4}$. To hold the fixed axis stationary against $\\vec{\\tau}_{\\text{mag}} = \\vec{M}\\times\\vec{B}$, the axis exerts an equal opposite torque of magnitude $\\dfrac{q\\omega r^2 B\\sin\\theta}{4}$, clockwise."
+    },
+    {
+      "id": 7,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A negatively charged particle projected towards east is deflected towards north by a uniform and constant magnetic field. The magnetic field must have a component:",
+      "options": [
+        {
+          "id": "A",
+          "text": "towards west"
+        },
+        {
+          "id": "B",
+          "text": "towards south"
+        },
+        {
+          "id": "C",
+          "text": "upward"
+        },
+        {
+          "id": "D",
+          "text": "downward"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Using the Lorentz magnetic force $\\vec{F} = q(\\vec{v} \\times \\vec{B})$: let east be $+\\hat{i}$, north be $+\\hat{j}$, and vertically upward be $+\\hat{k}$. Here $\\vec{v} = v\\hat{i}$, $\\vec{F}$ is along $+\\hat{j}$, and $q < 0$.\nTherefore $\\vec{v} \\times \\vec{B}$ must point along $-\\hat{j}$:\n$$\\hat{i} \\times \\hat{k} = -\\hat{j}$$\nHence the magnetic field must have a component along $+\\hat{k}$, i.e., **upward**.",
+      "explanation": "Using the Lorentz magnetic force $\\vec{F} = q(\\vec{v} \\times \\vec{B})$: let east be $+\\hat{i}$, north be $+\\hat{j}$, and vertically upward be $+\\hat{k}$. Here $\\vec{v} = v\\hat{i}$, $\\vec{F}$ is along $+\\hat{j}$, and $q < 0$.\nTherefore $\\vec{v} \\times \\vec{B}$ must point along $-\\hat{j}$:\n$$\\hat{i} \\times \\hat{k} = -\\hat{j}$$\nHence the magnetic field must have a component along $+\\hat{k}$, i.e., **upward**."
+    },
+    {
+      "id": 8,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A metallic wire is folded to form a square loop of side '$a$'. It carries a current $i$ and is kept perpendicular to the region of uniform magnetic field '$B$'. If the shape of the loop is changed from square to an equilateral triangle without changing the length of the wire and current, the magnitude of work done in doing so is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$Bia^2\\left[1 - \\dfrac{4\\sqrt{3}}{9}\\right]$"
+        },
+        {
+          "id": "B",
+          "text": "$Bia^2\\left[1 - \\dfrac{\\sqrt{3}}{9}\\right]$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{2}{3}Bia^2$"
+        },
+        {
+          "id": "D",
+          "text": "Zero"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Total wire length is $4a$, so the equilateral triangle has side $s = \\frac{4a}{3}$.\nInitial area of the square loop: $A_i = a^2$.\nFinal area of the equilateral triangle:\n$$A_f = \\frac{\\sqrt{3}}{4}s^2 = \\frac{\\sqrt{3}}{4}\\left(\\frac{4a}{3}\\right)^2 = \\frac{4\\sqrt{3}}{9}a^2$$\nSince both loops remain perpendicular to $\\vec{B}$, the magnitude of magnetic work / change in potential energy is:\n$$|W| = B\\Delta M = Bi|A_i - A_f| = Bia^2\\left[1 - \\frac{4\\sqrt{3}}{9}\\right]$$",
+      "explanation": "Total wire length is $4a$, so the equilateral triangle has side $s = \\frac{4a}{3}$.\nInitial area of the square loop: $A_i = a^2$.\nFinal area of the equilateral triangle:\n$$A_f = \\frac{\\sqrt{3}}{4}s^2 = \\frac{\\sqrt{3}}{4}\\left(\\frac{4a}{3}\\right)^2 = \\frac{4\\sqrt{3}}{9}a^2$$\nSince both loops remain perpendicular to $\\vec{B}$, the magnitude of magnetic work / change in potential energy is:\n$$|W| = B\\Delta M = Bi|A_i - A_f| = Bia^2\\left[1 - \\frac{4\\sqrt{3}}{9}\\right]$$"
+    },
+    {
+      "id": 9,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A star-shaped loop with length of each section '$l$' carries current $i$ as shown in figure. The magnitude of magnetic field induction at the center of the loop is ____.",
+      "images": [
+        "/images/ptm05/q09.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{3\\mu_0 i}{\\pi l}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{3\\mu_0 i}{2\\pi l}$"
+        },
+        {
+          "id": "C",
+          "text": "$(3 - \\sqrt{3})\\dfrac{\\mu_0 i}{\\pi l}$"
+        },
+        {
+          "id": "D",
+          "text": "$(3 + \\sqrt{3})\\dfrac{\\mu_0 i}{2\\pi l}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Notice the hexagram is made of $12$ straight outer segments of length $l$, or equivalently two opposite overlapping current distributions relative to the regular hexagon of side $l$ whose apothem (perpendicular distance from center) is $r = \\frac{\\sqrt{3}\\,l}{2}$:\nSpecifically, each outer star tip has two segments of length $l$ along lines passing at distance $r = \\frac{\\sqrt{3}l}{2}$ from the center, spanning angles relative to the center:\n$$B = 6\\left[\\frac{\\mu_0}{4\\pi}\\frac{i}{r}(\\sin 60^\\circ + \\sin 60^\\circ)\\right] - 6\\left[\\frac{\\mu_0}{4\\pi}\\frac{i}{r}(\\sin 30^\\circ + \\sin 30^\\circ)\\right]$$\n$$= 6\\cdot\\frac{\\mu_0 i}{4\\pi r}(\\sqrt{3} - 1) = 6\\cdot\\frac{\\mu_0 i}{4\\pi\\left(\\frac{\\sqrt{3}l}{2}\\right)}(\\sqrt{3} - 1) = \\frac{3(\\sqrt{3}-1)}{\\sqrt{3}}\\frac{\\mu_0 i}{\\pi l} = (3 - \\sqrt{3})\\frac{\\mu_0 i}{\\pi l}$$",
+      "explanation": "Notice the hexagram is made of $12$ straight outer segments of length $l$, or equivalently two opposite overlapping current distributions relative to the regular hexagon of side $l$ whose apothem (perpendicular distance from center) is $r = \\frac{\\sqrt{3}\\,l}{2}$:\nSpecifically, each outer star tip has two segments of length $l$ along lines passing at distance $r = \\frac{\\sqrt{3}l}{2}$ from the center, spanning angles relative to the center:\n$$B = 6\\left[\\frac{\\mu_0}{4\\pi}\\frac{i}{r}(\\sin 60^\\circ + \\sin 60^\\circ)\\right] - 6\\left[\\frac{\\mu_0}{4\\pi}\\frac{i}{r}(\\sin 30^\\circ + \\sin 30^\\circ)\\right]$$\n$$= 6\\cdot\\frac{\\mu_0 i}{4\\pi r}(\\sqrt{3} - 1) = 6\\cdot\\frac{\\mu_0 i}{4\\pi\\left(\\frac{\\sqrt{3}l}{2}\\right)}(\\sqrt{3} - 1) = \\frac{3(\\sqrt{3}-1)}{\\sqrt{3}}\\frac{\\mu_0 i}{\\pi l} = (3 - \\sqrt{3})\\frac{\\mu_0 i}{\\pi l}$$"
+    },
+    {
+      "id": 10,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The mid points of two small magnetic dipoles each of length $d$ are arranged in end-on positions with a distance of separation $X$ ($X \\gg d$) as shown in figure. The force between them is proportional to $X^{-n}$, where $n$ is:",
+      "images": [
+        "/images/ptm05/q10.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$1$"
+        },
+        {
+          "id": "B",
+          "text": "$2$"
+        },
+        {
+          "id": "C",
+          "text": "$3$"
+        },
+        {
+          "id": "D",
+          "text": "$4$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "The axial magnetic field of a short magnetic dipole $M_1$ at distance $X$ is $B(X) = \\frac{\\mu_0}{4\\pi}\\frac{2M_1}{X^3}$.\nThe force exerted on a collinear dipole $M_2$ is:\n$$F = M_2\\left|\\frac{dB}{dX}\\right| = M_2\\frac{\\mu_0}{4\\pi}\\frac{6M_1}{X^4} \\propto X^{-4}$$\nHence $n = 4$.",
+      "explanation": "The axial magnetic field of a short magnetic dipole $M_1$ at distance $X$ is $B(X) = \\frac{\\mu_0}{4\\pi}\\frac{2M_1}{X^3}$.\nThe force exerted on a collinear dipole $M_2$ is:\n$$F = M_2\\left|\\frac{dB}{dX}\\right| = M_2\\frac{\\mu_0}{4\\pi}\\frac{6M_1}{X^4} \\propto X^{-4}$$\nHence $n = 4$."
+    },
+    {
+      "id": 11,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Two short bar magnets of length $l$ and equal dipole moment $M$ are fastened perpendicularly at their centres (as shown in the figure). The magnitude of the magnetic field at a distance $d$ from the centre on the bisector of the right angle is ____ ($d \\ggg l$).",
+      "images": [
+        "/images/ptm05/q11.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{\\mu_0}{4\\pi}\\dfrac{M}{d^3}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{\\mu_0}{4\\pi}\\dfrac{\\sqrt{2}\\,M}{d^3}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{\\mu_0}{4\\pi}\\dfrac{2M}{d^3}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{\\mu_0}{4\\pi}\\dfrac{2\\sqrt{2}\\,M}{d^3}$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "From the polarity labels, the vertical magnet has $\\vec{M}_1 = M\\hat{j}$ ($\\text{S}\\to\\text{N}$) and the horizontal magnet has $\\vec{M}_2 = -M\\hat{i}$ ($\\text{S}\\to\\text{N}$). Their resultant dipole moment is:\n$$\\vec{M}' = \\vec{M}_1 + \\vec{M}_2 = M(-\\hat{i} + \\hat{j}), \\qquad |M'| = \\sqrt{2}M$$\nNotice $\\vec{M}'$ lies directly along the shown upper-left $45^\\circ$ angle bisector! Thus the point at distance $d$ lies on the **axial** line of the combined dipole $M'$:\n$$B = \\frac{\\mu_0}{4\\pi}\\frac{2M'}{d^3} = \\frac{\\mu_0}{4\\pi}\\frac{2\\sqrt{2}\\,M}{d^3}$$",
+      "explanation": "From the polarity labels, the vertical magnet has $\\vec{M}_1 = M\\hat{j}$ ($\\text{S}\\to\\text{N}$) and the horizontal magnet has $\\vec{M}_2 = -M\\hat{i}$ ($\\text{S}\\to\\text{N}$). Their resultant dipole moment is:\n$$\\vec{M}' = \\vec{M}_1 + \\vec{M}_2 = M(-\\hat{i} + \\hat{j}), \\qquad |M'| = \\sqrt{2}M$$\nNotice $\\vec{M}'$ lies directly along the shown upper-left $45^\\circ$ angle bisector! Thus the point at distance $d$ lies on the **axial** line of the combined dipole $M'$:\n$$B = \\frac{\\mu_0}{4\\pi}\\frac{2M'}{d^3} = \\frac{\\mu_0}{4\\pi}\\frac{2\\sqrt{2}\\,M}{d^3}$$"
+    },
+    {
+      "id": 12,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The ratio of magnitude of magnetic field at the centre of a circular current carrying coil to its magnetic moment is '$N$'. If the current and radius both were doubled, then the ratio will become ____.",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{N}{8}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{N}{4}$"
+        },
+        {
+          "id": "C",
+          "text": "$2N$"
+        },
+        {
+          "id": "D",
+          "text": "$4N$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "At the centre of a circular loop of radius $R$ carrying current $I$:\n$$B = \\frac{\\mu_0 I}{2R}, \\qquad M = I(\\pi R^2)$$\nTaking the ratio $N = \\frac{B}{M}$:\n$$N = \\frac{\\mu_0 I / (2R)}{I\\pi R^2} = \\frac{\\mu_0}{2\\pi R^3}$$\nNotice $N$ is independent of $I$ and inversely proportional to $R^3$. When both $I$ and $R$ are doubled ($R' = 2R$):\n$$N' = \\frac{N}{2^3} = \\frac{N}{8}$$",
+      "explanation": "At the centre of a circular loop of radius $R$ carrying current $I$:\n$$B = \\frac{\\mu_0 I}{2R}, \\qquad M = I(\\pi R^2)$$\nTaking the ratio $N = \\frac{B}{M}$:\n$$N = \\frac{\\mu_0 I / (2R)}{I\\pi R^2} = \\frac{\\mu_0}{2\\pi R^3}$$\nNotice $N$ is independent of $I$ and inversely proportional to $R^3$. When both $I$ and $R$ are doubled ($R' = 2R$):\n$$N' = \\frac{N}{2^3} = \\frac{N}{8}$$"
+    },
+    {
+      "id": 13,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A coil carries a current and experiences a torque due to a magnetic field. The value of the torque is $80\\%$ of the maximum possible torque. The angle between the magnetic field and the normal to the plane of the coil is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$30^\\circ$"
+        },
+        {
+          "id": "B",
+          "text": "$53^\\circ$"
+        },
+        {
+          "id": "C",
+          "text": "$45^\\circ$"
+        },
+        {
+          "id": "D",
+          "text": "$37^\\circ$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "The magnetic torque on a coil is $\\tau = MB\\sin\\theta$, where $\\theta$ is the angle between the area normal ($\\vec{M}$) and $\\vec{B}$, and $\\tau_{\\max} = MB$.\nGiven $\\tau = 0.80\\,\\tau_{\\max}$:\n$$\\sin\\theta = 0.8 = \\frac{4}{5} \\implies \\theta = 53^\\circ$$",
+      "explanation": "The magnetic torque on a coil is $\\tau = MB\\sin\\theta$, where $\\theta$ is the angle between the area normal ($\\vec{M}$) and $\\vec{B}$, and $\\tau_{\\max} = MB$.\nGiven $\\tau = 0.80\\,\\tau_{\\max}$:\n$$\\sin\\theta = 0.8 = \\frac{4}{5} \\implies \\theta = 53^\\circ$$"
+    },
+    {
+      "id": 14,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A horizontal bar of mass $M$ is suspended by two wires. Assume that a uniform magnetic field $B$ is directed into the plane of paper (as shown in the figure). When the current through the bar is $I$ (after closing the switch), then the tension in each supporting wire is ____. (Resistance of bar is very less but not zero)",
+      "images": [
+        "/images/ptm05/q14.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{Mg}{2}$"
+        },
+        {
+          "id": "B",
+          "text": "$2BIL$"
+        },
+        {
+          "id": "C",
+          "text": "$Mg - BIL$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{Mg - BIL}{2}$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "With current $I$ flowing from left to right along the bar of length $L$ and magnetic field $\\vec{B}$ directed into the plane of the page, $\\vec{F}_m = I(\\vec{L} \\times \\vec{B})$ acts vertically upward with magnitude $BIL$.\nFor vertical equilibrium of the bar suspended by two symmetric wires (each with tension $T$):\n$$2T + BIL = Mg \\implies T = \\frac{Mg - BIL}{2}$$",
+      "explanation": "With current $I$ flowing from left to right along the bar of length $L$ and magnetic field $\\vec{B}$ directed into the plane of the page, $\\vec{F}_m = I(\\vec{L} \\times \\vec{B})$ acts vertically upward with magnitude $BIL$.\nFor vertical equilibrium of the bar suspended by two symmetric wires (each with tension $T$):\n$$2T + BIL = Mg \\implies T = \\frac{Mg - BIL}{2}$$"
+    },
+    {
+      "id": 15,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "An electron is projected with velocity $v_0$ in a uniform electric field of magnitude $E$ perpendicular to the field. Again it is projected with velocity $v_0$ perpendicular to a uniform magnetic field of magnitude $B$. If $r_1$ is the initial radius of curvature just after entering the electric field and $r_2$ is the initial radius of curvature just after entering the magnetic field, then the ratio $\\dfrac{r_1}{r_2}$ is equal to:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{Bv_0^2}{E}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{B}{E}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{Ev_0}{B}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{Bv_0}{E}$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "At the instant of entry, both forces act perpendicular to $\\vec{v}_0$, supplying centripetal acceleration $\\frac{v_0^2}{r}$:\n1. In the electric field: $\\frac{eE}{m} = \\frac{v_0^2}{r_1} \\implies r_1 = \\frac{mv_0^2}{eE}$.\n2. In the magnetic field: $\\frac{ev_0 B}{m} = \\frac{v_0^2}{r_2} \\implies r_2 = \\frac{mv_0}{eB}$.\nTaking the ratio:\n$$\\frac{r_1}{r_2} = \\frac{mv_0^2/(eE)}{mv_0/(eB)} = \\frac{Bv_0}{E}$$",
+      "explanation": "At the instant of entry, both forces act perpendicular to $\\vec{v}_0$, supplying centripetal acceleration $\\frac{v_0^2}{r}$:\n1. In the electric field: $\\frac{eE}{m} = \\frac{v_0^2}{r_1} \\implies r_1 = \\frac{mv_0^2}{eE}$.\n2. In the magnetic field: $\\frac{ev_0 B}{m} = \\frac{v_0^2}{r_2} \\implies r_2 = \\frac{mv_0}{eB}$.\nTaking the ratio:\n$$\\frac{r_1}{r_2} = \\frac{mv_0^2/(eE)}{mv_0/(eB)} = \\frac{Bv_0}{E}$$"
+    },
+    {
+      "id": 16,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A coil having $N$ turns is wound tightly in the form of a spiral with inner and outer radii $a$ and $b$ respectively. When a current $I$ passes through the coil, the magnetic field induction at the centre is:",
+      "images": [
+        "/images/ptm05/q16.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{\\mu_0 NI}{b}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{2\\mu_0 NI}{a}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{\\mu_0 NI}{2(b - a)}\\ln\\dfrac{b}{a}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{\\mu_0 I}{2(b - a)}\\ln\\dfrac{b}{a}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Number of turns in an annular strip of thickness $dr$ at radius $r$ ($a \\le r \\le b$) is:\n$$dN = \\left(\\frac{N}{b - a}\\right)dr$$\nThe elemental magnetic field at the center due to these $dN$ circular turns is:\n$$dB = \\frac{\\mu_0\\,(dN)\\,I}{2r} = \\frac{\\mu_0 NI}{2(b - a)}\\frac{dr}{r}$$\nIntegrating from $r = a$ to $r = b$:\n$$B = \\int_a^b \\frac{\\mu_0 NI}{2(b - a)}\\frac{dr}{r} = \\frac{\\mu_0 NI}{2(b - a)}\\ln\\left(\\frac{b}{a}\\right)$$",
+      "explanation": "Number of turns in an annular strip of thickness $dr$ at radius $r$ ($a \\le r \\le b$) is:\n$$dN = \\left(\\frac{N}{b - a}\\right)dr$$\nThe elemental magnetic field at the center due to these $dN$ circular turns is:\n$$dB = \\frac{\\mu_0\\,(dN)\\,I}{2r} = \\frac{\\mu_0 NI}{2(b - a)}\\frac{dr}{r}$$\nIntegrating from $r = a$ to $r = b$:\n$$B = \\int_a^b \\frac{\\mu_0 NI}{2(b - a)}\\frac{dr}{r} = \\frac{\\mu_0 NI}{2(b - a)}\\ln\\left(\\frac{b}{a}\\right)$$",
+      "solutionImages": [
+        "/images/ptm05/sol_q16.png"
+      ]
+    },
+    {
+      "id": 17,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A magnet is suspended horizontally in the earth's magnetic field. When it is displaced and released it oscillates in a horizontal plane with a period $T$. If a piece of wood of the same moment of inertia (about the axis of rotation) as the magnet is kept above the magnet, the new period of oscillation of the system becomes ____.",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{T}{3}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{T}{2}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{T}{\\sqrt{2}}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\sqrt{2}\\,T$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "The oscillation time period of a magnet of moment of inertia $I$ and magnetic moment $M$ in Earth's horizontal field $B_H$ is:\n$$T = 2\\pi\\sqrt{\\frac{I}{MB_H}}$$\nPlacing a non-magnetic wooden piece of identical moment of inertia $I$ doubles the system's moment of inertia to $I' = 2I$, while the magnetic dipole moment $M$ stays unchanged:\n$$T' = 2\\pi\\sqrt{\\frac{2I}{MB_H}} = \\sqrt{2}\\,T$$",
+      "explanation": "The oscillation time period of a magnet of moment of inertia $I$ and magnetic moment $M$ in Earth's horizontal field $B_H$ is:\n$$T = 2\\pi\\sqrt{\\frac{I}{MB_H}}$$\nPlacing a non-magnetic wooden piece of identical moment of inertia $I$ doubles the system's moment of inertia to $I' = 2I$, while the magnetic dipole moment $M$ stays unchanged:\n$$T' = 2\\pi\\sqrt{\\frac{2I}{MB_H}} = \\sqrt{2}\\,T$$"
+    },
+    {
+      "id": 18,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A uniform magnetic field $\\vec{B} = B_0\\hat{j}$ exists in space. A particle of mass $m$ and charge $q$ is projected towards negative $X$-axis with speed $v$ from a point $(d, 0, 0)$. The maximum value of $v$ for which the particle does not hit the $Y$-$Z$ plane is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{2Bqd}{m}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{Bqd}{m}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{Bq}{2dm}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{Bqd}{2m}$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Since $\\vec{v} = -v\\hat{i}$ is perpendicular to $\\vec{B} = B_0\\hat{j}$, the particle describes a circular path in the $X$-$Z$ plane of radius $r = \\frac{mv}{qB_0}$ with center at $(d, 0, \\pm r)$. Thus the closest it comes to the $Y$-$Z$ plane ($x = 0$) is $x_{\\min} = d - r$. To just avoid hitting the $Y$-$Z$ plane ($x_{\\min} \\ge 0$):\n$$r = d \\implies \\frac{mv}{qB} = d \\implies v_{\\max} = \\frac{Bqd}{m}$$",
+      "explanation": "Since $\\vec{v} = -v\\hat{i}$ is perpendicular to $\\vec{B} = B_0\\hat{j}$, the particle describes a circular path in the $X$-$Z$ plane of radius $r = \\frac{mv}{qB_0}$ with center at $(d, 0, \\pm r)$. Thus the closest it comes to the $Y$-$Z$ plane ($x = 0$) is $x_{\\min} = d - r$. To just avoid hitting the $Y$-$Z$ plane ($x_{\\min} \\ge 0$):\n$$r = d \\implies \\frac{mv}{qB} = d \\implies v_{\\max} = \\frac{Bqd}{m}$$"
+    },
+    {
+      "id": 19,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A small block of mass $m$, having charge $q$, is placed on a frictionless fixed inclined plane making an angle $\\theta$ with the horizontal. There exists a uniform magnetic field $B$ parallel to the inclined plane but perpendicular to the length of spring (as shown in the figure). If $m$ is slightly pulled on the incline in downward direction and released, then the time period of oscillations of the block will be (assume that the block does not leave contact with the plane):",
+      "images": [
+        "/images/ptm05/q19.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$2\\pi\\sqrt{\\dfrac{m}{K}}$"
+        },
+        {
+          "id": "B",
+          "text": "$2\\pi\\sqrt{\\dfrac{2m}{K}}$"
+        },
+        {
+          "id": "C",
+          "text": "$2\\pi\\sqrt{\\dfrac{qB}{K}}$"
+        },
+        {
+          "id": "D",
+          "text": "$2\\pi\\sqrt{\\dfrac{qB}{2K}}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "The block oscillates along the incline ($\\vec{v}$ parallel to the incline surface). Because $\\vec{B}$ lies in the plane perpendicular to the spring (along the horizontal contour line of the incline), the magnetic Lorentz force $q(\\vec{v} \\times \\vec{B})$ points purely **perpendicular to the inclined plane**.\nSince the surface is frictionless and rigid (and the block does not leave contact), the normal reaction absorbs the magnetic force completely and there is zero magnetic component along the direction of motion. Therefore the restoring force is solely $-Kx$, giving:\n$$T = 2\\pi\\sqrt{\\frac{m}{K}}$$",
+      "explanation": "The block oscillates along the incline ($\\vec{v}$ parallel to the incline surface). Because $\\vec{B}$ lies in the plane perpendicular to the spring (along the horizontal contour line of the incline), the magnetic Lorentz force $q(\\vec{v} \\times \\vec{B})$ points purely **perpendicular to the inclined plane**.\nSince the surface is frictionless and rigid (and the block does not leave contact), the normal reaction absorbs the magnetic force completely and there is zero magnetic component along the direction of motion. Therefore the restoring force is solely $-Kx$, giving:\n$$T = 2\\pi\\sqrt{\\frac{m}{K}}$$"
+    },
+    {
+      "id": 20,
+      "subject": "Physics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A charged particle of charge $4\\text{ mC}$ enters a uniform magnetic field of induction $\\vec{B} = 4\\hat{i} + y\\hat{j} + z\\hat{k}\\text{ tesla}$ with a velocity $\\vec{V} = 2\\hat{i} + 3\\hat{j} - 6\\hat{k}\\text{ m/s}$. If the particle continues to move undeviated and experiences zero magnetic force, then the magnitude of the magnetic field induction ($B$) is ____ tesla.",
+      "options": [
+        {
+          "id": "A",
+          "text": "$14$"
+        },
+        {
+          "id": "B",
+          "text": "$2$"
+        },
+        {
+          "id": "C",
+          "text": "$3.5$"
+        },
+        {
+          "id": "D",
+          "text": "$28$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "For zero magnetic force $\\vec{F} = q(\\vec{V} \\times \\vec{B}) = \\vec{0}$ (with nonzero velocity), $\\vec{B}$ must be parallel (or antiparallel) to $\\vec{V}$, so their components are proportional:\n$$\\frac{4}{2} = \\frac{y}{3} = \\frac{z}{-6} = 2 \\implies y = 6, \\; z = -12$$\nHence $\\vec{B} = 4\\hat{i} + 6\\hat{j} - 12\\hat{k}\\text{ T}$, and its magnitude is:\n$$B = |\\vec{B}| = 2|\\vec{V}| = \\sqrt{4^2 + 6^2 + (-12)^2} = \\sqrt{16 + 36 + 144} = \\sqrt{196} = 14\\text{ T}$$",
+      "explanation": "For zero magnetic force $\\vec{F} = q(\\vec{V} \\times \\vec{B}) = \\vec{0}$ (with nonzero velocity), $\\vec{B}$ must be parallel (or antiparallel) to $\\vec{V}$, so their components are proportional:\n$$\\frac{4}{2} = \\frac{y}{3} = \\frac{z}{-6} = 2 \\implies y = 6, \\; z = -12$$\nHence $\\vec{B} = 4\\hat{i} + 6\\hat{j} - 12\\hat{k}\\text{ T}$, and its magnitude is:\n$$B = |\\vec{B}| = 2|\\vec{V}| = \\sqrt{4^2 + 6^2 + (-12)^2} = \\sqrt{16 + 36 + 144} = \\sqrt{196} = 14\\text{ T}$$"
+    },
+    {
+      "id": 21,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A long straight wire carrying current of $25\\text{ A}$ rests horizontally on a table as shown in figure. Another wire $PQ$ is placed directly above it of length $1\\text{ m}$, mass $2.5\\text{ g}$ carries the same current but in the opposite direction. The wire $PQ$ is free to slide up and down parallel to the wire on the table. The height raised by wire $PQ$ is ____ $\\text{mm}$ (in its equilibrium position). (take $g = 10\\text{ m/s}^2$)",
+      "images": [
+        "/images/ptm05/q21.png"
+      ],
+      "answer": "5",
+      "hasKey": true,
+      "solution": "Since the currents in the two parallel wires flow in opposite directions, the upper wire $PQ$ experiences an upward repulsive magnetic force:\n$$F = BIl = \\frac{\\mu_0 I^2 l}{2\\pi h}$$\nAt equilibrium at height $h$, magnetic repulsion balances gravity ($F = mg$):\n$$h = \\frac{\\mu_0 I^2 l}{2\\pi m g} = \\frac{4\\pi \\times 10^{-7} \\times 25^2 \\times 1}{2\\pi \\times (2.5 \\times 10^{-3}) \\times 10} = \\frac{2 \\times 10^{-7} \\times 625}{2.5 \\times 10^{-2}} = 5 \\times 10^{-3}\\text{ m} = 0.5\\text{ cm} = 5\\text{ mm}$$",
+      "explanation": "Since the currents in the two parallel wires flow in opposite directions, the upper wire $PQ$ experiences an upward repulsive magnetic force:\n$$F = BIl = \\frac{\\mu_0 I^2 l}{2\\pi h}$$\nAt equilibrium at height $h$, magnetic repulsion balances gravity ($F = mg$):\n$$h = \\frac{\\mu_0 I^2 l}{2\\pi m g} = \\frac{4\\pi \\times 10^{-7} \\times 25^2 \\times 1}{2\\pi \\times (2.5 \\times 10^{-3}) \\times 10} = \\frac{2 \\times 10^{-7} \\times 625}{2.5 \\times 10^{-2}} = 5 \\times 10^{-3}\\text{ m} = 0.5\\text{ cm} = 5\\text{ mm}$$"
+    },
+    {
+      "id": 22,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A steady current $I$ goes through a wire loop $PQR$ having shape of a right-angled triangle with $PQ = 3x$, $PR = 4x$ and $QR = 5x$. If the magnitude of magnetic field at $P$ due to this loop is $7\\left(\\dfrac{\\mu_0 I}{k\\pi x}\\right)$, find the value of $k$, if right angle is at vertex $P$.",
+      "answer": "48",
+      "hasKey": true,
+      "solution": "Since $P$ lies on the line of sides $PQ$ and $PR$, those two sides produce zero magnetic field at $P$. Only hypotenuse $QR = 5x$ contributes.\nThe perpendicular distance from right-angle vertex $P$ to hypotenuse $QR$ is:\n$$d = \\frac{(3x)(4x)}{5x} = \\frac{12x}{5}$$\nThe angles subtended by the ends $Q$ and $R$ at the foot of the perpendicular are $53^\\circ$ and $37^\\circ$ (or complement angles $\\cos 53^\\circ = 3/5$ and $\\cos 37^\\circ = 4/5$ in the Biot–Savart finite-wire formula):\n$$B = \\frac{\\mu_0 I}{4\\pi\\left(\\frac{12x}{5}\\right)}(\\cos 53^\\circ + \\cos 37^\\circ) = \\frac{5\\mu_0 I}{48\\pi x}\\left(\\frac{3}{5} + \\frac{4}{5}\\right) = 7\\left(\\frac{\\mu_0 I}{48\\pi x}\\right)$$\nComparing with $7\\left(\\frac{\\mu_0 I}{k\\pi x}\\right)$ gives $k = 48$.",
+      "explanation": "Since $P$ lies on the line of sides $PQ$ and $PR$, those two sides produce zero magnetic field at $P$. Only hypotenuse $QR = 5x$ contributes.\nThe perpendicular distance from right-angle vertex $P$ to hypotenuse $QR$ is:\n$$d = \\frac{(3x)(4x)}{5x} = \\frac{12x}{5}$$\nThe angles subtended by the ends $Q$ and $R$ at the foot of the perpendicular are $53^\\circ$ and $37^\\circ$ (or complement angles $\\cos 53^\\circ = 3/5$ and $\\cos 37^\\circ = 4/5$ in the Biot–Savart finite-wire formula):\n$$B = \\frac{\\mu_0 I}{4\\pi\\left(\\frac{12x}{5}\\right)}(\\cos 53^\\circ + \\cos 37^\\circ) = \\frac{5\\mu_0 I}{48\\pi x}\\left(\\frac{3}{5} + \\frac{4}{5}\\right) = 7\\left(\\frac{\\mu_0 I}{48\\pi x}\\right)$$\nComparing with $7\\left(\\frac{\\mu_0 I}{k\\pi x}\\right)$ gives $k = 48$.",
+      "solutionImages": [
+        "/images/ptm05/sol_q22.png"
+      ]
+    },
+    {
+      "id": 23,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A non-conducting rod of length $l$ with uniformly distributed charge $q$ is rotated with a constant frequency $n$ about an axis passing through centre and perpendicular to its length. Its magnetic moment is $\\dfrac{ql^2\\pi n}{(3)(k)}$, where $k = $ ____.",
+      "answer": "4",
+      "hasKey": true,
+      "solution": "For any uniformly charged rigid body having uniform charge-to-mass distribution, the gyromagnetic ratio satisfies:\n$$\\frac{M}{L} = \\frac{q}{2m}$$\nFor a thin rod of mass $m$ and length $l$ rotating about its center perpendicular to its length with angular velocity $\\omega = 2\\pi n$:\n$$L = I\\omega = \\left(\\frac{ml^2}{12}\\right)(2\\pi n)$$\nTherefore, the magnetic dipole moment is:\n$$M = \\frac{q}{2m}\\cdot\\frac{ml^2}{12}\\cdot 2\\pi n = \\frac{ql^2\\pi n}{12} = \\frac{ql^2\\pi n}{(3)(4)}$$\nHence $k = 4$.",
+      "explanation": "For any uniformly charged rigid body having uniform charge-to-mass distribution, the gyromagnetic ratio satisfies:\n$$\\frac{M}{L} = \\frac{q}{2m}$$\nFor a thin rod of mass $m$ and length $l$ rotating about its center perpendicular to its length with angular velocity $\\omega = 2\\pi n$:\n$$L = I\\omega = \\left(\\frac{ml^2}{12}\\right)(2\\pi n)$$\nTherefore, the magnetic dipole moment is:\n$$M = \\frac{q}{2m}\\cdot\\frac{ml^2}{12}\\cdot 2\\pi n = \\frac{ql^2\\pi n}{12} = \\frac{ql^2\\pi n}{(3)(4)}$$\nHence $k = 4$."
+    },
+    {
+      "id": 24,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Two particles $A$ and $B$ enter a region of uniform magnetic field after being accelerated through the same potential difference. They describe circular paths of radii $4\\text{ m}$ and $2\\text{ m}$ respectively. They have equal charges. Find the ratio of mass of $A$ to that of mass of $B$.",
+      "answer": "4",
+      "hasKey": true,
+      "solution": "When accelerated from rest through potential difference $V$, kinetic energy $K = qV$ and momentum $p = \\sqrt{2mqV}$. In uniform magnetic field $B$, the circular path radius is:\n$$r = \\frac{p}{Bq} = \\frac{\\sqrt{2mVq}}{Bq}$$\nSince $V$, $q$, and $B$ are identical for both particles, $r \\propto \\sqrt{m}$, i.e. $m \\propto r^2$. Thus:\n$$\\frac{m_A}{m_B} = \\left(\\frac{r_A}{r_B}\\right)^2 = \\left(\\frac{4}{2}\\right)^2 = 4$$",
+      "explanation": "When accelerated from rest through potential difference $V$, kinetic energy $K = qV$ and momentum $p = \\sqrt{2mqV}$. In uniform magnetic field $B$, the circular path radius is:\n$$r = \\frac{p}{Bq} = \\frac{\\sqrt{2mVq}}{Bq}$$\nSince $V$, $q$, and $B$ are identical for both particles, $r \\propto \\sqrt{m}$, i.e. $m \\propto r^2$. Thus:\n$$\\frac{m_A}{m_B} = \\left(\\frac{r_A}{r_B}\\right)^2 = \\left(\\frac{4}{2}\\right)^2 = 4$$"
+    },
+    {
+      "id": 25,
+      "subject": "Physics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The acceleration of an electron at a certain moment moving in a magnetic field $\\vec{B} = 2\\hat{i} + 3\\hat{j} + 4\\hat{k}\\text{ T}$ is $\\vec{a} = x\\hat{i} + \\hat{j} - \\hat{k}\\text{ m/s}^2$. Then find $4 \\times x$.",
+      "answer": "2",
+      "hasKey": true,
+      "solution": "The magnetic Lorentz force $\\vec{F} = q(\\vec{v} \\times \\vec{B})$ is always perpendicular to $\\vec{B}$, so the acceleration vector $\\vec{a} = \\vec{F}/m$ satisfies $\\vec{a} \\perp \\vec{B}$:\n$$\\vec{a}\\cdot\\vec{B} = 0 \\implies 2(x) + 3(1) + 4(-1) = 0$$\n$$2x - 1 = 0 \\implies x = \\frac{1}{2}$$\nTherefore $4 \\times x = 4 \\times \\frac{1}{2} = 2$.",
+      "explanation": "The magnetic Lorentz force $\\vec{F} = q(\\vec{v} \\times \\vec{B})$ is always perpendicular to $\\vec{B}$, so the acceleration vector $\\vec{a} = \\vec{F}/m$ satisfies $\\vec{a} \\perp \\vec{B}$:\n$$\\vec{a}\\cdot\\vec{B} = 0 \\implies 2(x) + 3(1) + 4(-1) = 0$$\n$$2x - 1 = 0 \\implies x = \\frac{1}{2}$$\nTherefore $4 \\times x = 4 \\times \\frac{1}{2} = 2$."
+    },
+    {
+      "id": 26,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The appropriate reagent for the following transformation is:",
+      "images": [
+        "/images/ptm05/q26.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\text{Zn(Hg)},\\,\\text{HCl}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\text{NaBH}_4$"
+        },
+        {
+          "id": "C",
+          "text": "$\\text{H}_2/\\text{Ni}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\text{NH}_2\\text{NH}_2/\\text{OH}^-$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "The transformation converts the ketone ($-\\text{COCH}_3$) completely to an ethyl group ($-\\text{CH}_2\\text{CH}_3$) while leaving the acid-sensitive secondary alcohol ($-\\text{OH}$) completely intact:\n- **Clemmensen ($\\text{Zn(Hg)}/\\text{HCl}$)** is strongly acidic and would convert the $-\\text{OH}$ group into $-\\text{Cl}$ or dehydrate it.\n- **$\\text{NaBH}_4$** and **$\\text{H}_2/\\text{Ni}$** reduce the ketone only to a secondary alcohol, not all the way to $-\\text{CH}_2-$.\n- **Wolff–Kishner reduction ($\\text{NH}_2\\text{NH}_2/\\text{OH}^-$)** operates under basic conditions, selectively deoxygenating the carbonyl $-\\text{C=O}$ to $-\\text{CH}_2-$ without affecting $-\\text{OH}$.",
+      "explanation": "The transformation converts the ketone ($-\\text{COCH}_3$) completely to an ethyl group ($-\\text{CH}_2\\text{CH}_3$) while leaving the acid-sensitive secondary alcohol ($-\\text{OH}$) completely intact:\n- **Clemmensen ($\\text{Zn(Hg)}/\\text{HCl}$)** is strongly acidic and would convert the $-\\text{OH}$ group into $-\\text{Cl}$ or dehydrate it.\n- **$\\text{NaBH}_4$** and **$\\text{H}_2/\\text{Ni}$** reduce the ketone only to a secondary alcohol, not all the way to $-\\text{CH}_2-$.\n- **Wolff–Kishner reduction ($\\text{NH}_2\\text{NH}_2/\\text{OH}^-$)** operates under basic conditions, selectively deoxygenating the carbonyl $-\\text{C=O}$ to $-\\text{CH}_2-$ without affecting $-\\text{OH}$."
+    },
+    {
+      "id": 27,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Which of the following compounds gives a positive iodoform test?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Methanal ($\\text{HCHO}$)"
+        },
+        {
+          "id": "B",
+          "text": "Ethanal ($\\text{CH}_3\\text{CHO}$)"
+        },
+        {
+          "id": "C",
+          "text": "Benzaldehyde ($\\text{C}_6\\text{H}_5\\text{CHO}$)"
+        },
+        {
+          "id": "D",
+          "text": "Propanal ($\\text{CH}_3\\text{CH}_2\\text{CHO}$)"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "The iodoform test ($\\text{I}_2 + \\text{NaOH}$) is positive only for carbonyl compounds containing the $\\text{CH}_3\\text{C(=O)}-$ group (or alcohols $\\text{CH}_3\\text{CH(OH)}-$ oxidizable to it).\nAmong aldehydes, **ethanal ($\\text{CH}_3\\text{CHO}$)** is the sole aldehyde containing the $\\text{CH}_3\\text{CO}-$ unit and thus gives a yellow precipitate of $\\text{CHI}_3$.",
+      "explanation": "The iodoform test ($\\text{I}_2 + \\text{NaOH}$) is positive only for carbonyl compounds containing the $\\text{CH}_3\\text{C(=O)}-$ group (or alcohols $\\text{CH}_3\\text{CH(OH)}-$ oxidizable to it).\nAmong aldehydes, **ethanal ($\\text{CH}_3\\text{CHO}$)** is the sole aldehyde containing the $\\text{CH}_3\\text{CO}-$ unit and thus gives a yellow precipitate of $\\text{CHI}_3$."
+    },
+    {
+      "id": 28,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "What is the principal product of the following reaction?",
+      "images": [
+        "/images/ptm05/q28.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "",
+          "image": "/images/ptm05/q28_optA.png"
+        },
+        {
+          "id": "B",
+          "text": "",
+          "image": "/images/ptm05/q28_optB.png"
+        },
+        {
+          "id": "C",
+          "text": "",
+          "image": "/images/ptm05/q28_optC.png"
+        },
+        {
+          "id": "D",
+          "text": "None of these"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "With aqueous-ethanolic $\\text{NaOH}$ and heat, *o*-phenylenediacetaldehyde undergoes an **intramolecular aldol condensation**:\n1. Base removes a benzylic $\\alpha$-proton from one $-\\text{CH}_2\\text{CHO}$ chain, forming a resonance-stabilized carbanion.\n2. It attacks the other aldehyde $-\\text{CHO}$ to close a stable $5$-membered ring ($\\beta$-hydroxy aldehyde, B).\n3. Upon heating, dehydration occurs immediately to form the conjugated $\\alpha,\\beta$-unsaturated aldehyde (indene-2-carbaldehyde, Option C).",
+      "explanation": "With aqueous-ethanolic $\\text{NaOH}$ and heat, *o*-phenylenediacetaldehyde undergoes an **intramolecular aldol condensation**:\n1. Base removes a benzylic $\\alpha$-proton from one $-\\text{CH}_2\\text{CHO}$ chain, forming a resonance-stabilized carbanion.\n2. It attacks the other aldehyde $-\\text{CHO}$ to close a stable $5$-membered ring ($\\beta$-hydroxy aldehyde, B).\n3. Upon heating, dehydration occurs immediately to form the conjugated $\\alpha,\\beta$-unsaturated aldehyde (indene-2-carbaldehyde, Option C)."
+    },
+    {
+      "id": 29,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The major products $(A)$ and $(B)$ are respectively:",
+      "images": [
+        "/images/ptm05/q29.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "",
+          "image": "/images/ptm05/q29_optA.png"
+        },
+        {
+          "id": "B",
+          "text": "",
+          "image": "/images/ptm05/q29_optB.png"
+        },
+        {
+          "id": "C",
+          "text": "",
+          "image": "/images/ptm05/q29_optC.png"
+        },
+        {
+          "id": "D",
+          "text": "Both (A) and (B)"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "This is a **crossed Cannizzaro reaction** between *p*-methoxybenzaldehyde and formaldehyde ($\\text{HCHO}$) in concentrated $\\text{KOH}$ upon heating:\n- Because $\\text{HCHO}$ is far less sterically hindered and lacks electron-donating conjugation, its carbonyl carbon carries a higher partial positive charge ($\\delta^+$) and undergoes faster hydroxide attack.\n- Consequently, $\\text{HCHO}$ acts as the hydride donor and is **oxidized** to potassium formate ($\\text{HCOO}^-\\text{K}^+$), while *p*-methoxybenzaldehyde is **reduced** to *p*-methoxybenzyl alcohol (Option A).",
+      "explanation": "This is a **crossed Cannizzaro reaction** between *p*-methoxybenzaldehyde and formaldehyde ($\\text{HCHO}$) in concentrated $\\text{KOH}$ upon heating:\n- Because $\\text{HCHO}$ is far less sterically hindered and lacks electron-donating conjugation, its carbonyl carbon carries a higher partial positive charge ($\\delta^+$) and undergoes faster hydroxide attack.\n- Consequently, $\\text{HCHO}$ acts as the hydride donor and is **oxidized** to potassium formate ($\\text{HCOO}^-\\text{K}^+$), while *p*-methoxybenzaldehyde is **reduced** to *p*-methoxybenzyl alcohol (Option A)."
+    },
+    {
+      "id": 30,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The major product of the following reaction is:",
+      "images": [
+        "/images/ptm05/q30.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "",
+          "image": "/images/ptm05/q30_optA.png"
+        },
+        {
+          "id": "B",
+          "text": "",
+          "image": "/images/ptm05/q30_optB.png"
+        },
+        {
+          "id": "C",
+          "text": "",
+          "image": "/images/ptm05/q30_optC.png"
+        },
+        {
+          "id": "D",
+          "text": "",
+          "image": "/images/ptm05/q30_optD.png"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Vigorous oxidation with hot alkaline $\\text{KMnO}_4$ followed by dilute $\\text{H}_2\\text{SO}_4$ workup oxidizes both benzylic carbon substituents completely down to carboxylic acid groups:\n- The methyl group ($-\\text{CH}_3$) oxidizes directly to $-\\text{COOH}$.\n- The acetyl group ($-\\text{COCH}_3$) undergoes vigorous oxidative C–C cleavage to $-\\text{COOH}$.\nThus the major product after acidification is **terephthalic acid** (benzene-1,4-dicarboxylic acid, Option C).",
+      "explanation": "Vigorous oxidation with hot alkaline $\\text{KMnO}_4$ followed by dilute $\\text{H}_2\\text{SO}_4$ workup oxidizes both benzylic carbon substituents completely down to carboxylic acid groups:\n- The methyl group ($-\\text{CH}_3$) oxidizes directly to $-\\text{COOH}$.\n- The acetyl group ($-\\text{COCH}_3$) undergoes vigorous oxidative C–C cleavage to $-\\text{COOH}$.\nThus the major product after acidification is **terephthalic acid** (benzene-1,4-dicarboxylic acid, Option C).",
+      "solutionImages": [
+        "/images/ptm05/sol_q30.png"
+      ]
+    },
+    {
+      "id": 31,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The acid $B$ obtained through the following sequence of reactions is:",
+      "images": [
+        "/images/ptm05/q31.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Succinic acid"
+        },
+        {
+          "id": "B",
+          "text": "Malonic acid"
+        },
+        {
+          "id": "C",
+          "text": "Maleic acid"
+        },
+        {
+          "id": "D",
+          "text": "Oxalic acid"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Step 1: Excess $\\text{KCN}$ substitutes both bromine atoms via $S_N2$:\n$$\\text{BrCH}_2-\\text{CH}_2\\text{Br} \\xrightarrow{\\text{KCN (excess)}} \\text{NC}-\\text{CH}_2-\\text{CH}_2-\\text{CN} \\; (A)$$\nStep 2: Complete acidic hydrolysis converts both nitrile groups into carboxylic acids:\n$$\\text{NC}-\\text{CH}_2-\\text{CH}_2-\\text{CN} \\xrightarrow{\\text{H}_3\\text{O}^+} \\text{HOOC}-\\text{CH}_2-\\text{CH}_2-\\text{COOH} \\; (B)$$\nThis 4-carbon saturated dicarboxylic acid (butanedioic acid) is **succinic acid**.",
+      "explanation": "Step 1: Excess $\\text{KCN}$ substitutes both bromine atoms via $S_N2$:\n$$\\text{BrCH}_2-\\text{CH}_2\\text{Br} \\xrightarrow{\\text{KCN (excess)}} \\text{NC}-\\text{CH}_2-\\text{CH}_2-\\text{CN} \\; (A)$$\nStep 2: Complete acidic hydrolysis converts both nitrile groups into carboxylic acids:\n$$\\text{NC}-\\text{CH}_2-\\text{CH}_2-\\text{CN} \\xrightarrow{\\text{H}_3\\text{O}^+} \\text{HOOC}-\\text{CH}_2-\\text{CH}_2-\\text{COOH} \\; (B)$$\nThis 4-carbon saturated dicarboxylic acid (butanedioic acid) is **succinic acid**."
+    },
+    {
+      "id": 32,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The decreasing order of ease of alkaline hydrolysis for the following esters is:",
+      "images": [
+        "/images/ptm05/q32.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\text{III} > \\text{II} > \\text{IV} > \\text{I}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\text{III} > \\text{II} > \\text{I} > \\text{IV}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\text{IV} > \\text{II} > \\text{III} > \\text{I}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\text{II} > \\text{III} > \\text{I} > \\text{IV}$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Alkaline hydrolysis of esters proceeds via nucleophilic acyl attack of $\\text{OH}^-$ at the carbonyl carbon (rate increases with electron-withdrawing groups that make the carbonyl carbon more electrophilic and stabilize the tetrahedral oxyanion intermediate):\n- **(III)** *p*-$\\text{NO}_2$: strong $-M, -I$ electron-withdrawing group (fastest)\n- **(II)** *p*-$\\text{Cl}$: net electron-withdrawing ($-I > +M$) (second)\n- **(I)** unsubstituted ethyl benzoate (third)\n- **(IV)** *p*-$\\text{OCH}_3$: strong $+M$ electron-donating group, decreasing electrophilicity (slowest)\nHence the order is $\\text{III} > \\text{II} > \\text{I} > \\text{IV}$.",
+      "explanation": "Alkaline hydrolysis of esters proceeds via nucleophilic acyl attack of $\\text{OH}^-$ at the carbonyl carbon (rate increases with electron-withdrawing groups that make the carbonyl carbon more electrophilic and stabilize the tetrahedral oxyanion intermediate):\n- **(III)** *p*-$\\text{NO}_2$: strong $-M, -I$ electron-withdrawing group (fastest)\n- **(II)** *p*-$\\text{Cl}$: net electron-withdrawing ($-I > +M$) (second)\n- **(I)** unsubstituted ethyl benzoate (third)\n- **(IV)** *p*-$\\text{OCH}_3$: strong $+M$ electron-donating group, decreasing electrophilicity (slowest)\nHence the order is $\\text{III} > \\text{II} > \\text{I} > \\text{IV}$."
+    },
+    {
+      "id": 33,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Sodium bicarbonate reacts with salicylic acid to form:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\text{C}_6\\text{H}_5\\text{ONa}$"
+        },
+        {
+          "id": "B",
+          "text": "",
+          "image": "/images/ptm05/q33_optB.png"
+        },
+        {
+          "id": "C",
+          "text": "",
+          "image": "/images/ptm05/q33_optC.png"
+        },
+        {
+          "id": "D",
+          "text": "",
+          "image": "/images/ptm05/q33_optD.png"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Salicylic acid (2-hydroxybenzoic acid) contains both a carboxylic acid group ($-\\text{COOH}$, $\\text{p}K_a \\approx 3.0$) and a phenolic hydroxyl group ($-\\text{OH}$, $\\text{p}K_a \\approx 10.0$).\nSince carbonic acid ($\\text{H}_2\\text{CO}_3$, $\\text{p}K_{a1} \\approx 6.35$) is weaker than $-\\text{COOH}$ but stronger than phenolic $-\\text{OH}$, $\\text{NaHCO}_3$ selectively neutralizes only the $-\\text{COOH}$ group to give **sodium salicylate** (Option B) along with $\\text{CO}_2\\uparrow + \\text{H}_2\\text{O}$.",
+      "explanation": "Salicylic acid (2-hydroxybenzoic acid) contains both a carboxylic acid group ($-\\text{COOH}$, $\\text{p}K_a \\approx 3.0$) and a phenolic hydroxyl group ($-\\text{OH}$, $\\text{p}K_a \\approx 10.0$).\nSince carbonic acid ($\\text{H}_2\\text{CO}_3$, $\\text{p}K_{a1} \\approx 6.35$) is weaker than $-\\text{COOH}$ but stronger than phenolic $-\\text{OH}$, $\\text{NaHCO}_3$ selectively neutralizes only the $-\\text{COOH}$ group to give **sodium salicylate** (Option B) along with $\\text{CO}_2\\uparrow + \\text{H}_2\\text{O}$."
+    },
+    {
+      "id": 34,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Which of the following will **not** undergo Hell–Volhard–Zelinsky (HVZ) reaction?",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\text{HCOOH}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\text{CH}_3\\text{COOH}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\text{CH}_3\\text{CH}_2\\text{COOH}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\text{CH}_3\\text{CHBrCOOH}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "The Hell–Volhard–Zelinsky reaction ($\\text{X}_2 / \\text{Red P}$, followed by $\\text{H}_2\\text{O}$) halogenates carboxylic acids specifically at their **$\\alpha$-carbon**, so the acid **must possess at least one $\\alpha$-hydrogen**.\nFormic acid ($\\text{HCOOH}$) has no $\\alpha$-carbon (and no $\\alpha$-H), whereas $\\text{CH}_3\\text{COOH}$, $\\text{CH}_3\\text{CH}_2\\text{COOH}$, and $\\text{CH}_3\\text{CHBrCOOH}$ all have $\\alpha$-hydrogens.",
+      "explanation": "The Hell–Volhard–Zelinsky reaction ($\\text{X}_2 / \\text{Red P}$, followed by $\\text{H}_2\\text{O}$) halogenates carboxylic acids specifically at their **$\\alpha$-carbon**, so the acid **must possess at least one $\\alpha$-hydrogen**.\nFormic acid ($\\text{HCOOH}$) has no $\\alpha$-carbon (and no $\\alpha$-H), whereas $\\text{CH}_3\\text{COOH}$, $\\text{CH}_3\\text{CH}_2\\text{COOH}$, and $\\text{CH}_3\\text{CHBrCOOH}$ all have $\\alpha$-hydrogens."
+    },
+    {
+      "id": 35,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A compound with molecular formula $\\text{C}_4\\text{H}_{10}\\text{O}_4$ on acylation with acetic anhydride gives a compound with molecular formula $\\text{C}_{12}\\text{H}_{18}\\text{O}_8$. How many hydroxyl groups are present in the compound?",
+      "options": [
+        {
+          "id": "A",
+          "text": "one"
+        },
+        {
+          "id": "B",
+          "text": "Two"
+        },
+        {
+          "id": "C",
+          "text": "Three"
+        },
+        {
+          "id": "D",
+          "text": "Four"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "Each $-\\text{OH}$ group esterified by acetic anhydride replaces $-\\text{H}$ with an acetyl group ($-\\text{COCH}_3$), increasing the formula by $\\text{C}_2\\text{H}_2\\text{O}$ (molecular mass $+42\\text{ u}$).\nComparing the initial and acylated formulas:\n$$\\text{C}_{12}\\text{H}_{18}\\text{O}_8 - \\text{C}_4\\text{H}_{10}\\text{O}_4 = \\text{C}_8\\text{H}_8\\text{O}_4 = 4 \\times (\\text{C}_2\\text{H}_2\\text{O})$$\nThus $4$ acetyl groups were introduced, meaning **$4$ hydroxyl ($-\\text{OH}$) groups** are present.",
+      "explanation": "Each $-\\text{OH}$ group esterified by acetic anhydride replaces $-\\text{H}$ with an acetyl group ($-\\text{COCH}_3$), increasing the formula by $\\text{C}_2\\text{H}_2\\text{O}$ (molecular mass $+42\\text{ u}$).\nComparing the initial and acylated formulas:\n$$\\text{C}_{12}\\text{H}_{18}\\text{O}_8 - \\text{C}_4\\text{H}_{10}\\text{O}_4 = \\text{C}_8\\text{H}_8\\text{O}_4 = 4 \\times (\\text{C}_2\\text{H}_2\\text{O})$$\nThus $4$ acetyl groups were introduced, meaning **$4$ hydroxyl ($-\\text{OH}$) groups** are present."
+    },
+    {
+      "id": 36,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "In the following sequence of reactions,\n$$\\text{CH}_3\\text{CH}_2\\text{OH} \\xrightarrow{\\text{P}+\\text{I}_2} A \\xrightarrow[\\text{Ether}]{\\text{Mg}} B \\xrightarrow{\\text{HCHO}} C \\xrightarrow{\\text{H}_2\\text{O}} D$$\nThe compound '$D$' is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "*n*-propyl alcohol"
+        },
+        {
+          "id": "B",
+          "text": "Propanal"
+        },
+        {
+          "id": "C",
+          "text": "butanal"
+        },
+        {
+          "id": "D",
+          "text": "*n*-butyl alcohol"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Tracing each step:\n- $A = \\text{CH}_3\\text{CH}_2\\text{I}$ (ethyl iodide, via $\\text{P}+\\text{I}_2$)\n- $B = \\text{CH}_3\\text{CH}_2\\text{MgI}$ (ethylmagnesium iodide Grignard reagent)\n- $C = \\text{CH}_3\\text{CH}_2\\text{CH}_2\\text{OMgI}$ (nucleophilic addition to formaldehyde $\\text{HCHO}$)\n- $D = \\text{CH}_3\\text{CH}_2\\text{CH}_2\\text{OH}$ (**n-propyl alcohol** / propan-1-ol upon hydrolysis).",
+      "explanation": "Tracing each step:\n- $A = \\text{CH}_3\\text{CH}_2\\text{I}$ (ethyl iodide, via $\\text{P}+\\text{I}_2$)\n- $B = \\text{CH}_3\\text{CH}_2\\text{MgI}$ (ethylmagnesium iodide Grignard reagent)\n- $C = \\text{CH}_3\\text{CH}_2\\text{CH}_2\\text{OMgI}$ (nucleophilic addition to formaldehyde $\\text{HCHO}$)\n- $D = \\text{CH}_3\\text{CH}_2\\text{CH}_2\\text{OH}$ (**n-propyl alcohol** / propan-1-ol upon hydrolysis)."
+    },
+    {
+      "id": 37,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "In the Cannizzaro reaction given below:\n$$2\\text{PhCHO} \\xrightarrow{: \\text{OH}^-} \\text{PhCH}_2\\text{OH} + \\text{PhCOO}^-$$\nthe slowest step is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "the transfer of hydride to the carbonyl group"
+        },
+        {
+          "id": "B",
+          "text": "the abstraction of proton from the carboxylic group"
+        },
+        {
+          "id": "C",
+          "text": "the deprotonation of $\\text{PhCH}_2\\text{OH}$"
+        },
+        {
+          "id": "D",
+          "text": "the attack of $: \\text{OH}^-$ at the carbonyl group"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "In the Cannizzaro mechanism:\n1. Hydroxide ion reversibly adds to the first benzaldehyde molecule to form a tetrahedral oxyanion intermediate.\n2. **Rate-Determining (Slowest) Step:** Hydride transfer ($\\text{H}^-$) from this anionic adduct to a second benzaldehyde molecule, because breaking the strong $\\text{C}-\\text{H}$ bond and transferring a poor leaving group ($\\text{H}^-$) carries the highest activation barrier.\n3. Fast proton transfer follows.",
+      "explanation": "In the Cannizzaro mechanism:\n1. Hydroxide ion reversibly adds to the first benzaldehyde molecule to form a tetrahedral oxyanion intermediate.\n2. **Rate-Determining (Slowest) Step:** Hydride transfer ($\\text{H}^-$) from this anionic adduct to a second benzaldehyde molecule, because breaking the strong $\\text{C}-\\text{H}$ bond and transferring a poor leaving group ($\\text{H}^-$) carries the highest activation barrier.\n3. Fast proton transfer follows."
+    },
+    {
+      "id": 38,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The major product of the following reaction is:",
+      "images": [
+        "/images/ptm05/q38.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "",
+          "image": "/images/ptm05/q38_optA.png"
+        },
+        {
+          "id": "B",
+          "text": "",
+          "image": "/images/ptm05/q38_optB.png"
+        },
+        {
+          "id": "C",
+          "text": "",
+          "image": "/images/ptm05/q38_optC.png"
+        },
+        {
+          "id": "D",
+          "text": "",
+          "image": "/images/ptm05/q38_optD.png"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Upon treatment with aqueous $\\text{KOH}$ followed by $\\text{H}^+$ and heat, the diketone undergoes **intramolecular aldol condensation** to form a stable **6-membered fused ring** followed by dehydration:\n- Options (C) and (D) contain highly strained $4$-membered fused cyclobutane/cyclobutene rings and are strongly disfavored.\n- Between the two $6$-membered bicyclic ketones (A) and (B), dehydration proceeds to give the thermodynamically favored **conjugated $\\alpha,\\beta$-unsaturated carbonyl** system (**Option A**), rather than the unconjugated alkene in Option (B).",
+      "explanation": "Upon treatment with aqueous $\\text{KOH}$ followed by $\\text{H}^+$ and heat, the diketone undergoes **intramolecular aldol condensation** to form a stable **6-membered fused ring** followed by dehydration:\n- Options (C) and (D) contain highly strained $4$-membered fused cyclobutane/cyclobutene rings and are strongly disfavored.\n- Between the two $6$-membered bicyclic ketones (A) and (B), dehydration proceeds to give the thermodynamically favored **conjugated $\\alpha,\\beta$-unsaturated carbonyl** system (**Option A**), rather than the unconjugated alkene in Option (B)."
+    },
+    {
+      "id": 39,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Benzoyl chloride is prepared from benzoic acid by:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\text{Cl}_2,\\, h\\nu$"
+        },
+        {
+          "id": "B",
+          "text": "$\\text{SO}_2\\text{Cl}_2$"
+        },
+        {
+          "id": "C",
+          "text": "$\\text{SOCl}_2$"
+        },
+        {
+          "id": "D",
+          "text": "$\\text{Cl}_2,\\, \\text{H}_2\\text{O}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Treating benzoic acid with thionyl chloride ($\\text{SOCl}_2$) converts $-\\text{COOH}$ cleanly into benzoyl chloride ($\\text{C}_6\\text{H}_5\\text{COCl}$), liberating gaseous byproducts $\\text{SO}_2\\uparrow$ and $\\text{HCl}\\uparrow$:\n$$\\text{C}_6\\text{H}_5\\text{COOH} + \\text{SOCl}_2 \\longrightarrow \\text{C}_6\\text{H}_5\\text{COCl} + \\text{SO}_2\\uparrow + \\text{HCl}\\uparrow$$",
+      "explanation": "Treating benzoic acid with thionyl chloride ($\\text{SOCl}_2$) converts $-\\text{COOH}$ cleanly into benzoyl chloride ($\\text{C}_6\\text{H}_5\\text{COCl}$), liberating gaseous byproducts $\\text{SO}_2\\uparrow$ and $\\text{HCl}\\uparrow$:\n$$\\text{C}_6\\text{H}_5\\text{COOH} + \\text{SOCl}_2 \\longrightarrow \\text{C}_6\\text{H}_5\\text{COCl} + \\text{SO}_2\\uparrow + \\text{HCl}\\uparrow$$"
+    },
+    {
+      "id": 40,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Which of the following acids has the **smallest** dissociation constant?",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\text{CH}_3\\text{CHFCOOH}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\text{FCH}_2\\text{CH}_2\\text{COOH}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\text{BrCH}_2\\text{CH}_2\\text{COOH}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\text{CH}_3\\text{CHBrCOOH}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Acid strength ($K_a$) of substituted carboxylic acids increases with the electron-withdrawing inductive effect ($-I$) of the halogen and decreases rapidly as distance from $-\\text{COOH}$ increases:\n- Electronegativity: $-\\text{F} > -\\text{Br}$ (stronger $-I$ for $\\text{F}$).\n- Position: $\\alpha$-substituted acids ($\\text{A, D}$) are much stronger than $\\beta$-substituted acids ($\\text{B, C}$).\nTherefore, the acid with both the weaker $-I$ substituent ($\\text{Br}$) and greater distance ($\\beta$-position) is the weakest acid, having the smallest $K_a$: **$\\text{BrCH}_2\\text{CH}_2\\text{COOH}$**.",
+      "explanation": "Acid strength ($K_a$) of substituted carboxylic acids increases with the electron-withdrawing inductive effect ($-I$) of the halogen and decreases rapidly as distance from $-\\text{COOH}$ increases:\n- Electronegativity: $-\\text{F} > -\\text{Br}$ (stronger $-I$ for $\\text{F}$).\n- Position: $\\alpha$-substituted acids ($\\text{A, D}$) are much stronger than $\\beta$-substituted acids ($\\text{B, C}$).\nTherefore, the acid with both the weaker $-I$ substituent ($\\text{Br}$) and greater distance ($\\beta$-position) is the weakest acid, having the smallest $K_a$: **$\\text{BrCH}_2\\text{CH}_2\\text{COOH}$**."
+    },
+    {
+      "id": 41,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "In the reaction sequence:\n$$\\text{CH}_3-\\text{C}\\equiv\\text{C}-\\text{H} \\xrightarrow{\\text{CH}_3\\text{MgBr}} \\text{CH}_4 + (A) \\xrightarrow[\\text{(ii) } \\text{H}_2\\text{O}/\\text{H}^+]{\\text{(i) } \\text{CO}_2} (B)$$\n$(B)$ will be:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\text{CH}_3-\\text{C}\\equiv\\text{C}-\\text{CH}_3$"
+        },
+        {
+          "id": "B",
+          "text": "$\\text{CH}_3-\\text{C}\\equiv\\text{C}-\\text{MgBr}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\text{CH}_3-\\text{C}\\equiv\\text{C}-\\text{COOH}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\text{CH}_3-\\text{CH}=\\text{CH}-\\text{COOH}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Step 1: Terminal alkyne proton ($sp$-hybridized C–H) reacts rapidly as an acid with $\\text{CH}_3\\text{MgBr}$ to liberate $\\text{CH}_4$ and form alkynyl Grignard $(A) = \\text{CH}_3-\\text{C}\\equiv\\text{C}-\\text{MgBr}$.\nStep 2: Carboxylation of $(A)$ with $\\text{CO}_2$ followed by acidic hydrolysis gives the $\\alpha,\\beta$-alkynoic acid:\n$$(B) = \\text{CH}_3-\\text{C}\\equiv\\text{C}-\\text{COOH}$$",
+      "explanation": "Step 1: Terminal alkyne proton ($sp$-hybridized C–H) reacts rapidly as an acid with $\\text{CH}_3\\text{MgBr}$ to liberate $\\text{CH}_4$ and form alkynyl Grignard $(A) = \\text{CH}_3-\\text{C}\\equiv\\text{C}-\\text{MgBr}$.\nStep 2: Carboxylation of $(A)$ with $\\text{CO}_2$ followed by acidic hydrolysis gives the $\\alpha,\\beta$-alkynoic acid:\n$$(B) = \\text{CH}_3-\\text{C}\\equiv\\text{C}-\\text{COOH}$$"
+    },
+    {
+      "id": 42,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "In the given reaction:\n$$\\text{C}_6\\text{H}_5-\\text{CH=O} \\xrightarrow{\\text{NH}_2\\text{OH}/\\text{H}^+} [\\text{X}]$$\n$[\\text{X}]$ will be:",
+      "images": [
+        "/images/ptm05/q42.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "Only syn oxime"
+        },
+        {
+          "id": "B",
+          "text": "Only anti oxime"
+        },
+        {
+          "id": "C",
+          "text": "mixture of syn and anti oxime"
+        },
+        {
+          "id": "D",
+          "text": "Secondary amide"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Benzaldehyde condenses with hydroxylamine ($\\text{NH}_2\\text{OH}$) under mild acid catalysis to yield **benzaldoxime** ($\\text{C}_6\\text{H}_5\\text{CH=N}-\\text{OH}$). Because the imine $\\text{C=N}$ bond restricts rotation and the two groups on carbon ($\\text{C}_6\\text{H}_5$ and $\\text{H}$) are non-identical while $\\text{N}$ bears $-\\text{OH}$ and a lone pair, the reaction produces a **mixture of both syn and anti geometrical isomers**.",
+      "explanation": "Benzaldehyde condenses with hydroxylamine ($\\text{NH}_2\\text{OH}$) under mild acid catalysis to yield **benzaldoxime** ($\\text{C}_6\\text{H}_5\\text{CH=N}-\\text{OH}$). Because the imine $\\text{C=N}$ bond restricts rotation and the two groups on carbon ($\\text{C}_6\\text{H}_5$ and $\\text{H}$) are non-identical while $\\text{N}$ bears $-\\text{OH}$ and a lone pair, the reaction produces a **mixture of both syn and anti geometrical isomers**."
+    },
+    {
+      "id": 43,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The order of reactivity of phenyl magnesium bromide with the following compounds is:",
+      "images": [
+        "/images/ptm05/q43.png"
+      ],
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\text{II} > \\text{III} > \\text{I}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\text{I} > \\text{III} > \\text{II}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\text{II} > \\text{I} > \\text{III}$"
+        },
+        {
+          "id": "D",
+          "text": "All react with the same rate"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Nucleophilic addition of Grignard reagent ($\\text{PhMgBr}$) to carbonyls is governed by both **electrophilicity ($\\delta^+$ on carbonyl carbon)** and **steric hindrance**:\n- **(II) Acetaldehyde ($\\text{CH}_3\\text{CHO}$):** least hindered and only one $+I$ alkyl group $\\implies$ highest $\\delta^+$ and fastest.\n- **(I) Acetone ($\\text{CH}_3\\text{COCH}_3$):** two $+I$ methyl groups and greater steric crowding $\\implies$ slower than (II).\n- **(III) Benzophenone ($\\text{PhCOPh}$):** strong $+M$ resonance from two phenyl rings plus severe steric bulk $\\implies$ slowest.\nThus the order is $\\text{II} > \\text{I} > \\text{III}$.",
+      "explanation": "Nucleophilic addition of Grignard reagent ($\\text{PhMgBr}$) to carbonyls is governed by both **electrophilicity ($\\delta^+$ on carbonyl carbon)** and **steric hindrance**:\n- **(II) Acetaldehyde ($\\text{CH}_3\\text{CHO}$):** least hindered and only one $+I$ alkyl group $\\implies$ highest $\\delta^+$ and fastest.\n- **(I) Acetone ($\\text{CH}_3\\text{COCH}_3$):** two $+I$ methyl groups and greater steric crowding $\\implies$ slower than (II).\n- **(III) Benzophenone ($\\text{PhCOPh}$):** strong $+M$ resonance from two phenyl rings plus severe steric bulk $\\implies$ slowest.\nThus the order is $\\text{II} > \\text{I} > \\text{III}$."
+    },
+    {
+      "id": 44,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The enolic form of acetone contains:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$9$ sigma bonds, $1$ pi bond and $2$ lone pairs"
+        },
+        {
+          "id": "B",
+          "text": "$8$ sigma bonds, $2$ pi bonds and $2$ lone pairs"
+        },
+        {
+          "id": "C",
+          "text": "$10$ sigma bonds, $1$ pi bond and $1$ lone pair"
+        },
+        {
+          "id": "D",
+          "text": "$9$ sigma bonds, $2$ pi bonds and $1$ lone pair"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "The enolic tautomer of acetone is prop-1-en-2-ol: $\\text{CH}_2=\\text{C(OH)}-\\text{CH}_3$.\nCounting all bonds and lone pairs:\n- **$\\sigma$ bonds:** $2\\;(\\text{C-H in CH}_2) + 1\\;(\\text{C=C}) + 1\\;(\\text{C-O}) + 1\\;(\\text{O-H}) + 1\\;(\\text{C-C}) + 3\\;(\\text{C-H in CH}_3) = 9\\;\\sigma$ bonds.\n- **$\\pi$ bonds:** $1\\;(\\text{from C=C})$.\n- **Lone pairs:** $2$ lone pairs (on the divalent oxygen atom).",
+      "explanation": "The enolic tautomer of acetone is prop-1-en-2-ol: $\\text{CH}_2=\\text{C(OH)}-\\text{CH}_3$.\nCounting all bonds and lone pairs:\n- **$\\sigma$ bonds:** $2\\;(\\text{C-H in CH}_2) + 1\\;(\\text{C=C}) + 1\\;(\\text{C-O}) + 1\\;(\\text{O-H}) + 1\\;(\\text{C-C}) + 3\\;(\\text{C-H in CH}_3) = 9\\;\\sigma$ bonds.\n- **$\\pi$ bonds:** $1\\;(\\text{from C=C})$.\n- **Lone pairs:** $2$ lone pairs (on the divalent oxygen atom).",
+      "solutionImages": [
+        "/images/ptm05/sol_q44.png"
+      ]
+    },
+    {
+      "id": 45,
+      "subject": "Chemistry",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "*m*-Chlorobenzaldehyde on reaction with conc. $\\text{KOH}$ at room temperature gives:",
+      "options": [
+        {
+          "id": "A",
+          "text": "Potassium *m*-chlorobenzoate and *m*-hydroxybenzaldehyde"
+        },
+        {
+          "id": "B",
+          "text": "*m*-hydroxybenzaldehyde and *m*-chlorobenzyl alcohol"
+        },
+        {
+          "id": "C",
+          "text": "*m*-chlorobenzyl and *m*-hydroxybenzyl alcohol"
+        },
+        {
+          "id": "D",
+          "text": "Potassium *m*-chlorobenzoate and *m*-chlorobenzyl alcohol"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "Since *m*-chlorobenzaldehyde lacks $\\alpha$-hydrogens, with concentrated $\\text{KOH}$ at room temperature it undergoes **Cannizzaro disproportionation**: one molecule is oxidized to **potassium *m*-chlorobenzoate** while another is reduced to ***m*-chlorobenzyl alcohol** (aryl $-\\text{Cl}$ does not hydrolyze under mild room-temperature conditions).",
+      "explanation": "Since *m*-chlorobenzaldehyde lacks $\\alpha$-hydrogens, with concentrated $\\text{KOH}$ at room temperature it undergoes **Cannizzaro disproportionation**: one molecule is oxidized to **potassium *m*-chlorobenzoate** while another is reduced to ***m*-chlorobenzyl alcohol** (aryl $-\\text{Cl}$ does not hydrolyze under mild room-temperature conditions)."
+    },
+    {
+      "id": 46,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Among the following, the number of reaction(s) that produce(s) benzaldehyde is / are:",
+      "images": [
+        "/images/ptm05/q46.png"
+      ],
+      "answer": "4",
+      "hasKey": true,
+      "solution": "Evaluating each reaction carefully:\n1. **(I) Gattermann–Koch reaction:** Benzene + $\\text{CO}, \\text{HCl}$ / anhydrous $\\text{AlCl}_3/\\text{CuCl} \\longrightarrow \\text{PhCHO}$ (benzaldehyde).\n2. **(II) Gem-dihalide hydrolysis:** Benzal chloride ($\\text{PhCHCl}_2$) + $\\text{H}_2\\text{O}$ at $100^\\circ\\text{C} \\longrightarrow [\\text{PhCH(OH)}_2] \\longrightarrow \\text{PhCHO}$ (benzaldehyde).\n3. **(III) Rosenmund reduction:** Benzoyl chloride ($\\text{PhCOCl}$) + $\\text{H}_2 / \\text{Pd-BaSO}_4 \\longrightarrow \\text{PhCHO}$ (benzaldehyde).\n4. **(IV) Selective ester reduction:** Methyl benzoate ($\\text{PhCO}_2\\text{Me}$) + $\\text{DIBAL-H}$ (toluene, $-78^\\circ\\text{C}$, then $\\text{H}_2\\text{O}$) $\\longrightarrow \\text{PhCHO}$ (benzaldehyde).\nAll **$4$** reactions produce benzaldehyde.",
+      "explanation": "Evaluating each reaction carefully:\n1. **(I) Gattermann–Koch reaction:** Benzene + $\\text{CO}, \\text{HCl}$ / anhydrous $\\text{AlCl}_3/\\text{CuCl} \\longrightarrow \\text{PhCHO}$ (benzaldehyde).\n2. **(II) Gem-dihalide hydrolysis:** Benzal chloride ($\\text{PhCHCl}_2$) + $\\text{H}_2\\text{O}$ at $100^\\circ\\text{C} \\longrightarrow [\\text{PhCH(OH)}_2] \\longrightarrow \\text{PhCHO}$ (benzaldehyde).\n3. **(III) Rosenmund reduction:** Benzoyl chloride ($\\text{PhCOCl}$) + $\\text{H}_2 / \\text{Pd-BaSO}_4 \\longrightarrow \\text{PhCHO}$ (benzaldehyde).\n4. **(IV) Selective ester reduction:** Methyl benzoate ($\\text{PhCO}_2\\text{Me}$) + $\\text{DIBAL-H}$ (toluene, $-78^\\circ\\text{C}$, then $\\text{H}_2\\text{O}$) $\\longrightarrow \\text{PhCHO}$ (benzaldehyde).\nAll **$4$** reactions produce benzaldehyde."
+    },
+    {
+      "id": 47,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Magnitude of difference in degree of unsaturation of $A$ and $D$ in the reaction sequence shown below is:",
+      "images": [
+        "/images/ptm05/q47.png"
+      ],
+      "answer": "3",
+      "hasKey": true,
+      "solution": "Working backward from the two products:\n- $B + C$ gives benzyl alcohol + benzoate salt in conc. $\\text{KOH}$ (Cannizzaro $\\implies \\text{PhCHO}$ self-Cannizzaro, so one component is $\\text{PhCHO}$).\n- $B + C$ gives crotonaldehyde $D$ ($\\text{CH}_3-\\text{CH}=\\text{CH}-\\text{CHO}$) in dil. $\\text{KOH}, \\Delta$ (self-aldol of ethanal $\\text{CH}_3\\text{CHO}$, so the second component is $\\text{CH}_3\\text{CHO}$).\n- Reductive ozonolysis ($\\text{O}_3/\\text{Me}_2\\text{S}$) of $A$ yields $\\text{PhCHO} + \\text{CH}_3\\text{CHO}$, hence:\n$$A = \\text{Ph}-\\text{CH}=\\text{CH}-\\text{CH}_3$$\nCalculating Degrees of Unsaturation (DOU):\n- $\\text{DOU}(A) = 4\\;(\\text{benzene ring}) + 1\\;(\\text{alkene } \\text{C=C}) = 5$\n- $\\text{DOU}(D) = 1\\;(\\text{C=C}) + 1\\;(\\text{C=O}) = 2$\nTherefore $|\\text{DOU}(A) - \\text{DOU}(D)| = |5 - 2| = 3$.",
+      "explanation": "Working backward from the two products:\n- $B + C$ gives benzyl alcohol + benzoate salt in conc. $\\text{KOH}$ (Cannizzaro $\\implies \\text{PhCHO}$ self-Cannizzaro, so one component is $\\text{PhCHO}$).\n- $B + C$ gives crotonaldehyde $D$ ($\\text{CH}_3-\\text{CH}=\\text{CH}-\\text{CHO}$) in dil. $\\text{KOH}, \\Delta$ (self-aldol of ethanal $\\text{CH}_3\\text{CHO}$, so the second component is $\\text{CH}_3\\text{CHO}$).\n- Reductive ozonolysis ($\\text{O}_3/\\text{Me}_2\\text{S}$) of $A$ yields $\\text{PhCHO} + \\text{CH}_3\\text{CHO}$, hence:\n$$A = \\text{Ph}-\\text{CH}=\\text{CH}-\\text{CH}_3$$\nCalculating Degrees of Unsaturation (DOU):\n- $\\text{DOU}(A) = 4\\;(\\text{benzene ring}) + 1\\;(\\text{alkene } \\text{C=C}) = 5$\n- $\\text{DOU}(D) = 1\\;(\\text{C=C}) + 1\\;(\\text{C=O}) = 2$\nTherefore $|\\text{DOU}(A) - \\text{DOU}(D)| = |5 - 2| = 3$."
+    },
+    {
+      "id": 48,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Total aldol condensation products (including stereoisomers) formed by the reaction between acetaldehyde and acetophenone is:",
+      "answer": "8",
+      "hasKey": true,
+      "solution": "Between acetaldehyde ($\\text{CH}_3\\text{CHO}$) and acetophenone ($\\text{PhCOCH}_3$), both have $\\alpha$-hydrogens, yielding $4$ distinct $\\alpha,\\beta$-unsaturated aldol condensation frameworks:\n1. **Self-aldol of $\\text{CH}_3\\text{CHO}$:** $\\text{CH}_3-\\text{CH}=\\text{CH}-\\text{CHO}$ (*E* and *Z* $\\implies 2$ stereoisomers)\n2. **Self-aldol of $\\text{PhCOCH}_3$:** $\\text{Ph}-\\text{C(=O)}-\\text{CH}=\\text{C(CH}_3\\text{)Ph}$ (*E* and *Z* $\\implies 2$ stereoisomers)\n3. **Cross-aldol ($\\text{PhCOCH}_3$ enolate $+ \\text{CH}_3\\text{CHO}$):** $\\text{CH}_3-\\text{CH}=\\text{CH}-\\text{C(=O)Ph}$ (*E* and *Z* $\\implies 2$ stereoisomers)\n4. **Cross-aldol ($\\text{CH}_3\\text{CHO}$ enolate $+ \\text{PhCOCH}_3$):** $\\text{Ph}-\\text{C(CH}_3\\text{)}=\\text{CH}-\\text{CHO}$ (*E* and *Z* $\\implies 2$ stereoisomers)\nTotal aldol condensation products (including *E*/*Z* stereoisomers) $= 2 + 2 + 2 + 2 = 8$.",
+      "explanation": "Between acetaldehyde ($\\text{CH}_3\\text{CHO}$) and acetophenone ($\\text{PhCOCH}_3$), both have $\\alpha$-hydrogens, yielding $4$ distinct $\\alpha,\\beta$-unsaturated aldol condensation frameworks:\n1. **Self-aldol of $\\text{CH}_3\\text{CHO}$:** $\\text{CH}_3-\\text{CH}=\\text{CH}-\\text{CHO}$ (*E* and *Z* $\\implies 2$ stereoisomers)\n2. **Self-aldol of $\\text{PhCOCH}_3$:** $\\text{Ph}-\\text{C(=O)}-\\text{CH}=\\text{C(CH}_3\\text{)Ph}$ (*E* and *Z* $\\implies 2$ stereoisomers)\n3. **Cross-aldol ($\\text{PhCOCH}_3$ enolate $+ \\text{CH}_3\\text{CHO}$):** $\\text{CH}_3-\\text{CH}=\\text{CH}-\\text{C(=O)Ph}$ (*E* and *Z* $\\implies 2$ stereoisomers)\n4. **Cross-aldol ($\\text{CH}_3\\text{CHO}$ enolate $+ \\text{PhCOCH}_3$):** $\\text{Ph}-\\text{C(CH}_3\\text{)}=\\text{CH}-\\text{CHO}$ (*E* and *Z* $\\implies 2$ stereoisomers)\nTotal aldol condensation products (including *E*/*Z* stereoisomers) $= 2 + 2 + 2 + 2 = 8$.",
+      "solutionImages": [
+        "/images/ptm05/sol_q48.png"
+      ]
+    },
+    {
+      "id": 49,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "How many of the following will form a stable hydrate?",
+      "images": [
+        "/images/ptm05/q49.png"
+      ],
+      "answer": "5",
+      "hasKey": true,
+      "solution": "Hydrate formation is favored when strongly electron-withdrawing groups destabilize the carbonyl (or make it strongly electrophilic), when internal H-bonding stabilizes the gem-diol, or when $sp^2 \\to sp^3$ hybridization relieves severe angle strain:\n1. $\\text{CH}_3\\text{CHO}$ — No (hydrate unfavorable)\n2. $\\text{CCl}_3\\text{CHO}$ (chloral) — **Yes** (strong $-I$ of $\\text{CCl}_3$ + intramolecular $\\text{OH}\\cdots\\text{Cl}$ H-bonding)\n3. $\\text{CF}_3\\text{CHO}$ — **Yes** (very strong $-I$ of $\\text{CF}_3$)\n4. $\\text{Ph}-\\text{CO}-\\text{CO}-\\text{CO}-\\text{Ph}$ — **Yes** (central carbonyl flanked by two $-I$ carbonyl groups)\n5. Ninhydrin (indane-1,2,3-trione) — **Yes** (central $\\text{C=O}$ flanked by two $-I$ carbonyls + relief of dipole repulsion)\n6. Cyclopropanone — **Yes** (changing $sp^2$ $120^\\circ$ to $sp^3$ $109.5^\\circ$ greatly relieves angle strain toward $60^\\circ$)\n7. Acetone — No\n8. Acetophenone — No\nThus **$5$** compounds (2, 3, 4, 5, 6) form stable hydrates.",
+      "explanation": "Hydrate formation is favored when strongly electron-withdrawing groups destabilize the carbonyl (or make it strongly electrophilic), when internal H-bonding stabilizes the gem-diol, or when $sp^2 \\to sp^3$ hybridization relieves severe angle strain:\n1. $\\text{CH}_3\\text{CHO}$ — No (hydrate unfavorable)\n2. $\\text{CCl}_3\\text{CHO}$ (chloral) — **Yes** (strong $-I$ of $\\text{CCl}_3$ + intramolecular $\\text{OH}\\cdots\\text{Cl}$ H-bonding)\n3. $\\text{CF}_3\\text{CHO}$ — **Yes** (very strong $-I$ of $\\text{CF}_3$)\n4. $\\text{Ph}-\\text{CO}-\\text{CO}-\\text{CO}-\\text{Ph}$ — **Yes** (central carbonyl flanked by two $-I$ carbonyl groups)\n5. Ninhydrin (indane-1,2,3-trione) — **Yes** (central $\\text{C=O}$ flanked by two $-I$ carbonyls + relief of dipole repulsion)\n6. Cyclopropanone — **Yes** (changing $sp^2$ $120^\\circ$ to $sp^3$ $109.5^\\circ$ greatly relieves angle strain toward $60^\\circ$)\n7. Acetone — No\n8. Acetophenone — No\nThus **$5$** compounds (2, 3, 4, 5, 6) form stable hydrates."
+    },
+    {
+      "id": 50,
+      "subject": "Chemistry",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "How many reactions will produce carboxylic acid as their end product?",
+      "images": [
+        "/images/ptm05/q50.png"
+      ],
+      "answer": "3",
+      "hasKey": true,
+      "solution": "Analyzing each sequence:\n1. **Reaction 1:** Benzene + $\\text{CH}_3\\text{COCl}/\\text{AlCl}_3$ gives acetophenone, which undergoes the iodoform reaction ($\\text{I}_2/\\text{OH}^-$) followed by acidification ($\\text{H}^+$) to form **benzoic acid** ($\\checkmark$).\n2. **Reaction 2:** Cyclohexene + $\\text{HI} \\to$ iodocyclohexane $\\xrightarrow{\\text{NaCN}}$ cyanocyclohexane $\\xrightarrow{\\text{H}_3\\text{O}^+}$ **cyclohexanecarboxylic acid** ($\\checkmark$).\n3. **Reaction 3:** Isobutyl chloride with anhydrous $\\text{AlCl}_3$ undergoes carbocation rearrangement (hydride shift) to form ***tert*-butylbenzene**! Since the benzylic carbon of *tert*-butylbenzene has **zero benzylic hydrogens**, hot $\\text{KMnO}_4$ cannot oxidize it to a carboxylic acid ($\\times$).\n4. **Reaction 4:** Chlorobenzene $\\xrightarrow{\\text{Mg},\\text{THF},\\Delta}$ $\\text{PhMgCl}$ $\\xrightarrow{\\text{CO}_2,\\text{H}^+}$ **benzoic acid** ($\\checkmark$).\nThus **$3$** reactions (1, 2, 4) yield carboxylic acids.",
+      "explanation": "Analyzing each sequence:\n1. **Reaction 1:** Benzene + $\\text{CH}_3\\text{COCl}/\\text{AlCl}_3$ gives acetophenone, which undergoes the iodoform reaction ($\\text{I}_2/\\text{OH}^-$) followed by acidification ($\\text{H}^+$) to form **benzoic acid** ($\\checkmark$).\n2. **Reaction 2:** Cyclohexene + $\\text{HI} \\to$ iodocyclohexane $\\xrightarrow{\\text{NaCN}}$ cyanocyclohexane $\\xrightarrow{\\text{H}_3\\text{O}^+}$ **cyclohexanecarboxylic acid** ($\\checkmark$).\n3. **Reaction 3:** Isobutyl chloride with anhydrous $\\text{AlCl}_3$ undergoes carbocation rearrangement (hydride shift) to form ***tert*-butylbenzene**! Since the benzylic carbon of *tert*-butylbenzene has **zero benzylic hydrogens**, hot $\\text{KMnO}_4$ cannot oxidize it to a carboxylic acid ($\\times$).\n4. **Reaction 4:** Chlorobenzene $\\xrightarrow{\\text{Mg},\\text{THF},\\Delta}$ $\\text{PhMgCl}$ $\\xrightarrow{\\text{CO}_2,\\text{H}^+}$ **benzoic acid** ($\\checkmark$).\nThus **$3$** reactions (1, 2, 4) yield carboxylic acids."
+    },
+    {
+      "id": 51,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A fair coin is tossed $13$ times, the probability of getting at least $7$ consecutive heads is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{8}{2^7}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{10}{2^8}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{2^{10} - 1}{2^{15}}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{8}{2^8}$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "To avoid overcounting runs of $7$ or more consecutive heads, partition favorable outcomes by the **first index** at which a run of $7$ consecutive heads starts:\n- Run starts at toss $1$: $\\underbrace{\\text{HHHHHHH}}_{7}\\,\\underbrace{XXXXXX}_{6} \\implies P_1 = \\left(\\frac{1}{2}\\right)^7$.\n- Run starts at toss $2$ (toss $1$ must be $T$): $T\\,\\underbrace{\\text{HHHHHHH}}_{7}\\,\\underbrace{XXXXX}_{5} \\implies P_2 = \\left(\\frac{1}{2}\\right)^8$.\n- Run starts at toss $k$ ($2 \\le k \\le 7$, so toss $k-1$ must be $T$, with no $7$ consecutive heads earlier since $k-2 \\le 5 < 7$): each of these $6$ disjoint cases has probability $\\left(\\frac{1}{2}\\right)^8$.\nTotal probability:\n$$P = \\left(\\frac{1}{2}\\right)^7 + 6\\left(\\frac{1}{2}\\right)^8 = \\frac{2 + 6}{2^8} = \\frac{8}{2^8}$$",
+      "explanation": "To avoid overcounting runs of $7$ or more consecutive heads, partition favorable outcomes by the **first index** at which a run of $7$ consecutive heads starts:\n- Run starts at toss $1$: $\\underbrace{\\text{HHHHHHH}}_{7}\\,\\underbrace{XXXXXX}_{6} \\implies P_1 = \\left(\\frac{1}{2}\\right)^7$.\n- Run starts at toss $2$ (toss $1$ must be $T$): $T\\,\\underbrace{\\text{HHHHHHH}}_{7}\\,\\underbrace{XXXXX}_{5} \\implies P_2 = \\left(\\frac{1}{2}\\right)^8$.\n- Run starts at toss $k$ ($2 \\le k \\le 7$, so toss $k-1$ must be $T$, with no $7$ consecutive heads earlier since $k-2 \\le 5 < 7$): each of these $6$ disjoint cases has probability $\\left(\\frac{1}{2}\\right)^8$.\nTotal probability:\n$$P = \\left(\\frac{1}{2}\\right)^7 + 6\\left(\\frac{1}{2}\\right)^8 = \\frac{2 + 6}{2^8} = \\frac{8}{2^8}$$"
+    },
+    {
+      "id": 52,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "There are $6$ pairs of children's gloves in a box. Each pair is of different colour. Suppose the righthand gloves are distributed at random to $6$ children, and then the lefthand gloves also are distributed to them at random. Then the probability that no child gets a matching pair is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{53}{144}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{191}{720}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{19}{30}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{1}{720}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Once each child receives one righthand glove (each child now has a unique right-glove color), no child receives a matching lefthand glove iff the assignment of lefthand gloves is a **derangement** $D_6$ of the $6$ colors:\n$$D_6 = 6!\\left(1 - \\frac{1}{1!} + \\frac{1}{2!} - \\frac{1}{3!} + \\frac{1}{4!} - \\frac{1}{5!} + \\frac{1}{6!}\\right) = 720\\left(\\frac{1}{2} - \\frac{1}{6} + \\frac{1}{24} - \\frac{1}{120} + \\frac{1}{720}\\right) = 360 - 120 + 30 - 6 + 1 = 265$$\nTherefore, the required probability is:\n$$P = \\frac{D_6}{6!} = \\frac{265}{720} = \\frac{53}{144}$$",
+      "explanation": "Once each child receives one righthand glove (each child now has a unique right-glove color), no child receives a matching lefthand glove iff the assignment of lefthand gloves is a **derangement** $D_6$ of the $6$ colors:\n$$D_6 = 6!\\left(1 - \\frac{1}{1!} + \\frac{1}{2!} - \\frac{1}{3!} + \\frac{1}{4!} - \\frac{1}{5!} + \\frac{1}{6!}\\right) = 720\\left(\\frac{1}{2} - \\frac{1}{6} + \\frac{1}{24} - \\frac{1}{120} + \\frac{1}{720}\\right) = 360 - 120 + 30 - 6 + 1 = 265$$\nTherefore, the required probability is:\n$$P = \\frac{D_6}{6!} = \\frac{265}{720} = \\frac{53}{144}$$"
+    },
+    {
+      "id": 53,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A signal which can be green or red with probability $\\dfrac{4}{5}$ or $\\dfrac{1}{5}$ respectively, is received by station $A$ and then transmitted to station $B$. The probability of each station receiving the signal correctly is $\\dfrac{3}{4}$. If the signal received at station $B$ is green, then the probability that the original signal was green is ____.",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{3}{23}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{20}{23}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{10}{23}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{5}{23}$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Let $G_0, R_0$ be original green/red signals, and $B_G$ the event that station $B$ receives green:\n- If original is $G_0$: $B$ receives green if $(A\\text{ right}, B\\text{ right})$ or $(A\\text{ wrong}, B\\text{ wrong})$:\n$$P(B_G \\mid G_0) = \\frac{3}{4}\\cdot\\frac{3}{4} + \\frac{1}{4}\\cdot\\frac{1}{4} = \\frac{10}{16}$$\n- If original is $R_0$: $B$ receives green if $(A\\text{ wrong}, B\\text{ right})$ or $(A\\text{ right}, B\\text{ wrong})$:\n$$P(B_G \\mid R_0) = \\frac{1}{4}\\cdot\\frac{3}{4} + \\frac{3}{4}\\cdot\\frac{1}{4} = \\frac{6}{16}$$\nBy Bayes' theorem:\n$$P(G_0 \\mid B_G) = \\frac{\\frac{4}{5}\\cdot\\frac{10}{16}}{\\frac{4}{5}\\cdot\\frac{10}{16} + \\frac{1}{5}\\cdot\\frac{6}{16}} = \\frac{40}{40 + 6} = \\frac{20}{23}$$",
+      "explanation": "Let $G_0, R_0$ be original green/red signals, and $B_G$ the event that station $B$ receives green:\n- If original is $G_0$: $B$ receives green if $(A\\text{ right}, B\\text{ right})$ or $(A\\text{ wrong}, B\\text{ wrong})$:\n$$P(B_G \\mid G_0) = \\frac{3}{4}\\cdot\\frac{3}{4} + \\frac{1}{4}\\cdot\\frac{1}{4} = \\frac{10}{16}$$\n- If original is $R_0$: $B$ receives green if $(A\\text{ wrong}, B\\text{ right})$ or $(A\\text{ right}, B\\text{ wrong})$:\n$$P(B_G \\mid R_0) = \\frac{1}{4}\\cdot\\frac{3}{4} + \\frac{3}{4}\\cdot\\frac{1}{4} = \\frac{6}{16}$$\nBy Bayes' theorem:\n$$P(G_0 \\mid B_G) = \\frac{\\frac{4}{5}\\cdot\\frac{10}{16}}{\\frac{4}{5}\\cdot\\frac{10}{16} + \\frac{1}{5}\\cdot\\frac{6}{16}} = \\frac{40}{40 + 6} = \\frac{20}{23}$$",
+      "solutionImages": [
+        "/images/ptm05/sol_q53.png"
+      ]
+    },
+    {
+      "id": 54,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "The probability that the birthdays of $6$ people will exactly fall in three calendar months is ____.",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{112200}{12^6}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{114400}{12^6}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{117700}{12^6}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{118800}{12^6}$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "Assuming all $12^6$ month assignments are equally likely:\n1. Choose the exact $3$ calendar months out of $12$ in ${}^{12}\\text{C}_3 = 220$ ways.\n2. Map the $6$ distinguishable people **onto** those $3$ chosen months by Inclusion–Exclusion:\n$$3^6 - {}^{3}\\text{C}_1\\,2^6 + {}^{3}\\text{C}_2\\,1^6 = 729 - 3(64) + 3(1) = 729 - 192 + 3 = 540$$\nTotal favorable outcomes $= 220 \\times 540 = 118800$.\nHence $P = \\dfrac{118800}{12^6}$.",
+      "explanation": "Assuming all $12^6$ month assignments are equally likely:\n1. Choose the exact $3$ calendar months out of $12$ in ${}^{12}\\text{C}_3 = 220$ ways.\n2. Map the $6$ distinguishable people **onto** those $3$ chosen months by Inclusion–Exclusion:\n$$3^6 - {}^{3}\\text{C}_1\\,2^6 + {}^{3}\\text{C}_2\\,1^6 = 729 - 3(64) + 3(1) = 729 - 192 + 3 = 540$$\nTotal favorable outcomes $= 220 \\times 540 = 118800$.\nHence $P = \\dfrac{118800}{12^6}$."
+    },
+    {
+      "id": 55,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "$A$ has $3$ shares in a lottery containing $3$ prizes and $9$ blanks, $B$ has $2$ shares in a lottery containing $2$ prizes and $6$ blanks where getting at least one prize is considered a success such that $\\dfrac{\\text{chance of success of } A}{\\text{chance of success of } B} = \\dfrac{l}{m}$ (where $\\gcd(l, m) = 1$), then the units digit of $(l - m)$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$2$"
+        },
+        {
+          "id": "B",
+          "text": "$3$"
+        },
+        {
+          "id": "C",
+          "text": "$7$"
+        },
+        {
+          "id": "D",
+          "text": "$8$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Using complementary probability (no prize):\n- For $A$ ($3$ shares from $3$ prizes $+\\,9$ blanks $= 12$ total):\n$$p(A) = 1 - \\frac{{}^9\\text{C}_3}{{}^{12}\\text{C}_3} = 1 - \\frac{84}{220} = 1 - \\frac{21}{55} = \\frac{34}{55}$$\n- For $B$ ($2$ shares from $2$ prizes $+\\,6$ blanks $= 8$ total):\n$$p(B) = 1 - \\frac{{}^6\\text{C}_2}{{}^8\\text{C}_2} = 1 - \\frac{15}{28} = \\frac{13}{28}$$\nTaking the ratio:\n$$\\frac{p(A)}{p(B)} = \\frac{34/55}{13/28} = \\frac{34 \\times 28}{55 \\times 13} = \\frac{952}{715}$$\nSince $\\gcd(952, 715) = 1$, $l - m = 952 - 715 = 237$, whose units digit is **$7$**.",
+      "explanation": "Using complementary probability (no prize):\n- For $A$ ($3$ shares from $3$ prizes $+\\,9$ blanks $= 12$ total):\n$$p(A) = 1 - \\frac{{}^9\\text{C}_3}{{}^{12}\\text{C}_3} = 1 - \\frac{84}{220} = 1 - \\frac{21}{55} = \\frac{34}{55}$$\n- For $B$ ($2$ shares from $2$ prizes $+\\,6$ blanks $= 8$ total):\n$$p(B) = 1 - \\frac{{}^6\\text{C}_2}{{}^8\\text{C}_2} = 1 - \\frac{15}{28} = \\frac{13}{28}$$\nTaking the ratio:\n$$\\frac{p(A)}{p(B)} = \\frac{34/55}{13/28} = \\frac{34 \\times 28}{55 \\times 13} = \\frac{952}{715}$$\nSince $\\gcd(952, 715) = 1$, $l - m = 952 - 715 = 237$, whose units digit is **$7$**."
+    },
+    {
+      "id": 56,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $A = \\{1, 2, 3, 4, 5\\}$, $B = \\{1, 2, 3\\}$. Then which of the following statements is **incorrect**?",
+      "options": [
+        {
+          "id": "A",
+          "text": "From all the mappings $f : A \\to B$ one mapping is selected at random, then probability that selected mapping is onto is $\\dfrac{50}{81}$"
+        },
+        {
+          "id": "B",
+          "text": "From all the mappings $f : A \\to B$ one mapping is selected at random, then probability that selected mapping is one-one is $\\dfrac{20}{81}$"
+        },
+        {
+          "id": "C",
+          "text": "From all the mappings $f : A \\to B$ one mapping is selected at random, then probability that selected mapping is constant mapping is $\\dfrac{1}{81}$"
+        },
+        {
+          "id": "D",
+          "text": "Number of injective mappings $f : A \\to A$ satisfying $f(i) \\neq i, \\; \\forall\\, i = 1, 2, 3, 4, 5$ is $44$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Total functions $f : A \\to B$ is $n(S) = 3^5 = 243$:\n- **(A)** Onto functions $= 3^5 - {}^3\\text{C}_1 2^5 + {}^3\\text{C}_2 1^5 = 243 - 96 + 3 = 150$, so $P = \\frac{150}{243} = \\frac{50}{81}$ (True).\n- **(B)** Since $|A| = 5 > |B| = 3$, by the Pigeonhole Principle **zero** functions $f : A \\to B$ can be one-one! Thus $P = 0 \\neq \\frac{20}{81}$ (**Incorrect**).\n- **(C)** Constant mappings $= |B| = 3$, so $P = \\frac{3}{243} = \\frac{1}{81}$ (True).\n- **(D)** Derangements $D_5 = 44$ (True).",
+      "explanation": "Total functions $f : A \\to B$ is $n(S) = 3^5 = 243$:\n- **(A)** Onto functions $= 3^5 - {}^3\\text{C}_1 2^5 + {}^3\\text{C}_2 1^5 = 243 - 96 + 3 = 150$, so $P = \\frac{150}{243} = \\frac{50}{81}$ (True).\n- **(B)** Since $|A| = 5 > |B| = 3$, by the Pigeonhole Principle **zero** functions $f : A \\to B$ can be one-one! Thus $P = 0 \\neq \\frac{20}{81}$ (**Incorrect**).\n- **(C)** Constant mappings $= |B| = 3$, so $P = \\frac{3}{243} = \\frac{1}{81}$ (True).\n- **(D)** Derangements $D_5 = 44$ (True)."
+    },
+    {
+      "id": 57,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $n$ positive integers are taken at random and multiplied together, then the units digit of the product is defined as an event $E$ and $P(E)$ is probability of occurrence of $E$. Then $P(1\\text{ or }3\\text{ or }7\\text{ or }9)$ is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{5^n - 2^n}{5^n}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{2^n}{5^n}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{8^n - 4^n}{10^n}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{4^n}{5^n}$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "The product $P_1 \\times P_2 \\times \\cdots \\times P_n$ ends in a digit from $\\{1, 3, 7, 9\\}$ (i.e., coprime to $10$) if and only if **no factor** ends in an even digit $\\{0, 2, 4, 6, 8\\}$ or in $5$.\nThat means each of the $n$ chosen integers must have its units digit in $\\{1, 3, 7, 9\\}$ ($4$ out of $10$ possible units digits).\nSince selections are independent:\n$$P = \\left(\\frac{4}{10}\\right)^n = \\left(\\frac{2}{5}\\right)^n = \\frac{2^n}{5^n}$$",
+      "explanation": "The product $P_1 \\times P_2 \\times \\cdots \\times P_n$ ends in a digit from $\\{1, 3, 7, 9\\}$ (i.e., coprime to $10$) if and only if **no factor** ends in an even digit $\\{0, 2, 4, 6, 8\\}$ or in $5$.\nThat means each of the $n$ chosen integers must have its units digit in $\\{1, 3, 7, 9\\}$ ($4$ out of $10$ possible units digits).\nSince selections are independent:\n$$P = \\left(\\frac{4}{10}\\right)^n = \\left(\\frac{2}{5}\\right)^n = \\frac{2^n}{5^n}$$"
+    },
+    {
+      "id": 58,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $A$ and $B$ be two independent events such that $P(A) = \\dfrac{1}{3}$ and $P(B) = \\dfrac{1}{6}$. Then, which of the following is true?",
+      "options": [
+        {
+          "id": "A",
+          "text": "$P(A / B') = \\dfrac{1}{3}$"
+        },
+        {
+          "id": "B",
+          "text": "$P(A / (A \\cup B)) = \\dfrac{1}{4}$"
+        },
+        {
+          "id": "C",
+          "text": "$P(A' / B') = \\dfrac{1}{3}$"
+        },
+        {
+          "id": "D",
+          "text": "$P(A / B) = \\dfrac{2}{3}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "Since $A$ and $B$ are independent, $A$ and $B'$ are also independent (and $A', B'$ are independent):\n- **(A)** $P(A / B') = P(A) = \\frac{1}{3}$ (**True**).\n- **(B)** $P(A / (A \\cup B)) = \\frac{P(A)}{P(A \\cup B)} = \\frac{1/3}{1/3 + 1/6 - 1/18} = \\frac{1/3}{4/9} = \\frac{3}{4} \\neq \\frac{1}{4}$.\n- **(C)** $P(A' / B') = P(A') = \\frac{2}{3} \\neq \\frac{1}{3}$.\n- **(D)** $P(A / B) = P(A) = \\frac{1}{3} \\neq \\frac{2}{3}$.",
+      "explanation": "Since $A$ and $B$ are independent, $A$ and $B'$ are also independent (and $A', B'$ are independent):\n- **(A)** $P(A / B') = P(A) = \\frac{1}{3}$ (**True**).\n- **(B)** $P(A / (A \\cup B)) = \\frac{P(A)}{P(A \\cup B)} = \\frac{1/3}{1/3 + 1/6 - 1/18} = \\frac{1/3}{4/9} = \\frac{3}{4} \\neq \\frac{1}{4}$.\n- **(C)** $P(A' / B') = P(A') = \\frac{2}{3} \\neq \\frac{1}{3}$.\n- **(D)** $P(A / B) = P(A) = \\frac{1}{3} \\neq \\frac{2}{3}$."
+    },
+    {
+      "id": 59,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "There are five machines and it is known that exactly two of them are faulty. They are tested, one by one, in a random order till both the faulty machines are identified. Then the probability that only two tests are needed is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$1/3$"
+        },
+        {
+          "id": "B",
+          "text": "$1/10$"
+        },
+        {
+          "id": "C",
+          "text": "$1/2$"
+        },
+        {
+          "id": "D",
+          "text": "$1/4$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Both faulty machines are identified in strictly the first two tests if and only if both the 1st machine tested and the 2nd machine tested are faulty:\n$$P = \\frac{2}{5} \\times \\frac{1}{4} = \\frac{1}{10}$$",
+      "explanation": "Both faulty machines are identified in strictly the first two tests if and only if both the 1st machine tested and the 2nd machine tested are faulty:\n$$P = \\frac{2}{5} \\times \\frac{1}{4} = \\frac{1}{10}$$"
+    },
+    {
+      "id": 60,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A visiting lecturer visits the college for taking his class. From past experience, it is known that the probabilities that he will come by train, bus, scooter or by other means of transport are respectively $\\dfrac{3}{10}, \\dfrac{1}{5}, \\dfrac{1}{10}$ and $\\dfrac{2}{5}$. The probabilities that he will be late are $\\dfrac{1}{4}, \\dfrac{1}{3}$ and $\\dfrac{1}{12}$ if he comes by train, bus and scooter respectively, but if he comes by other means of transport, then he will not be late. When he arrives at the college, he is late. Then the probability that he came by train is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{1}{3}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{1}{4}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{2}{5}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{1}{2}$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "Let $E_1, E_2, E_3, E_4$ be train, bus, scooter, and other means respectively, and $E$ be arriving late. By Bayes' theorem:\n$$P(E_1 \\mid E) = \\frac{P(E_1)P(E\\mid E_1)}{\\sum_{i=1}^{4} P(E_i)P(E\\mid E_i)}$$\n$$= \\frac{\\frac{3}{10}\\times\\frac{1}{4}}{\\frac{3}{10}\\times\\frac{1}{4} + \\frac{1}{5}\\times\\frac{1}{3} + \\frac{1}{10}\\times\\frac{1}{12} + \\frac{2}{5}\\times 0} = \\frac{\\frac{3}{40}}{\\frac{3}{40} + \\frac{1}{15} + \\frac{1}{120}} = \\frac{\\frac{3}{40}}{\\frac{9 + 8 + 1}{120}} = \\frac{3}{40} \\times \\frac{120}{18} = \\frac{1}{2}$$",
+      "explanation": "Let $E_1, E_2, E_3, E_4$ be train, bus, scooter, and other means respectively, and $E$ be arriving late. By Bayes' theorem:\n$$P(E_1 \\mid E) = \\frac{P(E_1)P(E\\mid E_1)}{\\sum_{i=1}^{4} P(E_i)P(E\\mid E_i)}$$\n$$= \\frac{\\frac{3}{10}\\times\\frac{1}{4}}{\\frac{3}{10}\\times\\frac{1}{4} + \\frac{1}{5}\\times\\frac{1}{3} + \\frac{1}{10}\\times\\frac{1}{12} + \\frac{2}{5}\\times 0} = \\frac{\\frac{3}{40}}{\\frac{3}{40} + \\frac{1}{15} + \\frac{1}{120}} = \\frac{\\frac{3}{40}}{\\frac{9 + 8 + 1}{120}} = \\frac{3}{40} \\times \\frac{120}{18} = \\frac{1}{2}$$"
+    },
+    {
+      "id": 61,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A bag contains some white and some black balls, all combinations being equally likely. The total number of balls in the bag is $12$. Four balls are drawn from the bag at random without replacement. Then the probability that all the four balls are black is equal to:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$2/5$"
+        },
+        {
+          "id": "B",
+          "text": "$3/5$"
+        },
+        {
+          "id": "C",
+          "text": "$1/3$"
+        },
+        {
+          "id": "D",
+          "text": "$1/5$"
+        }
+      ],
+      "answer": "D",
+      "hasKey": true,
+      "solution": "Let $E_i$ ($i = 0, 1, 2, \\ldots, 12$) be the hypothesis that the bag contains $i$ black balls and $(12-i)$ white balls. Since all $13$ compositions are equally likely, $P(E_i) = \\frac{1}{13}$.\nGiven event $A$ (drawing $4$ black balls): $P(A\\mid E_i) = 0$ for $i < 4$, and $P(A\\mid E_i) = \\frac{{}^i\\text{C}_4}{{}^{12}\\text{C}_4}$ for $i \\ge 4$.\nBy the Law of Total Probability and the Hockey-Stick identity:\n$$P(A) = \\sum_{i=4}^{12} \\frac{1}{13}\\frac{{}^i\\text{C}_4}{{}^{12}\\text{C}_4} = \\frac{{}^4\\text{C}_4 + {}^5\\text{C}_4 + \\cdots + {}^{12}\\text{C}_4}{13\\,{}^{12}\\text{C}_4} = \\frac{{}^{13}\\text{C}_5}{13\\,{}^{12}\\text{C}_4} = \\frac{\\frac{13}{5}{}^{12}\\text{C}_4}{13\\,{}^{12}\\text{C}_4} = \\frac{1}{5}$$",
+      "explanation": "Let $E_i$ ($i = 0, 1, 2, \\ldots, 12$) be the hypothesis that the bag contains $i$ black balls and $(12-i)$ white balls. Since all $13$ compositions are equally likely, $P(E_i) = \\frac{1}{13}$.\nGiven event $A$ (drawing $4$ black balls): $P(A\\mid E_i) = 0$ for $i < 4$, and $P(A\\mid E_i) = \\frac{{}^i\\text{C}_4}{{}^{12}\\text{C}_4}$ for $i \\ge 4$.\nBy the Law of Total Probability and the Hockey-Stick identity:\n$$P(A) = \\sum_{i=4}^{12} \\frac{1}{13}\\frac{{}^i\\text{C}_4}{{}^{12}\\text{C}_4} = \\frac{{}^4\\text{C}_4 + {}^5\\text{C}_4 + \\cdots + {}^{12}\\text{C}_4}{13\\,{}^{12}\\text{C}_4} = \\frac{{}^{13}\\text{C}_5}{13\\,{}^{12}\\text{C}_4} = \\frac{\\frac{13}{5}{}^{12}\\text{C}_4}{13\\,{}^{12}\\text{C}_4} = \\frac{1}{5}$$"
+    },
+    {
+      "id": 62,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "An instructor has a question bank consisting of $300$ easy True/False questions, $200$ difficult True/False questions, $500$ easy multiple choice questions and $400$ difficult multiple choice questions. If a question is selected at random from the question bank, then the probability that it will be an easy question given that it is a multiple choice question is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{1}{2}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{5}{9}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{3}{4}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{5}{14}$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "Total multiple choice questions $= 500 + 400 = 900$.\nNumber of easy multiple choice questions $= 500$.\nTherefore, the conditional probability is:\n$$P(E \\mid M) = \\frac{n(E \\cap M)}{n(M)} = \\frac{500}{900} = \\frac{5}{9}$$",
+      "explanation": "Total multiple choice questions $= 500 + 400 = 900$.\nNumber of easy multiple choice questions $= 500$.\nTherefore, the conditional probability is:\n$$P(E \\mid M) = \\frac{n(E \\cap M)}{n(M)} = \\frac{500}{900} = \\frac{5}{9}$$"
+    },
+    {
+      "id": 63,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Let $A$ and $B$ be two events such that $P\\!\\left(\\dfrac{B}{A}\\right) = \\dfrac{2}{5}$, $P\\!\\left(\\dfrac{A}{B}\\right) = \\dfrac{1}{7}$ and $P(A \\cap B) = \\dfrac{1}{9}$. Consider:\n\n**Statement-I:** $P(A' \\cup B) = \\dfrac{5}{6}$\n\n**Statement-II:** $P(A' \\cap B') = \\dfrac{1}{18}$",
+      "options": [
+        {
+          "id": "A",
+          "text": "Both Statement-I and Statement-II are true"
+        },
+        {
+          "id": "B",
+          "text": "Both Statement-I and Statement-II are false"
+        },
+        {
+          "id": "C",
+          "text": "Only Statement-I is true"
+        },
+        {
+          "id": "D",
+          "text": "Only Statement-II is true"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "First compute $P(A)$ and $P(B)$:\n$$P(A) = \\frac{P(A \\cap B)}{P(B/A)} = \\frac{1/9}{2/5} = \\frac{5}{18}, \\qquad P(B) = \\frac{P(A \\cap B)}{P(A/B)} = \\frac{1/9}{1/7} = \\frac{7}{9}$$\nCheck **Statement-I:**\n$$P(A' \\cup B) = 1 - P(A \\cap B') = 1 - [P(A) - P(A \\cap B)] = 1 - \\frac{5}{18} + \\frac{1}{9} = \\frac{15}{18} = \\frac{5}{6} \\quad (\\text{True})$$\nCheck **Statement-II:**\n$$P(A' \\cap B') = 1 - P(A \\cup B) = 1 - \\left(\\frac{5}{18} + \\frac{7}{9} - \\frac{1}{9}\\right) = 1 - \\frac{17}{18} = \\frac{1}{18} \\quad (\\text{True})$$",
+      "explanation": "First compute $P(A)$ and $P(B)$:\n$$P(A) = \\frac{P(A \\cap B)}{P(B/A)} = \\frac{1/9}{2/5} = \\frac{5}{18}, \\qquad P(B) = \\frac{P(A \\cap B)}{P(A/B)} = \\frac{1/9}{1/7} = \\frac{7}{9}$$\nCheck **Statement-I:**\n$$P(A' \\cup B) = 1 - P(A \\cap B') = 1 - [P(A) - P(A \\cap B)] = 1 - \\frac{5}{18} + \\frac{1}{9} = \\frac{15}{18} = \\frac{5}{6} \\quad (\\text{True})$$\nCheck **Statement-II:**\n$$P(A' \\cap B') = 1 - P(A \\cup B) = 1 - \\left(\\frac{5}{18} + \\frac{7}{9} - \\frac{1}{9}\\right) = 1 - \\frac{17}{18} = \\frac{1}{18} \\quad (\\text{True})$$"
+    },
+    {
+      "id": 64,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If the numbers appeared on the two throws of a fair six-faced die are $\\alpha$ and $\\beta$, then the probability that $x^2 + \\alpha x + \\beta > 0$ for all $x \\in \\mathbb{R}$, is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{17}{36}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{4}{9}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{1}{2}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{19}{36}$"
+        }
+      ],
+      "answer": "A",
+      "hasKey": true,
+      "solution": "For $x^2 + \\alpha x + \\beta > 0$ for all $x \\in \\mathbb{R}$, the discriminant must be strictly negative: $D = \\alpha^2 - 4\\beta < 0 \\iff \\alpha^2 < 4\\beta$.\nListing valid $\\alpha \\in \\{1,2,3,4,5,6\\}$ for each $\\beta$:\n- $\\beta = 1 \\implies \\alpha^2 < 4 \\implies \\alpha \\in \\{1\\}$ ($1$ case)\n- $\\beta = 2 \\implies \\alpha^2 < 8 \\implies \\alpha \\in \\{1, 2\\}$ ($2$ cases)\n- $\\beta = 3 \\implies \\alpha^2 < 12 \\implies \\alpha \\in \\{1, 2, 3\\}$ ($3$ cases)\n- $\\beta = 4 \\implies \\alpha^2 < 16 \\implies \\alpha \\in \\{1, 2, 3\\}$ ($3$ cases)\n- $\\beta = 5 \\implies \\alpha^2 < 20 \\implies \\alpha \\in \\{1, 2, 3, 4\\}$ ($4$ cases)\n- $\\beta = 6 \\implies \\alpha^2 < 24 \\implies \\alpha \\in \\{1, 2, 3, 4\\}$ ($4$ cases)\nTotal favorable pairs $= 1 + 2 + 3 + 3 + 4 + 4 = 17$, so probability $= \\dfrac{17}{36}$.",
+      "explanation": "For $x^2 + \\alpha x + \\beta > 0$ for all $x \\in \\mathbb{R}$, the discriminant must be strictly negative: $D = \\alpha^2 - 4\\beta < 0 \\iff \\alpha^2 < 4\\beta$.\nListing valid $\\alpha \\in \\{1,2,3,4,5,6\\}$ for each $\\beta$:\n- $\\beta = 1 \\implies \\alpha^2 < 4 \\implies \\alpha \\in \\{1\\}$ ($1$ case)\n- $\\beta = 2 \\implies \\alpha^2 < 8 \\implies \\alpha \\in \\{1, 2\\}$ ($2$ cases)\n- $\\beta = 3 \\implies \\alpha^2 < 12 \\implies \\alpha \\in \\{1, 2, 3\\}$ ($3$ cases)\n- $\\beta = 4 \\implies \\alpha^2 < 16 \\implies \\alpha \\in \\{1, 2, 3\\}$ ($3$ cases)\n- $\\beta = 5 \\implies \\alpha^2 < 20 \\implies \\alpha \\in \\{1, 2, 3, 4\\}$ ($4$ cases)\n- $\\beta = 6 \\implies \\alpha^2 < 24 \\implies \\alpha \\in \\{1, 2, 3, 4\\}$ ($4$ cases)\nTotal favorable pairs $= 1 + 2 + 3 + 3 + 4 + 4 = 17$, so probability $= \\dfrac{17}{36}$."
+    },
+    {
+      "id": 65,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A box contains $2$ red, $3$ blue and $4$ black balls, $3$ balls are drawn at random from the box. $p =$ the probability for the balls to be of different colours; $q =$ the probability for $2$ balls of the same colour and the third of different colour; $r =$ the probability for all the $3$ balls to be of the same colour. Then, which of the following is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "$p > q > r$"
+        },
+        {
+          "id": "B",
+          "text": "$q > r > p$"
+        },
+        {
+          "id": "C",
+          "text": "$q > p > r$"
+        },
+        {
+          "id": "D",
+          "text": "$r > q > p$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Total ways of choosing $3$ balls out of $2 + 3 + 4 = 9$ is ${}^9\\text{C}_3 = 84$:\n- $p = \\dfrac{{}^2\\text{C}_1 \\times {}^3\\text{C}_1 \\times {}^4\\text{C}_1}{84} = \\dfrac{24}{84} = \\dfrac{2}{7}$\n- $q = \\dfrac{{}^2\\text{C}_2\\,{}^7\\text{C}_1 + {}^3\\text{C}_2\\,{}^6\\text{C}_1 + {}^4\\text{C}_2\\,{}^5\\text{C}_1}{84} = \\dfrac{7 + 18 + 30}{84} = \\dfrac{55}{84}$\n- $r = \\dfrac{{}^3\\text{C}_3 + {}^4\\text{C}_3}{84} = \\dfrac{1 + 4}{84} = \\dfrac{5}{84}$\nComparing numerators over $84$: $55 > 24 > 5$, so **$q > p > r$**.",
+      "explanation": "Total ways of choosing $3$ balls out of $2 + 3 + 4 = 9$ is ${}^9\\text{C}_3 = 84$:\n- $p = \\dfrac{{}^2\\text{C}_1 \\times {}^3\\text{C}_1 \\times {}^4\\text{C}_1}{84} = \\dfrac{24}{84} = \\dfrac{2}{7}$\n- $q = \\dfrac{{}^2\\text{C}_2\\,{}^7\\text{C}_1 + {}^3\\text{C}_2\\,{}^6\\text{C}_1 + {}^4\\text{C}_2\\,{}^5\\text{C}_1}{84} = \\dfrac{7 + 18 + 30}{84} = \\dfrac{55}{84}$\n- $r = \\dfrac{{}^3\\text{C}_3 + {}^4\\text{C}_3}{84} = \\dfrac{1 + 4}{84} = \\dfrac{5}{84}$\nComparing numerators over $84$: $55 > 24 > 5$, so **$q > p > r$**."
+    },
+    {
+      "id": 66,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "$A$ and $B$ throw a pair of dice alternately. $A$ wins the game if $A$ gets a total of $6$ and $B$ wins if $B$ gets a total of $7$. If $A$ starts the game, then the probability of winning the game by $A$ in the third throw of the pair of dice is equal to:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{3}{5}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{5}{36}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{775}{7776}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{7}{15}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Sums with a pair of dice:\n- Total $6$: $\\{(1,5),(2,4),(3,3),(4,2),(5,1)\\} \\implies P(A) = \\frac{5}{36}$, $P(\\bar{A}) = \\frac{31}{36}$.\n- Total $7$: $6$ outcomes $\\implies P(B) = \\frac{6}{36} = \\frac{1}{6}$, $P(\\bar{B}) = \\frac{5}{6}$.\nSince $A$ starts, the $3\\text{rd}$ throw of the pair of dice is $A$'s second turn ($A$ fails, $B$ fails, then $A$ succeeds):\n$$P = P(\\bar{A})\\,P(\\bar{B})\\,P(A) = \\frac{31}{36} \\times \\frac{5}{6} \\times \\frac{5}{36} = \\frac{775}{7776}$$",
+      "explanation": "Sums with a pair of dice:\n- Total $6$: $\\{(1,5),(2,4),(3,3),(4,2),(5,1)\\} \\implies P(A) = \\frac{5}{36}$, $P(\\bar{A}) = \\frac{31}{36}$.\n- Total $7$: $6$ outcomes $\\implies P(B) = \\frac{6}{36} = \\frac{1}{6}$, $P(\\bar{B}) = \\frac{5}{6}$.\nSince $A$ starts, the $3\\text{rd}$ throw of the pair of dice is $A$'s second turn ($A$ fails, $B$ fails, then $A$ succeeds):\n$$P = P(\\bar{A})\\,P(\\bar{B})\\,P(A) = \\frac{31}{36} \\times \\frac{5}{6} \\times \\frac{5}{36} = \\frac{775}{7776}$$"
+    },
+    {
+      "id": 67,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A number '$x$' is chosen at random from the set $S = \\{1, 2, 3, \\ldots, 100\\}$. Then the probability that the expression $\\dfrac{x - 15}{(x - 10)(x - 20)}$ is a positive number is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{11}{25}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{7}{25}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{21}{25}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{17}{25}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Using the wavy-curve sign method on critical points $10, 15, 20$:\n$$\\frac{x - 15}{(x - 10)(x - 20)} > 0 \\iff x \\in (10, 15) \\cup (20, \\infty)$$\nInside $S = \\{1, 2, \\ldots, 100\\}$, the favorable integer values of $x$ are:\n$$\\{11, 12, 13, 14\\} \\cup \\{21, 22, \\ldots, 100\\}$$\nTotal favorable count $= 4 + 80 = 84$.\nHence $P(E) = \\dfrac{84}{100} = \\dfrac{21}{25}$.",
+      "explanation": "Using the wavy-curve sign method on critical points $10, 15, 20$:\n$$\\frac{x - 15}{(x - 10)(x - 20)} > 0 \\iff x \\in (10, 15) \\cup (20, \\infty)$$\nInside $S = \\{1, 2, \\ldots, 100\\}$, the favorable integer values of $x$ are:\n$$\\{11, 12, 13, 14\\} \\cup \\{21, 22, \\ldots, 100\\}$$\nTotal favorable count $= 4 + 80 = 84$.\nHence $P(E) = \\dfrac{84}{100} = \\dfrac{21}{25}$."
+    },
+    {
+      "id": 68,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If $A$ and $B$ are two events such that $P(A) = \\dfrac{4}{7}$, $P(A \\cap B) = \\dfrac{3}{28}$ and the conditional probability $P\\!\\left(\\dfrac{A}{A^c \\cup B^c}\\right)$ (where $A^c$ denotes the complement of the event $A$) is equal to $\\lambda$, then the value of $\\dfrac{26}{\\lambda}$ is equal to:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$100$"
+        },
+        {
+          "id": "B",
+          "text": "$50$"
+        },
+        {
+          "id": "C",
+          "text": "$75$"
+        },
+        {
+          "id": "D",
+          "text": "$42$"
+        }
+      ],
+      "answer": "B",
+      "hasKey": true,
+      "solution": "By De Morgan's law, $A^c \\cup B^c = (A \\cap B)^c$. Thus:\n$$\\lambda = P\\!\\left(\\frac{A}{A^c \\cup B^c}\\right) = \\frac{P(A \\cap (A \\cap B)^c)}{P((A \\cap B)^c)} = \\frac{P(A) - P(A \\cap B)}{1 - P(A \\cap B)}$$\nSubstituting the given values:\n$$\\lambda = \\frac{\\frac{4}{7} - \\frac{3}{28}}{1 - \\frac{3}{28}} = \\frac{\\frac{13}{28}}{\\frac{25}{28}} = \\frac{13}{25}$$\nTherefore $\\dfrac{26}{\\lambda} = 26 \\times \\dfrac{25}{13} = 50$.",
+      "explanation": "By De Morgan's law, $A^c \\cup B^c = (A \\cap B)^c$. Thus:\n$$\\lambda = P\\!\\left(\\frac{A}{A^c \\cup B^c}\\right) = \\frac{P(A \\cap (A \\cap B)^c)}{P((A \\cap B)^c)} = \\frac{P(A) - P(A \\cap B)}{1 - P(A \\cap B)}$$\nSubstituting the given values:\n$$\\lambda = \\frac{\\frac{4}{7} - \\frac{3}{28}}{1 - \\frac{3}{28}} = \\frac{\\frac{13}{28}}{\\frac{25}{28}} = \\frac{13}{25}$$\nTherefore $\\dfrac{26}{\\lambda} = 26 \\times \\dfrac{25}{13} = 50$."
+    },
+    {
+      "id": 69,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "For three events $A$, $B$ and $C$, $P(\\text{Exactly one of } A \\text{ or } B \\text{ occurs}) = P(\\text{Exactly one of } B \\text{ or } C \\text{ occurs}) = P(\\text{Exactly one of } C \\text{ or } A \\text{ occurs}) = \\dfrac{1}{4}$ and $P(\\text{All the three events occur simultaneously}) = \\dfrac{1}{16}$. Then the probability that at least one of the events occurs, is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{3}{16}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{7}{32}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{7}{16}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{7}{64}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "Writing the three given equations:\n$$P(A) + P(B) - 2P(A \\cap B) = \\frac{1}{4}$$\n$$P(B) + P(C) - 2P(B \\cap C) = \\frac{1}{4}$$\n$$P(C) + P(A) - 2P(C \\cap A) = \\frac{1}{4}$$\nAdding all three and dividing by $2$:\n$$P(A) + P(B) + P(C) - P(A \\cap B) - P(B \\cap C) - P(C \\cap A) = \\frac{3}{8}$$\nBy the Inclusion–Exclusion principle:\n$$P(A \\cup B \\cup C) = \\sum P(A) - \\sum P(A \\cap B) + P(A \\cap B \\cap C) = \\frac{3}{8} + \\frac{1}{16} = \\frac{7}{16}$$",
+      "explanation": "Writing the three given equations:\n$$P(A) + P(B) - 2P(A \\cap B) = \\frac{1}{4}$$\n$$P(B) + P(C) - 2P(B \\cap C) = \\frac{1}{4}$$\n$$P(C) + P(A) - 2P(C \\cap A) = \\frac{1}{4}$$\nAdding all three and dividing by $2$:\n$$P(A) + P(B) + P(C) - P(A \\cap B) - P(B \\cap C) - P(C \\cap A) = \\frac{3}{8}$$\nBy the Inclusion–Exclusion principle:\n$$P(A \\cup B \\cup C) = \\sum P(A) - \\sum P(A \\cap B) + P(A \\cap B \\cap C) = \\frac{3}{8} + \\frac{1}{16} = \\frac{7}{16}$$"
+    },
+    {
+      "id": 70,
+      "subject": "Mathematics",
+      "section": "Section A: Single Correct (20 Qs)",
+      "type": "single_correct",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Two distinct numbers $a$ and $b$ are selected at random from $1, 2, 3, \\ldots, 50$. The probability that their product is divisible by $3$, is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "$\\dfrac{272}{1225}$"
+        },
+        {
+          "id": "B",
+          "text": "$\\dfrac{561}{1225}$"
+        },
+        {
+          "id": "C",
+          "text": "$\\dfrac{664}{1225}$"
+        },
+        {
+          "id": "D",
+          "text": "$\\dfrac{8}{25}$"
+        }
+      ],
+      "answer": "C",
+      "hasKey": true,
+      "solution": "In $\\{1, 2, \\ldots, 50\\}$, multiples of $3$ are $\\{3, 6, \\ldots, 48\\}$ ($16$ numbers), and non-multiples of $3$ are $50 - 16 = 34$ numbers.\nTotal pairs of distinct numbers $= {}^{50}\\text{C}_2 = 1225$.\nThe product $ab$ is divisible by $3$ iff at least one of $a$ or $b$ is divisible by $3$:\n$$P(3 \\mid ab) = 1 - \\frac{{}^{34}\\text{C}_2}{{}^{50}\\text{C}_2} = 1 - \\frac{561}{1225} = \\frac{664}{1225}$$",
+      "explanation": "In $\\{1, 2, \\ldots, 50\\}$, multiples of $3$ are $\\{3, 6, \\ldots, 48\\}$ ($16$ numbers), and non-multiples of $3$ are $50 - 16 = 34$ numbers.\nTotal pairs of distinct numbers $= {}^{50}\\text{C}_2 = 1225$.\nThe product $ab$ is divisible by $3$ iff at least one of $a$ or $b$ is divisible by $3$:\n$$P(3 \\mid ab) = 1 - \\frac{{}^{34}\\text{C}_2}{{}^{50}\\text{C}_2} = 1 - \\frac{561}{1225} = \\frac{664}{1225}$$"
+    },
+    {
+      "id": 71,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Five numbers $x_1, x_2, x_3, x_4, x_5$ are randomly selected from the numbers $1, 2, 3, \\ldots, 18$ and are arranged in increasing order ($x_1 < x_2 < x_3 < x_4 < x_5$). The probability that $x_2 = 7$ and $x_4 = 11$ is $P$, then the value of $340P$ is equal to:",
+      "answer": "5",
+      "hasKey": true,
+      "solution": "Any $5$-element subset has a unique strictly increasing ordering, so $n(S) = {}^{18}\\text{C}_5 = 8568$.\nFixing $x_2 = 7$ and $x_4 = 11$, we must choose:\n- $x_1 \\in \\{1, 2, \\ldots, 6\\}$ in ${}^6\\text{C}_1 = 6$ ways,\n- $x_3 \\in \\{8, 9, 10\\}$ in ${}^3\\text{C}_1 = 3$ ways,\n- $x_5 \\in \\{12, 13, \\ldots, 18\\}$ in ${}^7\\text{C}_1 = 7$ ways.\nThus $n(E) = 6 \\times 3 \\times 7 = 126$, and:\n$$P = \\frac{126}{8568} = \\frac{1}{68} \\implies 340P = \\frac{340}{68} = 5$$",
+      "explanation": "Any $5$-element subset has a unique strictly increasing ordering, so $n(S) = {}^{18}\\text{C}_5 = 8568$.\nFixing $x_2 = 7$ and $x_4 = 11$, we must choose:\n- $x_1 \\in \\{1, 2, \\ldots, 6\\}$ in ${}^6\\text{C}_1 = 6$ ways,\n- $x_3 \\in \\{8, 9, 10\\}$ in ${}^3\\text{C}_1 = 3$ ways,\n- $x_5 \\in \\{12, 13, \\ldots, 18\\}$ in ${}^7\\text{C}_1 = 7$ ways.\nThus $n(E) = 6 \\times 3 \\times 7 = 126$, and:\n$$P = \\frac{126}{8568} = \\frac{1}{68} \\implies 340P = \\frac{340}{68} = 5$$"
+    },
+    {
+      "id": 72,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "If the probability that a number selected from the set $\\{1, 2, 3, \\ldots, 1000\\}$ is divisible by $3$, but neither divisible by $5$ nor by $7$ is $\\dfrac{m}{n}$, then $n - m = $ ____ (where $m$ and $n$ are relatively prime numbers).",
+      "answer": "771",
+      "hasKey": true,
+      "solution": "In $\\{1, 2, \\ldots, 1000\\}$, let $C, A, B$ be the subsets of integers divisible by $3, 5, 7$ respectively:\n- $|C| = \\lfloor 1000/3 \\rfloor = 333$\n- $|C \\cap A| = \\lfloor 1000/15 \\rfloor = 66$\n- $|C \\cap B| = \\lfloor 1000/21 \\rfloor = 47$\n- $|C \\cap A \\cap B| = \\lfloor 1000/105 \\rfloor = 9$\nBy Inclusion–Exclusion:\n$$n(\\bar{A} \\cap \\bar{B} \\cap C) = |C| - |C \\cap (A \\cup B)| = 333 - (66 + 47 - 9) = 333 - 104 = 229$$\nThus $\\frac{m}{n} = \\frac{229}{1000}$ (note $229$ is prime and coprime to $1000$). Hence $n - m = 1000 - 229 = 771$.",
+      "explanation": "In $\\{1, 2, \\ldots, 1000\\}$, let $C, A, B$ be the subsets of integers divisible by $3, 5, 7$ respectively:\n- $|C| = \\lfloor 1000/3 \\rfloor = 333$\n- $|C \\cap A| = \\lfloor 1000/15 \\rfloor = 66$\n- $|C \\cap B| = \\lfloor 1000/21 \\rfloor = 47$\n- $|C \\cap A \\cap B| = \\lfloor 1000/105 \\rfloor = 9$\nBy Inclusion–Exclusion:\n$$n(\\bar{A} \\cap \\bar{B} \\cap C) = |C| - |C \\cap (A \\cup B)| = 333 - (66 + 47 - 9) = 333 - 104 = 229$$\nThus $\\frac{m}{n} = \\frac{229}{1000}$ (note $229$ is prime and coprime to $1000$). Hence $n - m = 1000 - 229 = 771$.",
+      "solutionImages": [
+        "/images/ptm05/sol_q72.png"
+      ]
+    },
+    {
+      "id": 73,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A die is weighted such that the probability of rolling the face numbered $n$ is proportional to $n^2$ ($n = 1, 2, 3, 4, 5, 6$). If the probability of getting an odd number when such a die is thrown can be expressed in lowest rational form as $\\dfrac{p}{q}$, then the value of $(q - p)$ is equal to:",
+      "answer": "8",
+      "hasKey": true,
+      "solution": "Let $P(n) = \\lambda n^2$. Since $\\sum_{n=1}^{6} P(n) = 1$:\n$$\\lambda(1^2 + 2^2 + 3^2 + 4^2 + 5^2 + 6^2) = 91\\lambda = 1 \\implies \\lambda = \\frac{1}{91}$$\nProbability of rolling an odd number ($n \\in \\{1, 3, 5\\}$):\n$$\\frac{p}{q} = P(1) + P(3) + P(5) = \\frac{1 + 9 + 25}{91} = \\frac{35}{91} = \\frac{5}{13}$$\nTherefore $p = 5, \\; q = 13$, giving $q - p = 13 - 5 = 8$.",
+      "explanation": "Let $P(n) = \\lambda n^2$. Since $\\sum_{n=1}^{6} P(n) = 1$:\n$$\\lambda(1^2 + 2^2 + 3^2 + 4^2 + 5^2 + 6^2) = 91\\lambda = 1 \\implies \\lambda = \\frac{1}{91}$$\nProbability of rolling an odd number ($n \\in \\{1, 3, 5\\}$):\n$$\\frac{p}{q} = P(1) + P(3) + P(5) = \\frac{1 + 9 + 25}{91} = \\frac{35}{91} = \\frac{5}{13}$$\nTherefore $p = 5, \\; q = 13$, giving $q - p = 13 - 5 = 8$."
+    },
+    {
+      "id": 74,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "Six dice are thrown simultaneously. Then, the probability that at least two of them have different faces is $\\dfrac{N}{6^5}$. The sum of digits of $N$ is:",
+      "answer": "26",
+      "hasKey": true,
+      "solution": "The complementary event is that **all six dice show the exact same face**, which occurs in ${}^6\\text{C}_1 = 6$ ways out of $6^6$ equally likely throws:\n$$P = 1 - \\frac{6}{6^6} = 1 - \\frac{1}{6^5} = \\frac{6^5 - 1}{6^5} = \\frac{7776 - 1}{6^5} = \\frac{7775}{6^5}$$\nComparing with $\\frac{N}{6^5}$, we obtain $N = 7775$, and the sum of its digits is $7 + 7 + 7 + 5 = 26$.",
+      "explanation": "The complementary event is that **all six dice show the exact same face**, which occurs in ${}^6\\text{C}_1 = 6$ ways out of $6^6$ equally likely throws:\n$$P = 1 - \\frac{6}{6^6} = 1 - \\frac{1}{6^5} = \\frac{6^5 - 1}{6^5} = \\frac{7776 - 1}{6^5} = \\frac{7775}{6^5}$$\nComparing with $\\frac{N}{6^5}$, we obtain $N = 7775$, and the sum of its digits is $7 + 7 + 7 + 5 = 26$."
+    },
+    {
+      "id": 75,
+      "subject": "Mathematics",
+      "section": "Section B: Numerical Value (5 Qs)",
+      "type": "numerical",
+      "marking": {
+        "positive": 4,
+        "negative": 1
+      },
+      "question": "A card from a pack of $52$ cards is lost. From the remaining $51$ cards, $n$ cards are drawn and are found to be spades. If the probability of the lost card to be a spade is $\\dfrac{11}{50}$, then $n$ is equal to:",
+      "answer": "2",
+      "hasKey": true,
+      "solution": "After $n$ cards drawn from the remaining $51$ are observed to be spades, the conditional distribution of the $52 - n$ remaining cards (of which the lost card is symmetrically one) contains $13 - n$ spades.\n(Equivalently, by Bayes' theorem over the hypothesis $L_S$ = lost card is a spade vs $L_{NS}$ = lost card is not a spade):\n$$P(L_S \\mid n\\text{ spades drawn}) = \\frac{13 - n}{52 - n} = \\frac{11}{50}$$\nCross-multiplying gives $50(13 - n) = 11(52 - n) \\implies 650 - 50n = 572 - 11n \\implies 39n = 78 \\implies n = 2$.",
+      "explanation": "After $n$ cards drawn from the remaining $51$ are observed to be spades, the conditional distribution of the $52 - n$ remaining cards (of which the lost card is symmetrically one) contains $13 - n$ spades.\n(Equivalently, by Bayes' theorem over the hypothesis $L_S$ = lost card is a spade vs $L_{NS}$ = lost card is not a spade):\n$$P(L_S \\mid n\\text{ spades drawn}) = \\frac{13 - n}{52 - n} = \\frac{11}{50}$$\nCross-multiplying gives $50(13 - n) = 11(52 - n) \\implies 650 - 50n = 572 - 11n \\implies 39n = 78 \\implies n = 2$."
+    }
+  ]
+}

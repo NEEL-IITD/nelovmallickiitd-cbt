@@ -54,6 +54,11 @@ const SCHEDULED_TEST_LOCKS = [
     unlockAtMs: Date.parse('2026-12-02T09:00:00+05:30'),
     label: 'PTM 04 unlocks Wed, Dec 2, 2026 at 9:00 AM IST',
   },
+  {
+    pattern: /(?:^|\/)(?:ptm-?0?5\.(?:js|json))$/i,
+    unlockAtMs: Date.parse('2026-12-06T09:00:00+05:30'),
+    label: 'PTM 05 unlocks Sun, Dec 6, 2026 at 9:00 AM IST',
+  },
 ];
 
 // Sensitive paths/files that must NEVER be served by the web server

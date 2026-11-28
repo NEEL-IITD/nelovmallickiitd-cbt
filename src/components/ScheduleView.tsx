@@ -94,11 +94,12 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     jeeMainsTests.forEach((t: TestMetadata) => {
       map[t.id] = t.status;
     });
-    // PTM 01, PTM 02, PTM 03, and PTM 04 have 75 questions verified and are live
+    // PTM 01–05 have 75 questions verified and are live
     map['jee-mains-ptm-01'] = 'live';
     map['jee-mains-ptm-02'] = 'live';
     map['jee-mains-ptm-03'] = 'live';
     map['jee-mains-ptm-04'] = 'live';
+    map['jee-mains-ptm-05'] = 'live';
     return map;
   }, []);
 
@@ -138,7 +139,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
 
   // Check if test has questions and is ready to attempt
   const isTestReady = (testId: string) => {
-    return testId === 'jee-mains-ptm-01' || testId === 'jee-mains-ptm-02' || testId === 'jee-mains-ptm-03' || testId === 'jee-mains-ptm-04' || liveStatusMap[testId] === 'live';
+    return testId === 'jee-mains-ptm-01' || testId === 'jee-mains-ptm-02' || testId === 'jee-mains-ptm-03' || testId === 'jee-mains-ptm-04' || testId === 'jee-mains-ptm-05' || liveStatusMap[testId] === 'live';
   };
 
   // Reactive attempt history refresh listener
@@ -907,7 +908,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                           Physics Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-sky-800/80 dark:text-sky-400">
-                          {previewItem.code === 'PTM 04' ? 'Electrostatics, Capacitors & Current Electricity Focus' : (previewItem.code === 'PTM 03' ? 'Thermal Properties of Matter & Heat Transfer Focus' : (previewItem.code === 'PTM 02' ? 'Thermal Physics & Heat Transfer Focus' : (previewItem.code === 'PTM 01' ? 'Thermodynamics & Kinetic Theory Focus' : 'Standard JEE Mains Pattern')))}
+                          {previewItem.code === 'PTM 05' ? 'Moving Charges & Magnetism and Magnetism & Matter Focus' : (previewItem.code === 'PTM 04' ? 'Electrostatics, Capacitors & Current Electricity Focus' : (previewItem.code === 'PTM 03' ? 'Thermal Properties of Matter & Heat Transfer Focus' : (previewItem.code === 'PTM 02' ? 'Thermal Physics & Heat Transfer Focus' : (previewItem.code === 'PTM 01' ? 'Thermodynamics & Kinetic Theory Focus' : 'Standard JEE Mains Pattern'))))}
                         </p>
                       </div>
                     </div>
@@ -939,7 +940,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                           Chemistry Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-emerald-800/80 dark:text-emerald-400">
-                          {previewItem.code === 'PTM 04' ? 'Alcohols, Phenols, Ethers, Aldehydes & Stereochemistry Focus' : (previewItem.code === 'PTM 03' ? 'Haloalkanes & Haloarenes, Grignard Reagents & Polymers Focus' : (previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern')))}
+                          {previewItem.code === 'PTM 05' ? 'Aldehydes, Ketones, Carboxylic Acids & Derivatives Focus' : (previewItem.code === 'PTM 04' ? 'Alcohols, Phenols, Ethers, Aldehydes & Stereochemistry Focus' : (previewItem.code === 'PTM 03' ? 'Haloalkanes & Haloarenes, Grignard Reagents & Polymers Focus' : (previewItem.code === 'PTM 02' ? 'General Organic Chemistry & Isomerism Focus' : (previewItem.code === 'PTM 01' ? 'Organic Chemistry Foundations & Hydrocarbons' : 'Standard JEE Mains Pattern'))))}
                         </p>
                       </div>
                     </div>
@@ -971,7 +972,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                           Mathematics Syllabus (25 Questions · 100 Marks)
                         </h4>
                         <p className="text-[11px] text-purple-800/80 dark:text-purple-400">
-                          {previewItem.code === 'PTM 04' ? 'Permutations, Combinations, Matrices & Number Counting Focus' : (previewItem.code === 'PTM 03' ? 'Matrices, Determinants & System of Linear Equations Focus' : (previewItem.code === 'PTM 02' ? 'Quadratic Equations, Inequalities & Sequences Focus' : (previewItem.code === 'PTM 01' ? 'Trigonometry & Functional Relations' : 'Standard JEE Mains Pattern')))}
+                          {previewItem.code === 'PTM 05' ? "Probability, Conditional Probability & Bayes' Theorem Focus" : (previewItem.code === 'PTM 04' ? 'Permutations, Combinations, Matrices & Number Counting Focus' : (previewItem.code === 'PTM 03' ? 'Matrices, Determinants & System of Linear Equations Focus' : (previewItem.code === 'PTM 02' ? 'Quadratic Equations, Inequalities & Sequences Focus' : (previewItem.code === 'PTM 01' ? 'Trigonometry & Functional Relations' : 'Standard JEE Mains Pattern'))))}
                         </p>
                       </div>
                     </div>
